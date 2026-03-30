@@ -97,16 +97,30 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
     return (
       <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px', width: '100%' }}>
         <div className="home-layout-grid">
-          <div className="masonry-grid" id="skeletonContainer">
-            {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="skeleton-card masonry-grid-item" style={{ 
-                background: 'var(--surface-color)', borderRadius: '20px', padding: '18px'
-              }}>
-                <div className="skeleton" style={{ height: '200px', borderRadius: '20px 20px 0 0', marginBottom: '15px' }}></div>
-                <div className="skeleton" style={{ height: '20px', width: '60%', marginBottom: '10px' }}></div>
-                <div className="skeleton" style={{ height: '100px', width: '100%' }}></div>
-              </div>
-            ))}
+          <div className="masonry-grid-react" id="skeletonContainer" style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+            {(() => {
+              const items = [1, 2, 3, 4, 5, 6];
+              const cols = isMobile ? 2 : 3;
+              const columns = Array.from({ length: cols }, () => []);
+              
+              items.forEach((item, index) => {
+                columns[index % cols].push(
+                  <div key={item} className="skeleton-card masonry-grid-item" style={{ 
+                    background: 'var(--surface-color)', borderRadius: '20px', padding: '18px', marginBottom: 0
+                  }}>
+                    <div className="skeleton" style={{ height: '200px', borderRadius: '20px 20px 0 0', marginBottom: '15px' }}></div>
+                    <div className="skeleton" style={{ height: '20px', width: '60%', marginBottom: '10px' }}></div>
+                    <div className="skeleton" style={{ height: '100px', width: '100%' }}></div>
+                  </div>
+                );
+              });
+
+              return columns.map((colItems, i) => (
+                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '25px', minWidth: 0 }}>
+                  {colItems}
+                </div>
+              ));
+            })()}
           </div>
           <div className="social-sidebar skeleton" style={{ height: '500px', borderRadius: '32px' }}></div>
         </div>
@@ -176,24 +190,39 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
             </div>
           </div>
 
-          <div className="masonry-grid">
-            {filteredPrompts.slice(0, visibleCount).map(p => (
-              <PromptCard 
-                key={p.prompt_key || p.id} 
-                prompt={p} 
-                user={user}
-                isLiked={!!likes[p.prompt_key || p.id]} 
-                onLikeToggle={toggleLike}
-                isUnlocked={activeUnlockedKey === (p.prompt_key || p.id)}
-                onUnlock={() => setActiveUnlockedKey(p.prompt_key || p.id)}
-                onLock={() => setActiveUnlockedKey(null)}
-                isHighlighted={search.trim() !== '' && (
-                  p.prompt_key?.toLowerCase() === search.trim().toLowerCase() ||
-                  (search.trim().length >= 3 && p.prompt_key?.toLowerCase().includes(search.trim().toLowerCase()))
-                )}
-                searchTerm={search}
-              />
-            ))}
+          <div className="masonry-grid-react" style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+            {(() => {
+              const items = filteredPrompts.slice(0, visibleCount);
+              const cols = isMobile ? 2 : 3;
+              const columns = Array.from({ length: cols }, () => []);
+              
+              items.forEach((p, index) => {
+                columns[index % cols].push(
+                  <div key={p.prompt_key || p.id} style={{ marginBottom: 0 }}>
+                    <PromptCard 
+                      prompt={p} 
+                      user={user}
+                      isLiked={!!likes[p.prompt_key || p.id]} 
+                      onLikeToggle={toggleLike}
+                      isUnlocked={activeUnlockedKey === (p.prompt_key || p.id)}
+                      onUnlock={() => setActiveUnlockedKey(p.prompt_key || p.id)}
+                      onLock={() => setActiveUnlockedKey(null)}
+                      isHighlighted={search.trim() !== '' && (
+                        p.prompt_key?.toLowerCase() === search.trim().toLowerCase() ||
+                        (search.trim().length >= 3 && p.prompt_key?.toLowerCase().includes(search.trim().toLowerCase()))
+                      )}
+                      searchTerm={search}
+                    />
+                  </div>
+                );
+              });
+
+              return columns.map((colItems, i) => (
+                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '25px', minWidth: 0 }}>
+                  {colItems}
+                </div>
+              ));
+            })()}
           </div>
 
           {filteredPrompts.length > visibleCount && (
