@@ -37,7 +37,7 @@ if ($is_user_logged_in || true) {
 }
 
 $site_logo_files = glob("logo.*");
-$main_site_logo = (!empty($site_logo_files)) ? $site_logo_files[0] . '?v=' . time() : '';
+$main_site_logo = (!empty($site_logo_files)) ? $site_logo_files[0] . '?v=' . filemtime($site_logo_files[0]) : '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,8 +51,13 @@ $main_site_logo = (!empty($site_logo_files)) ? $site_logo_files[0] . '?v=' . tim
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://www.gstatic.com">
 
+    <?php if (!empty($main_site_logo)): ?>
+    <link rel="preload" as="image" href="<?php echo $main_site_logo; ?>" fetchpriority="high">
+    <?php endif; ?>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=JetBrains+Mono&display=swap">
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet" media="all">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
 
     <script type="module">
@@ -109,7 +114,7 @@ $main_site_logo = (!empty($site_logo_files)) ? $site_logo_files[0] . '?v=' . tim
         header { background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); padding: 15px 20px; position: sticky; top: 0; z-index: 1000; }
         .nav-wrapper { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
         .logo { display: flex; align-items: center; justify-content: center; }
-        .logo img { width: <?php echo htmlspecialchars($logo_width); ?>px; height: auto; max-height: 80px; object-fit: contain; transition: 0.3s; }
+        .logo img { width: <?php echo htmlspecialchars($logo_width); ?>px; height: auto; aspect-ratio: auto; max-height: 80px; object-fit: contain; transition: 0.3s; content-visibility: auto; }
         
         @media (max-width: 767px) { .nav-wrapper { justify-content: center; } }
         

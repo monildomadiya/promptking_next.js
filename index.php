@@ -72,20 +72,26 @@ if ($ad_res && $ad_res->num_rows > 0) { $adsense_home = $ad_res->fetch_assoc()['
                 if(strpos($ai_type_lower, 'gemini') !== false) $badgeClass = 'gemini';
                 if(strpos($ai_type_lower, 'midjourney') !== false) $badgeClass = 'midjourney';
 
+                $is_lcp = ($result->num_rows - $result->num_rows) < 2; // Rough way to catch first 2 in loop without a counter if needed, but I'll use a counter.
+                
+                // I'll actually use a counter variable.
+                $card_num = isset($card_num) ? $card_num + 1 : 1;
+                $priority_attr = ($card_num <= 2) ? 'fetchpriority="high"' : 'loading="lazy"';
+
                 echo '<div class="pro-card" data-category="'.$ai_type_lower.'" data-liked="'.$liked_status.'">';
                 
                 $ratio = $row['image_ratio'] ? $row['image_ratio'] : '16/9';
                 if ($row['is_image_slider'] && $row['img_before'] && $row['img_after']) {
                     echo '
                     <div class="slider-container" style="aspect-ratio: '.$ratio.';">
-                        <img src="'.htmlspecialchars($row['img_after']).'" loading="lazy" style="z-index: 1;">
-                        <img src="'.htmlspecialchars($row['img_before']).'" class="img-before" id="before-'.$key.'" loading="lazy" style="z-index: 2;">
+                        <img src="'.htmlspecialchars($row['img_after']).'" '.$priority_attr.' style="z-index: 1;">
+                        <img src="'.htmlspecialchars($row['img_before']).'" class="img-before" id="before-'.$key.'" '.$priority_attr.' style="z-index: 2;">
                         <div class="slider-handle-wrapper" id="line-'.$key.'"><div class="slider-handle-pill">◀ ▶</div></div>
                         <input type="range" class="slider-handle" min="0" max="100" value="50" oninput="updateSlider(\''.$key.'\', this.value)">
                     </div>';
                 } elseif ($row['img_after']) {
                     echo '<div style="width: calc(100% + 36px); margin: -18px -18px 15px -18px; position: relative; aspect-ratio: '.$ratio.'; background: #1a1a1a;">
-                        <img src="'.htmlspecialchars($row['img_after']).'" style="width: 100%; height: 100%; object-fit: cover; border-radius: 20px 20px 0 0;" loading="lazy">
+                        <img src="'.htmlspecialchars($row['img_after']).'" style="width: 100%; height: 100%; object-fit: cover; border-radius: 20px 20px 0 0;" '.$priority_attr.'>
                     </div>';
                 }
 
