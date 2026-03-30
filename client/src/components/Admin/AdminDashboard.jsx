@@ -241,15 +241,46 @@ const BrandingPanel = ({ onSave }) => {
           </div>
           <div style={{ position: 'relative' }}>
              <input 
-               type="text" 
-               className="glass-input" 
-               placeholder="Paste logo URL here..."
-               value={settings.logo_url || ''}
-               onChange={(e) => setSettings({ ...settings, logo_url: e.target.value })}
-               style={{ width: '100%', padding: '14px', borderRadius: '12px', fontWeight: 500, fontSize: '0.9rem', color: 'white', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }}
+               type="file" 
+               id="logo-upload"
+               accept="image/*"
+               style={{ display: 'none' }}
+               onChange={async (e) => {
+                 if (e.target.files && e.target.files[0]) {
+                   const formData = new FormData();
+                   formData.append('logo', e.target.files[0]);
+                   try {
+                     const res = await api.post('/admin/upload_logo', formData);
+                     if (res.data.status === 'success') {
+                       setSettings({ ...settings, logo_url: res.data.logoUrl });
+                       alert("Logo uploaded successfully!");
+                     }
+                   } catch (err) {
+                     console.error(err);
+                     alert("Failed to upload logo.");
+                   }
+                 }
+               }}
              />
+             <button 
+               onClick={() => document.getElementById('logo-upload').click()}
+               className="glass-button-secondary"
+               style={{ 
+                 width: '100%', 
+                 padding: '14px', 
+                 borderRadius: '12px', 
+                 fontWeight: 800, 
+                 fontSize: '0.9rem', 
+                 color: 'var(--accent-main)',
+                 background: 'rgba(229, 9, 20, 0.05)',
+                 border: '1px solid rgba(229, 9, 20, 0.2)',
+                 cursor: 'pointer'
+               }}
+             >
+               Choose Logo File
+             </button>
           </div>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>SVG or PNG with transparency recommended.</p>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>SVG, PNG or WEBP recommended.</p>
         </div>
 
         {/* Dimension Settings Card */}
@@ -703,8 +734,8 @@ const AdminDashboard = () => {
             </motion.div>
           )}
 
-          {view === 'settings-branding' && <SocialPanel key="social" onSave={() => fetchData('settings')} />}
-          {view === 'settings-social' && <BrandingPanel key="branding" onSave={() => fetchData('settings')} />}
+          {view === 'settings-branding' && <BrandingPanel key="branding" onSave={() => fetchData('settings')} />}
+          {view === 'settings-social' && <SocialPanel key="social" onSave={() => fetchData('settings')} />}
           {view === 'settings-ads' && <AdsPanel key="ads" onSave={() => fetchData('settings')} />}
           {view === 'settings-layout' && <LayoutPanel key="layout" />}
 
