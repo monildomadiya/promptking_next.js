@@ -354,24 +354,7 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
               )}
 
                 {/* Admin Link */}
-                {isAdmin && (
-                  <Link 
-                    to="/admin" 
-                    title="Admin Panel"
-                    className="pro-card-hover"
-                    style={{ 
-                      width: '42px', height: '42px', borderRadius: '50%', 
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                      background: 'rgba(59, 130, 246, 0.15)',
-                      border: '1px solid rgba(59, 130, 246, 0.3)',
-                      color: '#3B82F6',
-                      transition: '0.3s',
-                      backdropFilter: 'blur(10px)'
-                    }}
-                  >
-                    <Shield size={20} fill="rgba(59, 130, 246, 0.2)" />
-                  </Link>
-                )}
+
 
                 {/* User Actions */}
                 <nav style={{ display: 'flex', alignItems: 'center' }}>
