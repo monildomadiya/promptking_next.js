@@ -11,7 +11,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     description: '',
     ai_type: 'ChatGPT',
     password: '',
-    is_premium: true,
+    is_premium: false,
     image_ratio: '4 / 5'
   });
   const [originalKey, setOriginalKey] = useState(null);
@@ -24,7 +24,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
         ...prompt,
         hide_prompt_box: Boolean(prompt.hide_prompt_box),
         is_image_slider: Boolean(prompt.is_image_slider),
-        is_premium: prompt.is_premium !== undefined ? Boolean(prompt.is_premium) : true,
+        is_premium: prompt.is_premium !== undefined ? Boolean(prompt.is_premium) : (prompt.isPremium !== undefined ? Boolean(prompt.isPremium) : false),
         description: prompt.description || ''
       });
       setOriginalKey(prompt.prompt_key);

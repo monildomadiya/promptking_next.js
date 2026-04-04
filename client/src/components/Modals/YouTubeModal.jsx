@@ -18,6 +18,8 @@ const YouTubeModal = ({ isOpen, onClose, videoUrl }) => {
 
   // Extract embed info from YouTube or Instagram
   const getEmbedInfo = (url) => {
+    if (!url) return null;
+
     if (url.includes('instagram.com')) {
       const match = url.match(/(?:reel|reels)\/([A-Za-z0-9_-]+)/);
       if (match) {
@@ -28,17 +30,20 @@ const YouTubeModal = ({ isOpen, onClose, videoUrl }) => {
       }
     }
     
+    // Improved YouTube Pattern Detection
     const ytPatterns = [
-      /\/shorts\/([A-Za-z0-9_-]+)/,
+      /(?:youtube\.com\/shorts\/|youtu\.be\/|youtube\.com\/watch\?v=)([A-Za-z0-9_-]{11})/,
+      /youtube\.com\/shorts\/([A-Za-z0-9_-]+)/,
       /youtu\.be\/([A-Za-z0-9_-]+)/,
       /[?&]v=([A-Za-z0-9_-]+)/
     ];
+
     for (const pattern of ytPatterns) {
       const match = url.match(pattern);
-      if (match) {
+      if (match && match[1]) {
         return {
           type: 'youtube',
-          embedUrl: `https://www.youtube.com/embed/${match[1]}?autoplay=1`
+          embedUrl: `https://www.youtube.com/embed/${match[1]}?autoplay=1&rel=0&mute=1&playsinline=1&enablejsapi=1`
         };
       }
     }

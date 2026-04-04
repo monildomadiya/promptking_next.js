@@ -8,6 +8,7 @@ import { Search, Crown, Grid, MessageSquare, Sparkles, Image, Zap, Heart, Filter
 
 const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) => {
   const [prompts, setPrompts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [likes, setLikes] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeUnlockedKey, setActiveUnlockedKey] = useState(null);
@@ -49,6 +50,7 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
       const response = await api.get('/get_data');
       setPrompts(response.data.prompts);
       setLikes(response.data.likes);
+      setCategories(response.data.categories || []);
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch prompts", error);
@@ -138,59 +140,79 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
         {/* Main Grid Content */}
         <div className="grid-main-area">
           {/* Category Filter Toggle - Smoothly hidden during search on mobile to prevent layout jumps */}
-          <div className="category-filter-wrapper" style={{ 
-            marginBottom: (isMobile && search.trim() !== '') ? '0' : '20px',
+          {/* Premium Horizontal Category Bar */}
+          <div className="horizontal-category-bar" style={{ 
+            marginBottom: '25px',
             display: 'flex', 
-            justifyContent: 'flex-end', 
-            alignItems: 'center',
-            position: 'relative',
-            height: (isMobile && search.trim() !== '') ? '0' : '45px',
-            opacity: (isMobile && search.trim() !== '') ? 0 : 1,
-            pointerEvents: (isMobile && search.trim() !== '') ? 'none' : 'auto',
-            overflow: 'hidden',
-            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+            overflowX: 'auto',
+            gap: '12px',
+            padding: '5px 5px 15px 5px',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch',
+            maskImage: isMobile ? 'linear-gradient(to right, black 85%, transparent)' : 'none'
           }}>
-              <div style={{ position: 'relative' }} ref={dropdownRef}>
+            <button 
+              onClick={() => setFilter('all')}
+              style={{
+                background: filter === 'all' ? 'var(--accent-main)' : 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid',
+                borderColor: filter === 'all' ? 'var(--accent-main)' : 'rgba(255, 255, 255, 0.1)',
+                color: 'white',
+                padding: '12px 24px',
+                borderRadius: '50px',
+                fontSize: '0.9rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                whiteSpace: 'nowrap',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: filter === 'all' ? '0 8px 20px rgba(229, 9, 20, 0.3)' : 'none'
+              }}
+            >
+              <Grid size={18} />
+              All Prompts
+            </button>
+
+            {categories.map((cat) => {
+              const catName = cat.name.toLowerCase();
+              const isActive = filter === catName;
+              
+              // Map icons to categories
+              const Icon = catName.includes('art') ? Image : 
+                           catName.includes('chat') ? MessageSquare : 
+                           catName.includes('code') ? Code : 
+                           Sparkles;
+
+              return (
                 <button 
-                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  key={cat.id}
+                  onClick={() => setFilter(isActive ? 'all' : catName)}
                   style={{
-                    background: isFilterOpen ? 'var(--accent-main)' : 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: 'white',
-                    padding: isMobile ? '8px 18px' : '10px 24px',
+                    background: isActive ? 'var(--accent-main)' : 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid',
+                    borderColor: isActive ? 'var(--accent-main)' : 'rgba(255, 255, 255, 0.08)',
+                    color: isActive ? 'white' : 'rgba(255, 255, 255, 0.6)',
+                    padding: '12px 24px',
                     borderRadius: '50px',
-                    fontSize: isMobile ? '0.8rem' : '0.9rem',
+                    fontSize: '0.9rem',
                     fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    whiteSpace: 'nowrap',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: isMobile ? '6px' : '10px',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    backdropFilter: 'blur(10px)'
+                    gap: '8px',
+                    boxShadow: isActive ? '0 8px 20px rgba(229, 9, 20, 0.2)' : 'none'
                   }}
                 >
-                  <Filter size={isMobile ? 14 : 18} />
-                  {filter === 'all' ? 'All Categories' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  <Icon size={18} />
+                  {cat.name}
                 </button>
-
-                {isFilterOpen && (
-                  <div style={{ 
-                    position: 'absolute', 
-                    top: 'calc(100% + 15px)', 
-                    right: 0, 
-                    zIndex: 1000
-                  }}>
-                    <CategorySidebar 
-                      filter={filter} 
-                      setFilter={(newFilter) => {
-                        setFilter(newFilter);
-                        setIsFilterOpen(false);
-                      }} 
-                      user={user} 
-                    />
-                  </div>
-                )}
-            </div>
+              );
+            })}
           </div>
 
           <div className="masonry-grid-react" style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
