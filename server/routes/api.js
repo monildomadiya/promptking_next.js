@@ -75,10 +75,12 @@ router.post('/login', async (req, res) => {
     await db`
       INSERT INTO users (id, name, email, avatar_url) 
       VALUES (${uid}, ${name}, ${email}, ${picture})
-      ON CONFLICT (id) DO UPDATE SET 
-        name = EXCLUDED.name, 
+      INSERT INTO users (id, name, email, avatar_url) 
+      VALUES (${uid}, ${name}, ${email}, ${picture})
+      ON DUPLICATE KEY UPDATE 
+        name = VALUES(name), 
         avatar_url = CASE 
-          WHEN users.avatar_url IS NULL OR users.avatar_url = '' THEN EXCLUDED.avatar_url 
+          WHEN users.avatar_url IS NULL OR users.avatar_url = '' THEN VALUES(avatar_url) 
           ELSE users.avatar_url 
         END
     `;
@@ -159,7 +161,7 @@ router.get('/faqs', async (req, res) => {
 // --- CATEGORIES (Public) ---
 router.get('/categories', async (req, res) => {
   try {
-    const [rows] = await db.query('SELECT * FROM categories ORDER BY name ASC');
+    const rows = await db`SELECT * FROM categories ORDER BY name ASC`;
     res.json(rows);
   } catch (error) {
     console.error(error);
@@ -206,7 +208,7 @@ router.get('/prompt/:key', async (req, res) => {
 // --- SITE SETTINGS (Public) ---
 router.get('/settings', async (req, res) => {
   try {
-    const [rows] = await db.query('SELECT * FROM site_settings');
+    const rows = await db`SELECT * FROM site_settings`;
     const settings = {};
     rows.forEach(r => { settings[r.setting_key] = r.setting_value; });
     res.json(settings);
@@ -244,7 +246,7 @@ router.post('/record_copy', async (req, res) => {
   try {
     await db`UPDATE prompts SET copy_count = copy_count + 1 WHERE prompt_key = ${key}`;
     if (uid) {
-      await db`INSERT INTO user_copied (user_id, prompt_key) VALUES (${uid}, ${key}) ON CONFLICT DO NOTHING`;
+      await db`INSERT IGNORE INTO user_copied (user_id, prompt_key) VALUES (${uid}, ${key})`;
     }
     res.json({ status: "success" });
   } catch (error) {
@@ -356,7 +358,7 @@ router.post('/admin/login', (req, res) => {
 // Admin Settings
 router.get('/admin/settings', adminAuth, async (req, res) => {
   try {
-    const [rows] = await db.query('SELECT * FROM site_settings');
+    const rows = await db`SELECT * FROM site_settings`;
     const settings = {};
     rows.forEach(r => { settings[r.setting_key] = r.setting_value; });
     res.json(settings);
@@ -372,7 +374,7 @@ router.post('/admin/save_settings', adminAuth, async (req, res) => {
       await db`
         INSERT INTO site_settings (setting_key, setting_value) 
         VALUES (${key}, ${value}) 
-        ON CONFLICT (setting_key) DO UPDATE SET setting_value = EXCLUDED.setting_value
+        ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)
       `;
     }
     res.json({ status: "success" });
@@ -388,7 +390,7 @@ router.post('/admin/upload_logo', adminAuth, logoUpload.single('logo'), async (r
     await db`
       INSERT INTO site_settings (setting_key, setting_value) 
       VALUES ('logo_url', ${logoUrl}) 
-      ON CONFLICT (setting_key) DO UPDATE SET setting_value = EXCLUDED.setting_value
+      ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)
     `;
     res.json({ status: "success", logoUrl });
   } catch (error) {
@@ -581,7 +583,7 @@ router.delete('/admin/delete_faq/:id', adminAuth, async (req, res) => {
 // Admin Category CRUD
 router.get('/admin/categories', adminAuth, async (req, res) => {
   try {
-    const [rows] = await db.query('SELECT * FROM categories ORDER BY name ASC');
+    const rows = await db`SELECT * FROM categories ORDER BY name ASC`;
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: "Fetch failed" });

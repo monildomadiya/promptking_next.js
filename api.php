@@ -2,10 +2,10 @@
 header('Content-Type: application/json');
 session_start();
 
-$host = 'localhost';
-$db   = 'prompt-king';
-$user = 'root'; 
-$pass = '';     
+$host = '107.172.39.165';
+$db   = 'promptking';
+$user = 'pma_admin'; 
+$pass = 'Pk_Pma@2024Secure!';     
 
 $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) { die(json_encode(["error" => "Connection failed."])); }

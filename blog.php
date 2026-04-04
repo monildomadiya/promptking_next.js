@@ -1,6 +1,6 @@
 <?php
 session_start();
-$conn = new mysqli('localhost', 'root', '', 'prompt-king');
+$conn = new mysqli('107.172.39.165', 'pma_admin', 'Pk_Pma@2024Secure!', 'promptking');
 if ($conn->connect_error) { die("Connection failed."); }
 include 'header.php';
 ?>

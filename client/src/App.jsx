@@ -69,6 +69,17 @@ function AppContent() {
     }
   };
 
+  const fetchSettings = async () => {
+    try {
+      const response = await api.get('/settings');
+      if (response.data) {
+        setSettings(response.data);
+      }
+    } catch (error) {
+      console.error("App: Failed to fetch settings", error);
+    }
+  };
+
   useEffect(() => {
     fetchSettings();
     fetchAdminStatus();

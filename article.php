@@ -1,6 +1,6 @@
 <?php
 session_start();
-$conn = new mysqli('localhost', 'root', '', 'prompt-king');
+$conn = new mysqli('107.172.39.165', 'pma_admin', 'Pk_Pma@2024Secure!', 'promptking');
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($id === 0) { header("Location: blog.php"); exit; }

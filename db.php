@@ -3,10 +3,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$host = 'localhost';
-$db   = 'prompt-king';
-$user = 'root'; 
-$pass = '';     
+$host = '107.172.39.165';
+$db   = 'promptking';
+$user = 'pma_admin'; 
+$pass = 'Pk_Pma@2024Secure!';     
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 try {

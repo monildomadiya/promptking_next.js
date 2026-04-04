@@ -50,7 +50,7 @@ app.get('/api/health-check', async (req, res) => {
     status: "online",
     database: dbStatus,
     databaseError: dbError,
-    dbType: "PostgreSQL"
+    dbType: "MySQL"
   });
 });
 
