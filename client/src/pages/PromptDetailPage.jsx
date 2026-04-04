@@ -396,7 +396,7 @@ const PromptDetailPage = ({ user, adsSettings }) => {
               border: isUnlocked ? (prompt.isPremium ? '2px solid #FFD700' : (isCopied ? '2px solid #27C93F' : '2px solid var(--accent-main)')) : '1px solid rgba(255,255,255,0.08)',
               boxShadow: isUnlocked ? (prompt.isPremium ? '0 15px 50px rgba(255, 215, 0, 0.15)' : (isCopied ? '0 15px 50px rgba(39, 201, 63, 0.3)' : '0 15px 50px rgba(229, 9, 20, 0.2)')) : 'none',
               transform: isUnlocked ? (isCopied && !prompt.isPremium ? 'scale(1.02)' : 'scale(1.01)') : 'scale(1)',
-              minHeight: isUnlocked ? '200px' : '180px',
+              minHeight: isUnlocked ? (prompt.isPremium ? '240px' : '150px') : '180px',
               transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
             }}>
               {/* Vault Header */}

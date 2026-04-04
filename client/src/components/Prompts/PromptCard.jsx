@@ -501,7 +501,7 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
             margin: (isUnlocked && prompt.isPremium) ? '0' : '0 0 15px 0', 
             border: isUnlocked ? (prompt.isPremium ? '1px solid #FFD700' : (isCopied ? '1px solid #27C93F' : '1px solid var(--accent-main)')) : '1px solid rgba(255,255,255,0.06)',
             boxShadow: isUnlocked ? (prompt.isPremium ? (isMobile ? '0 0 20px rgba(255, 215, 0, 0.1)' : '0 0 40px rgba(255, 215, 0, 0.15)') : (isCopied ? '0 0 30px rgba(39, 201, 63, 0.3)' : (isMobile ? '0 0 15px rgba(229, 9, 20, 0.15)' : '0 0 40px rgba(229, 9, 20, 0.2)'))) : 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 10px 30px rgba(0,0,0,0.5)',
-            minHeight: isUnlocked ? (isMobile ? '300px' : '380px') : '140px',
+            minHeight: isUnlocked ? (prompt.isPremium ? (isMobile ? '300px' : '380px') : (isMobile ? '120px' : '180px')) : '140px',
             transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
             transform: isUnlocked ? (isCopied && !prompt.isPremium ? (isMobile ? 'scale(1.02)' : 'scale(1.03)') : 'scale(1.01)') : 'scale(1)'
           }}>
