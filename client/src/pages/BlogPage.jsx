@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
 import api from '../api';
-
+import Shimmer from '../components/Common/Shimmer';
 import SocialSidebar from '../components/Prompts/SocialSidebar';
 
 const BlogPage = () => {
@@ -26,8 +26,33 @@ const BlogPage = () => {
   };
 
   if (loading) return (
-    <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="loader"></div>
+    <div className="layout-with-sidebar">
+      <div className="main-content-area">
+        <header className="blog-hero">
+          <Shimmer height="30px" width="150px" borderRadius="100px" style={{ margin: '0 auto 20px' }} />
+          <Shimmer height="60px" width="400px" style={{ margin: '0 auto 20px' }} />
+          <Shimmer height="20px" width="600px" style={{ margin: '0 auto' }} />
+        </header>
+
+        <div className="blog-grid">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="blog-card-new">
+              <Shimmer height="240px" />
+              <div className="blog-card-content">
+                <Shimmer height="28px" style={{ marginBottom: '15px' }} />
+                <Shimmer height="60px" style={{ marginBottom: '25px' }} />
+                <div className="blog-card-footer">
+                  <Shimmer height="18px" width="120px" />
+                  <Shimmer height="18px" width="80px" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="social-sidebar">
+        <Shimmer height="600px" borderRadius="32px" />
+      </div>
     </div>
   );
 

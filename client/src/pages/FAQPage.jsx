@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronDown, HelpCircle, Search, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api';
+import Shimmer from '../components/Common/Shimmer';
 import SocialSidebar from '../components/Prompts/SocialSidebar';
 import SEOMetadata from '../components/SEO/SEOMetadata';
 
@@ -64,9 +65,27 @@ const FAQPage = () => {
   };
 
   if (loading) return (
-    <div style={{ padding: '120px 20px', textAlign: 'center', color: 'var(--accent-main)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <HelpCircle size={40} className="pulse-anim" style={{ marginBottom: '20px' }} />
-      <span style={{ fontWeight: 800, letterSpacing: '2px', textTransform: 'uppercase' }}>Loading Knowledge Base...</span>
+    <div className="layout-with-sidebar">
+      <div className="main-content-area">
+        <header style={{ textAlign: 'center', marginBottom: '60px' }}>
+          <Shimmer height="80px" width="80px" borderRadius="24px" style={{ margin: '0 auto 25px' }} />
+          <Shimmer height="60px" width="400px" style={{ margin: '0 auto 20px' }} />
+          <Shimmer height="24px" width="600px" style={{ margin: '0 auto 40px' }} />
+          <Shimmer height="60px" width="500px" borderRadius="20px" style={{ margin: '0 auto' }} />
+        </header>
+
+        <section style={{ marginBottom: '60px' }}>
+          <Shimmer height="35px" width="200px" style={{ marginBottom: '30px' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {[1, 2, 3, 4].map(i => (
+              <Shimmer key={i} height="100px" borderRadius="24px" />
+            ))}
+          </div>
+        </section>
+      </div>
+      <div className="social-sidebar">
+        <Shimmer height="600px" borderRadius="32px" />
+      </div>
     </div>
   );
 

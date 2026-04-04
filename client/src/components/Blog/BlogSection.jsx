@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api';
 import { ArrowRight } from 'lucide-react';
+import Shimmer from '../Common/Shimmer';
 
 const BlogSection = () => {
   const [blogs, setBlogs] = useState([]);
@@ -22,7 +23,34 @@ const BlogSection = () => {
     }
   };
 
-  if (loading || blogs.length === 0) return null;
+  if (loading) {
+    return (
+      <section style={{ padding: '80px 20px', background: 'rgba(255,255,255,0.02)', borderTop: '1px solid var(--border-color)' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}>
+            <div>
+              <Shimmer height="40px" width="300px" style={{ marginBottom: '10px' }} />
+              <Shimmer height="20px" width="450px" />
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '30px' }}>
+            {[1, 2, 3].map(i => (
+              <div key={i} style={{ background: 'rgba(255, 255, 255, 0.03)', borderRadius: '24px', overflow: 'hidden', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                <Shimmer height="220px" />
+                <div style={{ padding: '30px' }}>
+                  <Shimmer height="24px" style={{ marginBottom: '15px' }} />
+                  <Shimmer height="40px" style={{ marginBottom: '20px' }} />
+                  <Shimmer height="18px" width="100px" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (blogs.length === 0) return null;
 
   return (
     <section style={{ padding: '80px 20px', background: 'rgba(255,255,255,0.02)', borderTop: '1px solid var(--border-color)' }}>
@@ -77,9 +105,11 @@ const BlogSection = () => {
         </div>
       </div>
       <style>{`
-        .blog-card-home:hover { transform: translateY(-10px); border-color: var(--accent-main); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-        .blog-card-home:hover .blog-img { transform: scale(1.05); }
-        .view-all-btn:hover { background: var(--accent-main); color: white; transform: translateX(5px); }
+        @media (hover: hover) {
+          .blog-card-home:hover { transform: translateY(-10px); border-color: var(--accent-main); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+          .blog-card-home:hover .blog-img { transform: scale(1.05); }
+          .view-all-btn:hover { background: var(--accent-main); color: white; transform: translateX(5px); }
+        }
       `}</style>
     </section>
   );

@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, Heart, Activity } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import api from '../api';
+import Shimmer from '../components/Common/Shimmer';
 import YouTubeModal from '../components/Modals/YouTubeModal';
 import SEOMetadata from '../components/SEO/SEOMetadata';
 import AdSenseUnit from '../components/Ads/AdSenseUnit';
@@ -187,10 +188,27 @@ const PromptDetailPage = ({ user, adsSettings }) => {
   };
 
   if (loading) return (
-    <div style={{ padding: '150px 20px', textAlign: 'center', color: 'var(--text-secondary)', background: 'var(--bg-color)', minHeight: '100vh' }}>
+    <div className="detail-page-wrapper" style={{ background: 'var(--surface-0)', minHeight: '100vh', color: 'white' }}>
       <SEOMetadata title="Loading Prompt... | PromptKing" />
-      <div className="loader"></div>
-      <p style={{ marginTop: '20px' }}>Analyzing prompt architecture...</p>
+      <div className="container" style={{ padding: '40px 20px', maxWidth: '1400px', margin: '0 auto' }}>
+        <Shimmer height="20px" width="150px" style={{ marginBottom: '30px' }} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: '40px' }} className="detail-layout">
+          <div>
+            <div style={{ marginBottom: '35px' }}>
+              <div style={{ display: 'flex', gap: '15px', marginBottom: '12px' }}>
+                <Shimmer height="30px" width="100px" borderRadius="10px" />
+                <Shimmer height="30px" width="150px" borderRadius="10px" />
+              </div>
+              <Shimmer height="50px" width="80%" />
+            </div>
+            <Shimmer height="500px" borderRadius="32px" style={{ marginBottom: '40px' }} />
+            <Shimmer height="200px" borderRadius="32px" style={{ marginBottom: '40px' }} />
+          </div>
+          <aside className="detail-sidebar">
+            <Shimmer height="600px" borderRadius="28px" />
+          </aside>
+        </div>
+      </div>
     </div>
   );
 
@@ -475,8 +493,20 @@ const PromptDetailPage = ({ user, adsSettings }) => {
                           textDecoration: 'none', border: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer',
                           transition: 'all 0.3s ease'
                         }}
-                        onMouseOver={(e) => { e.currentTarget.style.color = 'white'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
-                        onMouseOut={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
+                        onMouseOver={(e) => { 
+                          const isMobile = window.innerWidth <= 768;
+                          if (!isMobile) {
+                            e.currentTarget.style.color = 'white'; 
+                            e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; 
+                          }
+                        }}
+                        onMouseOut={(e) => { 
+                          const isMobile = window.innerWidth <= 768;
+                          if (!isMobile) {
+                            e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; 
+                            e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; 
+                          }
+                        }}
                       >
                         {prompt.igLink.includes('instagram') ? (
                           <Instagram size={14} />
@@ -655,15 +685,17 @@ const PromptDetailPage = ({ user, adsSettings }) => {
         .detail-page-wrapper { animation: none; }
         @keyframes fadeIn { from { opacity: 1; transform: translateY(0); } to { opacity: 1; transform: translateY(0); } }
         .back-link { transition: 0.3s; }
-        .back-link:hover { color: white !important; transform: translateX(-5px); }
-        .suggested-card-item:hover { 
-          transform: translateY(-3px) translateX(4px); 
-          background: rgba(255,255,255,0.06) !important;
-          border-color: rgba(229, 9, 20, 0.2) !important;
-          box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        @media (hover: hover) {
+          .back-link:hover { color: white !important; transform: translateX(-5px); }
+          .suggested-card-item:hover { 
+            transform: translateY(-3px) translateX(4px); 
+            background: rgba(255,255,255,0.06) !important;
+            border-color: rgba(229, 9, 20, 0.2) !important;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+          }
+          .suggested-card-item:hover .suggestion-img { transform: scale(1.1); }
+          .suggested-card-item:hover h4 { color: var(--accent-main) !important; }
         }
-        .suggested-card-item:hover .suggestion-img { transform: scale(1.1); }
-        .suggested-card-item:hover h4 { color: var(--accent-main) !important; }
         .chatgpt { color: #10a37f; background: rgba(16, 163, 127, 0.08) !important; border-color: rgba(16, 163, 127, 0.3) !important; }
         
         @keyframes copyPulseDetail {

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import PromptCard from './PromptCard';
 import SocialSidebar from './SocialSidebar';
 import CategorySidebar from './CategorySidebar';
+import Shimmer from '../Common/Shimmer';
 import api from '../../api';
 import { Search, Crown, Grid, MessageSquare, Sparkles, Image, Zap, Heart, Filter } from 'lucide-react';
 
@@ -105,12 +106,12 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
               
               items.forEach((item, index) => {
                 columns[index % cols].push(
-                  <div key={item} className="skeleton-card masonry-grid-item" style={{ 
-                    background: 'var(--surface-color)', borderRadius: '20px', padding: '18px', marginBottom: 0
+                  <div key={item} className="masonry-grid-item" style={{ 
+                    background: 'rgba(255, 255, 255, 0.03)', borderRadius: '24px', padding: '18px', border: '1px solid rgba(255, 255, 255, 0.1)'
                   }}>
-                    <div className="skeleton" style={{ height: '200px', borderRadius: '20px 20px 0 0', marginBottom: '15px' }}></div>
-                    <div className="skeleton" style={{ height: '20px', width: '60%', marginBottom: '10px' }}></div>
-                    <div className="skeleton" style={{ height: '100px', width: '100%' }}></div>
+                    <Shimmer height={isMobile ? '140px' : '180px'} borderRadius="20px 20px 0 0" style={{ margin: '-18px -18px 15px -18px', width: 'calc(100% + 36px)' }} />
+                    <Shimmer height="20px" width="60%" style={{ marginBottom: '10px' }} />
+                    <Shimmer height="140px" width="100%" borderRadius="20px" />
                   </div>
                 );
               });
@@ -122,7 +123,9 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
               ));
             })()}
           </div>
-          <div className="social-sidebar skeleton" style={{ height: '500px', borderRadius: '32px' }}></div>
+          <div className="social-sidebar" style={{ width: '280px' }}>
+             <Shimmer height="500px" borderRadius="32px" />
+          </div>
         </div>
       </div>
     );
@@ -249,14 +252,18 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
                   letterSpacing: '0.5px'
                 }}
                 onMouseOver={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-                  e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
-                  e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.3)';
+                  if (!isMobile) {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                    e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+                    e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.3)';
+                  }
                 }}
                 onMouseOut={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                  e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.2)';
+                  if (!isMobile) {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                    e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                    e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.2)';
+                  }
                 }}
               >
                 <Sparkles size={20} className="floating-animation" style={{ color: 'var(--accent-main)' }} />

@@ -320,11 +320,13 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
             position: 'relative', overflow: 'hidden', borderRadius: '20px 20px 0 0', borderBottom: '1px solid var(--border-color)',
             minHeight: isMobile ? '140px' : '180px', background: '#111'
           }}>
-            <img src={prompt.imgAfter} alt="After" loading="lazy" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={prompt.imgAfter} alt="After" loading="lazy" width="400" height="225" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
             <img 
               src={prompt.imgBefore} 
               alt="Before" 
               loading="lazy"
+              width="400"
+              height="225"
               style={{ 
                 position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover',
                 clipPath: `inset(0 ${100 - sliderValue}% 0 0)`,
@@ -416,7 +418,7 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
           </div>
         ) : (prompt.imgAfter || prompt.imgBefore) && (
           <div style={{ width: `calc(100% + ${cardPadding * 2}px)`, margin: `-${cardPadding}px -${cardPadding}px 15px -${cardPadding}px`, aspectRatio: ratio, background: '#111', borderRadius: '20px 20px 0 0', overflow: 'hidden', minHeight: isMobile ? '140px' : '180px', position: 'relative' }}>
-            <img src={prompt.imgAfter || prompt.imgBefore} alt={prompt.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={prompt.imgAfter || prompt.imgBefore} alt={prompt.title} loading="lazy" width="400" height="225" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             
             {/* Floating Like Button for Static Image */}
             <button 
@@ -616,8 +618,8 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
                         textDecoration: 'none', border: 'none', cursor: 'pointer',
                         transition: 'all 0.3s ease'
                       }}
-                      onMouseOver={(e) => { e.currentTarget.style.color = 'white'; }}
-                      onMouseOut={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
+                      onMouseOver={(e) => { if (!isMobile) e.currentTarget.style.color = 'white'; }}
+                      onMouseOut={(e) => { if (!isMobile) e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
                     >
                       {prompt.igLink.includes('instagram') ? (
                         <Instagram size={16} color="currentColor" />
@@ -683,10 +685,12 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
           animation: copyPulse 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
-        .youtube-btn-hover:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 24px rgba(229, 9, 20, 0.15) !important;
-          border-color: rgba(229, 9, 20, 0.3) !important;
+        @media (hover: hover) {
+          .youtube-btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(229, 9, 20, 0.15) !important;
+            border-color: rgba(229, 9, 20, 0.3) !important;
+          }
         }
       `}</style>
     </div>

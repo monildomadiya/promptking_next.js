@@ -35,25 +35,25 @@ const BottomNav = ({ user, profileData, onHomeClick }) => {
       transition: 'transform 0.3s ease',
       display: 'flex'
     }}>
-      <Link to="/" onClick={onHomeClick} style={navItemStyle(isActive('/'))}>
+      <Link to="/" onClick={onHomeClick} style={navItemStyle(isActive('/'))} aria-label="Home">
         <Home size={24} />
         <span style={labelStyle}>Home</span>
       </Link>
 
-      <Link to="/blog" style={navItemStyle(isActive('/blog'))}>
+      <Link to="/blog" style={navItemStyle(isActive('/blog'))} aria-label="Blog">
         <Compass size={24} />
         <span style={labelStyle}>Blog</span>
       </Link>
 
       {user ? (
-        <div onClick={() => window.dispatchEvent(new CustomEvent('openProfile'))} style={navItemStyle(false)}>
+        <div onClick={() => window.dispatchEvent(new CustomEvent('openProfile'))} style={navItemStyle(false)} aria-label="Profile" role="button">
           <div style={{ width: '24px', height: '24px', borderRadius: '50%', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
-            <img src={profileData?.avatar_url || user.photoURL} alt="User" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={profileData?.avatar_url || user.photoURL} alt="User" width="24" height="24" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
           <span style={labelStyle}>Profile</span>
         </div>
       ) : (
-        <div onClick={handleLogin} style={navItemStyle(false)}>
+        <div onClick={handleLogin} style={navItemStyle(false)} aria-label="Sign In" role="button">
           <LogIn size={24} />
           <span style={labelStyle}>Sign In</span>
         </div>

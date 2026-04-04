@@ -166,7 +166,9 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
               {settings.logo_url ? (
                 <img 
                   src={settings.logo_url} 
-                  alt="Logo" 
+                  alt="PromptKing - AI Prompts Library" 
+                  width={isMobile ? (settings.logo_width_mobile || 120) : (settings.logo_width_desktop || 180)}
+                  height={isMobile ? 40 : 60}
                   style={{ 
                     width: isMobile ? `${settings.logo_width_mobile || 120}px` : `${settings.logo_width_desktop || 180}px`,
                     height: 'auto', 
@@ -176,7 +178,7 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                   className="site-logo"
                 />
               ) : (
-                <h1 className="header-logo-text" style={{ fontSize: '1.5rem', fontWeight: 800, color: 'white', letterSpacing: '-0.5px' }}>PromptKing</h1>
+                <span className="header-logo-text" style={{ fontSize: '1.5rem', fontWeight: 800, color: 'white', letterSpacing: '-0.5px' }}>PromptKing</span>
               )}
             </Link>
           </div>
@@ -206,6 +208,7 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                     onClick={() => setFilter(filter === 'premium' ? 'all' : 'premium')}
                     className="pro-card-hover"
                     title="Premium Prompts"
+                    aria-label="Filter Premium"
                     style={{ 
                       width: '38px', height: '38px', borderRadius: '50%', 
                       display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
@@ -223,6 +226,7 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                       onClick={() => setFilter(filter === 'liked' ? 'all' : 'liked')}
                       className="pro-card-hover"
                       title="My Likes"
+                      aria-label="Filter Liked"
                       style={{ 
                         width: '38px', height: '38px', borderRadius: '50%', 
                         display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
@@ -239,6 +243,8 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                   <div 
                     className="glass-button-secondary"
                     onClick={() => setIsSearchExpanded(true)}
+                    aria-label="Search"
+                    role="button"
                     style={{ 
                       width: '38px', height: '38px', borderRadius: '50%', 
                       display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'

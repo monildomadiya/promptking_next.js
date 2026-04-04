@@ -4,7 +4,8 @@ import { Helmet } from 'react-helmet-async';
 const SEOMetadata = ({ 
   title = "PromptKing - Premium AI Prompts", 
   description = "Discover the ultimate library of premium AI prompts for ChatGPT, Midjourney, and more. Elevate your workflows to professional levels.", 
-  image = "/favicon.svg", 
+  keywords = "ai prompts, chatgpt prompts, midjourney prompts, gemini prompts, prompt engineering, ai art prompts, premium prompts",
+  image = "https://promptking.in/banner.jpg", 
   url = window.location.href,
   schema = null
 }) => {
@@ -13,6 +14,7 @@ const SEOMetadata = ({
       {/* Standard Metadata */}
       <title>{title}</title>
       <meta name="description" content={description} />
+      <meta name="keywords" content={keywords} />
 
       {/* OpenGraph / Social Metadata */}
       <meta property="og:title" content={title} />

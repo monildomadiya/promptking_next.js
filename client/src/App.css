@@ -8,8 +8,10 @@
   transition: border-color 0.3s;
   margin-bottom: 24px;
 
-  &:hover {
-    border-color: var(--accent-border);
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--accent-border);
+    }
   }
   &:focus-visible {
     outline: 2px solid var(--accent);
@@ -127,8 +129,10 @@
     text-decoration: none;
     transition: box-shadow 0.3s;
 
-    &:hover {
-      box-shadow: var(--shadow);
+    @media (hover: hover) {
+      &:hover {
+        box-shadow: var(--shadow);
+      }
     }
     .button-icon {
       height: 18px;

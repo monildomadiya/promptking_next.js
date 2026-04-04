@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../api';
+import Shimmer from '../components/Common/Shimmer';
 import { ArrowLeft, Clock, Calendar, Share2 } from 'lucide-react';
 import SEOMetadata from '../components/SEO/SEOMetadata';
 import SocialSidebar from '../components/Prompts/SocialSidebar';
@@ -30,7 +31,23 @@ const ArticlePage = () => {
     }
   };
 
-  if (loading) return <div style={{ padding: '100px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading article...</div>;
+  if (loading) return (
+    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '60px 20px' }}>
+      <Shimmer height="20px" width="120px" style={{ marginBottom: '40px' }} />
+      <div className="article-layout">
+        <div className="main-content">
+          <Shimmer height="400px" borderRadius="30px" style={{ marginBottom: '40px' }} />
+          <Shimmer height="60px" width="80%" style={{ marginBottom: '30px' }} />
+          <Shimmer height="20px" style={{ marginBottom: '15px' }} />
+          <Shimmer height="20px" style={{ marginBottom: '15px' }} />
+          <Shimmer height="20px" width="70%" style={{ marginBottom: '15px' }} />
+        </div>
+        <aside className="sidebar">
+          <Shimmer height="500px" borderRadius="24px" />
+        </aside>
+      </div>
+    </div>
+  );
   if (!blog) return (
     <div style={{ padding: '100px', textAlign: 'center' }}>
       <SEOMetadata title="Article Not Found | PromptKing" />
@@ -175,7 +192,9 @@ const ArticlePage = () => {
           grid-template-columns: 1fr 340px;
           gap: 60px;
         }
-        .sidebar-blog-card:hover { transform: translateX(5px); color: var(--accent-main); }
+        @media (hover: hover) {
+          .sidebar-blog-card:hover { transform: translateX(5px); color: var(--accent-main); }
+        }
         .blog-content h2, .blog-content h3 { margin-top: 40px; margin-bottom: 20px; color: white; }
         .blog-content p { margin-bottom: 25px; }
         .blog-content img { max-width: 100%; border-radius: 15px; margin: 30px 0; }
