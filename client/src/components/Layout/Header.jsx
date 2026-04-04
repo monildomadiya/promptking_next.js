@@ -73,8 +73,19 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
     
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
+      
+      // Control header visibility based on scroll direction
+      if (currentScrollY > 150) {
+        if (currentScrollY > lastScrollY && !isSearchExpanded) {
+          setIsVisible(false);
+        } else {
+          setIsVisible(true);
+        }
+      } else {
+        setIsVisible(true);
+      }
+      
       setIsScrolled(currentScrollY > 20);
-      setIsVisible(true);
       setLastScrollY(currentScrollY);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -130,7 +141,8 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
         boxShadow: isScrolled ? '0 20px 40px rgba(0, 0, 0, 0.4)' : 'none',
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         transform: isVisible ? 'translateY(0)' : 'translateY(-120%)',
-        opacity: isVisible ? 1 : 0
+        opacity: isVisible ? 1 : 0,
+        minHeight: isMobile ? '65px' : '82px'
       }}>
         <div style={{ 
           margin: '0 auto', 
@@ -145,9 +157,10 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
               to="/" 
               onClick={onLogoClick}
               style={{ 
-                display: isMobile && isSearchExpanded ? 'none' : 'flex', 
+                display: 'flex', 
                 alignItems: 'center', 
-                gap: '8px' 
+                gap: '8px',
+                height: isMobile ? '45px' : 'auto' // Match search height for stability
               }}
             >
               {settings.logo_url ? (
@@ -172,7 +185,9 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
             display: 'flex', 
             alignItems: 'center', 
             gap: isMobile ? '10px' : '20px',
-            flex: isMobile && isSearchExpanded ? 1 : 'initial'
+            flex: isMobile && isSearchExpanded ? 1 : 'initial',
+            justifyContent: 'flex-end',
+            minWidth: 0
           }}>
             {/* Search Bar - Desktop (Right) or Expandable (Mobile) */}
             <div style={{ 
@@ -182,7 +197,8 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
               alignItems: 'center',
               justifyContent: 'flex-end',
               transition: 'all 0.3s ease',
-              gap: '10px'
+              gap: '10px',
+              minWidth: 0
             }}>
               {isMobile && !isSearchExpanded ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -236,7 +252,8 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                   width: isMobile && isSearchExpanded ? '100%' : (isMobile ? '0' : '350px'), 
                   position: 'relative', 
                   display: 'flex', 
-                  alignItems: 'center' 
+                  alignItems: 'center',
+                  flex: isMobile && isSearchExpanded ? 1 : 'initial'
                 }}>
                   <Search 
                     size={18} 

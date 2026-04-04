@@ -204,7 +204,7 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
                       user={user}
                       isLiked={!!likes[p.prompt_key || p.id]} 
                       onLikeToggle={toggleLike}
-                      isUnlocked={activeUnlockedKey === (p.prompt_key || p.id)}
+                      isUnlocked={!p.isPremium || activeUnlockedKey === (p.prompt_key || p.id)}
                       onUnlock={() => setActiveUnlockedKey(p.prompt_key || p.id)}
                       onLock={() => setActiveUnlockedKey(null)}
                       isHighlighted={search.trim() !== '' && (

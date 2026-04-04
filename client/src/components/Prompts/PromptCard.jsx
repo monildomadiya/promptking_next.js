@@ -12,8 +12,17 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
   const [isCopied, setIsCopied] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [isHeartAnimating, setIsHeartAnimating] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isSnapping, setIsSnapping] = useState(false);
   const [showAuthHint, setShowAuthHint] = useState(false);
+
+  React.useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const cardPadding = isMobile ? 12 : 18;
 
   const cardRef = React.useRef(null);
 
@@ -194,16 +203,38 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
       await api.post('/record_copy', { key: prompt.key });
       setIsCopied(true);
       
-      // Start Thanos Snap immediately
-      setIsSnapping(true);
-      triggerSnapConfetti();
+      // Feedback Animation: Success pulse and Confetti
+      if (prompt.isPremium) {
+        // Start Thanos Snap only for Premium content
+        setIsSnapping(true);
+        triggerSnapConfetti();
+      } else {
+        // Success Confetti for Free content
+        const box = document.getElementById(`box-${prompt.key}`);
+        if (box) {
+          const rect = box.getBoundingClientRect();
+          const x = (rect.left + rect.width / 2) / window.innerWidth;
+          const y = (rect.top + rect.height / 2) / window.innerHeight;
+          
+          confetti({
+            particleCount: 80,
+            spread: 70,
+            origin: { x, y },
+            colors: ['#e50914', '#FFD700', '#ffffff'],
+            scale: 0.8,
+            zIndex: 9999
+          });
+        }
+      }
       
-      // Wait for animation to finish before actual state lock
+      // Wait for animation or reset time
       setTimeout(() => {
         setIsSnapping(false);
         setIsCopied(false);
-        onLock();
-        setPin(''); // Reset PIN for next time
+        if (prompt.isPremium) {
+          onLock();
+          setPin(''); // Reset PIN for next time
+        }
       }, 800);
     } catch (err) {
       console.error('Failed to copy text: ', err);
@@ -255,12 +286,13 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
       WebkitBackdropFilter: 'blur(15px)',
       border: isHighlighted ? '2px solid var(--accent-main)' : '1px solid rgba(255, 255, 255, 0.1)',
       borderRadius: '24px',
-      padding: '18px',
+      padding: `${cardPadding}px`,
       zIndex: isHighlighted ? 10 : 1,
       transform: isHighlighted ? 'scale(1.02)' : 'scale(1)',
       transition: 'all 0.4s ease-in-out',
       boxShadow: isHighlighted ? '0 0 25px rgba(229, 9, 20, 0.3)' : 'none',
-      position: 'relative'
+      position: 'relative',
+      overflow: isHighlighted ? 'visible' : 'hidden' // Only allow overflow for highlighted sticker
     }}>
       {isHighlighted && (
         <div style={{
@@ -274,19 +306,19 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
       )}
       {/* Top Content Wrapper - Animate disappearance */}
       <div style={{
-        maxHeight: isUnlocked ? '0' : '600px',
-        opacity: isUnlocked ? '0' : '1',
+        maxHeight: (isUnlocked && prompt.isPremium) ? '0' : '600px',
+        opacity: (isUnlocked && prompt.isPremium) ? '0' : '1',
         overflow: 'hidden',
         transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-        pointerEvents: isUnlocked ? 'none' : 'auto',
-        marginBottom: isUnlocked ? '0' : '8px'
+        pointerEvents: (isUnlocked && prompt.isPremium) ? 'none' : 'auto',
+        marginBottom: (isUnlocked && prompt.isPremium) ? '0' : '8px'
       }}>
         {/* Image Section */}
         {prompt.isImageSlider ? (
           <div className="slider-container" style={{ 
-            aspectRatio: ratio, width: 'calc(100% + 36px)', margin: '-18px -18px 15px -18px',
+            aspectRatio: ratio, width: `calc(100% + ${cardPadding * 2}px)`, margin: `-${cardPadding}px -${cardPadding}px 15px -${cardPadding}px`,
             position: 'relative', overflow: 'hidden', borderRadius: '20px 20px 0 0', borderBottom: '1px solid var(--border-color)',
-            minHeight: '180px', background: '#111'
+            minHeight: isMobile ? '140px' : '180px', background: '#111'
           }}>
             <img src={prompt.imgAfter} alt="After" loading="lazy" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
             <img 
@@ -383,7 +415,7 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
             )}
           </div>
         ) : (prompt.imgAfter || prompt.imgBefore) && (
-          <div style={{ width: 'calc(100% + 36px)', margin: '-18px -18px 15px -18px', aspectRatio: ratio, background: '#111', borderRadius: '20px 20px 0 0', overflow: 'hidden', minHeight: '180px', position: 'relative' }}>
+          <div style={{ width: `calc(100% + ${cardPadding * 2}px)`, margin: `-${cardPadding}px -${cardPadding}px 15px -${cardPadding}px`, aspectRatio: ratio, background: '#111', borderRadius: '20px 20px 0 0', overflow: 'hidden', minHeight: isMobile ? '140px' : '180px', position: 'relative' }}>
             <img src={prompt.imgAfter || prompt.imgBefore} alt={prompt.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             
             {/* Floating Like Button for Static Image */}
@@ -455,7 +487,7 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
       {/* Prompt Area */}
       {!prompt.hidePromptBox && (
         <div style={{ transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }}>
-          <div id={`box-${prompt.key}`} className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isSnapping ? 'thanos-snap' : ''}`} style={{
+          <div id={`box-${prompt.key}`} className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isSnapping ? 'thanos-snap' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse' : ''}`} style={{
             background: 'rgba(15, 15, 20, 0.4)', 
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
@@ -464,15 +496,15 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
             overflow: 'hidden',
             display: 'flex', 
             flexDirection: 'column', 
-            margin: isUnlocked ? '0' : '0 0 15px 0', 
-            border: isUnlocked ? (prompt.isPremium ? '1px solid #FFD700' : '1px solid var(--accent-main)') : '1px solid rgba(255,255,255,0.06)',
-            boxShadow: isUnlocked ? (prompt.isPremium ? '0 0 40px rgba(255, 215, 0, 0.15)' : '0 0 40px rgba(229, 9, 20, 0.2)') : 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 10px 30px rgba(0,0,0,0.5)',
-            minHeight: isUnlocked ? '380px' : '140px',
+            margin: (isUnlocked && prompt.isPremium) ? '0' : '0 0 15px 0', 
+            border: isUnlocked ? (prompt.isPremium ? '1px solid #FFD700' : (isCopied ? '1px solid #27C93F' : '1px solid var(--accent-main)')) : '1px solid rgba(255,255,255,0.06)',
+            boxShadow: isUnlocked ? (prompt.isPremium ? (isMobile ? '0 0 20px rgba(255, 215, 0, 0.1)' : '0 0 40px rgba(255, 215, 0, 0.15)') : (isCopied ? '0 0 30px rgba(39, 201, 63, 0.3)' : (isMobile ? '0 0 15px rgba(229, 9, 20, 0.15)' : '0 0 40px rgba(229, 9, 20, 0.2)'))) : 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 10px 30px rgba(0,0,0,0.5)',
+            minHeight: isUnlocked ? (isMobile ? '300px' : '380px') : '140px',
             transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-            transform: isUnlocked ? 'scale(1.01)' : 'scale(1)'
+            transform: isUnlocked ? (isCopied && !prompt.isPremium ? (isMobile ? 'scale(1.02)' : 'scale(1.03)') : 'scale(1.01)') : 'scale(1)'
           }}>
             {/* macOS Style Header */}
-            <div style={{ background: 'transparent', padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ background: 'transparent', padding: isMobile ? '8px 10px' : '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', gap: '6px' }}>
                 <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#FF5F56' }}></div>
                 <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#FFBD2E' }}></div>
@@ -639,6 +671,16 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
         .thanos-snap {
           animation: thanosSnap 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
           pointer-events: none;
+        }
+
+        @keyframes copyPulse {
+          0% { transform: scale(1.01); border-color: var(--accent-main); }
+          50% { transform: scale(1.03); border-color: #27C93F; box-shadow: 0 0 50px rgba(39, 201, 63, 0.4); }
+          100% { transform: scale(1.01); border-color: #27C93F; }
+        }
+
+        .copy-success-pulse {
+          animation: copyPulse 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
         .youtube-btn-hover:hover {

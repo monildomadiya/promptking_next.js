@@ -14,6 +14,7 @@ if ($conn->connect_error) { die("Connection failed."); }
 
 $conn->query("CREATE TABLE IF NOT EXISTS settings (setting_key VARCHAR(50) PRIMARY KEY, setting_value LONGTEXT)");
 $conn->query("ALTER TABLE settings MODIFY setting_value LONGTEXT"); // Ensure scripts can be saved properly
+$conn->query("ALTER TABLE prompts ADD COLUMN IF NOT EXISTS hide_prompt_box TINYINT(1) DEFAULT 0 AFTER password");
 
 if (isset($_POST['login'])) {
     if ($_POST['password'] === $admin_password) {
@@ -36,6 +37,7 @@ if ($is_logged_in && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $title = $_POST['title']; $description = $_POST['description'] ?? ''; $ai_type = $_POST['ai_type']; $password = $_POST['password'];
         $hide_prompt_box = isset($_POST['hide_prompt_box']) ? 1 : 0; $ig_link = $_POST['ig_link']; $prompt_text = $_POST['prompt_text'];
         $image_ratio = $_POST['image_ratio']; $is_premium = isset($_POST['is_premium']) ? 1 : 0;
+        $img_before = $_POST['img_before'] ?? ''; $img_after = $_POST['img_after'] ?? '';
         $is_image_slider = (!empty($img_before) && !empty($img_after)) ? 1 : 0; $zero = 0;
 
         if (!empty($_POST['prompt_key'])) {
@@ -235,9 +237,9 @@ if ($is_logged_in) {
                     <div class="form-group full"><label>Prompt Title</label><input type="text" name="title" id="pTitle" class="form-input" required></div>
                     <div class="form-group full"><label>Tutorial / Description / Blog Content</label><textarea name="description" id="promptDescription"></textarea></div>
                     <div class="form-group"><label>AI Category</label><select name="ai_type" id="pCategory" class="form-input"><option value="ChatGPT">ChatGPT</option><option value="Gemini">Gemini</option><option value="Midjourney">Midjourney</option></select></div>
-                    <div class="form-group" style="flex-direction: row; align-items: center; gap: 12px; background: rgba(255, 193, 7, 0.1); padding: 16px; border-radius: 12px; border: 1px solid rgba(255, 193, 7, 0.3);"><input type="checkbox" name="is_premium" id="pIsPremium" checked style="width: 20px; height: 20px; accent-color: #FFC107;" onchange="togglePinField(this.checked)"><label for="pIsPremium" style="margin: 0; cursor: pointer; color: #FFC107; font-weight: bold;">Premium Content</label></div>
+                    <div class="form-group" style="flex-direction: row; align-items: center; gap: 12px; background: rgba(255, 193, 7, 0.1); padding: 16px; border-radius: 12px; border: 1px solid rgba(255, 193, 7, 0.3);"><input type="checkbox" name="is_premium" id="pIsPremium" checked style="width: 20px; height: 20px; accent-color: #FFC107;" onchange="togglePinField(this.checked)"><label for="pIsPremium" style="margin: 0; cursor: pointer; color: #FFC107; font-weight: bold;">Premium (Password Protected)</label></div>
                     <div class="form-group" id="pinGroup"><label>Unlock Password (PIN)</label><input type="text" name="password" id="pPassword" class="form-input" placeholder="e.g. 1234"></div>
-                    <div class="form-group full" style="flex-direction: row; align-items: center; gap: 12px; background: rgba(245, 158, 11, 0.1); padding: 16px; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.3);"><input type="checkbox" name="hide_prompt_box" id="pHidePromptBox" style="width: 20px; height: 20px; accent-color: var(--warning);"><label for="pHidePromptBox" style="margin: 0; cursor: pointer; color: var(--text-primary);">Hide Locked Prompt Box entirely</label></div>
+                    <div class="form-group full" style="flex-direction: row; align-items: center; gap: 12px; background: rgba(245, 158, 11, 0.1); padding: 16px; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.3);"><input type="checkbox" name="hide_prompt_box" id="pHidePromptBox" style="width: 20px; height: 20px; accent-color: var(--warning);"><label for="pHidePromptBox" style="margin: 0; cursor: pointer; color: var(--text-primary); font-weight: bold;">Hide Grid Prompt Box</label></div>
                     <div class="form-group full"><label>Instagram Reel URL</label><input type="text" name="ig_link" id="pIgUrl" class="form-input" placeholder="https://instagram.com/reel/..."></div>
                     <div class="form-group full"><label>The Actual Raw Prompt Text</label><textarea name="prompt_text" id="pText" class="form-input" required></textarea></div>
                     <div class="form-group full" style="border-top: 1px solid var(--border-color); padding-top: 25px; margin-top: 10px;"><label style="color: var(--text-primary); font-size: 1.1rem;"><i class="fa-solid fa-image" style="color: var(--accent-main);"></i> Image Slider Settings</label></div>

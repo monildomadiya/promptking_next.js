@@ -46,6 +46,9 @@ const PromptDetailPage = ({ user, adsSettings }) => {
         copyCount: p.copy_count || p.copy_count,
         key: p.prompt_key || p.key
       });
+      if (!(p.is_premium || p.isPremium)) {
+        setIsUnlocked(true);
+      }
       setLoading(false);
     } catch (err) {
       console.error("Error fetching prompt:", err);
@@ -150,10 +153,29 @@ const PromptDetailPage = ({ user, adsSettings }) => {
       await api.post('/record_copy', { key: prompt.key });
       setIsCopied(true);
       
-      // Relock smoothly with a very short delay to instantly respond to the copy
-      setTimeout(() => {
-        setIsUnlocked(false);
-      }, 200);
+      // Success Confetti for Free content
+      const box = document.getElementById(`box-detail`);
+      if (box) {
+        const rect = box.getBoundingClientRect();
+        const x = (rect.left + rect.width / 2) / window.innerWidth;
+        const y = (rect.top + rect.height / 2) / window.innerHeight;
+        
+        confetti({
+          particleCount: 100,
+          spread: 80,
+          origin: { x, y },
+          colors: ['#e50914', '#FFD700', '#ffffff'],
+          scale: 1,
+          zIndex: 9999
+        });
+      }
+
+      // Relock smoothly only for Premium content
+      if (prompt.isPremium) {
+        setTimeout(() => {
+          setIsUnlocked(false);
+        }, 200);
+      }
       
       setTimeout(() => {
         setIsCopied(false);
@@ -343,7 +365,7 @@ const PromptDetailPage = ({ user, adsSettings }) => {
             </div>
 
             {/* Interactive Vault Section */}
-            <div id="box-detail" className={`prompt-area ${isUnlocked ? 'unlocked' : ''}`} style={{
+            <div id="box-detail" className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse' : ''}`} style={{
               background: 'rgba(15, 15, 20, 0.4)', 
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
@@ -353,9 +375,9 @@ const PromptDetailPage = ({ user, adsSettings }) => {
               display: 'flex', 
               flexDirection: 'column', 
               marginBottom: '40px', 
-              border: isUnlocked ? (prompt.isPremium ? '2px solid #FFD700' : '2px solid var(--accent-main)') : '1px solid rgba(255,255,255,0.08)',
-              boxShadow: isUnlocked ? (prompt.isPremium ? '0 15px 50px rgba(255, 215, 0, 0.15)' : '0 15px 50px rgba(229, 9, 20, 0.2)') : 'none',
-              transform: isUnlocked ? 'scale(1.01)' : 'scale(1)',
+              border: isUnlocked ? (prompt.isPremium ? '2px solid #FFD700' : (isCopied ? '2px solid #27C93F' : '2px solid var(--accent-main)')) : '1px solid rgba(255,255,255,0.08)',
+              boxShadow: isUnlocked ? (prompt.isPremium ? '0 15px 50px rgba(255, 215, 0, 0.15)' : (isCopied ? '0 15px 50px rgba(39, 201, 63, 0.3)' : '0 15px 50px rgba(229, 9, 20, 0.2)')) : 'none',
+              transform: isUnlocked ? (isCopied && !prompt.isPremium ? 'scale(1.02)' : 'scale(1.01)') : 'scale(1)',
               minHeight: isUnlocked ? '200px' : '180px',
               transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
             }}>
@@ -643,6 +665,17 @@ const PromptDetailPage = ({ user, adsSettings }) => {
         .suggested-card-item:hover .suggestion-img { transform: scale(1.1); }
         .suggested-card-item:hover h4 { color: var(--accent-main) !important; }
         .chatgpt { color: #10a37f; background: rgba(16, 163, 127, 0.08) !important; border-color: rgba(16, 163, 127, 0.3) !important; }
+        
+        @keyframes copyPulseDetail {
+          0% { transform: scale(1.01); border-color: var(--accent-main); }
+          50% { transform: scale(1.02); border-color: #27C93F; box-shadow: 0 0 60px rgba(39, 201, 63, 0.4); }
+          100% { transform: scale(1.01); border-color: #27C93F; }
+        }
+
+        .copy-success-pulse {
+          animation: copyPulseDetail 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
         .gemini { color: #4285f4; background: rgba(66, 133, 244, 0.08) !important; border-color: rgba(66, 133, 244, 0.3) !important; }
         .midjourney { color: #a855f7; background: rgba(168, 85, 247, 0.08) !important; border-color: rgba(168, 85, 247, 0.3) !important; }
         .blog-content img { max-width: 100%; border-radius: 15px; margin: 20px 0; }
