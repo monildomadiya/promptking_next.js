@@ -219,33 +219,35 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
         setIsSnapping(true);
         triggerSnapConfetti();
       } else {
-        // Success Confetti for Free content
+        // Enhanced Celebration for Free Content
         const box = document.getElementById(`box-${prompt.key}`);
         if (box) {
           const rect = box.getBoundingClientRect();
           const x = (rect.left + rect.width / 2) / window.innerWidth;
           const y = (rect.top + rect.height / 2) / window.innerHeight;
           
-          confetti({
-            particleCount: 80,
-            spread: 70,
-            origin: { x, y },
+          const count = 60;
+          const defaults = { 
+            origin: { x, y }, 
             colors: ['#e50914', '#FFD700', '#ffffff'],
-            scale: 0.8,
-            zIndex: 9999
-          });
+            zIndex: 9999,
+            scalar: 0.8
+          };
+
+          confetti({ ...defaults, particleCount: count, spread: 30, startVelocity: 45 });
+          confetti({ ...defaults, particleCount: 40, spread: 60, startVelocity: 25 });
         }
       }
       
-      // Wait for animation or reset time
+      // Snappy Relock for Premium content (300ms confirmation + 100ms grace)
       setTimeout(() => {
         setIsSnapping(false);
         setIsCopied(false);
         if (prompt.isPremium) {
           onLock();
-          setPin(''); // Reset PIN for next time
+          setPin(''); // Clear PIN
         }
-      }, 800);
+      }, 400);
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
