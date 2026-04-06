@@ -1,5 +1,5 @@
 import React from 'react';
-import { Target, Rocket, Award, Shield, Zap, Sparkles } from 'lucide-react';
+import { Target, Rocket, Award, ShieldCheck, Zap, Sparkles } from '../components/Common/Icons';
 
 import SocialSidebar from '../components/Prompts/SocialSidebar';
 

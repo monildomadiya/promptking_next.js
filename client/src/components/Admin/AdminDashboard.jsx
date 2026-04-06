@@ -5,7 +5,7 @@ import {
   Table, Edit, Trash, Plus, Settings, FileText, 
   TableProperties, LogOut, ChevronRight, Layout, 
   Share2, Palette, Activity, Users, Layers, Crown
-} from 'lucide-react';
+} from '../Common/Icons';
 import PromptModal from './PromptModal';
 import BlogModal from './BlogModal';
 import FAQModal from './FAQModal';
@@ -193,6 +193,7 @@ const BrandingPanel = ({ onSave }) => {
     try {
       await api.post('/admin/save_settings', settings);
       onSave();
+      window.dispatchEvent(new CustomEvent('settingsUpdated'));
       alert("Branding settings applied!");
     } catch(e) { console.error(e); }
     finally { setIsSaving(false); }
@@ -289,22 +290,22 @@ const BrandingPanel = ({ onSave }) => {
           
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div>
-              <Label text="Desktop Width" icon={<Layout size={14} />} />
+              <Label text="Desktop Height" icon={<Layout size={14} />} />
               <input 
                 style={inputStyle} 
-                value={settings.logo_width_desktop || ''} 
-                onChange={e => setSettings({...settings, logo_width_desktop: e.target.value})} 
-                placeholder="e.g. 180px" 
+                value={settings.logo_height_desktop || ''} 
+                onChange={e => setSettings({...settings, logo_height_desktop: e.target.value})} 
+                placeholder="e.g. 50px" 
               />
               <Hint text="Affects header logo on PCs" />
             </div>
             <div>
-              <Label text="Mobile Width" icon={<Activity size={14} />} />
+              <Label text="Mobile Height" icon={<Activity size={14} />} />
               <input 
                 style={inputStyle} 
-                value={settings.logo_width_mobile || ''} 
-                onChange={e => setSettings({...settings, logo_width_mobile: e.target.value})} 
-                placeholder="e.g. 120px" 
+                value={settings.logo_height_mobile || ''} 
+                onChange={e => setSettings({...settings, logo_height_mobile: e.target.value})} 
+                placeholder="e.g. 32px" 
               />
               <Hint text="Affects header logo on phones" />
             </div>

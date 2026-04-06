@@ -1,5 +1,5 @@
 import React from 'react';
-import { Gavel, Scale, FileSignature, AlertCircle } from 'lucide-react';
+import { Gavel, Scale, FileSignature, AlertCircle } from '../components/Common/Icons';
 
 import SocialSidebar from '../components/Prompts/SocialSidebar';
 

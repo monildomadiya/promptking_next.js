@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Calendar, Clock } from 'lucide-react';
+import { ArrowRight, Calendar, Clock } from '../components/Common/Icons';
 import api from '../api';
 import Shimmer from '../components/Common/Shimmer';
 import SocialSidebar from '../components/Prompts/SocialSidebar';

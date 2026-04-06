@@ -10,7 +10,8 @@ const getBaseUrl = () => {
     return 'https://promptking-q4qu.onrender.com';
   }
   
-  return 'https://api.promptking.in';
+  // Local development — use the local backend
+  return 'http://localhost:5000';
 };
 
 const SERVER_URL = getBaseUrl();

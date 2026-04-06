@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Info, ExternalLink, Cpu } from 'lucide-react';
+import { AlertTriangle, Info, ExternalLink, Cpu, ShieldCheck } from '../components/Common/Icons';
 
 import SocialSidebar from '../components/Prompts/SocialSidebar';
 

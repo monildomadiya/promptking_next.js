@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
-import { X, ChevronDown, Zap, Image, Sparkles, Smile, Instagram, Shield, Camera } from 'lucide-react';
+import { X, Save, Image, Code, Star, Shield, Zap, Sparkles, Smartphone, PlusCircle, FileText, Activity } from '../Common/Icons';
 import { Editor } from '@tinymce/tinymce-react';
 
 const PromptModal = ({ prompt, onClose, onSave }) => {

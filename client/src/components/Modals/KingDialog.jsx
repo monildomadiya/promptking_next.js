@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Crown, Sparkles, Check } from '../Common/Icons';
 
 /**
  * KingDialog - A highly professional, animated, and glassmorphic dialog component.

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../api';
 import Shimmer from '../components/Common/Shimmer';
-import { ArrowLeft, Clock, Calendar, Share2 } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar, Share2, ShieldCheck } from '../components/Common/Icons';
 import SEOMetadata from '../components/SEO/SEOMetadata';
 import SocialSidebar from '../components/Prompts/SocialSidebar';
 

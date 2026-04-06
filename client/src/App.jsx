@@ -46,6 +46,7 @@ function AppContent() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [settings, setSettings] = useState({});
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [headerHeight, setHeaderHeight] = useState(isMobile ? 85 : 130);
   const location = useLocation();
   const isAdminPath = /^\/admin(\/|$)/i.test(location.pathname);
 
@@ -89,6 +90,10 @@ function AppContent() {
     };
     window.addEventListener('resize', handleResize);
 
+    // Re-fetch settings when admin saves branding
+    const handleSettingsUpdated = () => fetchSettings();
+    window.addEventListener('settingsUpdated', handleSettingsUpdated);
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         api.defaults.headers.common['X-User-Id'] = firebaseUser.uid;
@@ -113,7 +118,10 @@ function AppContent() {
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      window.removeEventListener('settingsUpdated', handleSettingsUpdated);
+    };
   }, []);
 
   const resetHome = () => {
@@ -139,9 +147,10 @@ function AppContent() {
           onLogoClick={resetHome}
           settings={settings}
           isAdmin={isAdmin}
+          onHeightChange={setHeaderHeight}
         />
       )}
-      <div style={{ paddingTop: isAdminPath ? '0' : (isMobile ? '85px' : '130px'), transition: 'padding-top 0.3s ease' }}>
+      <div style={{ paddingTop: isAdminPath ? '0' : headerHeight + 'px', transition: 'padding-top 0.3s ease' }}>
         <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<HomePage user={user} search={search} filter={filter} setFilter={setFilter} isMobile={isMobile} />} />

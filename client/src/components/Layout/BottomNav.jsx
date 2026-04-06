@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Compass, User, PlusCircle, LogIn } from 'lucide-react';
+import { Home, Compass, User, PlusCircle, LogIn } from '../Common/Icons';
 import { auth, googleProvider } from '../../firebase';
 import { signInWithPopup } from 'firebase/auth';
 

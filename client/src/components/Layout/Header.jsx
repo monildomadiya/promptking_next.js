@@ -3,11 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { auth, googleProvider } from '../../firebase';
 import { signInWithPopup, signOut } from 'firebase/auth';
 import api from '../../api';
-import { Search, LogOut, Settings, User, Mail, Shield, Zap, Star, Layout, Menu, X, Filter, Heart, Crown, LogIn, ChevronDown, Camera, Activity } from 'lucide-react';
+import { Search, LogOut, Settings, User, Mail, Shield, Zap, Star, Layout, Menu, X, Filter, Heart, Crown, LogIn, Layers, ChevronDown, Camera, Activity } from '../Common/Icons';
 import LoginModal from '../Modals/LoginModal';
 import AdSenseUnit from '../Ads/AdSenseUnit';
 
-const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter, setFilter, showFilters, setShowFilters, onLogoClick, settings, isAdmin }) => {
+const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter, setFilter, showFilters, setShowFilters, onLogoClick, settings, isAdmin, onHeightChange }) => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -21,6 +21,7 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
   const [lastScrollY, setLastScrollY] = useState(0);
   const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
+  const headerRef = React.useRef(null);
 
   // fetchSettings removed - now provided via props from App.jsx
 
@@ -106,13 +107,26 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
     };
     window.addEventListener('openLogin', handleTriggerLogin);
 
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        if (onHeightChange) {
+          onHeightChange(entry.target.offsetHeight + (isMobile ? 10 : 20)); // Add the 'top' margin/buffer
+        }
+      }
+    });
+
+    if (headerRef.current) {
+      resizeObserver.observe(headerRef.current);
+    }
+
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('openProfile', handleOpenProfile);
       window.removeEventListener('openLogin', handleTriggerLogin);
+      resizeObserver.disconnect();
     };
-  }, [lastScrollY]);
+  }, [lastScrollY, onHeightChange, isMobile]);
 
   useEffect(() => {
     if (profileData) {
@@ -123,7 +137,7 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
 
   return (
     <>
-      <header style={{
+      <header ref={headerRef} style={{
         position: 'fixed',
         top: isMobile ? '10px' : '20px',
         left: 0,
@@ -142,7 +156,8 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         transform: isVisible ? 'translateY(0)' : 'translateY(-120%)',
         opacity: isVisible ? 1 : 0,
-        minHeight: isMobile ? '65px' : '82px'
+        minHeight: isMobile ? '65px' : 'auto',
+        height: 'auto'
       }}>
         <div style={{ 
           margin: '0 auto', 
@@ -150,38 +165,40 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
           justifyContent: 'space-between', 
           alignItems: 'center',
           position: 'relative',
-          gap: isMobile ? '10px' : '40px'
+          gap: isMobile ? '8px' : '40px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', flex: '0 0 auto', zIndex: 20 }}>
             <Link 
               to="/" 
               onClick={onLogoClick}
               style={{ 
                 display: 'flex', 
-                alignItems: 'center', 
-                gap: '8px',
-                height: isMobile ? '45px' : 'auto' // Match search height for stability
+                alignItems: 'center'
               }}
             >
               {settings.logo_url ? (
                 <img 
                   src={settings.logo_url} 
-                  alt="PromptKing - AI Prompts Library" 
-                  width={isMobile ? (settings.logo_width_mobile || 120) : (settings.logo_width_desktop || 180)}
-                  height={isMobile ? 40 : 60}
+                  alt="PromptKing" 
                   style={{ 
-                    width: isMobile ? `${settings.logo_width_mobile || 120}px` : `${settings.logo_width_desktop || 180}px`,
-                    height: 'auto', 
+                    height: isMobile 
+                      ? (settings.logo_height_mobile || '32px') 
+                      : (settings.logo_height_desktop || '50px'),
+                    maxHeight: isMobile ? '75px' : '100%',
+                    width: 'auto',
                     objectFit: 'contain',
-                    transition: '0.3s'
+                    display: 'block',
+                    transition: 'height 0.3s ease'
                   }} 
                   className="site-logo"
                 />
               ) : (
-                <span className="header-logo-text" style={{ fontSize: '1.5rem', fontWeight: 800, color: 'white', letterSpacing: '-0.5px' }}>PromptKing</span>
+                <span className="header-logo-text" style={{ fontSize: isMobile ? '1.2rem' : '1.5rem', fontWeight: 900, color: 'white', letterSpacing: '-0.5px' }}>PromptKing</span>
               )}
             </Link>
           </div>
+
+          {/* Centered Category Icon Removed as per user request */}
 
           <div style={{ 
             display: 'flex', 
@@ -240,6 +257,21 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                       <Heart size={18} fill={filter === 'liked' ? '#E50914' : 'none'} />
                     </button>
                   )}
+                  <div 
+                    className="glass-button-secondary"
+                    onClick={() => window.dispatchEvent(new CustomEvent('openFilters'))}
+                    aria-label="Filter"
+                    role="button"
+                    style={{ 
+                      width: '38px', height: '38px', borderRadius: '50%', 
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      color: 'var(--accent-main)'
+                    }}
+                  >
+                    <Layers size={18} />
+                  </div>
                   <div 
                     className="glass-button-secondary"
                     onClick={() => setIsSearchExpanded(true)}
@@ -366,13 +398,12 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                         display: 'flex',
                         alignItems: 'center',
                         gap: '12px',
-                        background: 'rgba(255, 255, 255, 0.03)',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                        padding: '5px 18px 5px 5px',
+                        padding: isMobile ? '4px 10px 4px 4px' : '5px 18px 5px 5px',
                         borderRadius: '50px',
                         cursor: 'pointer',
                         transition: '0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        backdropFilter: 'blur(10px)'
+                        backdropFilter: 'blur(10px)',
+                        maxWidth: isMobile ? '150px' : 'none'
                       }}
                     >
                       <div style={{ width: '42px', height: '42px', borderRadius: '50%', overflow: 'hidden', border: '2px solid transparent' }}>
@@ -392,7 +423,7 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                         background: 'var(--accent-main)',
                         color: 'white',
                         border: 'none',
-                        padding: '12px 28px',
+                        padding: isMobile ? '8px 16px' : '12px 28px',
                         borderRadius: '50px',
                         fontWeight: 700,
                         fontSize: '0.9rem',

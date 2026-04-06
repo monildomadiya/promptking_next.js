@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Lock, Eye, FileText, CheckCircle } from 'lucide-react';
+import { Shield, Lock, Eye, FileText, CheckCircle, ShieldCheck } from '../components/Common/Icons';
 
 import SocialSidebar from '../components/Prompts/SocialSidebar';
 

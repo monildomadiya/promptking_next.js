@@ -5,6 +5,89 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+let lastDbFailure = 0;
+const DB_RETRY_DELAY = 10 * 60 * 1000; // 10 minutes
+
+const isDbHealthy = () => {
+  if (lastDbFailure === 0) return true;
+  const timeSinceFailure = Date.now() - lastDbFailure;
+  return timeSinceFailure > DB_RETRY_DELAY;
+};
+
+// Local Overrides Cache (for local dev resilience)
+let localSettingsCache = {};
+
+const MOCK_DATA = {
+  prompts: [
+    {
+      prompt_key: "PK001",
+      slug: "photorealistic-cyberpunk-portrait",
+      title: "Photorealistic Cyberpunk Portrait",
+      description: "A highly detailed portrait of a cyberpunk character in a neon-lit street.",
+      ai_type: "Midjourney",
+      prompt_text: "High-end fashion photography, close up portrait of a futuristic cyberpunk woman, neon accessories, glowing skin, shallow depth of field, 8k resolution, cinematic lighting --ar 4:5 --v 6.0",
+      img_before: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=800",
+      img_after: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80&w=800",
+      is_image_slider: 1,
+      hide_prompt_box: 0,
+      image_ratio: "4:5",
+      is_premium: 1,
+      copy_count: 156,
+      unlock_count: 42,
+      like_count: 89
+    },
+    {
+      prompt_key: "PK002",
+      slug: "modern-minimalist-living-room",
+      title: "Modern Minimalist Living Room",
+      description: "Clean and airy interior design style for a modern living room.",
+      ai_type: "DALL-E",
+      prompt_text: "Modern minimalist living room, soft natural lighting, Scandinavian furniture, neutral color palette, large windows, high ceiling, architectural photography style.",
+      img_before: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800",
+      img_after: "https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&q=80&w=800",
+      is_image_slider: 0,
+      hide_prompt_box: 0,
+      image_ratio: "16:9",
+      is_premium: 0,
+      copy_count: 312,
+      unlock_count: 0,
+      like_count: 145
+    },
+    {
+      prompt_key: "PK003",
+      slug: "ghibli-style-anime-landscape",
+      title: "Ghibli Style Anime Landscape",
+      description: "A beautiful, serene landscape in the style of Studio Ghibli.",
+      ai_type: "ChatGPT",
+      prompt_text: "Rolling green hills with a small white cottage, blooming flowers everywhere, huge fluffy white clouds in a bright blue sky, Ghibli anime style, oil painting texture, vibrant colors, peaceful atmosphere.",
+      img_before: "https://images.unsplash.com/photo-1541417904950-b855846fe074?auto=format&fit=crop&q=80&w=800",
+      img_after: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800",
+      is_image_slider: 1,
+      hide_prompt_box: 0,
+      image_ratio: "3:2",
+      is_premium: 0,
+      copy_count: 890,
+      unlock_count: 0,
+      like_count: 420
+    }
+  ],
+  categories: [
+    { id: 1, name: "Midjourney", slug: "midjourney" },
+    { id: 2, name: "DALL-E", slug: "dall-e" },
+    { id: 3, name: "ChatGPT", slug: "chatgpt" },
+    { id: 4, name: "Stable Diffusion", slug: "stable-diffusion" }
+  ],
+  settings: {
+    logo_url: "",
+    logo_height_desktop: "50px",
+    logo_height_mobile: "32px",
+    adsense_client_id: "ca-pub-test",
+    adsense_enabled: "0",
+    youtube_url: "https://youtube.com",
+    instagram_url: "https://instagram.com"
+  }
+};
+
 const uploadDir = 'uploads/';
 if (!fs.existsSync(uploadDir)) { fs.mkdirSync(uploadDir, { recursive: true }); }
 
@@ -75,8 +158,6 @@ router.post('/login', async (req, res) => {
     await db`
       INSERT INTO users (id, name, email, avatar_url) 
       VALUES (${uid}, ${name}, ${email}, ${picture})
-      INSERT INTO users (id, name, email, avatar_url) 
-      VALUES (${uid}, ${name}, ${email}, ${picture})
       ON DUPLICATE KEY UPDATE 
         name = VALUES(name), 
         avatar_url = CASE 
@@ -100,6 +181,49 @@ router.get('/logout', (req, res) => {
 // --- 2. FETCH PROMPTS & LIKES ---
 router.get('/get_data', async (req, res) => {
   const uid = req.headers['x-user-id'] || req.session.userId || null;
+  
+  if (!isDbHealthy()) {
+    console.log('Skipping DB query (Circuit Breaker active), fetching Live Data...');
+    return fetchLiveData();
+  }
+
+  async function fetchLiveData() {
+    try {
+      const liveRes = await fetch('https://api.promptking.in/api/get_data');
+      if (!liveRes.ok) throw new Error(`Live API responded with ${liveRes.status}`);
+      const data = await liveRes.json();
+      res.json(data);
+    } catch (liveError) {
+      console.error('CRITICAL ERROR: LIVE API FALLBACK FAILED:', liveError.message);
+      const mockPrompts = MOCK_DATA.prompts.map(p => ({
+        ...p,
+        isImageSlider: Boolean(p.is_image_slider),
+        hidePromptBox: Boolean(p.hide_prompt_box),
+        copyCount: Number(p.copy_count || 0),
+        unlockCount: Number(p.unlock_count || 0),
+        likeCount: Number(p.like_count || 0),
+        aiType: p.ai_type,
+        slug: p.slug,
+        key: p.prompt_key,
+        prompt_key: p.prompt_key,
+        password: p.password,
+        promptText: p.prompt_text,
+        imgAfter: p.img_after,
+        imgBefore: p.img_before,
+        igLink: p.ig_link,
+        imageRatio: p.image_ratio,
+        isPremium: Boolean(p.is_premium)
+      }));
+      res.json({ 
+        prompts: mockPrompts, 
+        likes: {}, 
+        categories: MOCK_DATA.categories,
+        isMockMode: true,
+        fallbackError: liveError.message 
+      });
+    }
+  }
+
   try {
     const promptsRows = await db`SELECT * FROM prompts`;
     const categoriesRows = await db`SELECT * FROM categories ORDER BY name ASC`;
@@ -131,46 +255,96 @@ router.get('/get_data', async (req, res) => {
     }
     res.json({ prompts, likes, categories: categoriesRows });
   } catch (error) {
-    console.error('CRITICAL DATABASE FETCH ERROR:', error);
-    res.status(500).json({ error: "Failed to fetch data", details: String(error) });
+    console.warn('LOCAL DB FAILED, FETCHING LIVE DATA FROM PRODUCTION API:', error.message);
+    lastDbFailure = Date.now();
+    await fetchLiveData();
   }
 });
 
 // --- BLOGS (Public) ---
 router.get('/blogs', async (req, res) => {
+  if (!isDbHealthy()) return fetchLiveBlogs();
+  
+  async function fetchLiveBlogs() {
+    try {
+      const liveRes = await fetch('https://api.promptking.in/api/blogs');
+      res.json(await liveRes.json());
+    } catch (liveError) {
+      res.status(500).json({ error: "Failed to fetch blogs from live API" });
+    }
+  }
+
   try {
     const rows = await db`SELECT * FROM blogs ORDER BY created_at DESC`;
     res.json(rows);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch blogs" });
+    console.warn('LOCAL DB FAILED, FETCHING LIVE BLOGS:', error.message);
+    lastDbFailure = Date.now();
+    await fetchLiveBlogs();
   }
 });
 
 // --- FAQS (Public) ---
 router.get('/faqs', async (req, res) => {
+  if (!isDbHealthy()) return fetchLiveFaqs();
+
+  async function fetchLiveFaqs() {
+    try {
+      const liveRes = await fetch('https://api.promptking.in/api/faqs');
+      res.json(await liveRes.json());
+    } catch (liveError) {
+      res.status(500).json({ error: "Failed to fetch FAQs from live API" });
+    }
+  }
+
   try {
     const rows = await db`SELECT * FROM faqs ORDER BY created_at DESC`;
     res.json(rows);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch FAQs" });
+    console.warn('LOCAL DB FAILED, FETCHING LIVE FAQS:', error.message);
+    lastDbFailure = Date.now();
+    await fetchLiveFaqs();
   }
 });
 
 // --- CATEGORIES (Public) ---
 router.get('/categories', async (req, res) => {
+  if (!isDbHealthy()) return fetchLiveCategories();
+
+  async function fetchLiveCategories() {
+    try {
+      const liveRes = await fetch('https://api.promptking.in/api/categories');
+      res.json(await liveRes.json());
+    } catch (liveError) {
+      res.json(MOCK_DATA.categories);
+    }
+  }
+
   try {
     const rows = await db`SELECT * FROM categories ORDER BY name ASC`;
     res.json(rows);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch categories" });
+    console.warn('LOCAL DB FAILED, FETCHING LIVE CATEGORIES:', error.message);
+    lastDbFailure = Date.now();
+    await fetchLiveCategories();
   }
 });
 
 router.get('/prompt/:key', async (req, res) => {
   const { key } = req.params;
+
+  if (!isDbHealthy()) return fetchLivePrompt();
+
+  async function fetchLivePrompt() {
+    try {
+      const liveRes = await fetch(`https://api.promptking.in/api/prompt/${key}`);
+      if (!liveRes.ok) return res.status(404).json({ error: "Prompt not found on live API" });
+      res.json(await liveRes.json());
+    } catch (liveError) {
+      res.status(500).json({ error: "Failed to fetch prompt from live API" });
+    }
+  }
+
   try {
     const rows = await db`
       SELECT * FROM prompts 
@@ -200,8 +374,9 @@ router.get('/prompt/:key', async (req, res) => {
     };
     res.json(prompt);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch prompt" });
+    console.warn('LOCAL DB FAILED, FETCHING LIVE PROMPT:', error.message);
+    lastDbFailure = Date.now();
+    await fetchLivePrompt();
   }
 });
 
@@ -211,9 +386,37 @@ router.get('/settings', async (req, res) => {
     const rows = await db`SELECT * FROM site_settings`;
     const settings = {};
     rows.forEach(r => { settings[r.setting_key] = r.setting_value; });
-    res.json(settings);
+    res.json(Object.assign({}, settings, localSettingsCache));
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch settings" });
+    console.warn('LOCAL DB FAILED, FETCHING LIVE SETTINGS:', error.message);
+    lastDbFailure = Date.now();
+    await fetchLiveSettings();
+  }
+
+  async function fetchLiveSettings() {
+    try {
+      const liveRes = await fetch('https://api.promptking.in/api/settings');
+      let data = await liveRes.json();
+      
+      // Merge with local overrides
+      data = Object.assign({}, data, localSettingsCache);
+
+      // Fix logo URL (only if not already an absolute URL)
+      if (data.logo_url && data.logo_url.startsWith('/')) {
+        data.logo_url = `https://api.promptking.in${data.logo_url}`;
+      }
+      
+      // Fix height units
+      ['logo_height_desktop', 'logo_height_mobile'].forEach(key => {
+        if (data[key] && !data[key].toString().includes('px') && !isNaN(data[key])) {
+          data[key] = `${data[key]}px`;
+        }
+      });
+      
+      res.json(data);
+    } catch (liveError) {
+      res.json(Object.assign({}, MOCK_DATA.settings, localSettingsCache));
+    }
   }
 });
 
@@ -355,20 +558,33 @@ router.post('/admin/login', (req, res) => {
   }
 });
 
+
 // Admin Settings
 router.get('/admin/settings', adminAuth, async (req, res) => {
   try {
     const rows = await db`SELECT * FROM site_settings`;
     const settings = {};
     rows.forEach(r => { settings[r.setting_key] = r.setting_value; });
-    res.json(settings);
+    
+    // Merge with memory cache
+    res.json(Object.assign({}, settings, localSettingsCache));
   } catch (error) {
-    res.status(500).json({ error: "Fetch settings failed" });
+    // If DB fails, return Live settings merged with local overrides
+    try {
+      const liveRes = await fetch('https://api.promptking.in/api/settings');
+      let data = await liveRes.json();
+      res.json(Object.assign({}, data, localSettingsCache));
+    } catch (e) {
+      res.json(Object.assign({}, MOCK_DATA.settings, localSettingsCache));
+    }
   }
 });
 
 router.post('/admin/save_settings', adminAuth, async (req, res) => {
   const settings = req.body;
+  // Update memory cache
+  Object.assign(localSettingsCache, settings);
+
   try {
     for (const [key, value] of Object.entries(settings)) {
       await db`
@@ -379,13 +595,19 @@ router.post('/admin/save_settings', adminAuth, async (req, res) => {
     }
     res.json({ status: "success" });
   } catch (error) {
-    res.status(500).json({ error: "Save settings failed" });
+    console.warn('ADMIN SAVE SETTINGS: DB FAILED, BUT PERSISTED TO MEMORY:', error.message);
+    lastDbFailure = Date.now();
+    res.json({ status: "success", warning: "Database unreachable, settings persisted to memory only." });
   }
 });
 
 router.post('/admin/upload_logo', adminAuth, logoUpload.single('logo'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
   const logoUrl = `/uploads/${req.file.filename}`;
+  
+  // Update memory cache
+  localSettingsCache.logo_url = logoUrl;
+
   try {
     await db`
       INSERT INTO site_settings (setting_key, setting_value) 
@@ -394,13 +616,16 @@ router.post('/admin/upload_logo', adminAuth, logoUpload.single('logo'), async (r
     `;
     res.json({ status: "success", logoUrl });
   } catch (error) {
-    res.status(500).json({ error: "Logo save failed" });
+    console.warn('ADMIN UPLOAD LOGO: DB FAILED, BUT PERSISTED TO MEMORY:', error.message);
+    lastDbFailure = Date.now();
+    res.json({ status: "success", logoUrl, warning: "Database unreachable, selection persisted to memory only." });
   }
 });
 
 router.post('/admin/upload_image', adminAuth, logoUpload.single('image'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
   const imageUrl = `/uploads/${req.file.filename}`;
+  // No DB persistence required for general image upload (usually for prompt editors)
   res.json({ status: "success", imageUrl });
 });
 
@@ -410,6 +635,24 @@ router.get('/admin/logout', (req, res) => {
 });
 
 router.get('/admin/prompts', adminAuth, async (req, res) => {
+  if (!isDbHealthy()) return fetchLiveAdminPrompts();
+
+  async function fetchLiveAdminPrompts() {
+    try {
+      const liveRes = await fetch('https://api.promptking.in/api/admin/prompts');
+      if (!liveRes.ok) throw new Error("Live API failed");
+      res.json(await liveRes.json());
+    } catch (e) {
+      // Last-ditch mock data for UI safety
+      res.json(MOCK_DATA.prompts.map(p => ({
+        ...p,
+        copy_count: Number(p.copy_count || 0),
+        unlock_count: Number(p.unlock_count || 0),
+        like_count: Number(p.like_count || 0),
+      })));
+    }
+  }
+
   try {
     const rows = await db`SELECT * FROM prompts`;
     const formatted = rows.map(r => ({
@@ -422,7 +665,9 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
     }));
     res.json(formatted);
   } catch (error) {
-    res.status(500).json({ error: "Fetch failed" });
+    console.warn('ADMIN PROMPTS DB FAILED, FETCHING LIVE:', error.message);
+    lastDbFailure = Date.now();
+    await fetchLiveAdminPrompts();
   }
 });
 
@@ -507,11 +752,22 @@ router.delete('/admin/delete_prompt/:key', adminAuth, async (req, res) => {
 
 // Admin Blog CRUD
 router.get('/admin/blogs', adminAuth, async (req, res) => {
+  if (!isDbHealthy()) return fetchLiveAdminBlogs();
+
+  async function fetchLiveAdminBlogs() {
+    try {
+      const liveRes = await fetch('https://api.promptking.in/api/admin/blogs');
+      res.json(await liveRes.json());
+    } catch (e) { res.json([]); }
+  }
+
   try {
     const rows = await db`SELECT * FROM blogs`;
     res.json(rows);
   } catch (error) {
-    res.status(500).json({ error: "Fetch failed" });
+    console.warn('ADMIN BLOGS DB FAILED, FETCHING LIVE:', error.message);
+    lastDbFailure = Date.now();
+    await fetchLiveAdminBlogs();
   }
 });
 
@@ -549,11 +805,22 @@ router.delete('/admin/delete_blog/:id', adminAuth, async (req, res) => {
 
 // FAQ CRUD
 router.get('/admin/faqs', adminAuth, async (req, res) => {
+  if (!isDbHealthy()) return fetchLiveAdminFaqs();
+
+  async function fetchLiveAdminFaqs() {
+    try {
+      const liveRes = await fetch('https://api.promptking.in/api/admin/faqs');
+      res.json(await liveRes.json());
+    } catch (e) { res.json([]); }
+  }
+
   try {
     const rows = await db`SELECT * FROM faqs`;
     res.json(rows);
   } catch (error) {
-    res.status(500).json({ error: "Fetch failed" });
+    console.warn('ADMIN FAQS DB FAILED, FETCHING LIVE:', error.message);
+    lastDbFailure = Date.now();
+    await fetchLiveAdminFaqs();
   }
 });
 
@@ -582,11 +849,22 @@ router.delete('/admin/delete_faq/:id', adminAuth, async (req, res) => {
 
 // Admin Category CRUD
 router.get('/admin/categories', adminAuth, async (req, res) => {
+  if (!isDbHealthy()) return fetchLiveAdminCategories();
+
+  async function fetchLiveAdminCategories() {
+    try {
+      const liveRes = await fetch('https://api.promptking.in/api/admin/categories');
+      res.json(await liveRes.json());
+    } catch (e) { res.json(MOCK_DATA.categories); }
+  }
+
   try {
     const rows = await db`SELECT * FROM categories ORDER BY name ASC`;
     res.json(rows);
   } catch (error) {
-    res.status(500).json({ error: "Fetch failed" });
+    console.warn('ADMIN CATEGORIES DB FAILED, FETCHING LIVE:', error.message);
+    lastDbFailure = Date.now();
+    await fetchLiveAdminCategories();
   }
 });
 

@@ -5,13 +5,14 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: true,
     proxy: {
       '/api': {
-        target: 'https://api.promptking.in',
+        target: 'http://localhost:5000',
         changeOrigin: true
       },
       '/uploads': {
-        target: 'https://api.promptking.in',
+        target: 'http://localhost:5000',
         changeOrigin: true
       }
     }

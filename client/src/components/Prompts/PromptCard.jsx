@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Copy, Check, Eye, Lock, Unlock, Youtube, ArrowRight, Crown, Code, Instagram } from 'lucide-react';
+import { Heart, Copy, Check, Eye, Lock, Unlock, Youtube, ArrowRight, Crown, Code, Instagram, Layout, Zap, Sparkles, Image, MessageSquare, Laptop } from '../Common/Icons';
 import api from '../../api';
 import confetti from 'canvas-confetti';
 import YouTubeModal from '../Modals/YouTubeModal';
@@ -275,6 +275,16 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
   );
 
   const safeAiType = (prompt.aiType || '').toLowerCase();
+  
+  // Dynamic Icon selection based on AI Type
+  const getAiIcon = () => {
+    if (safeAiType.includes('chatgpt')) return <Zap size={16} fill="#10a37f" color="#10a37f" />;
+    if (safeAiType.includes('gemini')) return <Sparkles size={16} color="#4285f4" />;
+    if (safeAiType.includes('midjourney') || safeAiType.includes('dall-e')) return <Image size={16} color="#FF00FF" />;
+    if (safeAiType.includes('coding') || safeAiType.includes('coder')) return <Code size={16} color="#00FF00" />;
+    return <Layout size={16} />;
+  };
+
   const badgeClass = safeAiType.includes('chatgpt') ? 'chatgpt' : 
                    safeAiType.includes('gemini') ? 'gemini' : 
                    safeAiType.includes('midjourney') ? 'midjourney' : '';
@@ -301,7 +311,7 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
           fontWeight: 800, textTransform: 'uppercase', boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
           zIndex: 110, animation: 'bounce 2s infinite'
         }}>
-          <HighlightText text="Search Match" highlight={searchTerm} />: <HighlightText text={prompt.prompt_key} highlight={searchTerm} />
+          ✦ Search Match: {prompt.prompt_key}
         </div>
       )}
       {/* Top Content Wrapper - Animate disappearance */}
@@ -537,7 +547,7 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
                 userSelect: (isUnlocked) ? 'text' : 'none', 
                 overflowY: (isUnlocked) ? 'auto' : 'hidden'
               }}>
-                {prompt.promptText}
+                <HighlightText text={prompt.promptText} highlight={searchTerm} />
               </div>
 
               {isUnlocked && (

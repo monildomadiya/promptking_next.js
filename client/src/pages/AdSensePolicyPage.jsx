@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Info, ExternalLink, Globe, Cookie } from 'lucide-react';
+import { ShieldCheck, Info, ExternalLink, Globe, Cookie } from '../components/Common/Icons';
 
 import SocialSidebar from '../components/Prompts/SocialSidebar';
 

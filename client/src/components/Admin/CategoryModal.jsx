@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
-import { X } from 'lucide-react';
+import { X, Save, PlusCircle, Activity } from '../Common/Icons';
 
 const CategoryModal = ({ category, onClose, onSave }) => {
   const [formData, setFormData] = useState({

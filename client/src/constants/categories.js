@@ -1,4 +1,4 @@
-import { Grid, MessageSquare, Sparkles, Image } from 'lucide-react';
+import { Grid, MessageSquare, Sparkles, Image } from '../components/Common/Icons';
 
 export const CATEGORIES = [
   { id: 'all', label: 'All', icon: Grid },

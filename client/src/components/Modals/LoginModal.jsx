@@ -1,6 +1,6 @@
 import React from 'react';
 import KingDialog from './KingDialog';
-import { Mail, Shield, Zap } from 'lucide-react';
+import { X, Mail, Lock, User, Shield } from '../Common/Icons';
 import { motion } from 'framer-motion';
 
 const LoginModal = ({ isOpen, onClose, onLogin, message }) => {

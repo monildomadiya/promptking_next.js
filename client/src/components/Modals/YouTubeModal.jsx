@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
+import { X, Youtube, Star } from '../Common/Icons';
 
 const YouTubeModal = ({ isOpen, onClose, videoUrl }) => {
   useEffect(() => {

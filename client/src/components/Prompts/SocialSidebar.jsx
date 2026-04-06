@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Youtube, Instagram, Facebook, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Youtube, Instagram, Facebook, ArrowRight, ShieldCheck } from '../Common/Icons';
 import api from '../../api';
 
 const PinterestIcon = ({ size = 24 }) => (

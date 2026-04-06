@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Save, Sparkle } from '../Common/Icons';
 import api from '../../api';
 
 const FAQModal = ({ faq, onClose, onSave }) => {

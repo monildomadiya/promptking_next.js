@@ -3,8 +3,9 @@ import PromptCard from './PromptCard';
 import SocialSidebar from './SocialSidebar';
 import CategorySidebar from './CategorySidebar';
 import Shimmer from '../Common/Shimmer';
+import CategoryBar from './CategoryBar';
 import api from '../../api';
-import { Search, Crown, Grid, MessageSquare, Sparkles, Image, Zap, Heart, Filter } from 'lucide-react';
+import { Search, Crown, Grid, MessageSquare, Sparkles, Image, Zap, Heart, Filter } from '../Common/Icons';
 
 const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) => {
   const [prompts, setPrompts] = useState([]);
@@ -13,6 +14,8 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
   const [loading, setLoading] = useState(true);
   const [activeUnlockedKey, setActiveUnlockedKey] = useState(null);
   const [visibleCount, setVisibleCount] = useState(12);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [catSearch, setCatSearch] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -96,6 +99,24 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
     return matchesSearch && matchesFilter;
   });
 
+  // Calculate counts for categories and types
+  const filterCounts = {
+    all: prompts.length,
+    free: prompts.filter(p => !p.isPremium).length,
+    premium: prompts.filter(p => p.isPremium).length,
+    liked: Object.values(likes).filter(Boolean).length,
+    categories: categories.reduce((acc, cat) => {
+      acc[cat.name.toLowerCase()] = prompts.filter(p => p.aiType.toLowerCase().includes(cat.name.toLowerCase())).length;
+      return acc;
+    }, {})
+  };
+
+  useEffect(() => {
+    const handleOpenFilters = () => setIsSidebarOpen(true);
+    window.addEventListener('openFilters', handleOpenFilters);
+    return () => window.removeEventListener('openFilters', handleOpenFilters);
+  }, []);
+
   if (loading) {
     return (
       <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px', width: '100%' }}>
@@ -134,88 +155,19 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
   }
 
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px', width: '100%' }}>
-      {/* Prompts Grid */}
-      <div className="home-layout-grid">
-        {/* Main Grid Content */}
-        <div className="grid-main-area">
-          {/* Category Filter Toggle - Smoothly hidden during search on mobile to prevent layout jumps */}
-          {/* Premium Horizontal Category Bar */}
-          <div className="horizontal-category-bar" style={{ 
-            marginBottom: '25px',
+    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: isMobile ? '10px' : '20px', width: '100%' }}>
+      <div className="home-layout-grid" style={{ 
+        display: isMobile ? 'flex' : 'grid', 
+        flexDirection: 'column' 
+      }}>
+        <div className="grid-main-area" style={{ width: '100%' }}>
+          <div className="masonry-grid-react" style={{ 
             display: 'flex', 
-            overflowX: 'auto',
-            gap: '12px',
-            padding: '5px 5px 15px 5px',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            WebkitOverflowScrolling: 'touch',
-            maskImage: isMobile ? 'linear-gradient(to right, black 85%, transparent)' : 'none'
+            gap: isMobile ? '12px' : '20px', 
+            alignItems: 'flex-start',
+            flexWrap: 'nowrap',
+            flexDirection: 'row'
           }}>
-            <button 
-              onClick={() => setFilter('all')}
-              style={{
-                background: filter === 'all' ? 'var(--accent-main)' : 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid',
-                borderColor: filter === 'all' ? 'var(--accent-main)' : 'rgba(255, 255, 255, 0.1)',
-                color: 'white',
-                padding: '12px 24px',
-                borderRadius: '50px',
-                fontSize: '0.9rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                whiteSpace: 'nowrap',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                boxShadow: filter === 'all' ? '0 8px 20px rgba(229, 9, 20, 0.3)' : 'none'
-              }}
-            >
-              <Grid size={18} />
-              All Prompts
-            </button>
-
-            {categories.map((cat) => {
-              const catName = cat.name.toLowerCase();
-              const isActive = filter === catName;
-              
-              // Map icons to categories
-              const Icon = catName.includes('art') ? Image : 
-                           catName.includes('chat') ? MessageSquare : 
-                           catName.includes('code') ? Code : 
-                           Sparkles;
-
-              return (
-                <button 
-                  key={cat.id}
-                  onClick={() => setFilter(isActive ? 'all' : catName)}
-                  style={{
-                    background: isActive ? 'var(--accent-main)' : 'rgba(255, 255, 255, 0.03)',
-                    border: '1px solid',
-                    borderColor: isActive ? 'var(--accent-main)' : 'rgba(255, 255, 255, 0.08)',
-                    color: isActive ? 'white' : 'rgba(255, 255, 255, 0.6)',
-                    padding: '12px 24px',
-                    borderRadius: '50px',
-                    fontSize: '0.9rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    whiteSpace: 'nowrap',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    boxShadow: isActive ? '0 8px 20px rgba(229, 9, 20, 0.2)' : 'none'
-                  }}
-                >
-                  <Icon size={18} />
-                  {cat.name}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="masonry-grid-react" style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
             {(() => {
               const items = filteredPrompts.slice(0, visibleCount);
               const cols = isMobile ? 2 : 3;
@@ -223,7 +175,7 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
               
               items.forEach((p, index) => {
                 columns[index % cols].push(
-                  <div key={p.prompt_key || p.id} style={{ marginBottom: 0 }}>
+                  <div key={p.prompt_key || p.id} style={{ width: '100%' }}>
                     <PromptCard 
                       prompt={p} 
                       user={user}
@@ -232,18 +184,15 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
                       isUnlocked={!p.isPremium || activeUnlockedKey === (p.prompt_key || p.id)}
                       onUnlock={() => setActiveUnlockedKey(p.prompt_key || p.id)}
                       onLock={() => setActiveUnlockedKey(null)}
-                      isHighlighted={search.trim() !== '' && (
-                        p.prompt_key?.toLowerCase() === search.trim().toLowerCase() ||
-                        (search.trim().length >= 3 && p.prompt_key?.toLowerCase().includes(search.trim().toLowerCase()))
-                      )}
                       searchTerm={search}
+                      isHighlighted={search && (p.title.toLowerCase().includes(search.toLowerCase()) || (p.prompt_key && p.prompt_key.toLowerCase().includes(search.toLowerCase())))}
                     />
                   </div>
                 );
               });
 
               return columns.map((colItems, i) => (
-                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '25px', minWidth: 0 }}>
+                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: isMobile ? '12px' : '25px', minWidth: 0 }}>
                   {colItems}
                 </div>
               ));
@@ -251,58 +200,118 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
           </div>
 
           {filteredPrompts.length > visibleCount && (
-            <div className="load-more-container" style={{ display: 'flex', justifyContent: 'center', marginTop: '15px', marginBottom: '20px' }}>
+            <div className="load-more-container" style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
               <button 
                 onClick={loadMore}
-                className="pro-card-hover"
                 style={{
                   background: 'rgba(255, 255, 255, 0.05)',
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
                   border: '1px solid rgba(255, 255, 255, 0.1)',
                   color: 'white',
-                  padding: '18px 48px',
+                  padding: isMobile ? '14px 30px' : '18px 48px',
                   borderRadius: '100px',
-                  fontSize: '1.05rem',
+                  fontSize: isMobile ? '0.9rem' : '1.05rem',
                   fontWeight: 700,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '14px',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
-                  letterSpacing: '0.5px'
-                }}
-                onMouseOver={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-                    e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
-                    e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.3)';
-                  }
-                }}
-                onMouseOut={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                    e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                    e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.2)';
-                  }
+                  gap: '12px'
                 }}
               >
-                <Sparkles size={20} className="floating-animation" style={{ color: 'var(--accent-main)' }} />
-                Load More Amazing Prompts
+                <Sparkles size={18} style={{ color: 'var(--accent-main)' }} />
+                Load More
               </button>
             </div>
           )}
-
-          {filteredPrompts.length === 0 && (
-            <p style={{ color: 'gray', textAlign: 'center', padding: '100px 40px', background: 'var(--surface-color)', borderRadius: '32px', marginTop: '40px' }}>No prompts found matching your criteria.</p>
-          )}
         </div>
 
-        {/* Sidebar Area */}
-        <div className="sidebar-area" style={{ flexShrink: 0 }}>
-          <SocialSidebar />
-        </div>
+        {!isMobile && (
+          <div className="sidebar-area" style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '30px', width: '300px' }}>
+            <CategorySidebar 
+              filter={filter} 
+              setFilter={setFilter} 
+              user={user} 
+              counts={filterCounts}
+            />
+            <SocialSidebar />
+          </div>
+        )}
+
+        {isMobile && isSidebarOpen && (
+          <div style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 10001,
+            background: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'flex-end',
+            animation: 'fadeIn 0.3s ease-out'
+          }} onClick={() => setIsSidebarOpen(false)}>
+            <div style={{
+              width: '100%',
+              maxHeight: '85vh',
+              overflowY: 'auto',
+              background: 'var(--surface-0)',
+              borderRadius: '32px 32px 0 0',
+              padding: '20px 24px 40px',
+              borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+              boxShadow: '0 -20px 60px rgba(0,0,0,0.9)',
+              animation: 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+              position: 'relative'
+            }} onClick={e => e.stopPropagation()}>
+              
+              {/* Drag Handle */}
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                marginBottom: '25px',
+                sticky: 'top',
+                paddingTop: '5px'
+              }}>
+                <div style={{ 
+                  width: '45px', 
+                  height: '5px', 
+                  background: 'rgba(255, 255, 255, 0.15)', 
+                  borderRadius: '10px' 
+                }} />
+              </div>
+
+              <div style={{ marginBottom: '10px' }}>
+                <h3 style={{ fontSize: '1.4rem', fontWeight: 900, color: 'white', marginBottom: '5px' }}>Controls</h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-dim)', marginBottom: '20px' }}>Configure your browsing experience.</p>
+              </div>
+
+              <CategorySidebar 
+                filter={filter} 
+                setFilter={(f) => {
+                  setFilter(f);
+                  // Optional: Close on selection for better UX
+                  // setIsSidebarOpen(false); 
+                }} 
+                user={user} 
+                counts={filterCounts}
+              />
+
+              <button 
+                onClick={() => setIsSidebarOpen(false)}
+                style={{
+                  width: '100%',
+                  padding: '18px',
+                  borderRadius: '16px',
+                  background: 'var(--accent-main)',
+                  border: 'none',
+                  color: 'white',
+                  fontWeight: 800,
+                  marginTop: '30px',
+                  fontSize: '1rem',
+                  boxShadow: '0 8px 25px var(--accent-glow)'
+                }}
+              >
+                APPLY SETTINGS
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
