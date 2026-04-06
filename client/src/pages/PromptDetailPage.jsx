@@ -229,6 +229,14 @@ const PromptDetailPage = ({ user, adsSettings }) => {
                    aiType.toLowerCase().includes('gemini') ? 'gemini' : 
                    aiType.toLowerCase().includes('midjourney') ? 'midjourney' : '';
 
+  const optimizeImage = (url, width = 800) => {
+    if (!url) return url;
+    if (url.startsWith('/uploads/')) {
+      return `/api/optimize?src=${encodeURIComponent(url)}&w=${width}`;
+    }
+    return url;
+  };
+
   const promptSchema = {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
@@ -308,9 +316,9 @@ const PromptDetailPage = ({ user, adsSettings }) => {
               <div style={{ borderRadius: '24px', overflow: 'hidden', position: 'relative' }}>
                 {prompt.isImageSlider ? (
                   <div className="slider-container" style={{ position: 'relative', aspectRatio: (prompt.image_ratio || prompt.imageRatio || '16 / 9').replace(/\s+/g, ' ').trim(), width: '100%' }}>
-                    <img src={prompt.imgAfter} alt="After" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={optimizeImage(prompt.imgAfter)} alt="After" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                     <img 
-                      src={prompt.imgBefore} 
+                      src={optimizeImage(prompt.imgBefore)} 
                       alt="Before" 
                       style={{ 
                         position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover',
@@ -357,7 +365,7 @@ const PromptDetailPage = ({ user, adsSettings }) => {
                   </div>
                 ) : (prompt.imgAfter || prompt.imgBefore) && (
                   <div style={{ width: '100%', aspectRatio: (prompt.image_ratio || prompt.imageRatio || '16 / 9').replace(/\s+/g, ' ').trim(), background: '#111', position: 'relative' }}>
-                    <img src={prompt.imgAfter || prompt.imgBefore} alt={prompt.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={optimizeImage(prompt.imgAfter || prompt.imgBefore)} alt={prompt.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                 )}
                 

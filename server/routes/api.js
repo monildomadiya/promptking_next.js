@@ -4,6 +4,7 @@ const db = require('../db');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const sharp = require('sharp');
 
 let lastDbFailure = 0;
 const DB_RETRY_DELAY = 10 * 60 * 1000; // 10 minutes
@@ -150,6 +151,46 @@ const logoUpload = multer({
     else cb(new Error("Invalid image type"));
   }
 });
+
+// --- IMAGE OPTIMIZATION PROXY ---
+router.get('/optimize', async (req, res) => {
+  try {
+    const src = req.query.src;
+    const width = parseInt(req.query.w, 10) || 800; // default 800px width
+
+    if (!src) {
+      return res.status(400).send('Missing src parameter');
+    }
+
+    // Ensure we are only optimizing local /uploads files
+    if (!src.startsWith('/uploads/')) {
+      return res.redirect(src);
+    }
+
+    // Resolve absolute path safely
+    const absolutePath = path.join(__dirname, '..', src);
+    
+    // Check if file physically exists
+    if (!fs.existsSync(absolutePath)) {
+      return res.status(404).send('Image not found');
+    }
+
+    // Process image with sharp
+    const optimizedBuffer = await sharp(absolutePath)
+      .resize({ width: width, withoutEnlargement: true })
+      .webp({ quality: 80 })
+      .toBuffer();
+
+    res.set('Content-Type', 'image/webp');
+    res.set('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+    res.send(optimizedBuffer);
+  } catch (error) {
+    console.error('Image Optimization Error:', error);
+    // Silent fallback to original image if optimization fails
+    res.redirect(req.query.src);
+  }
+});
+
 
 // --- 1. AUTHENTICATION ---
 router.post('/login', async (req, res) => {
