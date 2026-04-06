@@ -40,7 +40,17 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
   };
 
   React.useEffect(() => {
-    // Scroll into view removed to eliminate scroll animation effects
+    if (isUnlocked && prompt.isPremium) {
+      setTimeout(() => {
+        const box = document.getElementById(`box-${prompt.key}`);
+        if (box) {
+          box.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+        }
+      }, 400); // Wait for open/unlock animation
+    }
   }, [isUnlocked]);
 
   const ratio = (prompt.image_ratio || prompt.imageRatio || '16/9').toString().replace(/\s+/g, '').trim();

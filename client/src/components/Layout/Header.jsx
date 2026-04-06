@@ -167,7 +167,7 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
           position: 'relative',
           gap: isMobile ? '8px' : '40px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', flex: '0 0 auto', zIndex: 20 }}>
+          <div style={{ display: (isMobile && isSearchExpanded) ? 'none' : 'flex', alignItems: 'center', flex: '0 0 auto', zIndex: 20 }}>
             <Link 
               to="/" 
               onClick={onLogoClick}
