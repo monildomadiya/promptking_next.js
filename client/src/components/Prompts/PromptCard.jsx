@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Copy, Check, Eye, Lock, Unlock, Youtube, ArrowRight, Crown, Code, Instagram, Layout, Zap, Sparkles, Image, MessageSquare, Laptop } from '../Common/Icons';
+import { Heart, Copy, Check, Eye, Lock, Unlock, Youtube, ArrowRight, Crown, Code, Instagram, Layout, Zap, Sparkles, Image, MessageSquare, Laptop, ChevronLeft, ChevronRight } from '../Common/Icons';
 import api from '../../api';
 import confetti from 'canvas-confetti';
 import YouTubeModal from '../Modals/YouTubeModal';
@@ -368,8 +368,8 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
                   flexShrink: 0
                 }}
               >
-                <i className="fa fa-caret-left" aria-hidden="true" style={{ fontSize: '24px', display: 'block', lineHeight: 0.7, margin: 0 }}></i>
-                <i className="fa fa-caret-right" aria-hidden="true" style={{ fontSize: '24px', display: 'block', lineHeight: 0.7, margin: 0 }}></i>
+                <ChevronLeft size={24} color="black" style={{ display: 'block', margin: '-4px 0' }} />
+                <ChevronRight size={24} color="black" style={{ display: 'block', margin: '-4px 0' }} />
               </div>
             </div>
             <input 

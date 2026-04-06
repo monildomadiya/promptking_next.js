@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, Heart, Activity } from '../components/Common/Icons';
+import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, Heart, Activity, ChevronLeft, ChevronRight } from '../components/Common/Icons';
 import confetti from 'canvas-confetti';
 import api from '../api';
 import Shimmer from '../components/Common/Shimmer';
@@ -343,8 +343,8 @@ const PromptDetailPage = ({ user, adsSettings }) => {
                           flexShrink: 0
                         }}
                       >
-                        <i className="fa fa-caret-left" aria-hidden="true" style={{ fontSize: '26px', display: 'block', lineHeight: 0.6, margin: 0 }}></i>
-                        <i className="fa fa-caret-right" aria-hidden="true" style={{ fontSize: '26px', display: 'block', lineHeight: 0.6, margin: 0 }}></i>
+                        <ChevronLeft size={24} color="black" style={{ display: 'block', margin: '-4px 0' }} />
+                        <ChevronRight size={24} color="black" style={{ display: 'block', margin: '-4px 0' }} />
                       </div>
                     </div>
                     <input 
