@@ -250,8 +250,8 @@ button:active {
 
 @media (max-width: 500px) {
   .masonry-grid-react {
-    flex-direction: column !important;
-    gap: 15px !important;
+    flex-direction: row !important;
+    gap: 10px !important;
   }
   
   .sidebar-area {
