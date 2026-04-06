@@ -215,9 +215,10 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
       
       // Feedback Animation: Success pulse and Confetti
       if (prompt.isPremium) {
-        // Start Thanos Snap only for Premium content
         setIsSnapping(true);
         triggerSnapConfetti();
+        // Clear PIN instantly for security
+        setPin(''); 
       } else {
         // Enhanced Celebration for Free Content
         const box = document.getElementById(`box-${prompt.key}`);
@@ -239,13 +240,12 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
         }
       }
       
-      // Snappy Relock for Premium content (300ms confirmation + 100ms grace)
+      // Hard Relock (Snappy 400ms to allow Copied! feedback)
       setTimeout(() => {
         setIsSnapping(false);
         setIsCopied(false);
         if (prompt.isPremium) {
-          onLock();
-          setPin(''); // Clear PIN
+          onLock(); // Tell parent to relock
         }
       }, 400);
     } catch (err) {
