@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, Heart, Activity } from '../Common/Icons';
+import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, Heart, Activity } from '../components/Common/Icons';
 import confetti from 'canvas-confetti';
 import api from '../api';
 import Shimmer from '../components/Common/Shimmer';
