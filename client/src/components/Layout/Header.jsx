@@ -278,21 +278,6 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                   )}
                   <div 
                     className="glass-button-secondary"
-                    onClick={() => window.dispatchEvent(new CustomEvent('openFilters'))}
-                    aria-label="Filter"
-                    role="button"
-                    style={{ 
-                      width: '38px', height: '38px', borderRadius: '50%', 
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      color: 'var(--accent-main)'
-                    }}
-                  >
-                    <Layers size={18} />
-                  </div>
-                  <div 
-                    className="glass-button-secondary"
                     onClick={() => setIsSearchExpanded(true)}
                     aria-label="Search"
                     role="button"

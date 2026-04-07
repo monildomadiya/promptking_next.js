@@ -165,6 +165,30 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
         flexDirection: 'column' 
       }}>
         <div className="grid-main-area" style={{ width: '100%' }}>
+          {isMobile && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '15px' }}>
+              <button 
+                onClick={() => window.dispatchEvent(new CustomEvent('openFilters'))}
+                className="glass-button-secondary"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  padding: '8px 16px',
+                  borderRadius: '20px',
+                  color: 'white',
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  backdropFilter: 'blur(10px)'
+                }}
+              >
+                <Filter size={16} /> 
+                <span style={{ fontWeight: 600 }}>Filter</span>
+              </button>
+            </div>
+          )}
           <div className="masonry-grid-react" style={{ 
             display: 'flex', 
             gap: isMobile ? '12px' : '20px', 
