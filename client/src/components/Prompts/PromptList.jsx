@@ -192,6 +192,7 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
             display: 'flex', 
             gap: isMobile ? '12px' : '20px', 
             alignItems: 'flex-start',
+            marginTop: search ? '20px' : '0',
             flexWrap: 'nowrap',
             flexDirection: 'row'
           }}>
