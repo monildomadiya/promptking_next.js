@@ -240,14 +240,14 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
         }
       }
       
-      // Hard Relock (Snappy 400ms to allow Copied! feedback)
+      // Hard Relock (Snappy 1000ms for Premium, 2000ms for Free to allow Copied! feedback)
       setTimeout(() => {
         setIsSnapping(false);
         setIsCopied(false);
         if (prompt.isPremium) {
           onLock(); // Tell parent to relock
         }
-      }, 400);
+      }, prompt.isPremium ? 1000 : 2000);
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
@@ -707,12 +707,12 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
 
         @keyframes copyPulse {
           0% { transform: scale(1.01); border-color: var(--accent-main); }
-          50% { transform: scale(1.03); border-color: #27C93F; box-shadow: 0 0 50px rgba(39, 201, 63, 0.4); }
-          100% { transform: scale(1.01); border-color: #27C93F; }
+          50% { transform: scale(1.04); border-color: #27C93F; box-shadow: 0 0 50px rgba(39, 201, 63, 0.4); }
+          100% { transform: scale(1.01); border-color: #27C93F; box-shadow: 0 0 20px rgba(39, 201, 63, 0.2); }
         }
 
         .copy-success-pulse {
-          animation: copyPulse 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+          animation: copyPulse 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
         @media (hover: hover) {
