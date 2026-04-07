@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { auth, googleProvider } from '../../firebase';
 import { signInWithPopup, signOut } from 'firebase/auth';
 import api from '../../api';
@@ -22,6 +22,8 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
   const [lastScrollY, setLastScrollY] = useState(0);
   const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
   const headerRef = React.useRef(null);
 
   const optimizeImage = (url, width = 600) => {
@@ -247,24 +249,26 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
             }}>
               {isMobile && !isSearchExpanded ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <button 
-                    onClick={() => setFilter(filter === 'premium' ? 'all' : 'premium')}
-                    className="pro-card-hover"
-                    title="Premium Prompts"
-                    aria-label="Filter Premium"
-                    style={{ 
-                      width: '38px', height: '38px', borderRadius: '50%', 
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                      background: filter === 'premium' ? 'rgba(255, 193, 7, 0.15)' : 'rgba(255,255,255,0.03)',
-                      border: filter === 'premium' ? '1px solid rgba(255, 193, 7, 0.3)' : '1px solid rgba(255,255,255,0.08)',
-                      color: filter === 'premium' ? '#FFC107' : 'rgba(255,255,255,0.7)',
-                      transition: '0.3s',
-                      backdropFilter: 'blur(10px)'
-                    }}
-                  >
-                    <Crown size={18} fill={filter === 'premium' ? '#FFC107' : 'none'} />
-                  </button>
-                  {user && (
+                  {isHomePage && (
+                    <button 
+                      onClick={() => setFilter(filter === 'premium' ? 'all' : 'premium')}
+                      className="pro-card-hover"
+                      title="Premium Prompts"
+                      aria-label="Filter Premium"
+                      style={{ 
+                        width: '38px', height: '38px', borderRadius: '50%', 
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                        background: filter === 'premium' ? 'rgba(255, 193, 7, 0.15)' : 'rgba(255,255,255,0.03)',
+                        border: filter === 'premium' ? '1px solid rgba(255, 193, 7, 0.3)' : '1px solid rgba(255,255,255,0.08)',
+                        color: filter === 'premium' ? '#FFC107' : 'rgba(255,255,255,0.7)',
+                        transition: '0.3s',
+                        backdropFilter: 'blur(10px)'
+                      }}
+                    >
+                      <Crown size={18} fill={filter === 'premium' ? '#FFC107' : 'none'} />
+                    </button>
+                  )}
+                  {isHomePage && user && (
                     <button 
                       onClick={() => setFilter(filter === 'liked' ? 'all' : 'liked')}
                       className="pro-card-hover"
@@ -366,7 +370,7 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
             
             {!isMobile && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                {window.location.pathname === '/' && (
+                {isHomePage && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <button 
                       onClick={() => setFilter(filter === 'premium' ? 'all' : 'premium')}
