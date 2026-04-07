@@ -82,11 +82,10 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
   };
 
   const filteredPrompts = prompts.filter(p => {
-    const safeTitle = (p.title || '').toLowerCase();
     const safeKey = (p.prompt_key || '').toLowerCase();
     const safeSearch = (search || '').toLowerCase();
     
-    const matchesSearch = safeTitle.includes(safeSearch) || safeKey.includes(safeSearch);
+    const matchesSearch = safeKey.includes(safeSearch);
     
     let matchesFilter = true;
     if (filter === 'liked') {
@@ -213,7 +212,7 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
                       onUnlock={() => setActiveUnlockedKey(p.prompt_key || p.id)}
                       onLock={() => setActiveUnlockedKey(null)}
                       searchTerm={search}
-                      isHighlighted={search && (p.title.toLowerCase().includes(search.toLowerCase()) || (p.prompt_key && p.prompt_key.toLowerCase().includes(search.toLowerCase())))}
+                      isHighlighted={search && p.prompt_key && p.prompt_key.toLowerCase().includes(search.toLowerCase())}
                     />
                   </div>
                 );
