@@ -226,62 +226,122 @@ const BrandingPanel = ({ onSave }) => {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth > 1024 ? '350px 1fr' : '1fr', gap: '25px' }}>
-        {/* Logo Preview Card */}
-        <div style={{ ...glassPanelStyle, padding: '30px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <SectionTitle title="Logo Preview" />
-          <div style={{ 
-            aspectRatio: '1', borderRadius: '20px', background: 'rgba(0,0,0,0.4)', 
-            border: '2px dashed rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', 
-            justifyContent: 'center', padding: '20px', position: 'relative', overflow: 'hidden'
-          }}>
-            {settings.logo_url ? (
-               <img src={settings.logo_url} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} alt="Logo" />
-            ) : (
-               <Palette size={48} style={{ opacity: 0.1 }} />
-            )}
-          </div>
-          <div style={{ position: 'relative' }}>
-             <input 
-               type="file" 
-               id="logo-upload"
-               accept="image/*"
-               style={{ display: 'none' }}
-               onChange={async (e) => {
-                 if (e.target.files && e.target.files[0]) {
-                   const formData = new FormData();
-                   formData.append('logo', e.target.files[0]);
-                   try {
-                     const res = await api.post('/admin/upload_logo', formData);
-                     if (res.data.status === 'success') {
-                       setSettings({ ...settings, logo_url: res.data.logoUrl });
-                       alert("Logo uploaded successfully!");
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
+          {/* Logo Preview Card */}
+          <div style={{ ...glassPanelStyle, padding: '30px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <SectionTitle title="Logo Preview" />
+            <div style={{ 
+              aspectRatio: '1', borderRadius: '20px', background: 'rgba(0,0,0,0.4)', 
+              border: '2px dashed rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', 
+              justifyContent: 'center', padding: '20px', position: 'relative', overflow: 'hidden'
+            }}>
+              {settings.logo_url ? (
+                 <img src={settings.logo_url} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} alt="Logo" />
+              ) : (
+                 <Palette size={48} style={{ opacity: 0.1 }} />
+              )}
+            </div>
+            <div style={{ position: 'relative' }}>
+               <input 
+                 type="file" 
+                 id="logo-upload"
+                 accept="image/*"
+                 style={{ display: 'none' }}
+                 onChange={async (e) => {
+                   if (e.target.files && e.target.files[0]) {
+                     const formData = new FormData();
+                     formData.append('logo', e.target.files[0]);
+                     try {
+                       const res = await api.post('/admin/upload_logo', formData);
+                       if (res.data.status === 'success') {
+                         setSettings({ ...settings, logo_url: res.data.logoUrl });
+                         alert("Logo uploaded successfully!");
+                       }
+                     } catch (err) {
+                       console.error(err);
+                       alert("Failed to upload logo.");
                      }
-                   } catch (err) {
-                     console.error(err);
-                     alert("Failed to upload logo.");
                    }
-                 }
-               }}
-             />
-             <button 
-               onClick={() => document.getElementById('logo-upload').click()}
-               className="glass-button-secondary"
-               style={{ 
-                 width: '100%', 
-                 padding: '14px', 
-                 borderRadius: '12px', 
-                 fontWeight: 800, 
-                 fontSize: '0.9rem', 
-                 color: 'var(--accent-main)',
-                 background: 'rgba(229, 9, 20, 0.05)',
-                 border: '1px solid rgba(229, 9, 20, 0.2)',
-                 cursor: 'pointer'
-               }}
-             >
-               Choose Logo File
-             </button>
+                 }}
+               />
+               <button 
+                 onClick={() => document.getElementById('logo-upload').click()}
+                 className="glass-button-secondary"
+                 style={{ 
+                   width: '100%', 
+                   padding: '14px', 
+                   borderRadius: '12px', 
+                   fontWeight: 800, 
+                   fontSize: '0.9rem', 
+                   color: 'var(--accent-main)',
+                   background: 'rgba(229, 9, 20, 0.05)',
+                   border: '1px solid rgba(229, 9, 20, 0.2)',
+                   cursor: 'pointer'
+                 }}
+               >
+                 Choose Logo File
+               </button>
+            </div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>SVG, PNG or WEBP recommended.</p>
           </div>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>SVG, PNG or WEBP recommended.</p>
+
+          {/* Favicon Card */}
+          <div style={{ ...glassPanelStyle, padding: '30px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <SectionTitle title="Favicon Preview" />
+            <div style={{ 
+              aspectRatio: '1', borderRadius: '20px', background: 'rgba(0,0,0,0.4)', 
+              border: '2px dashed rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', 
+              justifyContent: 'center', padding: '20px', position: 'relative', overflow: 'hidden'
+            }}>
+              {settings.favicon_url ? (
+                 <img src={settings.favicon_url} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} alt="Favicon" />
+              ) : (
+                 <Crown size={48} style={{ opacity: 0.1 }} />
+              )}
+            </div>
+            <div style={{ position: 'relative' }}>
+               <input 
+                 type="file" 
+                 id="favicon-upload"
+                 accept="image/*"
+                 style={{ display: 'none' }}
+                 onChange={async (e) => {
+                   if (e.target.files && e.target.files[0]) {
+                     const formData = new FormData();
+                     formData.append('image', e.target.files[0]);
+                     try {
+                       const res = await api.post('/admin/upload_image', formData);
+                       if (res.data.status === 'success') {
+                         setSettings({ ...settings, favicon_url: res.data.imageUrl });
+                         alert("Favicon staged! Click Apply Changes to save.");
+                       }
+                     } catch (err) {
+                       console.error(err);
+                       alert("Failed to upload favicon.");
+                     }
+                   }
+                 }}
+               />
+               <button 
+                 onClick={() => document.getElementById('favicon-upload').click()}
+                 className="glass-button-secondary"
+                 style={{ 
+                   width: '100%', 
+                   padding: '14px', 
+                   borderRadius: '12px', 
+                   fontWeight: 800, 
+                   fontSize: '0.9rem', 
+                   color: '#fbbf24',
+                   background: 'rgba(251, 191, 36, 0.05)',
+                   border: '1px solid rgba(251, 191, 36, 0.2)',
+                   cursor: 'pointer'
+                 }}
+               >
+                 Choose Favicon
+               </button>
+            </div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>Square 1:1 image recommended.</p>
+          </div>
         </div>
 
         {/* Dimension Settings Card */}
@@ -300,6 +360,16 @@ const BrandingPanel = ({ onSave }) => {
               <Hint text="Affects header logo on PCs" />
             </div>
             <div>
+              <Label text="Desktop Width" icon={<Layout size={14} />} />
+              <input 
+                style={inputStyle} 
+                value={settings.logo_width_desktop || ''} 
+                onChange={e => setSettings({...settings, logo_width_desktop: e.target.value})} 
+                placeholder="e.g. auto" 
+              />
+              <Hint text="Affects header logo width on PCs" />
+            </div>
+            <div>
               <Label text="Mobile Height" icon={<Activity size={14} />} />
               <input 
                 style={inputStyle} 
@@ -308,6 +378,16 @@ const BrandingPanel = ({ onSave }) => {
                 placeholder="e.g. 32px" 
               />
               <Hint text="Affects header logo on phones" />
+            </div>
+            <div>
+              <Label text="Mobile Width" icon={<Activity size={14} />} />
+              <input 
+                style={inputStyle} 
+                value={settings.logo_width_mobile || ''} 
+                onChange={e => setSettings({...settings, logo_width_mobile: e.target.value})} 
+                placeholder="e.g. auto" 
+              />
+              <Hint text="Affects header logo width on phones" />
             </div>
           </div>
 

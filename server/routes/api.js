@@ -447,9 +447,9 @@ router.get('/settings', async (req, res) => {
         data.logo_url = `https://api.promptking.in${data.logo_url}`;
       }
       
-      // Fix height units
-      ['logo_height_desktop', 'logo_height_mobile'].forEach(key => {
-        if (data[key] && !data[key].toString().includes('px') && !isNaN(data[key])) {
+      // Fix dimension units
+      ['logo_height_desktop', 'logo_height_mobile', 'logo_width_desktop', 'logo_width_mobile'].forEach(key => {
+        if (data[key] && !data[key].toString().includes('px') && !data[key].toString().includes('%') && !data[key].toString().includes('auto') && !isNaN(data[key])) {
           data[key] = `${data[key]}px`;
         }
       });

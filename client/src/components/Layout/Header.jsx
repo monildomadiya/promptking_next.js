@@ -204,10 +204,12 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                       ? (settings.logo_height_mobile || '32px') 
                       : (settings.logo_height_desktop || '50px'),
                     maxHeight: isMobile ? '75px' : '100%',
-                    width: 'auto',
+                    width: isMobile 
+                      ? (settings.logo_width_mobile || 'auto')
+                      : (settings.logo_width_desktop || 'auto'),
                     objectFit: 'contain',
                     display: 'block',
-                    transition: 'height 0.3s ease'
+                    transition: 'all 0.3s ease'
                   }} 
                   className="site-logo"
                 />

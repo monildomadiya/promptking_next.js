@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
 import BottomNav from './components/Layout/BottomNav';
@@ -72,9 +73,14 @@ function AppContent() {
 
   const fetchSettings = async () => {
     try {
+      const cached = localStorage.getItem('siteSettings');
+      if (cached) {
+        try { setSettings(JSON.parse(cached)); } catch(e) {}
+      }
       const response = await api.get('/settings');
       if (response.data) {
         setSettings(response.data);
+        localStorage.setItem('siteSettings', JSON.stringify(response.data));
       }
     } catch (error) {
       console.error("App: Failed to fetch settings", error);
@@ -134,6 +140,12 @@ function AppContent() {
 
   return (
     <div className="App">
+      {settings?.favicon_url && (
+        <Helmet>
+          <link rel="icon" type="image/png" href={settings.favicon_url} />
+          <link rel="apple-touch-icon" href={settings.favicon_url} />
+        </Helmet>
+      )}
       {!isAdminPath && <GoogleAdSense settings={settings} />}
       {!isAdminPath && (
         <Header 
