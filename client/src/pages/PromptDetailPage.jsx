@@ -148,7 +148,11 @@ const PromptDetailPage = ({ user, adsSettings }) => {
 
 
 
-  const handleCopy = async () => {
+  const handleCopy = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     try {
       await navigator.clipboard.writeText(prompt.promptText);
       await api.post('/record_copy', { key: prompt.key });
@@ -300,7 +304,9 @@ const PromptDetailPage = ({ user, adsSettings }) => {
               }}>{prompt.title}</h1>
             </div>
 
-            {/* Hero Section: Image Display */}
+            {/* Media & Prompt Split Container */}
+            <div className="media-prompt-container">
+              {/* Hero Section: Image Display */}
             <div className="hero-section glass-panel" style={{
               background: 'rgba(255, 255, 255, 0.02)',
               backdropFilter: 'blur(30px)',
@@ -390,8 +396,10 @@ const PromptDetailPage = ({ user, adsSettings }) => {
               </div>
             </div>
 
-            {/* Interactive Vault Section */}
-            <div id="box-detail" className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse' : ''}`} style={{
+            {/* Right Column: Prompt Vault & Buttons */}
+            <div className="prompt-vault-column" style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+              {/* Interactive Vault Section */}
+              <div id="box-detail" className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse' : ''}`} style={{
               background: 'rgba(15, 15, 20, 0.4)', 
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
@@ -404,8 +412,10 @@ const PromptDetailPage = ({ user, adsSettings }) => {
               border: isUnlocked ? (prompt.isPremium ? '2px solid #FFD700' : (isCopied ? '2px solid #27C93F' : '2px solid var(--accent-main)')) : '1px solid rgba(255,255,255,0.08)',
               boxShadow: isUnlocked ? (prompt.isPremium ? '0 15px 50px rgba(255, 215, 0, 0.15)' : (isCopied ? '0 15px 50px rgba(39, 201, 63, 0.3)' : '0 15px 50px rgba(229, 9, 20, 0.2)')) : 'none',
               transform: isUnlocked ? (isCopied && !prompt.isPremium ? 'scale(1.02)' : 'scale(1.01)') : 'scale(1)',
-              minHeight: isUnlocked ? (prompt.isPremium ? '240px' : '150px') : '180px',
-              transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
+              minHeight: '350px',
+              transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+              height: '100%',
+              flex: 1
             }}>
               {/* Vault Header */}
               <div style={{ background: 'rgba(255,255,255,0.02)', padding: '15px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -433,28 +443,29 @@ const PromptDetailPage = ({ user, adsSettings }) => {
                 {isUnlocked && (
                   <button 
                     onClick={handleCopy}
+                    className="pro-card-hover"
                     style={{
                       position: 'absolute',
-                      bottom: '20px',
-                      right: '20px',
-                      background: isCopied ? '#27C93F' : 'white',
-                      border: 'none',
-                      color: isCopied ? 'white' : 'black',
-                      padding: '10px 24px',
-                      borderRadius: '14px',
+                      bottom: '15px',
+                      right: '15px',
+                      background: isCopied ? 'var(--accent-main)' : 'rgba(255,255,255,0.1)',
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      color: 'white',
+                      padding: '10px 18px',
+                      borderRadius: '12px',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '8px',
-                      fontSize: '0.85rem',
-                      fontWeight: 800,
+                      fontSize: '0.9rem',
+                      fontWeight: 700,
                       cursor: 'pointer',
                       zIndex: 20,
-                      transition: '0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      boxShadow: '0 10px 20px rgba(0,0,0,0.2)'
+                      backdropFilter: 'blur(5px)',
+                      transition: 'all 0.3s ease'
                     }}
                   >
                     {isCopied ? <Check size={16} /> : <Copy size={16} />}
-                    {isCopied ? 'Copied' : 'Copy Prompt'}
+                    {isCopied ? 'Copied!' : 'Copy'}
                   </button>
                 )}
 
@@ -529,12 +540,6 @@ const PromptDetailPage = ({ user, adsSettings }) => {
               </div>
             </div>
 
-            <YouTubeModal 
-              isOpen={showVideoModal} 
-              onClose={() => setShowVideoModal(false)} 
-              videoUrl={prompt.igLink} 
-            />
-
             {(!isUnlocked && !prompt.isPremium) && (
               <button 
                 onClick={handleCopy}
@@ -543,12 +548,24 @@ const PromptDetailPage = ({ user, adsSettings }) => {
                   border: 'none', padding: '18px', borderRadius: '20px', fontWeight: 900, fontSize: '1.1rem', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', transition: '0.3s ease',
                   boxShadow: isCopied ? '0 0 30px rgba(39, 201, 63, 0.3)' : '0 10px 30px rgba(0,0,0,0.3)',
-                  marginBottom: '30px'
+                  marginTop: '20px',
+                  marginBottom: '10px'
                 }}
               >
                 {isCopied ? <><Check size={22} /> Copied!</> : <><Copy size={22} /> Copy Full Prompt</>}
               </button>
             )}
+
+            </div> {/* Close Right Column */}
+            </div> {/* Close Media & Prompt Split */}
+
+            <YouTubeModal 
+              isOpen={showVideoModal} 
+              onClose={() => setShowVideoModal(false)} 
+              videoUrl={prompt.igLink} 
+            />
+
+            {/* Re-inserted copy button above */}
 
             {/* In-Content Ad Placement */}
             {adsSettings?.adsense_enabled === '1' && adsSettings?.adsense_slot_detail && (
@@ -720,6 +737,31 @@ const PromptDetailPage = ({ user, adsSettings }) => {
         .midjourney { color: #a855f7; background: rgba(168, 85, 247, 0.08) !important; border-color: rgba(168, 85, 247, 0.3) !important; }
         .blog-content img { max-width: 100%; border-radius: 15px; margin: 20px 0; }
         .blog-content h2, .blog-content h3 { color: white; margin-top: 35px; margin-bottom: 20px; }
+        
+        @media (min-width: 1025px) {
+          .media-prompt-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: stretch;
+            margin-bottom: 40px;
+          }
+          .media-prompt-container .hero-section {
+            margin-bottom: 0 !important;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+          }
+          .media-prompt-container .hero-section > div {
+            flex: 1;
+            display: flex;
+            align-items: center;
+          }
+          .media-prompt-container .prompt-area {
+            margin-bottom: 0 !important;
+          }
+        }
+        
         @media (max-width: 1024px) {
           .detail-layout { grid-template-columns: 1fr !important; }
           .detail-sidebar { display: none; }
