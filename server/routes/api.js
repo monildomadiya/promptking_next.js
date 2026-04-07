@@ -422,12 +422,30 @@ router.get('/prompt/:key', async (req, res) => {
 });
 
 // --- SITE SETTINGS (Public) ---
+const processSettings = (data) => {
+  data = Object.assign({}, data, localSettingsCache);
+  
+  ['logo_url', 'favicon_url'].forEach(key => {
+    if (data[key] && data[key].startsWith('/')) {
+      data[key] = `https://api.promptking.in${data[key]}`;
+    }
+  });
+  
+  ['logo_height_desktop', 'logo_height_mobile', 'logo_width_desktop', 'logo_width_mobile'].forEach(key => {
+    if (data[key] && !data[key].toString().includes('px') && !data[key].toString().includes('%') && !data[key].toString().includes('auto') && !isNaN(data[key])) {
+      data[key] = `${data[key]}px`;
+    }
+  });
+  
+  return data;
+};
+
 router.get('/settings', async (req, res) => {
   try {
     const rows = await db`SELECT * FROM site_settings`;
     const settings = {};
     rows.forEach(r => { settings[r.setting_key] = r.setting_value; });
-    res.json(Object.assign({}, settings, localSettingsCache));
+    res.json(processSettings(settings));
   } catch (error) {
     console.warn('LOCAL DB FAILED, FETCHING LIVE SETTINGS:', error.message);
     lastDbFailure = Date.now();
@@ -439,24 +457,9 @@ router.get('/settings', async (req, res) => {
       const liveRes = await fetch('https://api.promptking.in/api/settings');
       let data = await liveRes.json();
       
-      // Merge with local overrides
-      data = Object.assign({}, data, localSettingsCache);
-
-      // Fix logo URL (only if not already an absolute URL)
-      if (data.logo_url && data.logo_url.startsWith('/')) {
-        data.logo_url = `https://api.promptking.in${data.logo_url}`;
-      }
-      
-      // Fix dimension units
-      ['logo_height_desktop', 'logo_height_mobile', 'logo_width_desktop', 'logo_width_mobile'].forEach(key => {
-        if (data[key] && !data[key].toString().includes('px') && !data[key].toString().includes('%') && !data[key].toString().includes('auto') && !isNaN(data[key])) {
-          data[key] = `${data[key]}px`;
-        }
-      });
-      
-      res.json(data);
+      res.json(processSettings(data));
     } catch (liveError) {
-      res.json(Object.assign({}, MOCK_DATA.settings, localSettingsCache));
+      res.json(processSettings(MOCK_DATA.settings));
     }
   }
 });

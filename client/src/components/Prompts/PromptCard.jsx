@@ -634,19 +634,20 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
                         value={pin}
                         onChange={(e) => checkAutoUnlock(e.target.value)}
                         style={{ 
-                          width: isMobile ? '160px' : '140px',
-                          height: '42px',
+                          width: isMobile ? '110px' : '140px',
+                          height: isMobile ? '36px' : '42px',
                           borderRadius: '100px',
                           border: showError ? '2px solid #ff4444' : '1px solid rgba(255,255,255,0.2)',
                           background: 'rgba(255,255,255,0.08)',
                           color: 'white', 
                           textAlign: 'center', 
                           outline: 'none', 
-                          letterSpacing: isMobile ? '6px' : '8px', 
-                          fontSize: isMobile ? '14px' : '1rem', 
+                          letterSpacing: isMobile ? '4px' : '8px', 
+                          fontSize: isMobile ? '12px' : '1rem', 
                           transition: 'all 0.3s ease',
                           backdropFilter: 'blur(10px)',
-                          boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+                          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                          padding: 0
                         }} 
                       />
                     </form>
@@ -659,9 +660,12 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
                       onClick={() => setShowVideoModal(true)}
                       style={{ 
                         background: 'transparent', 
-                        fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', display: 'flex', alignItems: 'center', gap: '8px', 
+                        fontSize: isMobile ? '0.7rem' : '0.85rem', color: 'rgba(255,255,255,0.6)', 
+                        display: 'flex', alignItems: 'center', gap: isMobile ? '4px' : '8px', 
+                        flexDirection: isMobile ? 'column' : 'row',
                         textDecoration: 'none', border: 'none', cursor: 'pointer',
-                        transition: 'all 0.3s ease'
+                        transition: 'all 0.3s ease',
+                        textAlign: 'center'
                       }}
                       onMouseOver={(e) => { if (!isMobile) e.currentTarget.style.color = 'white'; }}
                       onMouseOut={(e) => { if (!isMobile) e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
