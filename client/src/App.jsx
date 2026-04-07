@@ -146,17 +146,31 @@ function AppContent() {
     return url;
   };
 
+  // Directly update favicon in DOM - the only reliable cross-browser way
+  useEffect(() => {
+    const faviconUrl = settings?.favicon_url;
+    if (!faviconUrl || faviconUrl.length <= 3) return;
+
+    // Remove all existing favicon links
+    const existingLinks = document.querySelectorAll('link[rel*="icon"]');
+    existingLinks.forEach(link => link.parentNode.removeChild(link));
+
+    // Add new favicon link
+    const link = document.createElement('link');
+    link.rel = 'icon';
+    link.type = 'image/x-icon';
+    link.href = faviconUrl + '?v=' + Date.now(); // Cache bust
+    document.head.appendChild(link);
+
+    // Apple touch icon
+    const appleLink = document.createElement('link');
+    appleLink.rel = 'apple-touch-icon';
+    appleLink.href = faviconUrl + '?v=' + Date.now();
+    document.head.appendChild(appleLink);
+  }, [settings?.favicon_url]);
+
   return (
     <div className="App">
-      <Helmet>
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        {settings?.favicon_url && settings.favicon_url.length > 3 && (
-          <link rel="icon" href={optimizeImage(settings.favicon_url, 150)} />
-        )}
-        {settings?.favicon_url && settings.favicon_url.length > 3 && (
-          <link rel="apple-touch-icon" href={optimizeImage(settings.favicon_url, 150)} />
-        )}
-      </Helmet>
       {!isAdminPath && <GoogleAdSense settings={settings} />}
       {!isAdminPath && (
         <Header 
