@@ -138,15 +138,23 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const optimizeImage = (url, width = 600) => {
+    if (!url) return url;
+    if (url.startsWith('/uploads/')) {
+      return `/api/optimize?src=${encodeURIComponent(url)}&w=${width}`;
+    }
+    return url;
+  };
+
   return (
     <div className="App">
       <Helmet>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        {settings?.favicon_url && settings.favicon_url.length > 3 && settings.favicon_url.includes('.') && (
-          <link rel="icon" type="image/png" href={settings.favicon_url} />
+        {settings?.favicon_url && settings.favicon_url.length > 3 && (
+          <link rel="icon" href={optimizeImage(settings.favicon_url, 150)} />
         )}
-        {settings?.favicon_url && settings.favicon_url.length > 3 && settings.favicon_url.includes('.') && (
-          <link rel="apple-touch-icon" href={settings.favicon_url} />
+        {settings?.favicon_url && settings.favicon_url.length > 3 && (
+          <link rel="apple-touch-icon" href={optimizeImage(settings.favicon_url, 150)} />
         )}
       </Helmet>
       {!isAdminPath && <GoogleAdSense settings={settings} />}
@@ -163,6 +171,7 @@ function AppContent() {
           settings={settings}
           isAdmin={isAdmin}
           onHeightChange={setHeaderHeight}
+          optimizeImage={optimizeImage}
         />
       )}
       <div style={{ paddingTop: isAdminPath ? '0' : headerHeight + 'px', transition: 'padding-top 0.3s ease' }}>

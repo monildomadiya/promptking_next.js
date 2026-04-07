@@ -35,6 +35,14 @@ const Footer = ({ onLogoClick }) => {
     setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
+  const optimizeImage = (url, width = 600) => {
+    if (!url) return url;
+    if (url.startsWith('/uploads/')) {
+      return `/api/optimize?src=${encodeURIComponent(url)}&w=${width}`;
+    }
+    return url;
+  };
+
   return (
     <footer style={{
       background: 'linear-gradient(to bottom, var(--surface-0), #000000)',
@@ -74,7 +82,7 @@ const Footer = ({ onLogoClick }) => {
             }}>
               {settings.logo_url && (
                 <img 
-                  src={settings.logo_url} 
+                  src={optimizeImage(settings.logo_url, 400)} 
                   alt="Logo Icon" 
                   style={{ 
                     height: isMobile ? '45px' : '55px',
