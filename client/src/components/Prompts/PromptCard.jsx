@@ -612,7 +612,29 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
                   className="pro-card-hover"
                 >
                   {isCopied ? <Check size={14} /> : <Copy size={14} />}
-                  {isCopied ? 'Copied' : 'Copy'}
+                  {isCopied ? 'Copied!' : 'Copy'}
+
+                  {/* Floating Toast Indicator */}
+                  {isCopied && (
+                    <span style={{
+                      position: 'absolute',
+                      top: '-35px',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      background: 'var(--accent-main)',
+                      color: 'white',
+                      padding: '3px 10px',
+                      borderRadius: '20px',
+                      fontSize: '0.65rem',
+                      fontWeight: 800,
+                      whiteSpace: 'nowrap',
+                      boxShadow: '0 4px 15px rgba(229, 9, 20, 0.4)',
+                      animation: 'toastFloatUp 0.6s ease-out forwards',
+                      zIndex: 100
+                    }}>
+                      Success!
+                    </span>
+                  )}
                 </button>
               )}
 
@@ -740,6 +762,13 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
           0% { transform: scale(1); }
           50% { transform: scale(1.15); }
           100% { transform: scale(1); }
+        }
+
+        @keyframes toastFloatUp {
+          0% { opacity: 0; transform: translate(-50%, 10px); }
+          20% { opacity: 1; transform: translate(-50%, 0); }
+          80% { opacity: 1; transform: translate(-50%, 0); }
+          100% { opacity: 0; transform: translate(-50%, -20px); }
         }
 
         @media (hover: hover) and (pointer: fine) {

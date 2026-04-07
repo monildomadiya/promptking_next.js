@@ -467,6 +467,28 @@ const PromptDetailPage = ({ user, adsSettings }) => {
                   >
                     {isCopied ? <Check size={16} /> : <Copy size={16} />}
                     {isCopied ? 'Copied!' : 'Copy'}
+
+                    {/* Floating Toast Indicator */}
+                    {isCopied && (
+                      <span style={{
+                        position: 'absolute',
+                        top: '-40px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        background: 'var(--accent-main)',
+                        color: 'white',
+                        padding: '4px 12px',
+                        borderRadius: '20px',
+                        fontSize: '0.75rem',
+                        fontWeight: 800,
+                        whiteSpace: 'nowrap',
+                        boxShadow: '0 4px 15px rgba(229, 9, 20, 0.4)',
+                        animation: 'toastFloatUp 0.6s ease-out forwards',
+                        zIndex: 100
+                      }}>
+                        Success!
+                      </span>
+                    )}
                   </button>
                 )}
 
@@ -738,6 +760,13 @@ const PromptDetailPage = ({ user, adsSettings }) => {
           0% { transform: scale(1); }
           50% { transform: scale(1.15); }
           100% { transform: scale(1); }
+        }
+
+        @keyframes toastFloatUp {
+          0% { opacity: 0; transform: translate(-50%, 10px); }
+          20% { opacity: 1; transform: translate(-50%, 0); }
+          80% { opacity: 1; transform: translate(-50%, 0); }
+          100% { opacity: 0; transform: translate(-50%, -20px); }
         }
 
         .gemini { color: #4285f4; background: rgba(66, 133, 244, 0.08) !important; border-color: rgba(66, 133, 244, 0.3) !important; }
