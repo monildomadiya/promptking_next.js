@@ -552,7 +552,7 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
               </div>
               <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, minWidth: 0 }}>
                 <span className={`badge ${badgeClass}`} style={{ 
-                  fontSize: isMobile ? '0.62rem' : '0.65rem', 
+                  fontSize: isMobile ? '10px' : '11px', 
                   padding: isMobile ? '2px 8px' : '3px 10px',
                   borderRadius: '6px',
                   fontWeight: 900,
@@ -628,7 +628,7 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
                         value={pin}
                         onChange={(e) => checkAutoUnlock(e.target.value)}
                         style={{ 
-                          width: '140px',
+                          width: isMobile ? '160px' : '140px',
                           height: '42px',
                           borderRadius: '100px',
                           border: showError ? '2px solid #ff4444' : '1px solid rgba(255,255,255,0.2)',
@@ -636,8 +636,8 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
                           color: 'white', 
                           textAlign: 'center', 
                           outline: 'none', 
-                          letterSpacing: '8px', 
-                          fontSize: '1rem', 
+                          letterSpacing: isMobile ? '6px' : '8px', 
+                          fontSize: isMobile ? '14px' : '1rem', 
                           transition: 'all 0.3s ease',
                           backdropFilter: 'blur(10px)',
                           boxShadow: '0 8px 32px rgba(0,0,0,0.3)'

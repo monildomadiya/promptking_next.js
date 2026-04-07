@@ -182,14 +182,23 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
               onClick={onLogoClick}
               style={{ 
                 display: 'flex', 
-                alignItems: 'center'
+                alignItems: 'center',
+                minHeight: isMobile ? '32px' : '50px',
+                minWidth: isMobile ? '100px' : 'fit-content'
               }}
             >
-              {settings.logo_url && !logoError ? (
+              {settings.logo_url && 
+               settings.logo_url !== 'null' && 
+               settings.logo_url !== 'undefined' && 
+               settings.logo_url !== '' && 
+               !logoError ? (
                 <img 
                   src={settings.logo_url} 
                   alt="PromptKing" 
-                  onError={() => setLogoError(true)}
+                  onError={() => {
+                    console.warn("Logo failed to load, switching to text fallback");
+                    setLogoError(true);
+                  }}
                   style={{ 
                     height: isMobile 
                       ? (settings.logo_height_mobile || '32px') 
@@ -203,7 +212,7 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                   className="site-logo"
                 />
               ) : (
-                <span className="header-logo-text" style={{ fontSize: isMobile ? '1.2rem' : '1.5rem', fontWeight: 900, color: 'white', letterSpacing: '-0.5px' }}>PromptKing</span>
+                <span className="header-logo-text" style={{ fontSize: isMobile ? '1.25rem' : '1.5rem', fontWeight: 900, color: 'white', letterSpacing: '-0.5px' }}>PromptKing</span>
               )}
             </Link>
           </div>
