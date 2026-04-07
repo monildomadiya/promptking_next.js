@@ -13,7 +13,8 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
   const [likes, setLikes] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeUnlockedKey, setActiveUnlockedKey] = useState(null);
-  const [visibleCount, setVisibleCount] = useState(12);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [catSearch, setCatSearch] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -59,10 +60,6 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
       console.error("Failed to fetch prompts", error);
       setLoading(false);
     }
-  };
-
-  const loadMore = () => {
-    setVisibleCount(prev => prev + 12);
   };
 
   const toggleLike = async (key) => {
@@ -119,6 +116,10 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
     window.addEventListener('openFilters', handleOpenFilters);
     return () => window.removeEventListener('openFilters', handleOpenFilters);
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, filter]);
 
   if (loading) {
     return (
@@ -197,7 +198,7 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
             flexDirection: 'row'
           }}>
             {(() => {
-              const items = filteredPrompts.slice(0, visibleCount);
+              const items = filteredPrompts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
               const cols = isMobile ? 2 : 3;
               const columns = Array.from({ length: cols }, () => []);
               
@@ -227,26 +228,90 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
             })()}
           </div>
 
-          {filteredPrompts.length > visibleCount && (
-            <div className="load-more-container" style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
+          {filteredPrompts.length > itemsPerPage && (
+            <div className="pagination-container" style={{ display: 'flex', justifyContent: 'center', marginTop: '30px', gap: '8px', alignItems: 'center' }}>
               <button 
-                onClick={loadMore}
+                onClick={() => {
+                  setCurrentPage(p => Math.max(1, p - 1));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                disabled={currentPage === 1}
                 style={{
                   background: 'rgba(255, 255, 255, 0.05)',
                   border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: 'white',
-                  padding: isMobile ? '14px 30px' : '18px 48px',
-                  borderRadius: '100px',
-                  fontSize: isMobile ? '0.9rem' : '1.05rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
+                  color: currentPage === 1 ? 'rgba(255,255,255,0.3)' : 'white',
+                  padding: isMobile ? '8px 12px' : '8px 16px',
+                  borderRadius: '12px',
+                  fontWeight: 600,
+                  cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                  fontSize: isMobile ? '0.8rem' : '0.9rem',
                   display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px'
+                  alignItems: 'center'
                 }}
               >
-                <Sparkles size={18} style={{ color: 'var(--accent-main)' }} />
-                Load More
+                Prev
+              </button>
+              
+              {Array.from({ length: Math.ceil(filteredPrompts.length / itemsPerPage) }).map((_, idx) => {
+                const pageNum = idx + 1;
+                const totalPages = Math.ceil(filteredPrompts.length / itemsPerPage);
+                
+                if (
+                  pageNum === 1 || 
+                  pageNum === totalPages || 
+                  (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                ) {
+                  return (
+                    <button 
+                      key={pageNum}
+                      onClick={() => {
+                        setCurrentPage(pageNum);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      style={{
+                        background: currentPage === pageNum ? 'var(--accent-main)' : 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        color: 'white',
+                        padding: isMobile ? '8px 12px' : '8px 14px',
+                        borderRadius: '8px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        boxShadow: currentPage === pageNum ? '0 0 15px rgba(229, 9, 20, 0.4)' : 'none',
+                        fontSize: isMobile ? '0.85rem' : '1rem'
+                      }}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                } else if (
+                  pageNum === currentPage - 2 || 
+                  pageNum === currentPage + 2
+                ) {
+                  return <span key={pageNum} style={{ color: 'rgba(255,255,255,0.5)', padding: '0 4px', fontSize: '0.9rem' }}>...</span>;
+                }
+                return null;
+              })}
+
+              <button 
+                onClick={() => {
+                  setCurrentPage(p => Math.min(Math.ceil(filteredPrompts.length / itemsPerPage), p + 1));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                disabled={currentPage === Math.ceil(filteredPrompts.length / itemsPerPage)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: currentPage === Math.ceil(filteredPrompts.length / itemsPerPage) ? 'rgba(255,255,255,0.3)' : 'white',
+                  padding: isMobile ? '8px 12px' : '8px 16px',
+                  borderRadius: '12px',
+                  fontWeight: 600,
+                  cursor: currentPage === Math.ceil(filteredPrompts.length / itemsPerPage) ? 'not-allowed' : 'pointer',
+                  fontSize: isMobile ? '0.8rem' : '0.9rem',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+              >
+                Next
               </button>
             </div>
           )}
