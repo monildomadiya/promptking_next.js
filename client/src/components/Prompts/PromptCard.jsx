@@ -536,23 +536,32 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
             transform: isUnlocked ? (isCopied && !prompt.isPremium ? (isMobile ? 'scale(1.02)' : 'scale(1.03)') : 'scale(1.01)') : 'scale(1)'
           }}>
             {/* macOS Style Header */}
-            <div style={{ background: 'transparent', padding: isMobile ? '8px 10px' : '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', gap: '6px' }}>
+            <div style={{ 
+              background: 'transparent', 
+              padding: isMobile ? '8px 10px' : '12px 15px', 
+              borderBottom: '1px solid rgba(255,255,255,0.04)', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between',
+              gap: '12px' 
+            }}>
+              <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
                 <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#FF5F56' }}></div>
                 <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#FFBD2E' }}></div>
                 <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#27C93F' }}></div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, minWidth: 0 }}>
                 <span className={`badge ${badgeClass}`} style={{ 
-                  fontSize: '0.65rem', 
-                  padding: '3px 10px',
+                  fontSize: isMobile ? '0.62rem' : '0.65rem', 
+                  padding: isMobile ? '2px 8px' : '3px 10px',
                   borderRadius: '6px',
                   fontWeight: 900,
                   textTransform: 'uppercase',
                   background: 'rgba(255,255,255,0.05)',
                   border: `1px solid ${brandColor || 'rgba(255,255,255,0.2)'}`,
                   color: brandColor || 'white',
-                  letterSpacing: '0.5px'
+                  letterSpacing: '0.5px',
+                  whiteSpace: 'nowrap'
                 }}>{prompt.aiType || 'AI'}</span>
               </div>
             </div>
