@@ -326,12 +326,18 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
     }}>
       {isHighlighted && (
         <div style={{
-          position: 'absolute', top: '-15px', right: '20px', background: 'var(--accent-main)',
-          color: 'white', padding: '4px 12px', borderRadius: '50px', fontSize: '0.7rem',
-          fontWeight: 800, textTransform: 'uppercase', boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
-          zIndex: 110, animation: 'bounce 2s infinite'
+          position: 'absolute', top: '-16px', left: '0', width: '100%', display: 'flex', justifyContent: 'center', pointerEvents: 'none', zIndex: 110
         }}>
-          ✦ Search Match: {prompt.prompt_key}
+          <div style={{
+            background: 'var(--accent-main)',
+            border: '3px solid #0a0a0f',
+            color: 'white', padding: '4px 16px', borderRadius: '50px', fontSize: '0.75rem',
+            fontWeight: 800, textTransform: 'uppercase', boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+            animation: 'bounce 2s infinite',
+            whiteSpace: 'nowrap'
+          }}>
+            ✦ Search Match: {prompt.prompt_key}
+          </div>
         </div>
       )}
       {/* Top Content Wrapper - Animate disappearance */}
