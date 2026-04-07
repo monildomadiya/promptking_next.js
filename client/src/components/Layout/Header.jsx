@@ -332,15 +332,27 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                       height: isMobile ? '45px' : '48px'
                     }} 
                   />
-                  {isMobile && isSearchExpanded && (
-                    <X 
-                      size={20} 
-                      style={{ position: 'absolute', right: '15px', color: 'var(--text-secondary)', cursor: 'pointer' }}
-                      onClick={() => {
+                  {((isMobile && isSearchExpanded) || search) && (
+                    <div 
+                      onPointerDown={(e) => {
+                        // Use pointer down to prevent input blur issues
+                        e.preventDefault(); 
                         setSearch('');
-                        setIsSearchExpanded(false);
+                        if (isMobile) setIsSearchExpanded(false);
                       }}
-                    />
+                      style={{ 
+                        position: 'absolute', 
+                        right: '5px', 
+                        padding: '10px',
+                        cursor: 'pointer',
+                        zIndex: 10,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <X size={20} style={{ color: 'var(--text-secondary)' }} />
+                    </div>
                   )}
                 </div>
               )}
