@@ -175,11 +175,9 @@ const PromptDetailPage = ({ user, adsSettings }) => {
         });
       }
 
-      // Relock smoothly only for Premium content
+      // Relock immediately for Premium content
       if (prompt.isPremium) {
-        setTimeout(() => {
-          setIsUnlocked(false);
-        }, 200);
+        setIsUnlocked(false);
       }
       
       setTimeout(() => {

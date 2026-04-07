@@ -240,14 +240,14 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
         }
       }
       
-      // Hard Relock (Snappy 1000ms for Premium, 2000ms for Free to allow Copied! feedback)
+      // Hard Relock (Snappy 100ms for Premium, 2000ms for Free to allow Copied! feedback)
       setTimeout(() => {
         setIsSnapping(false);
         setIsCopied(false);
         if (prompt.isPremium) {
           onLock(); // Tell parent to relock
         }
-      }, prompt.isPremium ? 1000 : 2000);
+      }, prompt.isPremium ? 100 : 2000);
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
