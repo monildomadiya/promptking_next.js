@@ -112,6 +112,7 @@ const Footer = ({ onLogoClick }) => {
                 <FooterLink to="/blog" text="Our Blog" />
                 <FooterLink to="/faq" text="FAQ & Help" />
                 <FooterLink to="/about" text="About Us" />
+                <FooterLink to="/contact" text="Contact Us" />
               </ul>
             )}
           </div>

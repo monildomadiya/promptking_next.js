@@ -21,6 +21,7 @@ const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
 const DisclaimerPage = lazy(() => import('./pages/DisclaimerPage'));
 const AdSensePolicyPage = lazy(() => import('./pages/AdSensePolicyPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
 const AdminDashboard = lazy(() => import('./components/Admin/AdminDashboard'));
 
 // Loading Fallback Component
@@ -169,6 +170,7 @@ function AppContent() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/article/:slug" element={<ArticlePage />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route path="/prompt/:key" element={<PromptDetailPage user={user} adsSettings={settings} />} />
           <Route path="/faq" element={<FAQPage />} />
           <Route path="/about" element={<AboutPage />} />
