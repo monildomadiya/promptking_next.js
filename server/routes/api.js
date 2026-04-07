@@ -98,7 +98,9 @@ const upload = multer({ storage: memoryStorage });
 
 // --- HELPER: Generate Unique Slug ---
 const generateUniqueSlug = async (title, currentId = null, table = 'prompts', idColumn = 'prompt_key') => {
-  let slug = title.toLowerCase()
+  if (!title) title = table === 'prompts' ? 'prompt' : 'article';
+  
+  let slug = title.toString().toLowerCase()
     .replace(/ /g, '-')
     .replace(/[^\w-]+/g, '')
     .replace(/--+/g, '-')
@@ -114,7 +116,7 @@ const generateUniqueSlug = async (title, currentId = null, table = 'prompts', id
     const rows = await db`
       SELECT ${db(idColumn)} 
       FROM ${db(table)} 
-      WHERE slug = ${uniqueSlug} AND ${db(idColumn)} != ${currentId || ''}
+      WHERE slug = ${uniqueSlug} AND ${db(idColumn)} != ${currentId || (idColumn === 'id' ? 0 : '')}
     `;
     if (rows.length === 0) {
       exists = false;

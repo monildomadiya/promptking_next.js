@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
-import { X, Image, Sparkles, PlusCircle, FileText, Save, Activity } from '../Common/Icons';
+import { X, Image, Sparkles, PlusCircle, FileText, Save, Activity, Camera } from '../Common/Icons';
 import { Editor } from '@tinymce/tinymce-react';
 
 const BlogModal = ({ blog, onClose, onSave }) => {
