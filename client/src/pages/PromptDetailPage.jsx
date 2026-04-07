@@ -461,7 +461,8 @@ const PromptDetailPage = ({ user, adsSettings }) => {
                       cursor: 'pointer',
                       zIndex: 20,
                       backdropFilter: 'blur(5px)',
-                      transition: 'all 0.3s ease'
+                      transition: 'all 0.3s ease',
+                      animation: isCopied ? 'copyButtonPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)' : 'none'
                     }}
                   >
                     {isCopied ? <Check size={16} /> : <Copy size={16} />}
@@ -731,6 +732,12 @@ const PromptDetailPage = ({ user, adsSettings }) => {
 
         .copy-success-pulse {
           animation: copyPulseDetail 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes copyButtonPop {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.15); }
+          100% { transform: scale(1); }
         }
 
         .gemini { color: #4285f4; background: rgba(66, 133, 244, 0.08) !important; border-color: rgba(66, 133, 244, 0.3) !important; }

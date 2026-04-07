@@ -605,7 +605,9 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
                     cursor: 'pointer',
                     backdropFilter: 'blur(10px)',
                     zIndex: 20,
-                    transition: 'all 0.3s ease'
+                    zIndex: 20,
+                    transition: 'all 0.3s ease',
+                    animation: isCopied ? 'copyButtonPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)' : 'none'
                   }}
                   className="pro-card-hover"
                 >
@@ -732,6 +734,12 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
 
         .copy-success-pulse {
           animation: copyPulse 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes copyButtonPop {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.15); }
+          100% { transform: scale(1); }
         }
 
         @media (hover: hover) and (pointer: fine) {
