@@ -134,9 +134,8 @@ function AppContent() {
   const resetHome = () => {
     setSearch('');
     setFilter('all');
-    if (window.location.pathname !== '/') {
-      window.scrollTo(0, 0);
-    }
+    window.dispatchEvent(new CustomEvent('resetPagination'));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (

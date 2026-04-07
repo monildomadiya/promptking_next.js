@@ -15,8 +15,10 @@ const SEOMetadata = ({
       <title>{title}</title>
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
+      <link rel="canonical" href={url} />
 
       {/* OpenGraph / Social Metadata */}
+      <meta property="og:site_name" content="PromptKing" />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={image} />
@@ -25,6 +27,7 @@ const SEOMetadata = ({
 
       {/* Twitter Metadata */}
       <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:site" content="@promptking" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />

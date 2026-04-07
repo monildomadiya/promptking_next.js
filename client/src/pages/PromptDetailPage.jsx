@@ -327,10 +327,10 @@ const PromptDetailPage = ({ user, adsSettings }) => {
               <div style={{ borderRadius: '24px', overflow: 'hidden', position: 'relative' }}>
                 {prompt.isImageSlider ? (
                   <div className="slider-container" style={{ position: 'relative', aspectRatio: (prompt.image_ratio || prompt.imageRatio || '16 / 9').replace(/\s+/g, ' ').trim(), width: '100%' }}>
-                    <img src={optimizeImage(prompt.imgAfter)} alt="After" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={optimizeImage(prompt.imgAfter)} alt={`${prompt.title} - After Preview`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                     <img 
                       src={optimizeImage(prompt.imgBefore)} 
-                      alt="Before" 
+                      alt={`${prompt.title} - Before Preview`} 
                       style={{ 
                         position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover',
                         clipPath: `inset(0 ${100 - sliderValue}% 0 0)`,

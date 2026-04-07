@@ -942,4 +942,47 @@ router.delete('/admin/delete_category/:id', adminAuth, async (req, res) => {
   }
 });
 
+// --- DYNAMIC SITEMAP ---
+router.get('/sitemap.xml', async (req, res) => {
+  const baseUrl = 'https://promptking.in';
+  let prompts = [];
+  let blogs = [];
+  
+  try {
+    // Attempt DB fetch if healthy
+    const db = require('./db');
+    prompts = await db`SELECT prompt_key FROM prompts WHERE prompt_key IS NOT NULL`;
+    blogs = await db`SELECT slug FROM blogs`;
+  } catch (err) {
+    console.warn("Sitemap: DB failed, serving static pages only", err.message);
+  }
+
+  try {
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+    
+    // Static Pages
+    const staticPages = ['', '/blog', '/faq', '/about', '/privacy', '/terms', '/disclaimer', '/contact'];
+    staticPages.forEach(p => {
+      xml += `  <url>\n    <loc>${baseUrl}${p}</loc>\n    <changefreq>daily</changefreq>\n    <priority>${p === '' ? '1.0' : '0.8'}</priority>\n  </url>\n`;
+    });
+
+    // Dynamic Prompts
+    prompts.forEach(p => {
+      xml += `  <url>\n    <loc>${baseUrl}/prompt/${p.prompt_key}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>\n`;
+    });
+
+    // Dynamic Blogs
+    blogs.forEach(b => {
+      xml += `  <url>\n    <loc>${baseUrl}/article/${b.slug}</loc>\n    <changefreq>monthly</changefreq>\n    <priority>0.5</priority>\n  </url>\n`;
+    });
+
+    xml += `</urlset>`;
+    res.header('Content-Type', 'application/xml');
+    res.send(xml);
+  } catch (error) {
+    console.error("Sitemap XML build error:", error);
+    res.status(500).send("Error generating sitemap");
+  }
+});
+
 module.exports = router;

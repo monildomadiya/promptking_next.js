@@ -113,8 +113,16 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
 
   useEffect(() => {
     const handleOpenFilters = () => setIsSidebarOpen(true);
+    const handleReset = () => {
+      setCurrentPage(1);
+      setActiveUnlockedKey(null);
+    };
     window.addEventListener('openFilters', handleOpenFilters);
-    return () => window.removeEventListener('openFilters', handleOpenFilters);
+    window.addEventListener('resetPagination', handleReset);
+    return () => {
+      window.removeEventListener('openFilters', handleOpenFilters);
+      window.removeEventListener('resetPagination', handleReset);
+    };
   }, []);
 
   useEffect(() => {
