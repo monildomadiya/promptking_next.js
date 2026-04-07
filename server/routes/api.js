@@ -92,16 +92,9 @@ const MOCK_DATA = {
 const uploadDir = 'uploads/';
 if (!fs.existsSync(uploadDir)) { fs.mkdirSync(uploadDir, { recursive: true }); }
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => { cb(null, uploadDir); },
-  filename: (req, file, cb) => {
-    const uid = req.headers['x-user-id'] || req.session.userId;
-    const ext = path.extname(file.originalname);
-    cb(null, `avatar_${uid}_${Date.now()}${ext}`);
-  }
-});
+const memoryStorage = multer.memoryStorage();
 
-const upload = multer({ storage });
+const upload = multer({ storage: memoryStorage });
 
 // --- HELPER: Generate Unique Slug ---
 const generateUniqueSlug = async (title, currentId = null, table = 'prompts', idColumn = 'prompt_key') => {
@@ -133,17 +126,9 @@ const generateUniqueSlug = async (title, currentId = null, table = 'prompts', id
   return uniqueSlug;
 };
 
-// --- LOGO UPLOAD (SVG Support) ---
-const logoStorage = multer.diskStorage({
-  destination: (req, file, cb) => { cb(null, uploadDir); },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, `logo_${Date.now()}${ext}`);
-  }
-});
-
+// --- LOGO UPLOAD (SVG Support & WebP native) ---
 const logoUpload = multer({ 
-  storage: logoStorage,
+  storage: memoryStorage,
   fileFilter: (req, file, cb) => {
     const allowed = ['.png', '.jpg', '.jpeg', '.svg', '.webp'];
     const ext = path.extname(file.originalname).toLowerCase();
@@ -546,7 +531,10 @@ router.post('/update_profile', upload.single('avatar'), async (req, res) => {
   try {
     let avatarUrl = null;
     if (req.file) {
-      avatarUrl = `/uploads/${req.file.filename}`;
+      const filename = `avatar_${uid}_${Date.now()}.webp`;
+      const filepath = path.join(uploadDir, filename);
+      await sharp(req.file.buffer).webp({ quality: 80 }).toFile(filepath);
+      avatarUrl = `/uploads/${filename}`;
     }
 
     if (avatarUrl) {
@@ -647,7 +635,19 @@ router.post('/admin/save_settings', adminAuth, async (req, res) => {
 
 router.post('/admin/upload_logo', adminAuth, logoUpload.single('logo'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-  const logoUrl = `/uploads/${req.file.filename}`;
+  
+  const ext = path.extname(req.file.originalname).toLowerCase();
+  const isSvg = ext === '.svg';
+  const filename = isSvg ? `logo_${Date.now()}.svg` : `logo_${Date.now()}.webp`;
+  const filepath = path.join(uploadDir, filename);
+  
+  if (isSvg) {
+    fs.writeFileSync(filepath, req.file.buffer);
+  } else {
+    await sharp(req.file.buffer).webp({ quality: 85 }).toFile(filepath);
+  }
+  
+  const logoUrl = `/uploads/${filename}`;
   
   // Update memory cache
   localSettingsCache.logo_url = logoUrl;
@@ -668,7 +668,12 @@ router.post('/admin/upload_logo', adminAuth, logoUpload.single('logo'), async (r
 
 router.post('/admin/upload_image', adminAuth, logoUpload.single('image'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-  const imageUrl = `/uploads/${req.file.filename}`;
+  
+  const filename = `img_${Date.now()}.webp`;
+  const filepath = path.join(uploadDir, filename);
+  await sharp(req.file.buffer).webp({ quality: 80 }).toFile(filepath);
+  
+  const imageUrl = `/uploads/${filename}`;
   // No DB persistence required for general image upload (usually for prompt editors)
   res.json({ status: "success", imageUrl });
 });

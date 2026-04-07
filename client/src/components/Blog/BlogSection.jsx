@@ -8,6 +8,14 @@ const BlogSection = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const optimizeImage = (url, width = 600) => {
+    if (!url) return url;
+    if (url.startsWith('/uploads/')) {
+      return `/api/optimize?src=${encodeURIComponent(url)}&w=${width}`;
+    }
+    return url;
+  };
+
   useEffect(() => {
     fetchBlogs();
   }, []);
@@ -89,7 +97,7 @@ const BlogSection = () => {
               transition: '0.4s'
             }} className="blog-card-home">
               <div style={{ height: '220px', overflow: 'hidden' }}>
-                <img src={blog.featured_image || 'https://via.placeholder.com/600x400/111/444?text=PromptKing+Blog'} alt={blog.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: '0.5s' }} className="blog-img" />
+                <img src={optimizeImage(blog.featured_image || 'https://via.placeholder.com/600x400/111/444?text=PromptKing+Blog', 600)} alt={blog.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: '0.5s' }} className="blog-img" />
               </div>
               <div style={{ padding: '30px' }}>
                 <h3 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '15px', lineHeight: 1.3 }}>{blog.title}</h3>

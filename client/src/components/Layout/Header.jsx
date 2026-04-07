@@ -24,6 +24,14 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
   const navigate = useNavigate();
   const headerRef = React.useRef(null);
 
+  const optimizeImage = (url, width = 600) => {
+    if (!url) return url;
+    if (url.startsWith('/uploads/')) {
+      return `/api/optimize?src=${encodeURIComponent(url)}&w=${width}`;
+    }
+    return url;
+  };
+
   // fetchSettings removed - now provided via props from App.jsx
 
   const handleLogin = async () => {
@@ -193,7 +201,7 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                settings.logo_url !== '' && 
                !logoError ? (
                 <img 
-                  src={settings.logo_url} 
+                  src={optimizeImage(settings.logo_url, 400)} 
                   alt="PromptKing" 
                   onError={() => {
                     console.warn("Logo failed to load, switching to text fallback");
@@ -219,8 +227,6 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
             </Link>
           </div>
 
-          {/* Centered Category Icon Removed as per user request */}
-
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
@@ -229,7 +235,6 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
             justifyContent: 'flex-end',
             minWidth: 0
           }}>
-            {/* Search Bar - Desktop (Right) or Expandable (Mobile) */}
             <div style={{ 
               flex: isMobile && isSearchExpanded ? 1 : 'initial',
               position: 'relative',
@@ -337,7 +342,6 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                   {((isMobile && isSearchExpanded) || search) && (
                     <div 
                       onPointerDown={(e) => {
-                        // Use pointer down to prevent input blur issues
                         e.preventDefault(); 
                         setSearch('');
                         if (isMobile) setIsSearchExpanded(false);
@@ -358,55 +362,49 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                   )}
                 </div>
               )}
-              
             </div>
             
             {!isMobile && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                {/* Status Icons - Only show on home page where filtering is active */}
                 {window.location.pathname === '/' && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <button 
                       onClick={() => setFilter(filter === 'premium' ? 'all' : 'premium')}
                       className="pro-card-hover"
                       title="Premium Prompts"
-                    style={{ 
-                      width: '42px', height: '42px', borderRadius: '50%', 
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                      background: filter === 'premium' ? 'rgba(255, 193, 7, 0.15)' : 'rgba(255,255,255,0.03)',
-                      border: filter === 'premium' ? '1px solid rgba(255, 193, 7, 0.3)' : '1px solid rgba(255,255,255,0.08)',
-                      color: filter === 'premium' ? '#FFC107' : 'rgba(255,255,255,0.7)',
-                      transition: '0.3s',
-                      backdropFilter: 'blur(10px)'
-                    }}
-                  >
-                    <Crown size={20} fill={filter === 'premium' ? '#FFC107' : 'none'} />
-                  </button>
-                  {user && (
-                    <button 
-                      onClick={() => setFilter(filter === 'liked' ? 'all' : 'liked')}
-                      className="pro-card-hover"
-                      title="My Likes"
                       style={{ 
                         width: '42px', height: '42px', borderRadius: '50%', 
                         display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                        background: filter === 'liked' ? 'rgba(229, 9, 20, 0.15)' : 'rgba(255,255,255,0.03)',
-                        border: filter === 'liked' ? '1px solid rgba(229, 9, 20, 0.3)' : '1px solid rgba(255,255,255,0.08)',
-                        color: filter === 'liked' ? '#E50914' : 'rgba(255,255,255,0.7)',
+                        background: filter === 'premium' ? 'rgba(255, 193, 7, 0.15)' : 'rgba(255,255,255,0.03)',
+                        border: filter === 'premium' ? '1px solid rgba(255, 193, 7, 0.3)' : '1px solid rgba(255,255,255,0.08)',
+                        color: filter === 'premium' ? '#FFC107' : 'rgba(255,255,255,0.7)',
                         transition: '0.3s',
                         backdropFilter: 'blur(10px)'
                       }}
                     >
-                      <Heart size={20} fill={filter === 'liked' ? '#E50914' : 'none'} />
+                      <Crown size={20} fill={filter === 'premium' ? '#FFC107' : 'none'} />
                     </button>
-                  )}
-                </div>
-              )}
+                    {user && (
+                      <button 
+                        onClick={() => setFilter(filter === 'liked' ? 'all' : 'liked')}
+                        className="pro-card-hover"
+                        title="My Likes"
+                        style={{ 
+                          width: '42px', height: '42px', borderRadius: '50%', 
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                          background: filter === 'liked' ? 'rgba(229, 9, 20, 0.15)' : 'rgba(255,255,255,0.03)',
+                          border: filter === 'liked' ? '1px solid rgba(229, 9, 20, 0.3)' : '1px solid rgba(255,255,255,0.08)',
+                          color: filter === 'liked' ? '#E50914' : 'rgba(255,255,255,0.7)',
+                          transition: '0.3s',
+                          backdropFilter: 'blur(10px)'
+                        }}
+                      >
+                        <Heart size={20} fill={filter === 'liked' ? '#E50914' : 'none'} />
+                      </button>
+                    )}
+                  </div>
+                )}
 
-                {/* Admin Link */}
-
-
-                {/* User Actions */}
                 <nav style={{ display: 'flex', alignItems: 'center' }}>
                   {user ? (
                     <div 
@@ -424,8 +422,8 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                         maxWidth: isMobile ? '150px' : 'none'
                       }}
                     >
-                      <div style={{ width: '42px', height: '42px', borderRadius: '50%', overflow: 'hidden', border: '2px solid transparent' }}>
-                        <img src={avatarPreview || user.photoURL} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <div className="user-icon-circle" style={{ width: '42px', height: '42px', borderRadius: '50%', overflow: 'hidden', border: '2px solid transparent' }}>
+                        <img src={optimizeImage(avatarPreview || user.photoURL, 150)} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                         <span className="profile-name-text" style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>Welcome back,</span>
@@ -507,8 +505,8 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                 className="profile-avatar-wrap"
                 onClick={() => document.getElementById('avatarInput').click()}
               >
-                <div style={{ width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', border: '4px solid #111', background: '#111' }}>
-                  <img src={avatarPreview || user.photoURL} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div className="mobile-user-avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', border: '4px solid #111', background: '#111' }}>
+                  <img src={optimizeImage(avatarPreview || user.photoURL, 150)} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{
                   position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
