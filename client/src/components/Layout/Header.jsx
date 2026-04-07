@@ -167,7 +167,14 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
           position: 'relative',
           gap: isMobile ? '8px' : '40px'
         }}>
-          <div style={{ display: (isMobile && isSearchExpanded) ? 'none' : 'flex', alignItems: 'center', flex: '0 0 auto', zIndex: 20 }}>
+          <div style={{ 
+            display: (isMobile && isSearchExpanded) ? 'none' : 'flex', 
+            alignItems: 'center', 
+            flex: '0 0 auto', 
+            zIndex: 20,
+            minWidth: isMobile ? '110px' : 'fit-content',
+            flexShrink: 0
+          }}>
             <Link 
               to="/" 
               onClick={onLogoClick}
@@ -419,6 +426,7 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                   ) : (
                     <button 
                       onClick={() => setIsLoginOpen(true)}
+                      className="signin-btn-main"
                       style={{
                         background: 'var(--accent-main)',
                         color: 'white',
@@ -430,14 +438,6 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                         cursor: 'pointer',
                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                         boxShadow: '0 8px 20px rgba(229, 9, 20, 0.2)'
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 12px 25px rgba(229, 9, 20, 0.3)';
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 8px 20px rgba(229, 9, 20, 0.2)';
                       }}
                     >
                       Sign In

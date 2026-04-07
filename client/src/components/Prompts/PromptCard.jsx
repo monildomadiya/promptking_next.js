@@ -22,7 +22,7 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const cardPadding = isMobile ? 12 : 18;
+  const cardPadding = isMobile ? 10 : 18;
 
   const cardRef = React.useRef(null);
 
@@ -716,6 +716,12 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
         }
 
         @media (hover: hover) {
+          .pro-card-hover:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(229, 9, 20, 0.15) !important;
+            border-color: rgba(229, 9, 20, 0.4) !important;
+          }
+          
           .youtube-btn-hover:hover {
             transform: translateY(-2px);
             box-shadow: 0 12px 24px rgba(229, 9, 20, 0.15) !important;
