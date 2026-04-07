@@ -140,12 +140,15 @@ function AppContent() {
 
   return (
     <div className="App">
-      {settings?.favicon_url && (
-        <Helmet>
+      <Helmet>
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        {settings?.favicon_url && settings.favicon_url.length > 3 && settings.favicon_url.includes('.') && (
           <link rel="icon" type="image/png" href={settings.favicon_url} />
+        )}
+        {settings?.favicon_url && settings.favicon_url.length > 3 && settings.favicon_url.includes('.') && (
           <link rel="apple-touch-icon" href={settings.favicon_url} />
-        </Helmet>
-      )}
+        )}
+      </Helmet>
       {!isAdminPath && <GoogleAdSense settings={settings} />}
       {!isAdminPath && (
         <Header 
