@@ -285,62 +285,30 @@ const BrandingPanel = ({ onSave }) => {
             <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>SVG, PNG or WEBP recommended.</p>
           </div>
 
-          {/* Favicon Card */}
+          {/* Favicon Card - Now Static */}
           <div style={{ ...glassPanelStyle, padding: '30px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <SectionTitle title="Favicon Preview" />
+            <SectionTitle title="Favicon" />
             <div style={{ 
               aspectRatio: '1', borderRadius: '20px', background: 'rgba(0,0,0,0.4)', 
-              border: '2px dashed rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', 
+              border: '2px solid rgba(229,9,20,0.2)', display: 'flex', alignItems: 'center', 
               justifyContent: 'center', padding: '20px', position: 'relative', overflow: 'hidden'
             }}>
-              {settings.favicon_url ? (
-                 <img src={settings.favicon_url} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} alt="Favicon" />
-              ) : (
-                 <Crown size={48} style={{ opacity: 0.1 }} />
-              )}
+              <img src="/favicon.png" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '12px' }} alt="Favicon" />
             </div>
-            <div style={{ position: 'relative' }}>
-               <input 
-                 type="file" 
-                 id="favicon-upload"
-                 accept="image/*"
-                 style={{ display: 'none' }}
-                 onChange={async (e) => {
-                   if (e.target.files && e.target.files[0]) {
-                     const formData = new FormData();
-                     formData.append('image', e.target.files[0]);
-                     try {
-                       const res = await api.post('/admin/upload_image', formData);
-                       if (res.data.status === 'success') {
-                         setSettings({ ...settings, favicon_url: res.data.imageUrl });
-                         alert("Favicon staged! Click Apply Changes to save.");
-                       }
-                     } catch (err) {
-                       console.error(err);
-                       alert("Failed to upload favicon.");
-                     }
-                   }
-                 }}
-               />
-               <button 
-                 onClick={() => document.getElementById('favicon-upload').click()}
-                 className="glass-button-secondary"
-                 style={{ 
-                   width: '100%', 
-                   padding: '14px', 
-                   borderRadius: '12px', 
-                   fontWeight: 800, 
-                   fontSize: '0.9rem', 
-                   color: '#fbbf24',
-                   background: 'rgba(251, 191, 36, 0.05)',
-                   border: '1px solid rgba(251, 191, 36, 0.2)',
-                   cursor: 'pointer'
-                 }}
-               >
-                 Choose Favicon
-               </button>
+            <div style={{ 
+              padding: '14px 18px', 
+              background: 'rgba(229, 9, 20, 0.05)', 
+              border: '1px solid rgba(229, 9, 20, 0.2)',
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10a37f', flexShrink: 0 }} />
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                Favicon is permanently set to the PromptKing logo. Loads instantly from static files — no server requests needed.
+              </span>
             </div>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>Square 1:1 image recommended.</p>
           </div>
         </div>
 
