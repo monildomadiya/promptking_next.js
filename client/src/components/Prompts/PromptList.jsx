@@ -5,7 +5,7 @@ import CategorySidebar from './CategorySidebar';
 import Shimmer from '../Common/Shimmer';
 import CategoryBar from './CategoryBar';
 import api from '../../api';
-import { Search, Crown, Grid, MessageSquare, Sparkles, Image, Zap, Heart, Filter } from '../Common/Icons';
+import { Search, Crown, Grid, MessageSquare, Sparkles, Image, Zap, Heart, Filter, X } from '../Common/Icons';
 
 const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) => {
   const [prompts, setPrompts] = useState([]);
@@ -82,8 +82,11 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
   };
 
   const filteredPrompts = prompts.filter(p => {
-    const matchesSearch = p.title.toLowerCase().includes(search.toLowerCase()) || 
-                          p.prompt_key.toLowerCase().includes(search.toLowerCase());
+    const safeTitle = (p.title || '').toLowerCase();
+    const safeKey = (p.prompt_key || '').toLowerCase();
+    const safeSearch = (search || '').toLowerCase();
+    
+    const matchesSearch = safeTitle.includes(safeSearch) || safeKey.includes(safeSearch);
     
     let matchesFilter = true;
     if (filter === 'liked') {
@@ -93,7 +96,7 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
     } else if (filter === 'premium') {
       matchesFilter = p.isPremium;
     } else if (filter !== 'all') {
-      matchesFilter = p.aiType.toLowerCase().includes(filter);
+      matchesFilter = (p.aiType || '').toLowerCase().includes(filter);
     }
     
     return matchesSearch && matchesFilter;
@@ -106,7 +109,8 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
     premium: prompts.filter(p => p.isPremium).length,
     liked: Object.values(likes).filter(Boolean).length,
     categories: categories.reduce((acc, cat) => {
-      acc[cat.name.toLowerCase()] = prompts.filter(p => p.aiType.toLowerCase().includes(cat.name.toLowerCase())).length;
+      const catName = (cat.name || '').toLowerCase();
+      acc[catName] = prompts.filter(p => (p.aiType || '').toLowerCase().includes(catName)).length;
       return acc;
     }, {})
   };
