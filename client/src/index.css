@@ -69,7 +69,7 @@ input::-webkit-credentials-auto-fill-button {
   border-radius: 10px;
   transition: all 0.3s ease;
 }
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   ::-webkit-scrollbar-thumb:hover {
     background: var(--accent-main);
   }
@@ -160,7 +160,7 @@ html {
   transition: all 0.3s ease !important;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .glass-button-secondary:hover {
     background: rgba(229, 9, 20, 0.1) !important;
     color: var(--accent-main) !important;
@@ -271,7 +271,7 @@ button:active {
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .pro-card-hover:hover {
     transform: translateY(-8px) scale(1.02);
     box-shadow: 0 15px 35px rgba(229, 9, 20, 0.15);
@@ -279,7 +279,7 @@ button:active {
   }
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .user-profile-pill:hover {
     background: rgba(255, 255, 255, 0.1) !important;
     border-color: rgba(255, 255, 255, 0.2) !important;
@@ -378,7 +378,7 @@ mark {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
 }
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .category-container::-webkit-scrollbar-thumb:hover {
     background: var(--accent-main);
   }
@@ -452,7 +452,7 @@ mark {
   position: relative;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .blog-card-new:hover {
     transform: translateY(-12px);
     background: rgba(255, 255, 255, 0.05);
@@ -474,7 +474,7 @@ mark {
   transition: transform 0.7s ease;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .blog-card-new:hover .blog-card-image-wrapper img {
     transform: scale(1.1);
   }
@@ -540,7 +540,7 @@ mark {
   transition: gap 0.3s ease;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .blog-card-new:hover .read-more-btn {
     gap: 12px;
   }
@@ -609,7 +609,7 @@ mark {
   -webkit-backdrop-filter: blur(12px);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .social-card-item:hover {
     background: rgba(255, 255, 255, 0.06);
     border-color: rgba(255, 255, 255, 0.2);
@@ -636,14 +636,14 @@ mark {
   transition: all 0.3s ease;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .social-card-item:hover .social-card-icon-wrap {
     background: var(--icon-color);
     transform: scale(1.1) rotate(-5deg);
   }
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .social-card-item:hover .social-card-icon-wrap svg {
     color: white !important;
   }
@@ -686,7 +686,7 @@ mark {
   transition: all 0.3s ease;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .social-card-item:hover .social-card-action {
     opacity: 1;
     transform: translateX(0);
@@ -787,7 +787,7 @@ mark {
   border-radius: 10px;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .unlocked-prompt-content::-webkit-scrollbar-thumb:hover {
     background: #ff4d4d;
   }

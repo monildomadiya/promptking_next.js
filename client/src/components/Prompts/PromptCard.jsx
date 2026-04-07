@@ -715,7 +715,7 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
           animation: copyPulse 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
-        @media (hover: hover) {
+        @media (hover: hover) and (pointer: fine) {
           .pro-card-hover:hover {
             transform: translateY(-8px) scale(1.02);
             box-shadow: 0 15px 35px rgba(229, 9, 20, 0.15) !important;

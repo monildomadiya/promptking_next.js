@@ -9,6 +9,7 @@ import AdSenseUnit from '../Ads/AdSenseUnit';
 
 const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter, setFilter, showFilters, setShowFilters, onLogoClick, settings, isAdmin, onHeightChange }) => {
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -172,8 +173,9 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
             alignItems: 'center', 
             flex: '0 0 auto', 
             zIndex: 20,
-            minWidth: isMobile ? '110px' : 'fit-content',
-            flexShrink: 0
+            minWidth: isMobile ? '130px' : 'fit-content',
+            flexShrink: 0,
+            overflow: 'visible'
           }}>
             <Link 
               to="/" 
@@ -183,10 +185,11 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                 alignItems: 'center'
               }}
             >
-              {settings.logo_url ? (
+              {settings.logo_url && !logoError ? (
                 <img 
                   src={settings.logo_url} 
                   alt="PromptKing" 
+                  onError={() => setLogoError(true)}
                   style={{ 
                     height: isMobile 
                       ? (settings.logo_height_mobile || '32px') 
