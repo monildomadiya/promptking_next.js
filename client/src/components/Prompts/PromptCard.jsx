@@ -76,6 +76,13 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
       onUnlock();
       api.post('/record_unlock', { key: prompt.key }).catch(console.error);
       triggerConfetti();
+      // Auto-center current card for UX
+      setTimeout(() => {
+        const box = document.getElementById(`box-${prompt.key}`);
+        if (box) {
+          box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
     } else if (inputPass.length >= targetPass.length) {
       setShowError(true);
       setTimeout(() => {

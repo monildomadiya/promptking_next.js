@@ -91,6 +91,13 @@ const PromptDetailPage = ({ user, adsSettings }) => {
     if (inputPass === targetPass) {
       setIsUnlocked(true);
       triggerConfetti();
+      // Auto-center the box so the user sees the unlocked content
+      setTimeout(() => {
+        const box = document.getElementById('box-detail');
+        if (box) {
+          box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
       try {
         await api.post('/record_unlock', { key: prompt.key }); // Record as unlock
       } catch (err) {
