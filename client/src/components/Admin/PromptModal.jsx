@@ -12,7 +12,8 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     ai_type: 'ChatGPT',
     password: '',
     is_premium: false,
-    image_ratio: '4 / 5'
+    image_ratio: '4 / 5',
+    is_image_slider: false
   });
   const [originalKey, setOriginalKey] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -22,12 +23,15 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     if (prompt) {
       setFormData({
         ...prompt,
-        hide_prompt_box: Boolean(prompt.hide_prompt_box),
         is_image_slider: Boolean(prompt.is_image_slider),
         is_premium: prompt.is_premium !== undefined ? Boolean(prompt.is_premium) : (prompt.isPremium !== undefined ? Boolean(prompt.isPremium) : false),
         description: prompt.description || ''
       });
       setOriginalKey(prompt.prompt_key);
+    } else {
+      // Auto-generate a unique ID for new prompts
+      const uniqueId = 'PK' + Date.now().toString().slice(-6);
+      setFormData(prev => ({ ...prev, prompt_key: uniqueId }));
     }
 
     const handleEsc = (e) => {
@@ -39,6 +43,13 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validation: Premium content MUST have a password
+    if (formData.is_premium && (!formData.password || formData.password.trim() === '')) {
+      alert("⚠️ SECURITY REQUIRED: Premium content must have an unlock PIN/Password.");
+      return;
+    }
+
     try {
       await api.post('/admin/save_prompt', { ...formData, originalKey });
       onSave();
@@ -201,7 +212,6 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
               <div className="glass-card" style={{ padding: '25px', borderRadius: '20px' }}>
                 <Label text="Presentation Mode" />
                 <div style={{ display: 'flex', gap: '30px', marginTop: '15px' }}>
-                  <Checkbox label="Hide Prompt Panel" checked={formData.hide_prompt_box} onChange={(val) => setFormData({...formData, hide_prompt_box: val})} />
                   <Checkbox label="Enable Contrast Slider" checked={formData.is_image_slider} onChange={(val) => setFormData({...formData, is_image_slider: val})} />
                   <Checkbox label="Premium Content" premium checked={formData.is_premium} onChange={(val) => setFormData({...formData, is_premium: val, password: val ? formData.password : ''})} />
                 </div>

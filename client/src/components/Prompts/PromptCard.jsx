@@ -530,9 +530,8 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
       </div>
 
       {/* Prompt Area */}
-      {!prompt.hidePromptBox && (
-        <div style={{ transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }}>
-          <div id={`box-${prompt.key}`} className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isSnapping ? 'thanos-snap' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse' : ''}`} style={{
+      <div style={{ transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }}>
+        <div id={`box-${prompt.key}`} className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isSnapping ? 'thanos-snap' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse' : ''}`} style={{
             background: 'rgba(15, 15, 20, 0.4)', 
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
@@ -720,9 +719,6 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
             videoUrl={prompt.igLink} 
           />
         </div>
-      )}
-
-
 
 
       <style>{`

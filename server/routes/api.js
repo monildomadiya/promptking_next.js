@@ -764,7 +764,6 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
           img_after = ${p.img_after}, 
           ig_link = ${p.ig_link}, 
           is_image_slider = ${!!p.is_image_slider}, 
-          hide_prompt_box = ${!!p.hide_prompt_box}, 
           image_ratio = ${p.image_ratio}, 
           password = ${p.password}, 
           is_premium = ${!!p.is_premium} 
@@ -775,11 +774,11 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
       await db`
         INSERT INTO prompts (
           prompt_key, slug, title, description, ai_type, prompt_text, img_before, img_after, 
-          ig_link, is_image_slider, hide_prompt_box, image_ratio, password, is_premium
+          ig_link, is_image_slider, image_ratio, password, is_premium
         ) VALUES (
           ${finalKey}, ${finalSlug}, ${p.title}, ${p.description}, ${p.ai_type}, ${p.prompt_text}, 
           ${p.img_before}, ${p.img_after}, ${p.ig_link}, ${!!p.is_image_slider}, 
-          ${!!p.hide_prompt_box}, ${p.image_ratio}, ${p.password}, ${!!p.is_premium}
+          ${p.image_ratio}, ${p.password}, ${!!p.is_premium}
         )
       `;
     }
