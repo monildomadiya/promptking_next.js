@@ -1,7 +1,7 @@
 import PromptList from '../components/Prompts/PromptList';
 import SEOMetadata from '../components/SEO/SEOMetadata';
 
-const HomePage = ({ user, search, filter, setFilter, isMobile }) => {
+const HomePage = ({ search, filter, setFilter, isMobile }) => {
   const schema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -34,7 +34,6 @@ const HomePage = ({ user, search, filter, setFilter, isMobile }) => {
         PromptKing - Premium AI Prompts Library for ChatGPT, Midjourney & Gemini
       </h1>
       <PromptList 
-        user={user} 
         search={search} 
         filter={filter} 
         setFilter={setFilter} 

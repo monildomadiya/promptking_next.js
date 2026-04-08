@@ -22,7 +22,6 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
-          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore', 'react-firebase-hooks/auth'],
           animations: ['framer-motion', 'canvas-confetti'],
           editor: ['@tinymce/tinymce-react']
         }

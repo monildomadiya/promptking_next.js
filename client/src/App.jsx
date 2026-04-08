@@ -3,9 +3,6 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { Helmet } from 'react-helmet-async';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
-import BottomNav from './components/Layout/BottomNav';
-import { auth } from './firebase';
-import { onAuthStateChanged } from 'firebase/auth';
 import api from './api';
 import GoogleAdSense from './components/Ads/GoogleAdSense';
 import './index.css';
@@ -41,8 +38,6 @@ const PageLoader = () => (
 
 
 function AppContent() {
-  const [user, setUser] = useState(null);
-  const [profileData, setProfileData] = useState({ name: '', email: '', avatar_url: '' });
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [isAdmin, setIsAdmin] = useState(false);
@@ -51,17 +46,6 @@ function AppContent() {
   const [headerHeight, setHeaderHeight] = useState(isMobile ? 85 : 130);
   const location = useLocation();
   const isAdminPath = /^\/admin(\/|$)/i.test(location.pathname);
-
-  const fetchProfile = async () => {
-    try {
-      const response = await api.get('/get_profile');
-      if (response.data) {
-        setProfileData(response.data);
-      }
-    } catch (error) {
-      console.error("App: Failed to fetch profile", error);
-    }
-  };
 
   const fetchAdminStatus = async () => {
     try {
@@ -101,32 +85,7 @@ function AppContent() {
     const handleSettingsUpdated = () => fetchSettings();
     window.addEventListener('settingsUpdated', handleSettingsUpdated);
 
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        api.defaults.headers.common['X-User-Id'] = firebaseUser.uid;
-        try {
-          await api.post('/login', {
-            uid: firebaseUser.uid,
-            name: firebaseUser.displayName,
-            email: firebaseUser.email,
-            picture: firebaseUser.photoURL
-          });
-          setUser(firebaseUser);
-          fetchProfile();
-          fetchAdminStatus();
-        } catch (error) {
-          console.error("App: Backend login failed", error);
-        }
-      } else {
-        delete api.defaults.headers.common['X-User-Id'];
-        setUser(null);
-        setProfileData({ name: '', email: '', avatar_url: '' });
-        fetchAdminStatus();
-      }
-    });
-
     return () => {
-      unsubscribe();
       window.removeEventListener('settingsUpdated', handleSettingsUpdated);
     };
   }, []);
@@ -151,9 +110,6 @@ function AppContent() {
       {!isAdminPath && <GoogleAdSense settings={settings} />}
       {!isAdminPath && (
         <Header 
-          user={user} 
-          profileData={profileData} 
-          onProfileUpdate={fetchProfile} 
           search={search}
           setSearch={setSearch}
           filter={filter}
@@ -168,12 +124,12 @@ function AppContent() {
       <div style={{ paddingTop: isAdminPath ? '0' : headerHeight + 'px', transition: 'padding-top 0.3s ease' }}>
         <Suspense fallback={<PageLoader />}>
         <Routes>
-          <Route path="/" element={<HomePage user={user} search={search} filter={filter} setFilter={setFilter} isMobile={isMobile} />} />
+          <Route path="/" element={<HomePage search={search} filter={filter} setFilter={setFilter} isMobile={isMobile} />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/article/:slug" element={<ArticlePage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/prompt/:key" element={<PromptDetailPage user={user} adsSettings={settings} />} />
+          <Route path="/prompt/:key" element={<PromptDetailPage adsSettings={settings} />} />
           <Route path="/faq" element={<FAQPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
@@ -184,7 +140,6 @@ function AppContent() {
       </Suspense>
       </div>
       {!isAdminPath && <Footer onLogoClick={resetHome} />}
-      {!isAdminPath && <BottomNav user={user} profileData={profileData} onHomeClick={resetHome} />}
     </div>
   );
 }

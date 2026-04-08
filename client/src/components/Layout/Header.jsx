@@ -1,22 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { auth, googleProvider } from '../../firebase';
-import { signInWithPopup, signOut } from 'firebase/auth';
 import api from '../../api';
-import { Search, LogOut, Settings, User, Mail, Shield, Zap, Star, Layout, Menu, X, Filter, Heart, Crown, LogIn, Layers, ChevronDown, Camera, Activity } from '../Common/Icons';
-import LoginModal from '../Modals/LoginModal';
+import { Search, Layout, Menu, X, Filter, Crown, Layers, ChevronDown, Camera, Activity } from '../Common/Icons';
 import AdSenseUnit from '../Ads/AdSenseUnit';
 
-const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter, setFilter, showFilters, setShowFilters, onLogoClick, settings, isAdmin, onHeightChange }) => {
-  const [showProfileModal, setShowProfileModal] = useState(false);
+const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilters, onLogoClick, settings, isAdmin, onHeightChange }) => {
   const [logoError, setLogoError] = useState(false);
-  const [avatarPreview, setAvatarPreview] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const [localName, setLocalName] = useState('');
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [loginMessage, setLoginMessage] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -32,51 +23,6 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
       return `/api/optimize?src=${encodeURIComponent(url)}&w=${width}`;
     }
     return url;
-  };
-
-  // fetchSettings removed - now provided via props from App.jsx
-
-  const handleLogin = async () => {
-    try {
-      await signInWithPopup(auth, googleProvider);
-      setIsLoginOpen(false);
-    } catch (error) {
-      console.error("Google Sign-In failed", error);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      await api.get('/logout');
-      setShowProfileModal(false);
-      navigate('/');
-    } catch (error) {
-      console.error("Sign-Out failed", error);
-    }
-  };
-
-  const handleUpdateProfile = async (e) => {
-    e.preventDefault();
-    setIsSaving(true);
-    const formData = new FormData();
-    formData.append('name', localName);
-    const avatarInput = document.getElementById('avatarInput');
-    if (avatarInput && avatarInput.files[0]) {
-      formData.append('avatar', avatarInput.files[0]);
-    }
-
-    try {
-      const response = await api.post('/update_profile', formData);
-      if (response.data.status === 'success') {
-        onProfileUpdate();
-        setIsSaving(false);
-        setTimeout(() => setShowProfileModal(false), 1000);
-      }
-    } catch (error) {
-      console.error("Failed to update profile", error);
-      setIsSaving(false);
-    }
   };
 
   useEffect(() => {
@@ -105,19 +51,6 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
     // Fetch categories
     api.get('/categories').then(res => setCategories(res.data));
 
-    const handleOpenProfile = () => setShowProfileModal(true);
-    window.addEventListener('openProfile', handleOpenProfile);
-    
-    const handleTriggerLogin = (e) => {
-      if (e.detail && e.detail.message) {
-        setLoginMessage(e.detail.message);
-      } else {
-        setLoginMessage('');
-      }
-      setIsLoginOpen(true);
-    };
-    window.addEventListener('openLogin', handleTriggerLogin);
-
     const resizeObserver = new ResizeObserver((entries) => {
       for (let entry of entries) {
         if (onHeightChange) {
@@ -133,18 +66,9 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('openProfile', handleOpenProfile);
-      window.removeEventListener('openLogin', handleTriggerLogin);
       resizeObserver.disconnect();
     };
   }, [lastScrollY, onHeightChange, isMobile]);
-
-  useEffect(() => {
-    if (profileData) {
-      if (profileData.avatar_url) setAvatarPreview(profileData.avatar_url);
-      if (profileData.name) setLocalName(profileData.name);
-    }
-  }, [profileData]);
 
   return (
     <>
@@ -268,37 +192,18 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                       <Crown size={18} fill={filter === 'premium' ? '#FFC107' : 'none'} />
                     </button>
                   )}
-                  {isHomePage && user && (
-                    <button 
-                      onClick={() => setFilter(filter === 'liked' ? 'all' : 'liked')}
-                      className="pro-card-hover"
-                      title="My Likes"
-                      aria-label="Filter Liked"
+                    <div 
+                      className="glass-button-secondary"
+                      onClick={() => setIsSearchExpanded(true)}
+                      aria-label="Open search"
+                      role="button"
                       style={{ 
                         width: '38px', height: '38px', borderRadius: '50%', 
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                        background: filter === 'liked' ? 'rgba(229, 9, 20, 0.15)' : 'rgba(255,255,255,0.03)',
-                        border: filter === 'liked' ? '1px solid rgba(229, 9, 20, 0.3)' : '1px solid rgba(255,255,255,0.08)',
-                        color: filter === 'liked' ? '#E50914' : 'rgba(255,255,255,0.7)',
-                        transition: '0.3s',
-                        backdropFilter: 'blur(10px)'
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'
                       }}
                     >
-                      <Heart size={18} fill={filter === 'liked' ? '#E50914' : 'none'} />
-                    </button>
-                  )}
-                  <div 
-                    className="glass-button-secondary"
-                    onClick={() => setIsSearchExpanded(true)}
-                    aria-label="Search"
-                    role="button"
-                    style={{ 
-                      width: '38px', height: '38px', borderRadius: '50%', 
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'
-                    }}
-                  >
-                    <Search size={18} />
-                  </div>
+                      <Search size={18} />
+                    </div>
                 </div>
               ) : (
                 <div style={{ 
@@ -388,216 +293,13 @@ const Header = ({ user, profileData, onProfileUpdate, search, setSearch, filter,
                     >
                       <Crown size={20} fill={filter === 'premium' ? '#FFC107' : 'none'} />
                     </button>
-                    {user && (
-                      <button 
-                        onClick={() => setFilter(filter === 'liked' ? 'all' : 'liked')}
-                        className="pro-card-hover"
-                        title="My Likes"
-                        style={{ 
-                          width: '42px', height: '42px', borderRadius: '50%', 
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                          background: filter === 'liked' ? 'rgba(229, 9, 20, 0.15)' : 'rgba(255,255,255,0.03)',
-                          border: filter === 'liked' ? '1px solid rgba(229, 9, 20, 0.3)' : '1px solid rgba(255,255,255,0.08)',
-                          color: filter === 'liked' ? '#E50914' : 'rgba(255,255,255,0.7)',
-                          transition: '0.3s',
-                          backdropFilter: 'blur(10px)'
-                        }}
-                      >
-                        <Heart size={20} fill={filter === 'liked' ? '#E50914' : 'none'} />
-                      </button>
-                    )}
                   </div>
                 )}
-
-                <nav style={{ display: 'flex', alignItems: 'center' }}>
-                  {user ? (
-                    <div 
-                      className="user-profile-pill pro-card-hover"
-                      onClick={() => setShowProfileModal(true)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        padding: isMobile ? '4px 10px 4px 4px' : '5px 18px 5px 5px',
-                        borderRadius: '50px',
-                        cursor: 'pointer',
-                        transition: '0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        backdropFilter: 'blur(10px)',
-                        maxWidth: isMobile ? '150px' : 'none'
-                      }}
-                    >
-                      <div className="user-icon-circle" style={{ width: '42px', height: '42px', borderRadius: '50%', overflow: 'hidden', border: '2px solid transparent' }}>
-                        <img src={optimizeImage(avatarPreview || user.photoURL, 150)} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                        <span className="profile-name-text" style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>Welcome back,</span>
-                        <span className="profile-name-text" style={{ fontSize: '0.95rem', fontWeight: 700, color: 'white', display: 'flex', alignItems: 'center' }}>
-                          {profileData.name || user.displayName} <ChevronDown size={14} style={{ marginLeft: '6px', color: 'var(--accent-main)' }} />
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <button 
-                      onClick={() => setIsLoginOpen(true)}
-                      className="signin-btn-main"
-                      style={{
-                        background: 'var(--accent-main)',
-                        color: 'white',
-                        border: 'none',
-                        padding: isMobile ? '8px 16px' : '12px 28px',
-                        borderRadius: '50px',
-                        fontWeight: 700,
-                        fontSize: '0.9rem',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        boxShadow: '0 8px 20px rgba(229, 9, 20, 0.2)'
-                      }}
-                    >
-                      Sign In
-                    </button>
-                  )}
-                </nav>
               </div>
             )}
           </div>
         </div>
       </header>
-
-      {showProfileModal && (
-        <div className="glass-overlay" style={{
-          position: 'fixed', inset: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000,
-          animation: 'fadeIn 0.3s ease-out'
-        }}>
-          <div className="glass-modal" style={{
-            padding: isMobile ? '35px 25px' : '45px', 
-            width: isMobile ? 'calc(100% - 30px)' : '100%', 
-            maxWidth: '480px', 
-            textAlign: 'center', 
-            position: 'relative',
-            boxShadow: '0 30px 60px rgba(0,0,0,0.6)', 
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: isMobile ? '32px' : '28px'
-          }}>
-            <X 
-              size={22} 
-              style={{ position: 'absolute', top: '25px', right: '25px', color: 'var(--text-secondary)', cursor: 'pointer', transition: '0.3s' }} 
-              onClick={() => setShowProfileModal(false)}
-              className="hover-rotate"
-            />
-            <h2 style={{ 
-              marginBottom: isMobile ? '25px' : '35px', 
-              fontSize: isMobile ? '1.6rem' : '2rem', 
-              fontWeight: 900, 
-              fontFamily: '"Outfit", sans-serif',
-              background: 'linear-gradient(to bottom, #fff, #aaa)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              letterSpacing: '-0.5px'
-            }}>User Profile</h2>
-            
-            <form onSubmit={handleUpdateProfile}>
-              <div 
-                style={{
-                  position: 'relative', 
-                  width: isMobile ? '100px' : '130px', 
-                  height: isMobile ? '100px' : '130px', 
-                  margin: '0 auto 30px auto',
-                  borderRadius: '50%', padding: '4px', background: 'var(--accent-gradient)',
-                  boxShadow: '0 0 30px rgba(229, 9, 20, 0.3)', cursor: 'pointer', transition: '0.4s'
-                }}
-                className="profile-avatar-wrap"
-                onClick={() => document.getElementById('avatarInput').click()}
-              >
-                <div className="mobile-user-avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', border: '4px solid #111', background: '#111' }}>
-                  <img src={optimizeImage(avatarPreview || user.photoURL, 150)} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                </div>
-                <div style={{
-                  position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: 'white', background: 'rgba(0,0,0,0.6)', borderRadius: '50%', opacity: 0, transition: '0.3s',
-                  backdropFilter: 'blur(4px)'
-                }} className="avatar-overlay">
-                  <Camera size={26} />
-                </div>
-                <input type="file" id="avatarInput" style={{ display: 'none' }} accept="image/*" onChange={(e) => {
-                  if (e.target.files[0]) {
-                    setAvatarPreview(URL.createObjectURL(e.target.files[0]));
-                  }
-                }} />
-              </div>
-
-              <div className="glass-divider" />
-
-              <div style={{ textAlign: 'left', marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>Display Name</label>
-                <input 
-                  type="text" 
-                  value={localName} 
-                  onChange={(e) => setLocalName(e.target.value)}
-                  className="glass-input"
-                  style={{ width: '100%', padding: '14px 18px', borderRadius: '12px' }}
-                  required 
-                />
-              </div>
-
-              <div style={{ textAlign: 'left', marginBottom: isMobile ? '15px' : '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600 }}>Email Address</label>
-                <input 
-                  type="email" 
-                  value={profileData.email} 
-                  disabled 
-                  className="glass-input"
-                  style={{ width: '100%', padding: isMobile ? '12px 15px' : '14px 18px', borderRadius: '12px', opacity: 0.5, cursor: 'not-allowed' }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', gap: isMobile ? '10px' : '15px', marginTop: isMobile ? '25px' : '40px' }}>
-                <button 
-                  type="button" 
-                  onClick={handleLogout}
-                  className="glass-button-secondary"
-                  style={{ 
-                    flex: 1, 
-                    padding: isMobile ? '14px' : '16px', 
-                    borderRadius: '16px', 
-                    fontWeight: 700, 
-                    cursor: 'pointer',
-                    fontSize: isMobile ? '0.85rem' : '0.9rem'
-                  }}
-                >
-                  Logout
-                </button>
-                <button 
-                  type="submit" 
-                  disabled={isSaving}
-                  style={{ 
-                    flex: 2, 
-                    background: 'var(--accent-gradient)', 
-                    color: 'white', 
-                    border: 'none', 
-                    padding: isMobile ? '14px' : '16px', 
-                    borderRadius: '16px', 
-                    fontWeight: 800, 
-                    cursor: 'pointer',
-                    fontSize: isMobile ? '0.85rem' : '0.9rem',
-                    boxShadow: '0 10px 25px rgba(229, 9, 20, 0.3)',
-                    transition: '0.3s',
-                    opacity: isSaving ? 0.7 : 1
-                  }}
-                >
-                  {isSaving ? 'Updating...' : 'Save Settings'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-      <LoginModal 
-        isOpen={isLoginOpen} 
-        onClose={() => setIsLoginOpen(false)} 
-        onLogin={handleLogin}
-        message={loginMessage}
-      />
       {/* Top Banner Ad - Policy Compliant Placement */}
       {settings?.adsense_enabled === '1' && settings?.adsense_slot_header && (
         <div style={{ 

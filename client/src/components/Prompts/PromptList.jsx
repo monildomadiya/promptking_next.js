@@ -5,12 +5,11 @@ import CategorySidebar from './CategorySidebar';
 import Shimmer from '../Common/Shimmer';
 import CategoryBar from './CategoryBar';
 import api from '../../api';
-import { Search, Crown, Grid, MessageSquare, Sparkles, Image, Zap, Heart, Filter, X } from '../Common/Icons';
+import { Search, Crown, Grid, MessageSquare, Sparkles, Image, Zap, Filter, X } from '../Common/Icons';
 
-const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) => {
+const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
   const [prompts, setPrompts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [likes, setLikes] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeUnlockedKey, setActiveUnlockedKey] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,14 +45,13 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
 
   useEffect(() => {
     fetchData();
-  }, [user]);
+  }, []);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       const response = await api.get('/get_data');
       setPrompts(response.data.prompts);
-      setLikes(response.data.likes);
       setCategories(response.data.categories || []);
       setLoading(false);
     } catch (error) {
@@ -62,21 +60,7 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
     }
   };
 
-  const toggleLike = async (key) => {
-    if (!user) {
-      window.dispatchEvent(new CustomEvent('openLogin'));
-      return;
-    }
-    try {
-      const response = await api.post('/toggle_like', { key });
-      setLikes(prev => ({
-        ...prev,
-        [key]: response.data.status === 'added'
-      }));
-    } catch (error) {
-      console.error("Failed to toggle like", error);
-    }
-  };
+
 
   const filteredPrompts = prompts.filter(p => {
     const safeKey = (p.prompt_key || '').toLowerCase();
@@ -85,9 +69,7 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
     const matchesSearch = safeKey.includes(safeSearch);
     
     let matchesFilter = true;
-    if (filter === 'liked') {
-      matchesFilter = likes[p.prompt_key];
-    } else if (filter === 'free') {
+    if (filter === 'free') {
       matchesFilter = !p.isPremium;
     } else if (filter === 'premium') {
       matchesFilter = p.isPremium;
@@ -103,7 +85,6 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
     all: prompts.length,
     free: prompts.filter(p => !p.isPremium).length,
     premium: prompts.filter(p => p.isPremium).length,
-    liked: Object.values(likes).filter(Boolean).length,
     categories: categories.reduce((acc, cat) => {
       const catName = (cat.name || '').toLowerCase();
       acc[catName] = prompts.filter(p => (p.aiType || '').toLowerCase().includes(catName)).length;
@@ -177,6 +158,7 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '15px' }}>
               <button 
                 onClick={() => window.dispatchEvent(new CustomEvent('openFilters'))}
+                aria-label="Open filter menu"
                 className="glass-button-secondary"
                 style={{
                   display: 'flex',
@@ -215,9 +197,6 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
                   <div key={p.prompt_key || p.id} style={{ width: '100%' }}>
                     <PromptCard 
                       prompt={p} 
-                      user={user}
-                      isLiked={!!likes[p.prompt_key || p.id]} 
-                      onLikeToggle={toggleLike}
                       isUnlocked={!p.isPremium || activeUnlockedKey === (p.prompt_key || p.id)}
                       onUnlock={() => setActiveUnlockedKey(p.prompt_key || p.id)}
                       onLock={() => setActiveUnlockedKey(null)}
@@ -330,7 +309,6 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
             <CategorySidebar 
               filter={filter} 
               setFilter={setFilter} 
-              user={user} 
               counts={filterCounts}
             />
             <SocialSidebar />
@@ -414,7 +392,6 @@ const PromptList = ({ user, search, filter, setFilter, showFilters, isMobile }) 
                   // Optional: Close on selection for better UX
                   // setIsSidebarOpen(false); 
                 }} 
-                user={user} 
                 counts={filterCounts}
               />
 

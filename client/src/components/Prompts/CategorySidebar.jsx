@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Layers, Search, X, Filter, Sparkles, Crown, Heart, CheckCircle } from '../Common/Icons';
+import { Layers, Search, X, Filter, Sparkles, Crown, CheckCircle } from '../Common/Icons';
 import api from '../../api';
 
-const CategorySidebar = ({ filter, setFilter, user, counts = {} }) => {
+const CategorySidebar = ({ filter, setFilter, counts = {} }) => {
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -143,6 +143,7 @@ const CategorySidebar = ({ filter, setFilter, user, counts = {} }) => {
           {filter !== 'all' && (
             <button 
               onClick={() => setFilter('all')}
+              aria-label="Clear all filters"
               style={{
                 background: 'none',
                 border: 'none',
@@ -194,6 +195,7 @@ const CategorySidebar = ({ filter, setFilter, user, counts = {} }) => {
             <X 
               size={14} 
               onClick={() => setSearchTerm('')}
+              aria-label="Clear search term"
               style={{ 
                 position: 'absolute', 
                 right: '14px', 
@@ -226,14 +228,7 @@ const CategorySidebar = ({ filter, setFilter, user, counts = {} }) => {
           count={counts.premium} 
           onClick={() => setFilter('premium')} 
         />
-        {user && (
-          <FilterItem 
-            label="My Liked" 
-            value="liked" 
-            count={counts.liked} 
-            onClick={() => setFilter('liked')} 
-          />
-        )}
+
       </FilterGroup>
 
       <FilterGroup title="By Category">

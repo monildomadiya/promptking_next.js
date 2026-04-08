@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, Heart, Activity, ChevronLeft, ChevronRight } from '../components/Common/Icons';
+import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, Activity, ChevronLeft, ChevronRight } from '../components/Common/Icons';
 import confetti from 'canvas-confetti';
 import api from '../api';
 import Shimmer from '../components/Common/Shimmer';
@@ -8,10 +8,9 @@ import YouTubeModal from '../components/Modals/YouTubeModal';
 import SEOMetadata from '../components/SEO/SEOMetadata';
 import AdSenseUnit from '../components/Ads/AdSenseUnit';
 
-const PromptDetailPage = ({ user, adsSettings }) => {
+const PromptDetailPage = ({ adsSettings }) => {
   const { key } = useParams();
   const [prompt, setPrompt] = useState(null);
-  const [showAuthHint, setShowAuthHint] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   

@@ -1,20 +1,18 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Copy, Check, Eye, Lock, Unlock, Youtube, ArrowRight, Crown, Code, Instagram, Layout, Zap, Sparkles, Image, MessageSquare, Laptop, ChevronLeft, ChevronRight } from '../Common/Icons';
+import { Copy, Check, Eye, Lock, Unlock, Youtube, ArrowRight, Crown, Code, Instagram, Layout, Zap, Sparkles, Image, MessageSquare, Laptop, ChevronLeft, ChevronRight } from '../Common/Icons';
 import api from '../../api';
 import confetti from 'canvas-confetti';
 import YouTubeModal from '../Modals/YouTubeModal';
 
-const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock, onLock, isHighlighted, searchTerm }) => {
+const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searchTerm }) => {
   const [sliderValue, setSliderValue] = useState(50);
   const [pin, setPin] = useState('');
   const [showError, setShowError] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
-  const [isHeartAnimating, setIsHeartAnimating] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isSnapping, setIsSnapping] = useState(false);
-  const [showAuthHint, setShowAuthHint] = useState(false);
 
   React.useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -127,72 +125,6 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
     }
   };
 
-  const triggerHeartConfetti = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (rect.left + rect.width / 2) / window.innerWidth;
-    const y = (rect.top + rect.height / 2) / window.innerHeight;
-
-    const defaults = {
-      spread: 360,
-      ticks: 50,
-      gravity: 0,
-      decay: 0.94,
-      startVelocity: 15,
-      shapes: ['heart'],
-      colors: ['#e50914', '#ff4d4d', '#ff8080', '#ffffff'],
-      zIndex: 9999
-    };
-
-    confetti({
-      ...defaults,
-      particleCount: 20,
-      origin: { x, y }
-    });
-  };
-
-  const handleLikeClick = (e) => {
-    e.stopPropagation();
-    
-    if (!user) {
-      setShowAuthHint(true);
-      setTimeout(() => setShowAuthHint(false), 3000);
-      window.dispatchEvent(new CustomEvent('openLogin', { 
-        detail: { message: 'Login required to save your likes' } 
-      }));
-      return;
-    }
-    
-    // Trigger pop animation immediately
-    setIsHeartAnimating(true);
-    setTimeout(() => setIsHeartAnimating(false), 450);
-
-    // Call original toggle
-    onLikeToggle(prompt.key);
-
-    // Trigger heart confetti if we are LIKING (not unliking)
-    if (!isLiked) {
-      triggerHeartConfetti(e);
-    }
-  };
-
-  const handleLikeWithEffect = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    
-    if (!user) {
-      setShowAuthHint(true);
-      setTimeout(() => setShowAuthHint(false), 3000);
-      window.dispatchEvent(new CustomEvent('openLogin'));
-      return;
-    }
-    
-    // Call heart confetti
-    triggerHeartConfetti(e);
-    
-    // Call original toggle
-    onLikeToggle(prompt.key);
-  };
-
   const triggerSnapConfetti = () => {
     const box = document.getElementById(`box-${prompt.key}`);
     if (box) {
@@ -259,39 +191,6 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
       console.error('Failed to copy text: ', err);
     }
   };
-
-  const AuthHint = () => (
-    <div style={{
-      position: 'absolute',
-      bottom: '100%',
-      right: '0',
-      marginBottom: '10px',
-      background: 'rgba(229, 9, 20, 0.95)',
-      backdropFilter: 'blur(10px)',
-      color: 'white',
-      padding: '6px 14px',
-      borderRadius: '12px',
-      fontSize: '0.75rem',
-      fontWeight: 800,
-      whiteSpace: 'nowrap',
-      zIndex: 100,
-      boxShadow: '0 10px 30px rgba(229, 9, 20, 0.4)',
-      animation: 'fadeUp 0.3s ease-out forwards',
-      pointerEvents: 'none'
-    }}>
-      Login to Save Likes
-      <div style={{
-        position: 'absolute',
-        top: '100%',
-        right: '12px',
-        width: '0',
-        height: '0',
-        borderLeft: '6px solid transparent',
-        borderRight: '6px solid transparent',
-        borderTop: '6px solid rgba(229, 9, 20, 0.95)'
-      }}></div>
-    </div>
-  );
 
   const safeAiType = (prompt.aiType || '').toLowerCase();
   
@@ -410,46 +309,14 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
               min="0" max="100" 
               value={sliderValue} 
               onChange={handleSliderChange}
+              aria-label="Image comparison slider"
               style={{ position: 'absolute', inset: 0, zIndex: 10, opacity: 0, cursor: 'ew-resize', width: '100%', height: '100%' }}
             />
             
-            {/* Floating Like Button for Slider */}
-            <button 
-              onClick={handleLikeWithEffect}
-              style={{
-                position: 'absolute',
-                top: '20px',
-                right: '20px',
-                background: 'rgba(0,0,0,0.3)',
-                backdropFilter: 'blur(10px)',
-                WebkitBackdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '50%',
-                width: '38px',
-                height: '38px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                zIndex: 30,
-                transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-                padding: 0
-              }}
-              className="pro-card-hover"
-            >
-              {showAuthHint && <AuthHint />}
-              <Heart 
-                size={18} 
-                fill={isLiked ? '#e50914' : 'none'} 
-                color={isLiked ? '#e50914' : 'white'} 
-                style={{ transition: '0.3s' }}
-              />
-            </button>
-            {/* Premium Icon Near Like (Slider) */}
+            {/* Premium Icon (Slider) */}
             {prompt.isPremium && (
               <div style={{
-                position: 'absolute', top: '20px', right: '65px', background: 'rgba(0,0,0,0.3)',
+                position: 'absolute', top: '20px', right: '20px', background: 'rgba(0,0,0,0.3)',
                 backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
                 border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '50%',
                 width: '38px', height: '38px', display: 'flex', alignItems: 'center',
@@ -463,43 +330,10 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
           <div style={{ width: `calc(100% + ${cardPadding * 2}px)`, margin: `-${cardPadding}px -${cardPadding}px 15px -${cardPadding}px`, aspectRatio: ratio, background: '#111', borderRadius: '20px 20px 0 0', overflow: 'hidden', minHeight: isMobile ? '140px' : '180px', position: 'relative' }}>
             <img src={optimizeImage(prompt.imgAfter || prompt.imgBefore)} alt={prompt.title} loading="lazy" width="400" height="225" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             
-            {/* Floating Like Button for Static Image */}
-            <button 
-              onClick={handleLikeWithEffect}
-              style={{
-                position: 'absolute',
-                top: '20px',
-                right: '20px',
-                background: 'rgba(0,0,0,0.3)',
-                backdropFilter: 'blur(10px)',
-                WebkitBackdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '50%',
-                width: '38px',
-                height: '38px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                zIndex: 30,
-                transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-                padding: 0
-              }}
-              className="pro-card-hover"
-            >
-              {showAuthHint && <AuthHint />}
-              <Heart 
-                size={18} 
-                fill={isLiked ? '#e50914' : 'none'} 
-                color={isLiked ? '#e50914' : 'white'} 
-                style={{ transition: '0.3s' }}
-              />
-            </button>
-            {/* Premium Icon Near Like (Static) */}
+            {/* Premium Icon (Static) */}
             {prompt.isPremium && (
               <div style={{
-                position: 'absolute', top: '20px', right: '65px', background: 'rgba(0,0,0,0.3)',
+                position: 'absolute', top: '20px', right: '20px', background: 'rgba(0,0,0,0.3)',
                 backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
                 border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '50%',
                 width: '38px', height: '38px', display: 'flex', alignItems: 'center',
@@ -594,6 +428,7 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
               {isUnlocked && (
                 <button 
                   onClick={handleCopy}
+                  aria-label="Copy prompt text"
                   style={{
                     position: 'absolute',
                     bottom: '12px',
@@ -688,6 +523,7 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
                   {prompt.igLink && (
                     <button 
                       onClick={() => setShowVideoModal(true)}
+                      aria-label="Get PIN from video"
                       style={{ 
                         background: 'transparent', 
                         fontSize: isMobile ? '0.7rem' : '0.85rem', color: 'rgba(255,255,255,0.6)', 
@@ -729,16 +565,6 @@ const PromptCard = ({ prompt, user, isLiked, onLikeToggle, isUnlocked, onUnlock,
         @keyframes bounce {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-3px); }
-        }
-
-        @keyframes heartPop {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.4); }
-          100% { transform: scale(1); }
-        }
-
-        .heart-pop {
-          animation: heartPop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         @keyframes thanosSnap {

@@ -35,7 +35,6 @@
   --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-  --app-bottom-nav-height: 70px;
   --logo-width: 150px;
   --success: #10a37f;
 }
@@ -318,17 +317,11 @@ button:active {
 }
 
 /* Navigation Display Logic */
-.mobile-bottom-nav {
-  display: none !important;
-}
+
 
 @media (max-width: 768px) {
-  .mobile-bottom-nav {
-    display: flex !important;
-  }
-  
   body {
-    padding-bottom: calc(var(--app-bottom-nav-height) + 20px);
+    padding-bottom: 20px;
   }
   
   .load-more-container {

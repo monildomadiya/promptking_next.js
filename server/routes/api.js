@@ -179,37 +179,12 @@ router.get('/optimize', async (req, res) => {
 });
 
 
-// --- 1. AUTHENTICATION ---
-router.post('/login', async (req, res) => {
-  const { uid, name, email, picture } = req.body;
-  try {
-    await db`
-      INSERT INTO users (id, name, email, avatar_url) 
-      VALUES (${uid}, ${name}, ${email}, ${picture})
-      ON DUPLICATE KEY UPDATE 
-        name = VALUES(name), 
-        avatar_url = CASE 
-          WHEN users.avatar_url IS NULL OR users.avatar_url = '' THEN VALUES(avatar_url) 
-          ELSE users.avatar_url 
-        END
-    `;
-    req.session.userId = uid;
-    res.json({ status: "success" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to login" });
-  }
-});
+// --- 1. AUTHENTICATION (Removed Firebase Auth) ---
+// Login and logout routes were removed. Admin auth remains separate.
 
-router.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.json({ status: "success" });
-});
 
-// --- 2. FETCH PROMPTS & LIKES ---
+// --- 2. FETCH PROMPTS ---
 router.get('/get_data', async (req, res) => {
-  const uid = req.headers['x-user-id'] || req.session.userId || null;
-  
   if (!isDbHealthy()) {
     console.log('Skipping DB query (Circuit Breaker active), fetching Live Data...');
     return fetchLiveData();
@@ -276,12 +251,7 @@ router.get('/get_data', async (req, res) => {
       isPremium: Boolean(row.is_premium)
     }));
 
-    let likes = {};
-    if (uid) {
-      const likeRows = await db`SELECT prompt_key FROM user_likes WHERE user_id = ${uid}`;
-      likeRows.forEach(l => likes[l.prompt_key] = true);
-    }
-    res.json({ prompts, likes, categories: categoriesRows });
+    res.json({ prompts, likes: {}, categories: categoriesRows });
   } catch (error) {
     console.warn('LOCAL DB FAILED, FETCHING LIVE DATA FROM PRODUCTION API:', error.message);
     lastDbFailure = Date.now();
@@ -451,37 +421,15 @@ router.get('/settings', async (req, res) => {
   }
 });
 
-router.post('/toggle_like', async (req, res) => {
-  const uid = req.headers['x-user-id'] || req.session.userId;
-  if (!uid) return res.status(401).json({ error: "Not logged in" });
+// --- 3. LIKES (REMOVED) ---
+// Like functionality was removed from the public interface.
 
-  const { key } = req.body;
-  try {
-    const existing = await db`SELECT * FROM user_likes WHERE user_id = ${uid} AND prompt_key = ${key}`;
-    if (existing.length > 0) {
-      await db`DELETE FROM user_likes WHERE user_id = ${uid} AND prompt_key = ${key}`;
-      await db`UPDATE prompts SET like_count = GREATEST(0, like_count - 1) WHERE prompt_key = ${key}`;
-      res.json({ status: "removed" });
-    } else {
-      await db`INSERT INTO user_likes (user_id, prompt_key) VALUES (${uid}, ${key})`;
-      await db`UPDATE prompts SET like_count = like_count + 1 WHERE prompt_key = ${key}`;
-      res.json({ status: "added" });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to toggle like" });
-  }
-});
 
 // --- 4. RECORD COPY ---
 router.post('/record_copy', async (req, res) => {
-  const uid = req.headers['x-user-id'] || req.session.userId || null;
   const { key } = req.body;
   try {
     await db`UPDATE prompts SET copy_count = copy_count + 1 WHERE prompt_key = ${key}`;
-    if (uid) {
-      await db`INSERT IGNORE INTO user_copied (user_id, prompt_key) VALUES (${uid}, ${key})`;
-    }
     res.json({ status: "success" });
   } catch (error) {
     console.error(error);
@@ -501,66 +449,9 @@ router.post('/record_unlock', async (req, res) => {
   }
 });
 
-// --- 5. GET USER PROFILE ---
-router.get('/get_profile', async (req, res) => {
-  const uid = req.headers['x-user-id'] || req.session.userId;
-  if (!uid) return res.status(401).json({ error: "Not logged in" });
+// --- 5. USER PROFILE (REMOVED) ---
+// User profile management was removed.
 
-  try {
-    const rows = await db`SELECT name, email, avatar_url FROM users WHERE id = ${uid}`;
-    if (rows.length === 0) return res.status(404).json({ error: "User not found" });
-
-    let userData = rows[0];
-    if (!userData.avatar_url) {
-      const encodedName = encodeURIComponent(userData.name || 'User');
-      userData.avatar_url = `https://ui-avatars.com/api/?name=${encodedName}&background=e50914&color=fff&bold=true`;
-    }
-    res.json(userData);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch profile" });
-  }
-});
-
-// --- 6. UPDATE USER PROFILE ---
-router.post('/update_profile', upload.single('avatar'), async (req, res) => {
-  const uid = req.headers['x-user-id'] || req.session.userId;
-  if (!uid) return res.status(401).json({ error: "Not logged in" });
-
-  const { name } = req.body;
-  if (!name || name.trim() === '') return res.status(400).json({ error: "Name cannot be empty" });
-
-  try {
-    let avatarUrl = null;
-    if (req.file) {
-      const filename = `avatar_${uid}_${Date.now()}.webp`;
-      const filepath = path.join(uploadDir, filename);
-      await sharp(req.file.buffer).webp({ quality: 80 }).toFile(filepath);
-      avatarUrl = `/uploads/${filename}`;
-    }
-
-    if (avatarUrl) {
-      await db`UPDATE users SET name = ${name}, avatar_url = ${avatarUrl} WHERE id = ${uid}`;
-    } else {
-      await db`UPDATE users SET name = ${name} WHERE id = ${uid}`;
-    }
-
-    const rows = await db`SELECT name, avatar_url FROM users WHERE id = ${uid}`;
-    if (rows.length === 0) return res.status(404).json({ error: "User not found" });
-    const userData = rows[0];
-    
-    let newAvatar = userData.avatar_url;
-    if (!newAvatar) {
-      const encodedName = encodeURIComponent(userData.name);
-      newAvatar = `https://ui-avatars.com/api/?name=${encodedName}&background=e50914&color=fff&bold=true`;
-    }
-
-    res.json({ status: "success", new_avatar: newAvatar });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to update profile" });
-  }
-});
 
 // --- 7. ADMIN ENDPOINTS (Restricted) ---
 const adminAuth = (req, res, next) => {

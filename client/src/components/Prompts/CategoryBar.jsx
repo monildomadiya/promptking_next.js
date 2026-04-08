@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
-import { Sparkles, Crown, Zap, Image, Heart, Grid, Layout } from '../Common/Icons';
+import { Sparkles, Crown, Zap, Image, Grid, Layout } from '../Common/Icons';
 
-const CategoryBar = ({ filter, setFilter, categories, counts, user }) => {
+const CategoryBar = ({ filter, setFilter, categories, counts }) => {
   const scrollRef = useRef(null);
 
   const isActive = (val) => filter === val;
@@ -69,6 +69,7 @@ const CategoryBar = ({ filter, setFilter, categories, counts, user }) => {
         {/* Filter Trigger Button */}
         <button
           onClick={() => window.dispatchEvent(new CustomEvent('openFilters'))}
+          aria-label="Open filters"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -91,7 +92,7 @@ const CategoryBar = ({ filter, setFilter, categories, counts, user }) => {
         <FilterChip label="All" value="all" icon={Grid} count={counts.all} />
         <FilterChip label="Free" value="free" icon={Sparkles} count={counts.free} />
         <FilterChip label="Premium" value="premium" icon={Crown} count={counts.premium} />
-        {user && <FilterChip label="Liked" value="liked" icon={Heart} count={counts.liked} />}
+
         
         <div style={{ width: '1px', background: 'rgba(255, 255, 255, 0.1)', margin: '0 5px' }} />
         
