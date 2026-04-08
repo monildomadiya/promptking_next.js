@@ -611,11 +611,16 @@ const AdminDashboard = () => {
   const [isKingDialogOpen, setIsKingDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [settings, setSettings] = useState({});
+  const [selectedKeys, setSelectedKeys] = useState([]);
 
   useEffect(() => { 
     checkAuth(); 
     api.get('/admin/settings').then(res => setSettings(res.data));
   }, []);
+
+  useEffect(() => {
+    setSelectedKeys([]);
+  }, [view]);
 
   const checkAuth = async () => {
     try {
@@ -663,8 +668,43 @@ const AdminDashboard = () => {
     if (!window.confirm("Permanent delete? This cannot be undone.")) return;
     const id = item.prompt_key || item.id;
     const type = view === 'prompts' ? 'prompt' : (view === 'blogs' ? 'blog' : (view === 'categories' ? 'category' : 'faq'));
-    await api.delete(`/admin/delete_${type}/${id}`);
-    fetchData(view);
+    try {
+      await api.delete(`/admin/delete_${type}/${id}`);
+      fetchData(view);
+    } catch (err) {
+      alert("Deletion failed. See console for details.");
+      console.error(err);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (view !== 'prompts') return;
+    if (!window.confirm(`Delete ${selectedKeys.length} prompts permanently?`)) return;
+    
+    try {
+      await api.post('/admin/delete_prompts_bulk', { keys: selectedKeys });
+      setSelectedKeys([]);
+      fetchData(view);
+      alert("Bulk deletion successful.");
+    } catch (err) {
+      alert("Bulk deletion failed.");
+      console.error(err);
+    }
+  };
+
+  const toggleSelect = (key) => {
+    setSelectedKeys(prev => 
+      prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedKeys.length === data.length) {
+      setSelectedKeys([]);
+    } else {
+      const allKeys = data.map(item => item.prompt_key || item.id);
+      setSelectedKeys(allKeys);
+    }
   };
 
   if (!isAdmin) {
@@ -755,6 +795,14 @@ const AdminDashboard = () => {
           </div>
           {['prompts', 'blogs', 'categories', 'faqs'].includes(view) && (
             <div style={{ display: 'flex', gap: '12px' }}>
+              {selectedKeys.length > 0 && view === 'prompts' && (
+                <ActionButton 
+                  label={`DELETE SELECTED (${selectedKeys.length})`} 
+                  color="var(--accent-main)" 
+                  icon={<Trash size={18} />} 
+                  onClick={handleBulkDelete} 
+                />
+              )}
               <ActionButton 
                 label="UI DEMO" 
                 color="rgba(255,255,255,0.05)" 
@@ -793,6 +841,16 @@ const AdminDashboard = () => {
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.01)' }}>
+                    {view === 'prompts' && (
+                      <th style={{ padding: '24px', width: '50px' }}>
+                        <input 
+                          type="checkbox" 
+                          checked={data.length > 0 && selectedKeys.length === data.length} 
+                          onChange={toggleSelectAll}
+                          style={{ cursor: 'pointer', width: '18px', height: '18px', accentColor: 'var(--accent-main)' }}
+                        />
+                      </th>
+                    )}
                     <th style={{ padding: '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Resource Title</th>
                     {view === 'prompts' && <th style={{ padding: '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Status</th>}
                     <th style={{ padding: '24px', textAlign: 'right', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Controls</th>
@@ -800,7 +858,20 @@ const AdminDashboard = () => {
                 </thead>
                 <tbody>
                   {(Array.isArray(data) ? data : []).map((item, idx) => (
-                    <motion.tr key={idx} variants={itemVariants} initial="hidden" animate="visible" exit="hidden" custom={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                    <motion.tr key={idx} variants={itemVariants} initial="hidden" animate="visible" exit="hidden" custom={idx} style={{ 
+                      borderBottom: '1px solid rgba(255,255,255,0.03)',
+                      background: selectedKeys.includes(item.prompt_key || item.id) ? 'rgba(229, 9, 20, 0.03)' : 'transparent'
+                    }}>
+                      {view === 'prompts' && (
+                        <td style={{ padding: '20px 24px' }}>
+                          <input 
+                            type="checkbox" 
+                            checked={selectedKeys.includes(item.prompt_key || item.id)} 
+                            onChange={() => toggleSelect(item.prompt_key || item.id)}
+                            style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: 'var(--accent-main)' }}
+                          />
+                        </td>
+                      )}
                       <td style={{ padding: '20px 24px' }}>
                         <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '4px' }}>{item.prompt_key || item.title || item.name}</div>
                         <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{item.title || item.question || item.slug}</div>

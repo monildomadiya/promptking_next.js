@@ -716,11 +716,30 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
 });
 
 router.delete('/admin/delete_prompt/:key', adminAuth, async (req, res) => {
+  const { key } = req.params;
   try {
-    await db`DELETE FROM prompts WHERE prompt_key = ${req.params.key}`;
+    console.log(`[Admin] Single delete request for prompt: ${key}`);
+    await db`DELETE FROM prompts WHERE prompt_key = ${key}`;
     res.json({ status: "success" });
   } catch (error) {
+    console.error(`[Admin] Single delete FAILED for ${key}:`, error);
     res.status(500).json({ error: "Delete failed" });
+  }
+});
+
+router.post('/admin/delete_prompts_bulk', adminAuth, async (req, res) => {
+  const { keys } = req.body;
+  if (!Array.isArray(keys) || keys.length === 0) {
+    return res.status(400).json({ error: "No keys provided for bulk delete" });
+  }
+
+  try {
+    console.log(`[Admin] Bulk delete request for ${keys.length} prompts`);
+    await db`DELETE FROM prompts WHERE prompt_key IN ${db(keys)}`;
+    res.json({ status: "success", count: keys.length });
+  } catch (error) {
+    console.error("[Admin] Bulk delete FAILED:", error);
+    res.status(500).json({ error: "Bulk delete failed" });
   }
 });
 
