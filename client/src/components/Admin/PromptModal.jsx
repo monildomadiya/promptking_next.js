@@ -29,8 +29,8 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
       });
       setOriginalKey(prompt.prompt_key);
     } else {
-      // Auto-generate a unique ID for new prompts
-      const uniqueId = 'PK' + Date.now().toString().slice(-6);
+      // Auto-generate a unique ID for new prompts (PK + 4 random digits)
+      const uniqueId = 'PK' + Math.floor(1000 + Math.random() * 9000);
       setFormData(prev => ({ ...prev, prompt_key: uniqueId }));
     }
 
@@ -107,8 +107,8 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                 value={formData.prompt_key} 
                 onChange={(e) => {
                   let val = e.target.value.toUpperCase();
-                  if (!val.startsWith('PK')) val = 'PK' + val.replace(/[^0-9]/g, '');
-                  else val = 'PK' + val.slice(2).replace(/[^0-9]/g, '');
+                  if (!val.startsWith('PK')) val = 'PK' + val.replace(/[^0-9]/g, '').slice(0, 4);
+                  else val = 'PK' + val.slice(2).replace(/[^0-9]/g, '').slice(0, 4);
                   setFormData({ ...formData, prompt_key: val });
                 }}
                 className="glass-input"
