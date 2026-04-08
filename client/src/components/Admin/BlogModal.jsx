@@ -108,13 +108,23 @@ const BlogModal = ({ blog, onClose, onSave }) => {
                   value={formData.content}
                   onEditorChange={(content) => setFormData({ ...formData, content })}
                   init={{
-                    height: 500,
-                    menubar: false,
-                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'code', 'help', 'wordcount', 'emoticons', 'codesample', 'media', 'table'],
-                    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table emoticons codesample | removeformat | fullscreen preview code',
+                    height: 600,
+                    menubar: true,
+                    plugins: [
+                      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                      'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons',
+                      'codesample', 'accordion'
+                    ],
+                    toolbar: 'undo redo | accordion accordionremove | blocks fontfamily fontsize | ' +
+                      'bold italic underline strikethrough | forecolor backcolor removeformat | ' +
+                      'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | ' +
+                      'link image media table | emoticons codesample | fullscreen preview code help',
                     skin: 'oxide-dark',
                     content_css: 'dark',
-                    toolbar_mode: 'wrap'
+                    toolbar_mode: 'sliding',
+                    contextmenu: 'link image table',
+                    quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
                   }}
                 />
               </div>

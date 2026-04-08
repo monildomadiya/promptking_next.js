@@ -181,12 +181,23 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                   value={formData.description}
                   onEditorChange={(content) => setFormData({ ...formData, description: content })}
                   init={{
-                    height: 320,
-                    menubar: false,
-                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'code', 'help', 'wordcount', 'emoticons', 'codesample'],
-                    toolbar: 'undo redo | bold italic underline | forecolor | alignleft aligncenter alignright | bullist numlist | link image emoticons codesample | code',
+                    height: 400,
+                    menubar: true,
+                    plugins: [
+                      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                      'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons',
+                      'codesample', 'accordion'
+                    ],
+                    toolbar: 'undo redo | accordion accordionremove | blocks fontfamily fontsize | ' +
+                      'bold italic underline strikethrough | forecolor backcolor removeformat | ' +
+                      'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | ' +
+                      'link image media table | emoticons codesample | fullscreen preview code help',
                     skin: 'oxide-dark',
-                    content_css: 'dark'
+                    content_css: 'dark',
+                    toolbar_mode: 'sliding',
+                    contextmenu: 'link image table',
+                    quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
                   }}
                 />
               </div>
