@@ -148,7 +148,8 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(prompt.promptText);
+      const brandedText = `${prompt.promptText}\n\n- Copied from PromptKing.in`;
+      await navigator.clipboard.writeText(brandedText);
       await api.post('/record_copy', { key: prompt.key });
       setIsCopied(true);
       
