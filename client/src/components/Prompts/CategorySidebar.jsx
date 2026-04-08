@@ -128,8 +128,6 @@ const CategorySidebar = ({ filter, setFilter, counts = {} }) => {
       border: '1px solid rgba(255, 255, 255, 0.08)',
       minWidth: '280px',
       boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
-      position: 'sticky',
-      top: '120px'
     }}>
       {/* Search Header */}
       <div style={{ marginBottom: '25px' }}>

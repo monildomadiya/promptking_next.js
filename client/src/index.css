@@ -574,8 +574,6 @@ mark {
 }
 
 .sidebar-sticky-wrapper {
-  position: sticky;
-  top: 90px;
   display: flex;
   flex-direction: column;
   gap: 25px;

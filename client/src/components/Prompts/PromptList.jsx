@@ -305,7 +305,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
         </div>
 
         {!isMobile && (
-          <div className="sidebar-area" style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '30px', width: '300px' }}>
+          <div className="sidebar-area" style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '30px', width: '300px', position: 'sticky', top: '100px', height: 'fit-content' }}>
             <CategorySidebar 
               filter={filter} 
               setFilter={setFilter} 
