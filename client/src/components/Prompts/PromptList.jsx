@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PromptCard from './PromptCard';
+import MagicKingIntro from './MagicKingIntro';
 import SocialSidebar from './SocialSidebar';
 import CategorySidebar from './CategorySidebar';
 import Shimmer from '../Common/Shimmer';
@@ -214,6 +215,8 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
               ));
             })()}
           </div>
+
+          <MagicKingIntro isMobile={isMobile} />
 
           {filteredPrompts.length > itemsPerPage && (
             <div className="pagination-container" style={{ display: 'flex', justifyContent: 'center', marginTop: '30px', gap: '8px', alignItems: 'center' }}>
