@@ -209,7 +209,10 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
 
   const optimizeImage = (url, width = 600) => {
     if (!url) return url;
-    if (url.startsWith('/uploads/')) {
+    // Proxy local uploads AND specifically allowed external image domains
+    if (url.startsWith('/uploads/') || url.includes('images.unsplash.com') || url.includes('i.pinimg.com')) {
+      const baseUrl = isMobile ? 'https://api.promptking.in' : ''; // Use absolute URL if needed in prod, or relative for local proxy
+      // Using relative path assuming Vite proxies /api to backend, or use absolute if needed during dev
       return `/api/optimize?src=${encodeURIComponent(url)}&w=${width}`;
     }
     return url;

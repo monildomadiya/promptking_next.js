@@ -143,7 +143,8 @@
   <!-- Instant splash screen: visible before React JS loads -->
   <div id="app-splash" aria-hidden="true">
     <div class="splash-logo-wrap">
-      <img class="splash-logo-img" src="/favicon.png" alt="PromptKing" width="52" height="52" />
+      <!-- Fixed: Ensure the image loads exactly what's needed (or scales elegantly) to prevent layout shifts/oversized warnings -->
+      <img class="splash-logo-img" src="/favicon.png" alt="PromptKing" width="52" height="52" style="width: 52px; height: 52px; object-fit: contain;" />
       <div class="splash-logo-text">Prompt<span>King</span></div>
     </div>
     <div class="splash-spinner"></div>

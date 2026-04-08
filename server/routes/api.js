@@ -143,27 +143,46 @@ const logoUpload = multer({
 router.get('/optimize', async (req, res) => {
   try {
     const src = req.query.src;
-    const width = parseInt(req.query.w, 10) || 800; // default 800px width
+    const width = parseInt(req.query.w, 10) || 800;
 
-    if (!src) {
-      return res.status(400).send('Missing src parameter');
-    }
+    if (!src) return res.status(400).send('Missing src parameter');
 
-    // Ensure we are only optimizing local /uploads files
-    if (!src.startsWith('/uploads/')) {
-      return res.redirect(src);
-    }
+    let imageBuffer;
 
-    // Resolve absolute path safely
-    const absolutePath = path.join(__dirname, '..', src);
-    
-    // Check if file physically exists
-    if (!fs.existsSync(absolutePath)) {
-      return res.status(404).send('Image not found');
+    if (src.startsWith('/uploads/')) {
+      // Local image processing
+      const absolutePath = path.join(__dirname, '..', src);
+      if (!fs.existsSync(absolutePath)) {
+        return res.status(404).send('Image not found');
+      }
+      imageBuffer = await fs.promises.readFile(absolutePath);
+    } else if (src.startsWith('http://') || src.startsWith('https://')) {
+      // External image processing with basic domain whitelisting
+      try {
+        const parsedUrl = new URL(src);
+        const allowedDomains = ['images.unsplash.com', 'i.pinimg.com', 'api.promptking.in'];
+        
+        if (!allowedDomains.includes(parsedUrl.hostname)) {
+          console.warn('Unauthorized image proxy attempt:', parsedUrl.hostname);
+          return res.redirect(src); // Gracefully fallback to original source
+        }
+
+        const fetchRes = await fetch(src);
+        if (!fetchRes.ok) throw new Error(`External fetch failed: ${fetchRes.statusText}`);
+        
+        // Convert arrayBuffer to Node Buffer
+        const arrayBuffer = await fetchRes.arrayBuffer();
+        imageBuffer = Buffer.from(arrayBuffer);
+      } catch (fetchErr) {
+        console.error('External image fetch error:', fetchErr);
+        return res.redirect(src);
+      }
+    } else {
+       return res.redirect(src);
     }
 
     // Process image with sharp
-    const optimizedBuffer = await sharp(absolutePath)
+    const optimizedBuffer = await sharp(imageBuffer)
       .resize({ width: width, withoutEnlargement: true })
       .webp({ quality: 80 })
       .toBuffer();
@@ -173,7 +192,6 @@ router.get('/optimize', async (req, res) => {
     res.send(optimizedBuffer);
   } catch (error) {
     console.error('Image Optimization Error:', error);
-    // Silent fallback to original image if optimization fails
     res.redirect(req.query.src);
   }
 });
