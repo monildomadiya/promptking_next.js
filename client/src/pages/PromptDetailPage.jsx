@@ -199,21 +199,65 @@ const PromptDetailPage = ({ adsSettings }) => {
     <div className="detail-page-wrapper" style={{ background: 'var(--surface-0)', minHeight: '100vh', color: 'white' }}>
       <SEOMetadata title="Loading Prompt... | PromptKing" />
       <div className="container" style={{ padding: '40px 20px', maxWidth: '1400px', margin: '0 auto' }}>
-        <Shimmer height="20px" width="150px" style={{ marginBottom: '30px' }} />
+        {/* Back Link Shimmer */}
+        <Shimmer height="20px" width="180px" style={{ marginBottom: '30px' }} />
+        
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: '40px' }} className="detail-layout">
           <div>
+            {/* Header Shimmer */}
             <div style={{ marginBottom: '35px' }}>
               <div style={{ display: 'flex', gap: '15px', marginBottom: '12px' }}>
-                <Shimmer height="30px" width="100px" borderRadius="10px" />
-                <Shimmer height="30px" width="150px" borderRadius="10px" />
+                <Shimmer height="28px" width="80px" borderRadius="10px" />
+                <Shimmer height="20px" width="180px" borderRadius="10px" />
               </div>
-              <Shimmer height="50px" width="80%" />
+              <Shimmer height="50px" width="90%" borderRadius="12px" />
             </div>
-            <Shimmer height="500px" borderRadius="32px" style={{ marginBottom: '40px' }} />
-            <Shimmer height="200px" borderRadius="32px" style={{ marginBottom: '40px' }} />
+
+            {/* Media & Prompt Container Shimmer */}
+            <div className="media-prompt-container">
+               {/* Hero Image Shimmer */}
+               <div className="hero-section" style={{ marginBottom: '40px' }}>
+                  <Shimmer height="450px" borderRadius="32px" />
+               </div>
+               {/* Vault/Prompt Shimmer */}
+               <div className="prompt-area" style={{ marginBottom: '40px', minHeight: '350px' }}>
+                  <Shimmer height="100%" borderRadius="32px" />
+               </div>
+            </div>
+
+            {/* Description Section Shimmer */}
+            <div style={{ marginTop: '20px' }}>
+               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
+                  <Shimmer height="30px" width="220px" borderRadius="8px" />
+               </div>
+               <Shimmer height="20px" width="100%" style={{ marginBottom: '10px' }} />
+               <Shimmer height="20px" width="95%" style={{ marginBottom: '10px' }} />
+               <Shimmer height="20px" width="98%" style={{ marginBottom: '10px' }} />
+               <Shimmer height="20px" width="60%" />
+            </div>
           </div>
+
           <aside className="detail-sidebar">
-            <Shimmer height="600px" borderRadius="28px" />
+            <div style={{ 
+              background: 'rgba(255, 255, 255, 0.02)', 
+              border: '1px solid rgba(255, 255, 255, 0.05)', 
+              borderRadius: '28px', 
+              padding: '28px'
+            }}>
+               <Shimmer height="24px" width="180px" style={{ marginBottom: '24px' }} />
+               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {[1, 2, 3, 4].map(i => (
+                     <div key={i} style={{ display: 'flex', gap: '14px', padding: '12px' }}>
+                        <Shimmer height="65px" width="85px" borderRadius="12px" />
+                        <div style={{ flex: 1 }}>
+                           <Shimmer height="15px" width="100%" style={{ marginBottom: '8px' }} />
+                           <Shimmer height="15px" width="60%" />
+                        </div>
+                     </div>
+                  ))}
+               </div>
+               <Shimmer height="200px" borderRadius="20px" style={{ marginTop: '30px' }} />
+            </div>
           </aside>
         </div>
       </div>
