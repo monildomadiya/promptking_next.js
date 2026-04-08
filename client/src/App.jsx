@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { Helmet } from 'react-helmet-async';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
-import api from './api';
+import api, { SERVER_URL } from './api';
 import GoogleAdSense from './components/Ads/GoogleAdSense';
 import './index.css';
 
@@ -99,8 +99,12 @@ function AppContent() {
 
   const optimizeImage = (url, width = 600) => {
     if (!url) return url;
-    if (url.startsWith('/uploads/')) {
-      return `/api/optimize?src=${encodeURIComponent(url)}&w=${width}`;
+    let rawUrl = url;
+    if (url.startsWith(SERVER_URL)) {
+      rawUrl = url.replace(SERVER_URL, '');
+    }
+    if (rawUrl.startsWith('/uploads/') || rawUrl.includes('images.unsplash.com') || rawUrl.includes('i.pinimg.com')) {
+      return `${SERVER_URL}/api/optimize?src=${encodeURIComponent(rawUrl)}&w=${width}`;
     }
     return url;
   };

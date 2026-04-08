@@ -12,7 +12,7 @@ const getBaseUrl = () => {
   return 'http://localhost:5000';
 };
 
-const SERVER_URL = getBaseUrl();
+export const SERVER_URL = getBaseUrl();
 
 const api = {
   get: async (url, options = {}) => {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Copy, Check, Eye, Lock, Unlock, Youtube, ArrowRight, Crown, Code, Instagram, Layout, Zap, Sparkles, Image, MessageSquare, Laptop, ChevronLeft, ChevronRight } from '../Common/Icons';
-import api from '../../api';
+import api, { SERVER_URL } from '../../api';
 import confetti from 'canvas-confetti';
 import YouTubeModal from '../Modals/YouTubeModal';
 
@@ -209,11 +209,15 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
 
   const optimizeImage = (url, width = 600) => {
     if (!url) return url;
-    // Proxy local uploads AND specifically allowed external image domains
-    if (url.startsWith('/uploads/') || url.includes('images.unsplash.com') || url.includes('i.pinimg.com')) {
-      const baseUrl = isMobile ? 'https://api.promptking.in' : ''; // Use absolute URL if needed in prod, or relative for local proxy
-      // Using relative path assuming Vite proxies /api to backend, or use absolute if needed during dev
-      return `/api/optimize?src=${encodeURIComponent(url)}&w=${width}`;
+    
+    // If the image is locally uploaded, it might already have SERVER_URL prepended by api.js
+    let rawUrl = url;
+    if (url.startsWith(SERVER_URL)) {
+      rawUrl = url.replace(SERVER_URL, '');
+    }
+
+    if (rawUrl.startsWith('/uploads/') || rawUrl.includes('images.unsplash.com') || rawUrl.includes('i.pinimg.com')) {
+      return `${SERVER_URL}/api/optimize?src=${encodeURIComponent(rawUrl)}&w=${width}`;
     }
     return url;
   };
