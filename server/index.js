@@ -14,6 +14,8 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+const compression = require('compression');
+app.use(compression());
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
