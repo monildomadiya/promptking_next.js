@@ -6,6 +6,15 @@ const path = require('path');
 const fs = require('fs');
 const sharp = require('sharp');
 
+// Safety Guard: Prevent infinite self-referential DDOS in production fallbacks
+const originalFetch = global.fetch;
+global.fetch = async (url, options) => {
+  if (process.env.NODE_ENV === 'production' && typeof url === 'string' && url.includes('api.promptking.in/api/')) {
+    throw new Error('Self-referential live API fallback disabled in production.');
+  }
+  return originalFetch(url, options);
+};
+
 let lastDbFailure = 0;
 const DB_RETRY_DELAY = 10 * 60 * 1000; // 10 minutes
 
