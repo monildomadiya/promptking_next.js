@@ -90,6 +90,11 @@ function AppContent() {
     };
   }, []);
 
+  // Scroll to top on page change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [location.pathname]);
+
   const resetHome = () => {
     setSearch('');
     setFilter('all');
