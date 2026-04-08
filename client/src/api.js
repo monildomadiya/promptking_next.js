@@ -25,7 +25,8 @@ const api = {
     
     const res = await fetch(`${SERVER_URL}/api${url}`, {
       ...options,
-      headers
+      headers,
+      credentials: 'include'
     });
     
     const data = await res.json();
@@ -43,7 +44,28 @@ const api = {
       method: 'POST',
       ...options,
       headers,
-      body: JSON.stringify(body)
+      credentials: 'include',
+      body: body instanceof FormData ? body : JSON.stringify(body)
+    });
+    
+    const data = await res.json();
+    return { data: transformUploadPaths(data) };
+  },
+  delete: async (url, options = {}) => {
+    const adminPin = localStorage.getItem('adminPin');
+    const headers = {
+      ...options.headers
+    };
+    if (adminPin) headers['X-Admin-Pin'] = adminPin;
+    
+    // Note: Don't set Content-Type for DELETE if body is empty
+    if (options.body) headers['Content-Type'] = 'application/json';
+    
+    const res = await fetch(`${SERVER_URL}/api${url}`, {
+      method: 'DELETE',
+      ...options,
+      headers,
+      credentials: 'include'
     });
     
     const data = await res.json();

@@ -489,7 +489,9 @@ router.post('/record_unlock', async (req, res) => {
 // --- 7. ADMIN ENDPOINTS (Restricted) ---
 const adminAuth = (req, res, next) => {
   const isLocal = req.hostname === 'localhost' || req.hostname === '127.0.0.1';
-  const hasValidHeader = req.headers['x-admin-pin'] === (process.env.ADMIN_PASSWORD || 'admin');
+  const pinHeader = req.headers['x-admin-pin'];
+  const expectedPin = (process.env.ADMIN_PASSWORD || 'admin');
+  const hasValidHeader = pinHeader === expectedPin;
 
   if (hasValidHeader || req.session.isAdmin || isLocal) {
     if (isLocal && !req.session.isAdmin) {
@@ -497,6 +499,8 @@ const adminAuth = (req, res, next) => {
     }
     return next();
   }
+
+  console.warn(`[AdminAuth] Rejected request from ${req.hostname}. Header Pin: ${pinHeader ? 'Provided' : 'Missing'}, Session: ${req.session.isAdmin ? 'Valid' : 'Invalid'}`);
   res.status(401).json({ error: "Admin access required" });
 };
 
@@ -735,7 +739,8 @@ router.post('/admin/delete_prompts_bulk', adminAuth, async (req, res) => {
 
   try {
     console.log(`[Admin] Bulk delete request for ${keys.length} prompts`);
-    await db`DELETE FROM prompts WHERE prompt_key IN ${db(keys)}`;
+    // Note: With the new db.js update, we just pass the array and it handles IN (...)
+    await db`DELETE FROM prompts WHERE prompt_key IN ${keys}`;
     res.json({ status: "success", count: keys.length });
   } catch (error) {
     console.error("[Admin] Bulk delete FAILED:", error);

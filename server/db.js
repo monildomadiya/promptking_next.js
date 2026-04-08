@@ -37,6 +37,10 @@ const sql = (strings, ...values) => {
             const v = values[i];
             if (v && typeof v === 'object' && v.type === 'identifier') {
                 query += '`' + v.value.replace(/`/g, '``') + '`';
+            } else if (Array.isArray(v)) {
+                // Handle IN (?) where v is ['a', 'b']
+                query += '(' + v.map(() => '?').join(', ') + ')';
+                finalValues.push(...v);
             } else {
                 query += '?';
                 finalValues.push(v);
