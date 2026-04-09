@@ -50,6 +50,10 @@ const Footer = ({ onLogoClick }) => {
       padding: isMobile ? '60px 20px 40px' : '100px 40px 40px',
       minHeight: isMobile ? '600px' : '400px',
       color: 'white',
+      maxWidth: '1400px',
+      margin: '0 auto',
+      borderRadius: '32px 32px 0 0',
+      borderTop: '1px solid rgba(255,255,255,0.1)',
       paddingBottom: isMobile ? 'calc(var(--app-bottom-nav-height, 70px) + 20px)' : '40px',
       overflow: 'hidden'
     }}>

@@ -223,6 +223,30 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
       position: 'relative',
       overflow: isHighlighted ? 'visible' : 'hidden' // Only allow overflow for highlighted sticker
     }}>
+      {/* Premium Badge - Top Right */}
+      {prompt.isPremium && (
+        <div style={{
+          position: 'absolute', 
+          top: '12px', 
+          right: '12px', 
+          background: 'rgba(0, 0, 0, 0.4)',
+          backdropFilter: 'blur(12px)', 
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255, 215, 0, 0.3)', 
+          borderRadius: '50%',
+          width: '36px', 
+          height: '36px', 
+          display: 'flex', 
+          alignItems: 'center',
+          justifyContent: 'center', 
+          zIndex: 50, 
+          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+          pointerEvents: 'none'
+        }}>
+          <Crown size={18} fill="#FFD700" color="#FFD700" />
+        </div>
+      )}
+
       {isHighlighted && (
         <div style={{
           position: 'absolute', top: '-16px', left: '0', width: '100%', display: 'flex', justifyContent: 'center', pointerEvents: 'none', zIndex: 110
@@ -537,18 +561,6 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
               )}
             </div>
             
-            {/* Premium Icon */}
-            {prompt.isPremium && (
-              <div style={{
-                position: 'absolute', top: '20px', right: '20px', background: 'rgba(0,0,0,0.3)',
-                backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '50%',
-                width: '38px', height: '38px', display: 'flex', alignItems: 'center',
-                justifyContent: 'center', zIndex: 30, boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
-              }}>
-                <Crown size={18} fill="#FFD700" color="#FFD700" />
-              </div>
-            )}
           </div>
           
           <YouTubeModal 

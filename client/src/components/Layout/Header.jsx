@@ -78,30 +78,20 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
         left: 0,
         right: 0,
         margin: '0 auto',
-        width: isMobile ? 'calc(100% - 20px)' : 'calc(100% - 40px)',
-        maxWidth: '1400px',
+        width: '100%',
         zIndex: 2000,
         background: 'rgba(10, 10, 15, 0.7)',
         backdropFilter: 'blur(25px)',
         WebkitBackdropFilter: 'blur(25px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        borderRadius: '24px',
-        padding: isMobile ? '10px 15px' : '12px 20px',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
         boxShadow: isScrolled ? '0 20px 40px rgba(0, 0, 0, 0.4)' : 'none',
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         transform: isVisible ? 'translateY(0)' : 'translateY(-120%)',
         opacity: isVisible ? 1 : 0,
-        minHeight: isMobile ? '65px' : 'auto',
+        minHeight: isMobile ? '65px' : '75px',
         height: 'auto'
       }}>
-        <div style={{ 
-          margin: '0 auto', 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          position: 'relative',
-          gap: isMobile ? '8px' : '40px'
-        }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: isMobile ? '10px' : '0 20px', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', gap: isMobile ? '8px' : '40px' }}>
           <div style={{ 
             display: (isMobile && isSearchExpanded) ? 'none' : 'flex', 
             alignItems: 'center', 
@@ -186,10 +176,11 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                         border: filter === 'premium' ? '1px solid rgba(255, 193, 7, 0.3)' : '1px solid rgba(255,255,255,0.08)',
                         color: filter === 'premium' ? '#FFC107' : 'rgba(255,255,255,0.7)',
                         transition: '0.3s',
-                        backdropFilter: 'blur(10px)'
+                        backdropFilter: 'blur(10px)',
+                        padding: 0
                       }}
                     >
-                      <Crown size={18} fill={filter === 'premium' ? '#FFC107' : 'none'} />
+                      <Crown size={18} fill={filter === 'premium' ? '#FFC107' : 'none'} style={{ display: 'block' }} />
                     </button>
                   )}
                     <div 
@@ -288,10 +279,11 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                         border: filter === 'premium' ? '1px solid rgba(255, 193, 7, 0.3)' : '1px solid rgba(255,255,255,0.08)',
                         color: filter === 'premium' ? '#FFC107' : 'rgba(255,255,255,0.7)',
                         transition: '0.3s',
-                        backdropFilter: 'blur(10px)'
+                        backdropFilter: 'blur(10px)',
+                        padding: 0
                       }}
                     >
-                      <Crown size={20} fill={filter === 'premium' ? '#FFC107' : 'none'} />
+                      <Crown size={20} fill={filter === 'premium' ? '#FFC107' : 'none'} style={{ display: 'block' }} />
                     </button>
                   </div>
                 )}

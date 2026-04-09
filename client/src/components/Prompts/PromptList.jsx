@@ -149,7 +149,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
   }
 
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: isMobile ? '10px' : '20px', width: '100%' }}>
+    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: isMobile ? '10px' : '0 20px', width: '100%' }}>
       <div className="home-layout-grid" style={{ 
         display: isMobile ? 'flex' : 'grid', 
         flexDirection: 'column' 

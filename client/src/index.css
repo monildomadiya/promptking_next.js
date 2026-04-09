@@ -748,9 +748,9 @@ mark {
   display: grid;
   grid-template-columns: 1fr 280px;
   gap: 40px;
-  max-width: 1600px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0 20px 20px 20px;
   width: 100%;
 }
 
