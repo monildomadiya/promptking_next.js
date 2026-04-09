@@ -84,6 +84,7 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
         backdropFilter: 'blur(25px)',
         WebkitBackdropFilter: 'blur(25px)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        padding: isMobile ? '10px 10px' : '15px 20px',
         boxShadow: isScrolled ? '0 20px 40px rgba(0, 0, 0, 0.4)' : 'none',
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         transform: isVisible ? 'translateY(0)' : 'translateY(-120%)',
@@ -91,7 +92,7 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
         minHeight: isMobile ? '65px' : '75px',
         height: 'auto'
       }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: isMobile ? '10px' : '0 20px', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', gap: isMobile ? '8px' : '40px' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', gap: isMobile ? '8px' : '40px' }}>
           <div style={{ 
             display: (isMobile && isSearchExpanded) ? 'none' : 'flex', 
             alignItems: 'center', 
