@@ -177,12 +177,13 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
               <Label text="Detailed Description" />
               <div style={{ borderRadius: '18px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
                 <Editor
-                  tinymceScriptSrc="https://cdnjs.cloudflare.com/ajax/libs/tinymce/7.4.1/tinymce.min.js"
+                  tinymceScriptSrc="https://cdn.tiny.cloud/1/no-api-key/tinymce/7/tinymce.min.js"
                   value={formData.description}
                   onEditorChange={(content) => setFormData({ ...formData, description: content })}
                   init={{
                     height: 400,
                     menubar: true,
+                    license_key: 'gpl',
                     plugins: [
                       'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                       'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
