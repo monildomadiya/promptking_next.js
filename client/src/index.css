@@ -197,18 +197,19 @@ button:active {
 
 /* Animations from the original CSS */
 @keyframes shimmer {
-  0% { background-position: -200% 100%; }
-  100% { background-position: 200% 100%; }
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-.shimmer-effect {
-  background: linear-gradient(90deg, 
-    rgba(255, 255, 255, 0.03) 25%, 
-    rgba(255, 255, 255, 0.08) 50%, 
-    rgba(255, 255, 255, 0.03) 75%
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.02) 25%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.02) 75%
   );
   background-size: 200% 100%;
-  animation: shimmer 2s infinite linear;
+  animation: shimmer 1.5s infinite ease-in-out;
 }
 
 /* Responsive Masonry Layout */
@@ -724,6 +725,22 @@ mark {
   font-size: 0.75rem;
   color: var(--text-secondary);
   line-height: 1.4;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
 }
 
 /* responsive mobile sidebar */

@@ -3,7 +3,7 @@ import React from 'react';
 const Shimmer = ({ width = '100%', height = '20px', borderRadius = '8px', className = '', style = {} }) => {
   return (
     <div 
-      className={`shimmer-effect ${className}`} 
+      className={`skeleton ${className}`} 
       style={{ 
         width, 
         height, 
