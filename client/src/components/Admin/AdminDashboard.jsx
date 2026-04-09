@@ -612,6 +612,7 @@ const AdminDashboard = () => {
   const [editingItem, setEditingItem] = useState(null);
   const [settings, setSettings] = useState({});
   const [selectedKeys, setSelectedKeys] = useState([]);
+  const [adminSearch, setAdminSearch] = useState('');
 
   useEffect(() => { 
     checkAuth(); 
@@ -620,6 +621,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     setSelectedKeys([]);
+    setAdminSearch('');
   }, [view]);
 
   const checkAuth = async () => {
@@ -698,14 +700,24 @@ const AdminDashboard = () => {
     );
   };
 
-  const toggleSelectAll = () => {
-    if (selectedKeys.length === data.length) {
+  const toggleSelectAll = (visibleItems) => {
+    const itemsToSelect = visibleItems || data;
+    if (selectedKeys.length === itemsToSelect.length) {
       setSelectedKeys([]);
     } else {
-      const allKeys = data.map(item => item.prompt_key || item.id);
+      const allKeys = itemsToSelect.map(item => item.prompt_key || item.id);
       setSelectedKeys(allKeys);
     }
   };
+
+  const filteredData = Array.isArray(data) ? data.filter(item => {
+    if (!adminSearch) return true;
+    const search = adminSearch.toLowerCase();
+    const promptKey = String(item.prompt_key || '').toLowerCase();
+    const title = String(item.title || item.name || '').toLowerCase();
+    const aiType = String(item.ai_type || item.aiType || '').toLowerCase();
+    return promptKey.includes(search) || title.includes(search) || aiType.includes(search);
+  }) : [];
 
   if (!isAdmin) {
     return (
@@ -803,6 +815,24 @@ const AdminDashboard = () => {
                   onClick={handleBulkDelete} 
                 />
               )}
+              {['prompts', 'blogs', 'categories', 'faqs'].includes(view) && (
+                <div style={{ position: 'relative', width: '250px' }}>
+                  <input
+                    type="text"
+                    placeholder={`Search ${view}...`}
+                    value={adminSearch}
+                    onChange={(e) => setAdminSearch(e.target.value)}
+                    style={{
+                      ...inputStyle,
+                      padding: '10px 16px',
+                      fontSize: '0.85rem',
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '10px'
+                    }}
+                  />
+                </div>
+              )}
               <ActionButton 
                 label="UI DEMO" 
                 color="rgba(255,255,255,0.05)" 
@@ -845,8 +875,8 @@ const AdminDashboard = () => {
                       <th style={{ padding: '24px', width: '50px' }}>
                         <input 
                           type="checkbox" 
-                          checked={data.length > 0 && selectedKeys.length === data.length} 
-                          onChange={toggleSelectAll}
+                          checked={filteredData.length > 0 && selectedKeys.length === filteredData.length} 
+                          onChange={() => toggleSelectAll(filteredData)}
                           style={{ cursor: 'pointer', width: '18px', height: '18px', accentColor: 'var(--accent-main)' }}
                         />
                       </th>
@@ -857,7 +887,7 @@ const AdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {(Array.isArray(data) ? data : []).map((item, idx) => (
+                  {filteredData.map((item, idx) => (
                     <motion.tr key={idx} variants={itemVariants} initial="hidden" animate="visible" exit="hidden" custom={idx} style={{ 
                       borderBottom: '1px solid rgba(255,255,255,0.03)',
                       background: selectedKeys.includes(item.prompt_key || item.id) ? 'rgba(229, 9, 20, 0.03)' : 'transparent'
