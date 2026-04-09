@@ -69,12 +69,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
     
     const matchesSearch = safeKey.includes(safeSearch);
     
-    let matchesFilter = true;
-    if (filter === 'free') {
-      matchesFilter = !p.isPremium;
-    } else if (filter === 'premium') {
-      matchesFilter = p.isPremium;
-    } else if (filter !== 'all') {
+    if (filter !== 'all' && filter !== 'free' && filter !== 'premium') {
       matchesFilter = (p.aiType || '').toLowerCase().includes(filter);
     }
     
@@ -84,8 +79,6 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
   // Calculate counts for categories and types
   const filterCounts = {
     all: prompts.length,
-    free: prompts.filter(p => !p.isPremium).length,
-    premium: prompts.filter(p => p.isPremium).length,
     categories: categories.reduce((acc, cat) => {
       const catName = (cat.name || '').toLowerCase();
       acc[catName] = prompts.filter(p => (p.aiType || '').toLowerCase().includes(catName)).length;

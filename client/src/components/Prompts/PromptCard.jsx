@@ -6,13 +6,9 @@ import confetti from 'canvas-confetti';
 import YouTubeModal from '../Modals/YouTubeModal';
 
 const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searchTerm }) => {
-  const [sliderValue, setSliderValue] = useState(50);
-  const [pin, setPin] = useState('');
-  const [showError, setShowError] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const [isSnapping, setIsSnapping] = useState(false);
 
   React.useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -37,19 +33,6 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
     );
   };
 
-  React.useEffect(() => {
-    if (isUnlocked && prompt.isPremium) {
-      setTimeout(() => {
-        const box = document.getElementById(`box-${prompt.key}`);
-        if (box) {
-          box.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' 
-          });
-        }
-      }, 400); // Wait for open/unlock animation
-    }
-  }, [isUnlocked]);
 
   const ratio = (prompt.image_ratio || prompt.imageRatio || '16/9').toString().replace(/\s+/g, '').trim();
   const aiType = prompt.aiType || '';
@@ -62,33 +45,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
     setSliderValue(e.target.value);
   };
 
-  const checkAutoUnlock = (value) => {
-    setPin(value);
-    setShowError(false);
-    const targetPass = String(prompt.password || '1234').trim();
-    const inputPass = String(value || '').trim();
-    
-    // console.log(`Checking: "${inputPass}" vs "${targetPass}"`); 
-    
-    if (inputPass === targetPass) {
-      onUnlock();
-      api.post('/record_unlock', { key: prompt.key }).catch(console.error);
-      triggerConfetti();
-      // Auto-center current card for UX
-      setTimeout(() => {
-        const box = document.getElementById(`box-${prompt.key}`);
-        if (box) {
-          box.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 100);
-    } else if (inputPass.length >= targetPass.length) {
-      setShowError(true);
-      setTimeout(() => {
-        setPin('');
-        setShowError(false);
-      }, 800);
-    }
-  };
+
 
   const triggerConfetti = () => {
     const box = document.getElementById(`box-${prompt.key}`);
@@ -125,26 +82,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
     }
   };
 
-  const triggerSnapConfetti = () => {
-    const box = document.getElementById(`box-${prompt.key}`);
-    if (box) {
-      const rect = box.getBoundingClientRect();
-      const originX = (rect.left + (rect.width / 2)) / window.innerWidth;
-      const originY = (rect.top + (rect.height / 2)) / window.innerHeight;
-      
-      confetti({
-        particleCount: 150,
-        spread: 120,
-        origin: { x: originX, y: originY },
-        colors: ['#4a4a4a', '#2c2c2c', '#6a6a6a', '#1a1a1a'],
-        gravity: 0.1,
-        scalar: 0.7,
-        drift: 1,
-        ticks: 200,
-        zIndex: 9999
-      });
-    }
-  };
+
 
   const handleCopy = async () => {
     try {
@@ -153,41 +91,28 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
       await api.post('/record_copy', { key: prompt.key });
       setIsCopied(true);
       
-      // Feedback Animation: Success pulse and Confetti
-      if (prompt.isPremium) {
-        setIsSnapping(true);
-        triggerSnapConfetti();
-        // Clear PIN instantly for security
-        setPin(''); 
-      } else {
-        // Enhanced Celebration for Free Content
-        const box = document.getElementById(`box-${prompt.key}`);
-        if (box) {
-          const rect = box.getBoundingClientRect();
-          const x = (rect.left + rect.width / 2) / window.innerWidth;
-          const y = (rect.top + rect.height / 2) / window.innerHeight;
-          
-          const count = 60;
-          const defaults = { 
-            origin: { x, y }, 
-            colors: ['#e50914', '#FFD700', '#ffffff'],
-            zIndex: 9999,
-            scalar: 0.8
-          };
+      // Enhanced Celebration for All Content
+      const box = document.getElementById(`box-${prompt.key}`);
+      if (box) {
+        const rect = box.getBoundingClientRect();
+        const x = (rect.left + rect.width / 2) / window.innerWidth;
+        const y = (rect.top + rect.height / 2) / window.innerHeight;
+        
+        const count = 60;
+        const defaults = { 
+          origin: { x, y }, 
+          colors: ['#e50914', '#FFD700', '#ffffff'],
+          zIndex: 9999,
+          scalar: 0.8
+        };
 
-          confetti({ ...defaults, particleCount: count, spread: 30, startVelocity: 45 });
-          confetti({ ...defaults, particleCount: 40, spread: 60, startVelocity: 25 });
-        }
+        confetti({ ...defaults, particleCount: count, spread: 30, startVelocity: 45 });
+        confetti({ ...defaults, particleCount: 40, spread: 60, startVelocity: 25 });
       }
       
-      // Hard Relock (Snappy 100ms for Premium, 2000ms for Free to allow Copied! feedback)
       setTimeout(() => {
-        setIsSnapping(false);
         setIsCopied(false);
-        if (prompt.isPremium) {
-          onLock(); // Tell parent to relock
-        }
-      }, prompt.isPremium ? 100 : 2000);
+      }, 2000);
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
@@ -321,35 +246,13 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
               style={{ position: 'absolute', inset: 0, zIndex: 10, opacity: 0, cursor: 'ew-resize', width: '100%', height: '100%' }}
             />
             
-            {/* Premium Icon (Slider) */}
-            {prompt.isPremium && (
-              <div style={{
-                position: 'absolute', top: '20px', right: '20px', background: 'rgba(0,0,0,0.3)',
-                backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '50%',
-                width: '38px', height: '38px', display: 'flex', alignItems: 'center',
-                justifyContent: 'center', zIndex: 30, boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
-              }}>
-                <Crown size={18} fill="#FFD700" color="#FFD700" />
-              </div>
-            )}
+
           </div>
         ) : (prompt.imgAfter || prompt.imgBefore) && (
           <div style={{ width: `calc(100% + ${cardPadding * 2}px)`, margin: `-${cardPadding}px -${cardPadding}px 15px -${cardPadding}px`, aspectRatio: ratio, background: '#111', borderRadius: '20px 20px 0 0', overflow: 'hidden', minHeight: isMobile ? '140px' : '180px', position: 'relative' }}>
             <img src={optimizeImage(prompt.imgAfter || prompt.imgBefore)} alt={prompt.title} loading="lazy" width="400" height="225" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             
-            {/* Premium Icon (Static) */}
-            {prompt.isPremium && (
-              <div style={{
-                position: 'absolute', top: '20px', right: '20px', background: 'rgba(0,0,0,0.3)',
-                backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '50%',
-                width: '38px', height: '38px', display: 'flex', alignItems: 'center',
-                justifyContent: 'center', zIndex: 30, boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
-              }}>
-                <Crown size={18} fill="#FFD700" color="#FFD700" />
-              </div>
-            )}
+
           </div>
         )}
         {/* Header Info */}
@@ -373,7 +276,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
 
       {/* Prompt Area */}
       <div style={{ transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }}>
-        <div id={`box-${prompt.key}`} className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isSnapping ? 'thanos-snap' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse' : ''}`} style={{
+        <div id={`box-${prompt.key}`} className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isCopied ? 'copy-success-pulse' : ''}`} style={{
             background: 'rgba(15, 15, 20, 0.4)', 
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
@@ -382,12 +285,12 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
             overflow: 'hidden',
             display: 'flex', 
             flexDirection: 'column', 
-            margin: (isUnlocked && prompt.isPremium) ? '0' : '0 0 15px 0', 
-            border: isUnlocked ? (prompt.isPremium ? '1px solid #FFD700' : (isCopied ? '1px solid #27C93F' : '1px solid var(--accent-main)')) : '1px solid rgba(255,255,255,0.06)',
-            boxShadow: isUnlocked ? (prompt.isPremium ? (isMobile ? '0 0 20px rgba(255, 215, 0, 0.1)' : '0 0 40px rgba(255, 215, 0, 0.15)') : (isCopied ? '0 0 30px rgba(39, 201, 63, 0.3)' : (isMobile ? '0 0 15px rgba(229, 9, 20, 0.15)' : '0 0 40px rgba(229, 9, 20, 0.2)'))) : 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 10px 30px rgba(0,0,0,0.5)',
-            minHeight: isUnlocked ? (prompt.isPremium ? (isMobile ? '300px' : '380px') : (isMobile ? '170px' : '180px')) : '140px',
+            margin: '0 0 15px 0', 
+            border: isCopied ? '1px solid #27C93F' : '1px solid var(--accent-main)',
+            boxShadow: isCopied ? '0 0 30px rgba(39, 201, 63, 0.3)' : (isMobile ? '0 0 15px rgba(229, 9, 20, 0.15)' : '0 0 40px rgba(229, 9, 20, 0.2)'),
+            minHeight: isMobile ? '170px' : '180px',
             transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-            transform: isUnlocked ? (isCopied && !prompt.isPremium ? (isMobile ? 'scale(1.02)' : 'scale(1.03)') : 'scale(1.01)') : 'scale(1)'
+            transform: isCopied ? (isMobile ? 'scale(1.02)' : 'scale(1.03)') : 'scale(1.01)'
           }}>
             {/* macOS Style Header */}
             <div style={{ 
@@ -487,73 +390,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
                 </button>
               )}
 
-              {!isUnlocked && (
-                <div style={{ 
-                  position: 'absolute', inset: 0, background: 'rgba(10, 10, 12, 0.85)', 
-                  backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px 12px', zIndex: 10, gap: '10px'
-                }}>
-                  <div style={{ 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    width: '100%'
-                  }}>
-                    <form onSubmit={(e) => e.preventDefault()} style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                      <input 
-                        type="password" 
-                        placeholder="••••" 
-                        value={pin}
-                        onChange={(e) => checkAutoUnlock(e.target.value)}
-                        style={{ 
-                          width: isMobile ? '110px' : '140px',
-                          height: isMobile ? '36px' : '42px',
-                          borderRadius: '100px',
-                          border: showError ? '2px solid #ff4444' : '1px solid rgba(255,255,255,0.2)',
-                          background: 'rgba(255,255,255,0.08)',
-                          color: 'white', 
-                          textAlign: 'center', 
-                          outline: 'none', 
-                          letterSpacing: isMobile ? '4px' : '8px', 
-                          fontSize: '16px', 
-                          transition: 'all 0.3s ease',
-                          backdropFilter: 'blur(10px)',
-                          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                          padding: 0
-                        }} 
-                      />
-                    </form>
-                  </div>
 
-                  {showError && <p style={{ color: '#ff4444', fontSize: '0.75rem', marginTop: '8px', fontWeight: 600 }}>Incorrect PIN</p>}
-                  
-                  {prompt.igLink && (
-                    <button 
-                      onClick={() => setShowVideoModal(true)}
-                      aria-label="Get PIN from video"
-                      style={{ 
-                        background: 'transparent', 
-                        fontSize: isMobile ? '0.7rem' : '0.85rem', color: 'rgba(255,255,255,0.6)', 
-                        display: 'flex', alignItems: 'center', gap: isMobile ? '4px' : '8px', 
-                        flexDirection: isMobile ? 'column' : 'row',
-                        textDecoration: 'none', border: 'none', cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                        textAlign: 'center'
-                      }}
-                      onMouseOver={(e) => { if (!isMobile) e.currentTarget.style.color = 'white'; }}
-                      onMouseOut={(e) => { if (!isMobile) e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
-                    >
-                      {prompt.igLink.includes('instagram') ? (
-                        <Instagram size={16} color="currentColor" />
-                      ) : (
-                        <Youtube size={16} color="currentColor" />
-                      )}
-                      Get PIN from {prompt.igLink.includes('instagram') ? 'Reel' : 'Short'}
-                    </button>
-                  )}
-                </div>
-              )}
             </div>
           </div>
           
@@ -575,15 +412,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
           50% { transform: translateY(-3px); }
         }
 
-        @keyframes thanosSnap {
-          0% { opacity: 1; filter: blur(0px) brightness(1); transform: scale(1.02); }
-          100% { opacity: 0; filter: blur(10px) brightness(1.5); transform: scale(1.1); }
-        }
 
-        .thanos-snap {
-          animation: thanosSnap 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
-          pointer-events: none;
-        }
 
         @keyframes copyPulse {
           0% { transform: scale(1.01); border-color: var(--accent-main); }

@@ -46,9 +46,7 @@ const PromptDetailPage = ({ adsSettings }) => {
         copyCount: p.copy_count || p.copy_count,
         key: p.prompt_key || p.key
       });
-      if (!(p.is_premium || p.isPremium)) {
-        setIsUnlocked(true);
-      }
+      setIsUnlocked(true);
       setLoading(false);
     } catch (err) {
       console.error("Error fetching prompt:", err);
@@ -81,35 +79,7 @@ const PromptDetailPage = ({ adsSettings }) => {
     setSliderValue(e.target.value);
   };
 
-  const checkAutoUnlock = async (value) => {
-    setPin(value);
-    setShowError(false);
-    const targetPass = String(prompt?.password || '1234').trim();
-    const inputPass = String(value || '').trim();
-    
-    if (inputPass === targetPass) {
-      setIsUnlocked(true);
-      triggerConfetti();
-      // Auto-center the box so the user sees the unlocked content
-      setTimeout(() => {
-        const box = document.getElementById('box-detail');
-        if (box) {
-          box.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 100);
-      try {
-        await api.post('/record_unlock', { key: prompt.key }); // Record as unlock
-      } catch (err) {
-        console.error("Failed to record correct attempt:", err);
-      }
-    } else if (inputPass.length >= targetPass.length) {
-      setShowError(true);
-      setTimeout(() => {
-        setPin('');
-        setShowError(false);
-      }, 800);
-    }
-  };
+
 
   const contentRef = React.useRef(null);
 
@@ -181,15 +151,9 @@ const PromptDetailPage = ({ adsSettings }) => {
           zIndex: 9999
         });
       }
-
-      // Relock immediately for Premium content
-      if (prompt.isPremium) {
-        setIsUnlocked(false);
-      }
       
       setTimeout(() => {
         setIsCopied(false);
-        setPin(''); // Reset PIN
       }, 800);
     } catch (err) {
       console.error('Failed to copy text: ', err);
@@ -424,24 +388,7 @@ const PromptDetailPage = ({ adsSettings }) => {
                   </div>
                 )}
                 
-                {prompt?.isPremium && (
-                  <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 100 }}>
-                    <div style={{
-                      background: 'rgba(0,0,0,0.4)',
-                      backdropFilter: 'blur(10px)',
-                      WebkitBackdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      borderRadius: '50%',
-                      width: '46px',
-                      height: '46px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      <Crown size={22} fill="#FFD700" color="#FFD700" />
-                    </div>
-                  </div>
-                )}
+
               </div>
             </div>
 
@@ -541,78 +488,11 @@ const PromptDetailPage = ({ adsSettings }) => {
                   </button>
                 )}
 
-                {!isUnlocked && (
-                  <div style={{ 
-                    position: 'absolute', inset: 0, background: 'rgba(10, 10, 12, 0.8)', 
-                    backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '30px', zIndex: 10, gap: '20px'
-                  }}>
-                    <div style={{ width: '100%', maxWidth: '200px' }}>
-                      <form onSubmit={(e) => e.preventDefault()}>
-                        <input 
-                          type="password" 
-                          placeholder="••••" 
-                          value={pin}
-                          onChange={(e) => checkAutoUnlock(e.target.value)}
-                          style={{ 
-                            width: '100%',
-                            height: '55px',
-                            borderRadius: '16px',
-                            border: showError ? '2px solid #ff4444' : '1px solid rgba(255,255,255,0.15)',
-                            background: 'rgba(255,255,255,0.05)',
-                            color: 'white', 
-                            textAlign: 'center', 
-                            outline: 'none', 
-                            letterSpacing: '8px', 
-                            fontSize: '1.6rem', 
-                            transition: 'all 0.3s ease',
-                            backdropFilter: 'blur(10px)'
-                          }} 
-                        />
-                      </form>
-                    </div>
 
-                    {showError && <p style={{ color: '#ff4444', fontSize: '0.8rem', fontWeight: 700 }}>Verification Failed</p>}
-                    
-                    {prompt.igLink && (
-                      <button 
-                        onClick={() => setShowVideoModal(true)}
-                        style={{ 
-                          background: 'rgba(255,255,255,0.03)', 
-                          fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', gap: '8px', 
-                          padding: '8px 16px', borderRadius: '10px',
-                          textDecoration: 'none', border: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer',
-                          transition: 'all 0.3s ease'
-                        }}
-                        onMouseOver={(e) => { 
-                          const isMobile = window.innerWidth <= 768;
-                          if (!isMobile) {
-                            e.currentTarget.style.color = 'white'; 
-                            e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; 
-                          }
-                        }}
-                        onMouseOut={(e) => { 
-                          const isMobile = window.innerWidth <= 768;
-                          if (!isMobile) {
-                            e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; 
-                            e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; 
-                          }
-                        }}
-                      >
-                        {prompt.igLink.includes('instagram') ? (
-                          <Instagram size={14} />
-                        ) : (
-                          <Youtube size={14} />
-                        )}
-                        Get PIN from {prompt.igLink.includes('instagram') ? 'Reel' : 'Short'}
-                      </button>
-                    )}
-                  </div>
-                )}
               </div>
             </div>
 
-            {(!isUnlocked && !prompt.isPremium) && (
+            {(!isCopied) && (
               <button 
                 onClick={handleCopy}
                 style={{

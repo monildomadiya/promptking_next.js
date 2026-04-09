@@ -104,13 +104,14 @@ const BlogModal = ({ blog, onClose, onSave }) => {
               <SectionTitle title="Story Canvas" />
               <div style={{ borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', marginTop: '20px' }}>
                 <Editor
-                  tinymceScriptSrc="https://cdn.tiny.cloud/1/no-api-key/tinymce/7/tinymce.min.js"
+                  tinymceScriptSrc="/tinymce/tinymce.min.js"
                   value={formData.content}
                   onEditorChange={(content) => setFormData({ ...formData, content })}
                   init={{
                     height: 600,
                     menubar: true,
                     license_key: 'gpl',
+                    promotion: false,
                     plugins: [
                       'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                       'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
