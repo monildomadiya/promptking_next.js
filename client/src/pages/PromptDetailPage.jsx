@@ -362,7 +362,7 @@ const PromptDetailPage = ({ adsSettings }) => {
                   {prompt.copyCount || 0} Successful Copies
                 </span>
               </div>
-              <h1 style={{ 
+              <h1 className="prompt-detail-title" style={{ 
                 fontSize: '2.4rem', 
                 fontWeight: 900, 
                 marginBottom: '10px', 

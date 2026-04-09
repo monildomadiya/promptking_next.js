@@ -824,3 +824,16 @@ body.shorts-modal-open {
   width: 100%;
 }
 
+/* ── Prompt Detail Page: Responsive Title ──────────────────────── */
+@media (max-width: 768px) {
+  .prompt-detail-title {
+    font-size: 1.6rem !important;
+    letter-spacing: -0.5px !important;
+    line-height: 1.2 !important;
+  }
+}
+@media (max-width: 480px) {
+  .prompt-detail-title {
+    font-size: 1.4rem !important;
+  }
+}
