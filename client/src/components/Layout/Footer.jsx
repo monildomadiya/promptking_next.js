@@ -48,7 +48,7 @@ const Footer = ({ onLogoClick }) => {
       background: 'linear-gradient(to bottom, var(--surface-0), #000000)',
       position: 'relative',
       padding: isMobile ? '60px 20px 40px' : '100px 40px 40px',
-      marginTop: 'auto',
+      minHeight: isMobile ? '600px' : '400px',
       color: 'white',
       paddingBottom: isMobile ? 'calc(var(--app-bottom-nav-height, 70px) + 20px)' : '40px',
       overflow: 'hidden'
@@ -84,6 +84,8 @@ const Footer = ({ onLogoClick }) => {
                 <img 
                   src={optimizeImage(settings.logo_url, 400)} 
                   alt="Logo Icon" 
+                  width="180"
+                  height="55"
                   style={{ 
                     height: isMobile ? '45px' : '55px',
                     width: 'auto', 

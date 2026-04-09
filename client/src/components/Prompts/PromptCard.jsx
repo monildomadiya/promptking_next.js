@@ -5,7 +5,7 @@ import api, { SERVER_URL } from '../../api';
 import confetti from 'canvas-confetti';
 import YouTubeModal from '../Modals/YouTubeModal';
 
-const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searchTerm }) => {
+const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searchTerm, isPriority = false }) => {
   const [sliderValue, setSliderValue] = useState(50);
   const [pin, setPin] = useState('');
   const [showError, setShowError] = useState(false);
@@ -13,6 +13,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isSnapping, setIsSnapping] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   React.useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -254,11 +255,21 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
             position: 'relative', overflow: 'hidden', borderRadius: '20px 20px 0 0', borderBottom: '1px solid var(--border-color)',
             minHeight: isMobile ? '140px' : '180px', background: '#111'
           }}>
-            <img src={optimizeImage(prompt.imgAfter)} alt="After" loading="lazy" width="400" height="225" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
             <img 
-              src={optimizeImage(prompt.imgBefore)} 
+              src={optimizeImage(prompt.imgAfter, isMobile ? 450 : 600)} 
+              alt="After" 
+              loading={isPriority ? "eager" : "lazy"} 
+              fetchpriority={isPriority ? "high" : "auto"}
+              onLoad={() => setIsLoaded(true)}
+              width="400" 
+              height="225" 
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} 
+            />
+            <img 
+              src={optimizeImage(prompt.imgBefore, isMobile ? 450 : 600)} 
               alt="Before" 
-              loading="lazy"
+              loading={isPriority ? "eager" : "lazy"}
+              fetchpriority={isPriority ? "high" : "auto"}
               width="400"
               height="225"
               style={{ 
@@ -309,7 +320,16 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
           </div>
         ) : (prompt.imgAfter || prompt.imgBefore) && (
           <div style={{ width: `calc(100% + ${cardPadding * 2}px)`, margin: `-${cardPadding}px -${cardPadding}px 15px -${cardPadding}px`, aspectRatio: ratio, background: '#111', borderRadius: '20px 20px 0 0', overflow: 'hidden', minHeight: isMobile ? '140px' : '180px', position: 'relative' }}>
-            <img src={optimizeImage(prompt.imgAfter || prompt.imgBefore)} alt={prompt.title} loading="lazy" width="400" height="225" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img 
+              src={optimizeImage(prompt.imgAfter || prompt.imgBefore, isMobile ? 450 : 600)} 
+              alt={prompt.title} 
+              loading={isPriority ? "eager" : "lazy"} 
+              fetchpriority={isPriority ? "high" : "auto"}
+              onLoad={() => setIsLoaded(true)}
+              width="400" 
+              height="225" 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            />
             
 
           </div>

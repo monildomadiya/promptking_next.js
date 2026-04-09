@@ -203,6 +203,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
                       onLock={() => setActiveUnlockedKey(null)}
                       searchTerm={search}
                       isHighlighted={search && p.prompt_key && p.prompt_key.toLowerCase().includes(search.toLowerCase())}
+                      isPriority={index < 2}
                     />
                   </div>
                 );

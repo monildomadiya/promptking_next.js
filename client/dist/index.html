@@ -3,15 +3,19 @@
 
 <head>
   <meta charset="UTF-8" />
-  <!-- Permanent Favicon - PromptKing Logo -->
-  <link rel="icon" type="image/png" href="/favicon.png" />
-  <link rel="shortcut icon" href="/favicon.png" />
-  <link rel="apple-touch-icon" href="/favicon.png" />
+  <!-- Permanent Favicon - Highly Optimized SVG -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="shortcut icon" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#e50914" />
-  <meta name="description" content="PromptKing - The best AI prompts marketplace" />
+  <meta name="description" content="PromptKing - The ultimate premium library for AI engineering and creative workflows. Discover prompts for ChatGPT, Midjourney, and Gemini." />
 
-  <!-- Performance: Preconnect to critical domains -->
+  <!-- Performance: Preconnect & Preload -->
+  <link rel="preconnect" href="https://api.promptking.in" crossorigin>
+  <link rel="preload" href="/assets/Outfit-Bold-DVwZUuqo.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="/assets/Outfit-Regular-CZeFCLjM.ttf" as="font" type="font/ttf" crossorigin>
+  
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
   <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com">
@@ -137,18 +141,18 @@
     gtag('js', new Date());
     gtag('config', 'G-1HK9T17LSR');
   </script>
-  <script type="module" crossorigin src="/assets/index-BvyILAiu.js"></script>
+  <script type="module" crossorigin src="/assets/index-C0A7Vtjl.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/vendor-NDfzKuVC.js">
   <link rel="modulepreload" crossorigin href="/assets/animations-CtV_57Xv.js">
-  <link rel="stylesheet" crossorigin href="/assets/index-DiZASnSi.css">
+  <link rel="stylesheet" crossorigin href="/assets/index-Px270fCb.css">
 </head>
 
 <body>
   <!-- Instant splash screen: visible before React JS loads -->
   <div id="app-splash" aria-hidden="true">
     <div class="splash-logo-wrap">
-      <!-- Fixed: Ensure the image loads exactly what's needed (or scales elegantly) to prevent layout shifts/oversized warnings -->
-      <img class="splash-logo-img" src="/favicon.png" alt="PromptKing" width="52" height="52" style="width: 52px; height: 52px; object-fit: contain;" />
+      <!-- Optimized: Using SVG for instant load and sharp vector rendering -->
+      <img class="splash-logo-img" src="/favicon.svg" alt="PromptKing" width="52" height="52" style="width: 52px; height: 52px; object-fit: contain;" />
       <div class="splash-logo-text">Prompt<span>King</span></div>
     </div>
     <div class="splash-spinner"></div>
