@@ -77,10 +77,6 @@ const PromptDetailPage = ({ adsSettings }) => {
     }
   };
 
-  const sliderValueState = useState(50);
-  const sliderValue = sliderValueState[0];
-  const setSliderValue = sliderValueState[1];
-
   const handleSliderChange = (e) => {
     setSliderValue(e.target.value);
   };
