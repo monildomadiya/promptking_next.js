@@ -23,69 +23,7 @@ const AdminDashboard = lazy(() => import('./components/Admin/AdminDashboard'));
 
 // Loading Fallback Component
 const PageLoader = () => (
-  <div style={{ 
-    minHeight: '100vh', 
-    position: 'fixed',
-    inset: 0,
-    background: 'radial-gradient(circle at center, #111 0%, #020202 100%)',
-    display: 'flex', 
-    flexDirection: 'column', 
-    alignItems: 'center', 
-    justifyContent: 'center',
-    gap: '30px',
-    zIndex: 9999
-  }}>
-    <div style={{ position: 'relative' }}>
-      <div className="loader" style={{ width: '80px', height: '80px', borderThickness: '3px' }}></div>
-      <div style={{ 
-        position: 'absolute', 
-        top: '50%', 
-        left: '50%', 
-        transform: 'translate(-50%, -50%)',
-        width: '40px',
-        height: '40px',
-        background: 'var(--accent-main)',
-        borderRadius: '10px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontWeight: 900,
-        fontSize: '1.2rem',
-        boxShadow: '0 0 20px var(--accent-glow)',
-        animation: 'pulse 2s infinite'
-      }}>
-        PK
-      </div>
-    </div>
-    <div style={{ textAlign: 'center' }}>
-      <p style={{ 
-        color: 'white', 
-        fontWeight: 800, 
-        letterSpacing: '4px', 
-        fontSize: '0.8rem',
-        textTransform: 'uppercase',
-        marginBottom: '8px',
-        opacity: 0.8
-      }}>
-        PROMPT KING
-      </p>
-      <p style={{ 
-        color: 'var(--text-secondary)', 
-        fontSize: '0.7rem', 
-        fontWeight: 500,
-        letterSpacing: '1px'
-      }}>
-        INITIALIZING PREMIUM EXPERIENCE...
-      </p>
-    </div>
-
-    <style>{`
-      @keyframes pulse {
-        0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
-        100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      }
-    `}</style>
+  <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
   </div>
 );
 

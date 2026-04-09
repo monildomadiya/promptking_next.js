@@ -204,12 +204,13 @@ button:active {
 .skeleton {
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.01) 25%,
-    rgba(255, 255, 255, 0.03) 50%,
-    rgba(255, 255, 255, 0.01) 75%
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 75%
   );
+  background-color: rgba(255, 255, 255, 0.02);
   background-size: 200% 100%;
-  animation: shimmer 1.2s infinite ease-in-out;
+  animation: shimmer 1.5s infinite ease-in-out;
 }
 
 /* Responsive Masonry Layout */
