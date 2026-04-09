@@ -56,15 +56,29 @@ const ArticlePage = () => {
   );
 
   const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": blog.title,
-    "image": blog.featured_image,
-    "datePublished": blog.created_at,
-    "author": [{
-        "@type": "Organization",
-        "name": "PromptKing",
-        "url": "https://promptking.com"
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    'headline': blog.title,
+    'description': blog.content ? blog.content.replace(/<[^>]*>?/gm, '').substring(0, 200) : '',
+    'image': blog.featured_image || 'https://promptking.in/favicon.png',
+    'datePublished': blog.created_at,
+    'dateModified': blog.updated_at || blog.created_at,
+    'mainEntityOfPage': {
+      '@type': 'WebPage',
+      '@id': `https://promptking.in/article/${blog.slug}`
+    },
+    'publisher': {
+      '@type': 'Organization',
+      'name': 'PromptKing',
+      'logo': {
+        '@type': 'ImageObject',
+        'url': 'https://promptking.in/favicon.png'
+      }
+    },
+    'author': [{
+      '@type': 'Organization',
+      'name': 'PromptKing',
+      'url': 'https://promptking.in'
     }]
   };
 
@@ -72,8 +86,18 @@ const ArticlePage = () => {
     <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '60px 20px' }}>
       <SEOMetadata 
         title={`${blog.title} | PromptKing Blog`}
-        image={blog.featured_image}
+        description={blog.content ? blog.content.replace(/<[^>]*>?/gm, '').substring(0, 160) : `Read ${blog.title} on the PromptKing Blog.`}
+        image={blog.featured_image || 'https://promptking.in/favicon.png'}
+        url={`https://promptking.in/article/${blog.slug}`}
+        type="article"
+        publishedDate={blog.created_at}
+        modifiedDate={blog.updated_at || blog.created_at}
         schema={articleSchema}
+        breadcrumb={[
+          { name: 'Home', url: 'https://promptking.in/' },
+          { name: 'Blog', url: 'https://promptking.in/blog' },
+          { name: blog.title, url: `https://promptking.in/article/${blog.slug}` }
+        ]}
       />
       <Link to="/blog" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', marginBottom: '40px', textDecoration: 'none', fontWeight: 600 }}>
         <ArrowLeft size={18} /> Back to Blog

@@ -4,6 +4,7 @@ import { ArrowRight, Calendar, Clock } from '../components/Common/Icons';
 import api from '../api';
 import Shimmer from '../components/Common/Shimmer';
 import SocialSidebar from '../components/Prompts/SocialSidebar';
+import SEOMetadata from '../components/SEO/SEOMetadata';
 
 const BlogPage = () => {
   const [blogs, setBlogs] = useState([]);
@@ -56,8 +57,33 @@ const BlogPage = () => {
     </div>
   );
 
+  const blogSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    'name': 'PromptKing Blog - AI Tips, Guides & Updates',
+    'description': 'Explore insights, tutorials, and news about AI prompts, creative workflows, and the latest from the PromptKing platform.',
+    'url': 'https://promptking.in/blog',
+    ...(blogs.length > 0 && {
+      'hasPart': blogs.map(b => ({
+        '@type': 'BlogPosting',
+        'headline': b.title,
+        'url': `https://promptking.in/article/${b.slug}`,
+        'image': b.featured_image,
+        'datePublished': b.created_at,
+      }))
+    })
+  };
+
   return (
     <div className="layout-with-sidebar">
+      <SEOMetadata
+        title="PromptKing Blog - AI Prompt Tips, Guides & Updates"
+        description="Explore tutorials, tips and news about AI prompts, creative workflows, ChatGPT, Midjourney, Gemini, and the latest PromptKing updates."
+        keywords="promptking blog, ai prompt tips, chatgpt guide, midjourney tutorial, ai workflow, prompt engineering blog"
+        url="https://promptking.in/blog"
+        schema={blogSchema}
+        breadcrumb={[{ name: 'Home', url: 'https://promptking.in/' }, { name: 'Blog', url: 'https://promptking.in/blog' }]}
+      />
       <div className="main-content-area">
         <header className="blog-hero">
           <div style={{ 

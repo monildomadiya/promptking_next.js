@@ -293,24 +293,43 @@ const PromptDetailPage = ({ adsSettings }) => {
   };
 
   const promptSchema = {
-    "@context": "https://schema.org",
-    "@type": "CreativeWork",
-    "name": prompt.title,
-    "description": prompt.description,
-    "image": prompt.img_after || prompt.img_before,
-    "author": {
-      "@type": "Organization",
-      "name": "PromptKing"
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    'name': prompt.title,
+    'description': prompt.description,
+    'image': prompt.img_after || prompt.img_before || 'https://promptking.in/favicon.png',
+    'url': `https://promptking.in/prompt/${prompt.key}`,
+    'keywords': `${prompt.aiType || 'AI'} prompt, ${prompt.title}, prompt engineering, PromptKing`,
+    'genre': prompt.aiType || 'AI Prompt',
+    'inLanguage': 'en',
+    'isAccessibleForFree': !prompt.isPremium,
+    'publisher': {
+      '@type': 'Organization',
+      'name': 'PromptKing',
+      'url': 'https://promptking.in',
+      'logo': 'https://promptking.in/favicon.png'
+    },
+    'author': {
+      '@type': 'Organization',
+      'name': 'PromptKing',
+      'url': 'https://promptking.in'
     }
   };
 
   return (
     <div className="detail-page-wrapper" style={{ background: 'var(--surface-0)', minHeight: '100vh', color: 'white' }}>
       <SEOMetadata 
-        title={`${prompt.title} - AI Prompt | PromptKing`}
-        description={prompt.description?.slice(0, 160)}
-        image={prompt.img_after || prompt.img_before}
+        title={`${prompt.title} - ${prompt.aiType || 'AI'} Prompt | PromptKing`}
+        description={prompt.description?.slice(0, 160) || `Unlock the "${prompt.title}" AI prompt on PromptKing. Works with ${prompt.aiType || 'AI'}.`}
+        image={prompt.img_after || prompt.img_before || 'https://promptking.in/favicon.png'}
+        url={`https://promptking.in/prompt/${prompt.key}`}
+        keywords={`${prompt.aiType || 'AI'} prompt, ${prompt.title}, prompt engineering, PromptKing, chatgpt prompts`}
         schema={promptSchema}
+        breadcrumb={[
+          { name: 'Home', url: 'https://promptking.in/' },
+          { name: 'Prompts', url: 'https://promptking.in/' },
+          { name: prompt.title, url: `https://promptking.in/prompt/${prompt.key}` }
+        ]}
       />
       <div className="container" style={{ padding: '40px 20px', maxWidth: '1400px', margin: '0 auto' }}>
         
