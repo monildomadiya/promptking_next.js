@@ -109,6 +109,8 @@ const BlogModal = ({ blog, onClose, onSave }) => {
                   onEditorChange={(content) => setFormData({ ...formData, content })}
                   init={{
                     height: 600,
+                    base_url: '/tinymce',
+                    suffix: '.min',
                     menubar: true,
                     license_key: 'gpl',
                     promotion: false,

@@ -214,6 +214,18 @@ const CategorySidebar = ({ filter, setFilter, counts = {} }) => {
           count={counts.all} 
           onClick={() => setFilter('all')} 
         />
+        <FilterItem 
+          label="Free Access" 
+          value="free" 
+          count={counts.free} 
+          onClick={() => setFilter('free')} 
+        />
+        <FilterItem 
+          label="Premium King" 
+          value="premium" 
+          count={counts.premium} 
+          onClick={() => setFilter('premium')} 
+        />
 
       </FilterGroup>
 

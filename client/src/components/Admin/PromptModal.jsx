@@ -11,6 +11,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     description: '',
     ai_type: 'ChatGPT',
     password: '',
+    is_premium: false,
     image_ratio: '4 / 5',
     is_image_slider: false
   });
@@ -42,6 +43,12 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+ 
+    // Validation: Premium content MUST have a password
+    if (formData.is_premium && (!formData.password || formData.password.trim() === '')) {
+      alert("⚠️ SECURITY REQUIRED: Premium content must have an unlock PIN/Password.");
+      return;
+    }
 
     try {
       await api.post('/admin/save_prompt', { ...formData, originalKey });
@@ -175,9 +182,10 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                   onEditorChange={(content) => setFormData({ ...formData, description: content })}
                   init={{
                     height: 400,
-                    menubar: true,
-                    license_key: 'gpl',
+                    base_url: '/tinymce',
+                    suffix: '.min',
                     promotion: false,
+                    license_key: 'gpl',
                     plugins: [
                       'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                       'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
@@ -219,6 +227,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                 <Label text="Presentation Mode" />
                 <div style={{ display: 'flex', gap: '30px', marginTop: '15px' }}>
                   <Checkbox label="Enable Contrast Slider" checked={formData.is_image_slider} onChange={(val) => setFormData({...formData, is_image_slider: val})} />
+                  <Checkbox label="Premium Content" premium checked={formData.is_premium} onChange={(val) => setFormData({...formData, is_premium: val, password: val ? formData.password : ''})} />
                 </div>
               </div>
             </div>
@@ -265,6 +274,20 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
             <div style={{ gridColumn: 'span 2', marginTop: '20px' }}>
               <SectionTitle title="Access & Monetization" />
             </div>
+
+            {formData.is_premium && (
+              <div style={{ gridColumn: 'span 1' }}>
+                <Label text="Unlock PIN Code" />
+                <input 
+                  type="text" 
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="glass-input"
+                  placeholder="4-8 Digit PIN"
+                  style={{ width: '100%', padding: '14px', borderRadius: '14px' }}
+                />
+              </div>
+            )}
 
             <div style={{ gridColumn: 'span 1' }}>
               <Label text="Monetization URL (YT Shorts)" />

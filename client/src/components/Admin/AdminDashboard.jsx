@@ -820,6 +820,7 @@ const AdminDashboard = () => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px', marginBottom: '48px' }}>
                 <StatCard label="Total Prompts" value={stats.prompts} color="#ff4d4d" icon={<TableProperties size={24} />} />
                 <StatCard label="Copy Interactions" value={stats.copies} color="#3b82f6" icon={<Activity size={24} />} />
+                <StatCard label="Unlocks Generated" value={stats.unlocks} color="#fbbf24" icon={<Layers size={24} />} />
                 <StatCard label="Social Likes" value={stats.likes} color="#ec4899" icon={<Activity size={24} />} />
               </div>
               <div style={{ ...glassPanelStyle, padding: '40px', textAlign: 'center' }}>
@@ -878,7 +879,8 @@ const AdminDashboard = () => {
                       {view === 'prompts' && (
                         <td style={{ padding: '20px 24px' }}>
                           <div style={{ display: 'flex', gap: '8px' }}>
-                            <span style={{ padding: '4px 12px', background: 'rgba(255,191,38,0.1)', color: '#fbbf24', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700 }}>{item.copy_count || 0} COPIES</span>
+                            <span style={{ padding: '4px 12px', background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700 }}>{item.is_premium ? 'PREMIUM' : 'FREE'}</span>
+                            <span style={{ padding: '4px 12px', background: 'rgba(255,191,38,0.1)', color: '#fbbf24', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700 }}>{item.unlock_count || 0}</span>
                           </div>
                         </td>
                       )}
