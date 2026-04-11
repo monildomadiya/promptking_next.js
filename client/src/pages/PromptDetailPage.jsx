@@ -196,11 +196,12 @@ const PromptDetailPage = ({ adsSettings }) => {
       }
       
       // Relock automatically after copy if password-protected or premium
+      if (prompt.isPremium || prompt.password) {
+        setIsUnlocked(false);
+        setPin(''); // Reset PIN for next use
+      }
+
       setTimeout(() => {
-        if (prompt.isPremium || prompt.password) {
-          setIsUnlocked(false);
-          setPin(''); // Reset PIN for next use
-        }
         setIsCopied(false);
       }, 1000);
     } catch (err) {
