@@ -90,13 +90,17 @@ const PromptDetailPage = ({ adsSettings }) => {
     if (inputPass === targetPass) {
       setIsUnlocked(true);
       triggerConfetti();
+      
       // Auto-center the box so the user sees the unlocked content
       setTimeout(() => {
         const box = document.getElementById('box-detail');
         if (box) {
-          box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          const yOffset = -window.innerHeight / 2 + box.clientHeight / 2;
+          const y = box.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
         }
       }, 100);
+
       try {
         await api.post('/record_unlock', { key: prompt.key }); // Record as unlock
       } catch (err) {
@@ -116,8 +120,15 @@ const PromptDetailPage = ({ adsSettings }) => {
   const contentRef = React.useRef(null);
 
   useEffect(() => {
-    // Scroll into view removed to eliminate scroll animation effects
-  }, [isUnlocked]);
+    if (isUnlocked && prompt?.password) {
+      const box = document.getElementById('box-detail');
+      if (box) {
+        setTimeout(() => {
+          box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
+      }
+    }
+  }, [isUnlocked, prompt?.password]);
 
   const triggerConfetti = () => {
     const box = document.getElementById(`box-detail`);
@@ -184,15 +195,14 @@ const PromptDetailPage = ({ adsSettings }) => {
         });
       }
       
-      // Relock immediately for Premium content
-      if (prompt.isPremium) {
-        setIsUnlocked(false);
-      }
-      
+      // Relock automatically after copy if password-protected or premium
       setTimeout(() => {
+        if (prompt.isPremium || prompt.password) {
+          setIsUnlocked(false);
+          setPin(''); // Reset PIN for next use
+        }
         setIsCopied(false);
-        setPin(''); // Reset PIN
-      }, 800);
+      }, 1000);
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
