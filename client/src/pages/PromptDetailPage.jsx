@@ -19,6 +19,7 @@ const PromptDetailPage = ({ adsSettings }) => {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [showError, setShowError] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [isRelocking, setIsRelocking] = useState(false);
   const [suggestedPrompts, setSuggestedPrompts] = useState([]);
   const [showVideoModal, setShowVideoModal] = useState(false);
 
@@ -197,8 +198,12 @@ const PromptDetailPage = ({ adsSettings }) => {
       
       // Relock automatically after copy if password-protected or premium
       if (prompt.isPremium || prompt.password) {
+        setIsRelocking(true);
         setIsUnlocked(false);
         setPin(''); // Reset PIN for next use
+        setTimeout(() => {
+          setIsRelocking(false);
+        }, 1000);
       }
 
       setTimeout(() => {
@@ -463,7 +468,7 @@ const PromptDetailPage = ({ adsSettings }) => {
             {/* Right Column: Prompt Vault & Buttons */}
             <div className="prompt-vault-column" style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
               {/* Interactive Vault Section */}
-              <div id="box-detail" className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse' : ''}`} style={{
+              <div id="box-detail" className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse' : ''} ${isRelocking ? 'vault-relock-animate' : ''}`} style={{
               background: 'rgba(15, 15, 20, 0.4)', 
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
@@ -499,7 +504,8 @@ const PromptDetailPage = ({ adsSettings }) => {
                   filter: (isUnlocked) ? 'none' : 'blur(12px)', 
                   WebkitFilter: (isUnlocked) ? 'none' : 'blur(12px)',
                   userSelect: (isUnlocked) ? 'text' : 'none', 
-                  overflowY: (isUnlocked) ? 'auto' : 'hidden'
+                  overflowY: (isUnlocked) ? 'auto' : 'hidden',
+                  transition: 'filter 0.5s ease-out, -webkit-filter 0.5s ease-out'
                 }}>
                   {prompt.promptText}
                 </div>
@@ -557,7 +563,7 @@ const PromptDetailPage = ({ adsSettings }) => {
                 )}
 
                 {!isUnlocked && (
-                  <div style={{ 
+                  <div className={isRelocking ? 'lock-overlay-animate' : ''} style={{ 
                     position: 'absolute', inset: 0, background: 'rgba(10, 10, 12, 0.8)', 
                     backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '30px', zIndex: 10, gap: '20px'

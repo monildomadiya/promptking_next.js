@@ -837,3 +837,35 @@ body.shorts-modal-open {
     font-size: 1.4rem !important;
   }
 }
+
+/* ── Relock Animation Definitions ──────────────────────── */
+@keyframes lockOverlayDrop {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+    background: rgba(229, 9, 20, 0.4);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    background: rgba(10, 10, 12, 0.8);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+}
+
+.lock-overlay-animate {
+  animation: lockOverlayDrop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes lockVaultPulse {
+  0% { transform: scale(1.02); box-shadow: 0 0 0 0 rgba(229, 9, 20, 0.7); border-color: rgba(229, 9, 20, 0.8); }
+  50% { transform: scale(0.98); box-shadow: 0 0 30px rgba(229, 9, 20, 0.5); border-color: rgba(229, 9, 20, 0.6); }
+  100% { transform: scale(1); box-shadow: none; border-color: rgba(255,255,255,0.08); }
+}
+
+.vault-relock-animate {
+  animation: lockVaultPulse 0.6s ease-out forwards;
+}
