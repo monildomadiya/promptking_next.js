@@ -4,6 +4,7 @@ const db = require('../db');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const sharp = require('sharp');
 
 // Safety Guard: Prevent infinite self-referential DDOS in production fallbacks
@@ -487,36 +488,61 @@ router.post('/record_unlock', async (req, res) => {
 
 
 // --- 7. ADMIN ENDPOINTS (Restricted) ---
-const adminAuth = (req, res, next) => {
-  const isLocal = req.hostname === 'localhost' || req.hostname === '127.0.0.1';
-  const pinHeader = req.headers['x-admin-pin'];
-  const expectedPin = (process.env.ADMIN_PASSWORD || 'admin');
-  const hasValidHeader = pinHeader === expectedPin;
 
-  if (hasValidHeader || req.session.isAdmin || isLocal) {
-    if (isLocal && !req.session.isAdmin) {
-      req.session.isAdmin = true;
-    }
+// State for Session Tokens and Rate Limiting
+const validAdminTokens = new Set();
+const loginAttempts = new Map(); // IP -> { count, timestamp }
+
+// Rate Limit logic: 5 fails per 15 minutes
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_MS = 15 * 60 * 1000; 
+
+const adminAuth = (req, res, next) => {
+  const tokenHeader = req.headers['x-admin-token'];
+
+  if (req.session.isAdmin || (tokenHeader && validAdminTokens.has(tokenHeader))) {
     return next();
   }
 
-  console.warn(`[AdminAuth] Rejected request from ${req.hostname}. Header Pin: ${pinHeader ? 'Provided' : 'Missing'}, Session: ${req.session.isAdmin ? 'Valid' : 'Invalid'}`);
+  console.warn(`[AdminAuth] Rejected SECURE request from IP ${req.ip || 'Unknown'}. Token Provided: ${!!tokenHeader}`);
   res.status(401).json({ error: "Admin access required" });
 };
 
 router.get('/admin/check_auth', (req, res) => {
-  const isLocal = req.hostname === 'localhost' || req.hostname === '127.0.0.1';
-  const hasValidHeader = req.headers['x-admin-pin'] === (process.env.ADMIN_PASSWORD || 'admin');
-  res.json({ isAdmin: !!(req.session.isAdmin || isLocal || hasValidHeader) });
+  const tokenHeader = req.headers['x-admin-token'];
+  res.json({ isAdmin: !!(req.session.isAdmin || (tokenHeader && validAdminTokens.has(tokenHeader))) });
 });
 
 router.post('/admin/login', (req, res) => {
+  const ip = req.ip || req.connection.remoteAddress;
+  
+  // Check Rate Limit
+  const attempt = loginAttempts.get(ip);
+  if (attempt) {
+    if (Date.now() - attempt.timestamp > LOCKOUT_MS) {
+      loginAttempts.delete(ip); // lock expired
+    } else if (attempt.count >= MAX_ATTEMPTS) {
+      return res.status(429).json({ error: "Too many failed attempts. Security lock engaged. Try again in 15 minutes." });
+    }
+  }
+
   const { password } = req.body;
   if (password === (process.env.ADMIN_PASSWORD || 'admin')) {
+    // Reset attempts on success
+    loginAttempts.delete(ip);
+    
+    // Issue secure session token
+    const token = crypto.randomUUID();
+    validAdminTokens.add(token);
+    
     req.session.isAdmin = true;
-    res.json({ status: "success" });
+    res.json({ status: "success", token });
   } else {
-    res.status(401).json({ error: "Invalid password" });
+    // Record Failure
+    const currentCount = attempt ? attempt.count : 0;
+    loginAttempts.set(ip, { count: currentCount + 1, timestamp: Date.now() });
+    
+    res.status(401).json({ error: "Invalid PIN" });
   }
 });
 
@@ -609,6 +635,8 @@ router.post('/admin/upload_image', adminAuth, logoUpload.single('image'), async 
 });
 
 router.get('/admin/logout', (req, res) => {
+  const tokenHeader = req.headers['x-admin-token'];
+  if (tokenHeader) validAdminTokens.delete(tokenHeader);
   req.session.isAdmin = false;
   res.json({ status: "success" });
 });

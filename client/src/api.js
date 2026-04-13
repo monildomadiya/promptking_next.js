@@ -16,12 +16,12 @@ export const SERVER_URL = getBaseUrl();
 
 const api = {
   get: async (url, options = {}) => {
-    const adminPin = localStorage.getItem('adminPin');
+    const adminToken = localStorage.getItem('adminToken');
     const headers = {
       'Content-Type': 'application/json',
       ...options.headers
     };
-    if (adminPin) headers['X-Admin-Pin'] = adminPin;
+    if (adminToken) headers['x-admin-token'] = adminToken;
     
     const res = await fetch(`${SERVER_URL}/api${url}`, {
       ...options,
@@ -33,12 +33,12 @@ const api = {
     return { data: transformUploadPaths(data) };
   },
   post: async (url, body = {}, options = {}) => {
-    const adminPin = localStorage.getItem('adminPin');
+    const adminToken = localStorage.getItem('adminToken');
     const headers = {
       'Content-Type': 'application/json',
       ...options.headers
     };
-    if (adminPin) headers['X-Admin-Pin'] = adminPin;
+    if (adminToken) headers['x-admin-token'] = adminToken;
     
     const res = await fetch(`${SERVER_URL}/api${url}`, {
       method: 'POST',
@@ -52,11 +52,11 @@ const api = {
     return { data: transformUploadPaths(data) };
   },
   delete: async (url, options = {}) => {
-    const adminPin = localStorage.getItem('adminPin');
+    const adminToken = localStorage.getItem('adminToken');
     const headers = {
       ...options.headers
     };
-    if (adminPin) headers['X-Admin-Pin'] = adminPin;
+    if (adminToken) headers['x-admin-token'] = adminToken;
     
     // Note: Don't set Content-Type for DELETE if body is empty
     if (options.body) headers['Content-Type'] = 'application/json';

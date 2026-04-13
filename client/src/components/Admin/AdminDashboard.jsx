@@ -635,16 +635,26 @@ const AdminDashboard = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/admin/login', { password });
-      localStorage.setItem('adminPin', password);
-      setIsAdmin(true);
-      fetchData('prompts');
-    } catch (e) { alert("Invalid PIN"); }
+      const response = await api.post('/admin/login', { password });
+      if (response.data && response.data.error) {
+        alert(response.data.error);
+        return;
+      }
+      if (response.data && response.data.token) {
+        localStorage.setItem('adminToken', response.data.token);
+        setIsAdmin(true);
+        fetchData('prompts');
+      } else {
+        alert("Authentication failed.");
+      }
+    } catch (e) { 
+      alert("Network or authentication error."); 
+    }
   };
 
   const handleLogout = async () => {
     await api.get('/admin/logout');
-    localStorage.removeItem('adminPin');
+    localStorage.removeItem('adminToken');
     setIsAdmin(false);
   };
 

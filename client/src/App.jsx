@@ -36,7 +36,7 @@ function AppContent() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [headerHeight, setHeaderHeight] = useState(isMobile ? 85 : 130);
   const location = useLocation();
-  const isAdminPath = /^\/admin(\/|$)/i.test(location.pathname);
+  const isAdminPath = /^\/admin-secure(\/|$)/i.test(location.pathname);
 
   const fetchAdminStatus = async () => {
     try {
@@ -125,7 +125,7 @@ function AppContent() {
         <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<HomePage search={search} filter={filter} setFilter={setFilter} isMobile={isMobile} />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin-secure" element={<AdminDashboard />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/article/:slug" element={<ArticlePage />} />
           <Route path="/contact" element={<ContactPage />} />
