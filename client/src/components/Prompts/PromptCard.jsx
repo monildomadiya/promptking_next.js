@@ -10,6 +10,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
   const [pin, setPin] = useState('');
   const [showError, setShowError] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [isRelocking, setIsRelocking] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isSnapping, setIsSnapping] = useState(false);
@@ -139,11 +140,17 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
       setIsCopied(true);
       
       // Feedback Animation: Success pulse and Confetti
-      if (prompt.isPremium) {
-        setIsSnapping(true);
-        triggerSnapConfetti();
-        // Clear PIN instantly for security
-        setPin(''); 
+      if (prompt.isPremium || prompt.password) {
+        setIsRelocking(true);
+        setPin(''); // Clear PIN instantly for security
+        
+        // Hard Relock (Snappy 1000ms for Protected to allow Copied! feedback)
+        setTimeout(() => {
+          setIsCopied(false);
+          setIsSnapping(false);
+          setIsRelocking(false);
+          onLock(); // Tell parent to relock
+        }, 1000);
       } else {
         // Enhanced Celebration for Free Content
         const box = document.getElementById(`box-${prompt.key}`);
@@ -163,16 +170,12 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
           confetti({ ...defaults, particleCount: count, spread: 30, startVelocity: 45 });
           confetti({ ...defaults, particleCount: 40, spread: 60, startVelocity: 25 });
         }
+        
+        setTimeout(() => {
+          setIsCopied(false);
+          setIsSnapping(false);
+        }, 2000);
       }
-      
-      // Hard Relock (Snappy 100ms for Premium, 2000ms for Free to allow Copied! feedback)
-      setTimeout(() => {
-        setIsSnapping(false);
-        setIsCopied(false);
-        if (prompt.isPremium) {
-          onLock(); // Tell parent to relock
-        }
-      }, prompt.isPremium ? 100 : 2000);
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
@@ -379,7 +382,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
 
       {/* Prompt Area */}
       <div style={{ transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }}>
-        <div id={`box-${prompt.key}`} className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isSnapping ? 'thanos-snap' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse' : ''}`} style={{
+        <div id={`box-${prompt.key}`} className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isSnapping ? 'thanos-snap' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse' : ''} ${isRelocking ? 'vault-relock-animate' : ''}`} style={{
             background: 'rgba(15, 15, 20, 0.4)', 
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
@@ -431,10 +434,11 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
                 position: 'absolute', inset: 0, padding: isMobile ? '15px 15px 45px 15px' : '24px 24px 60px 24px', 
                 fontFamily: '"JetBrains Mono", "Fira Code", Consolas, monospace', 
                 fontSize: isMobile ? '0.82rem' : '0.9rem', color: '#a1a1aa', lineHeight: isMobile ? 1.6 : 1.8,
-                filter: (isUnlocked) ? 'none' : 'blur(10px)', 
-                WebkitFilter: (isUnlocked) ? 'none' : 'blur(10px)',
-                userSelect: (isUnlocked) ? 'text' : 'none', 
-                overflowY: (isUnlocked) ? 'auto' : 'hidden'
+                filter: (isUnlocked && !isRelocking) ? 'none' : 'blur(10px)', 
+                WebkitFilter: (isUnlocked && !isRelocking) ? 'none' : 'blur(10px)',
+                userSelect: (isUnlocked && !isRelocking) ? 'text' : 'none', 
+                overflowY: (isUnlocked && !isRelocking) ? 'auto' : 'hidden',
+                transition: 'filter 0.5s ease-out, -webkit-filter 0.5s ease-out'
               }}>
                 <HighlightText text={prompt.promptText} highlight={searchTerm} />
               </div>
@@ -492,10 +496,9 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
                 </button>
               )}
 
-              {!isUnlocked && (
-                <div style={{ 
-                  position: 'absolute', inset: 0, background: 'rgba(10, 10, 12, 0.85)', 
-                  backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+              {(!isUnlocked || isRelocking) && (
+                <div className={`lock-overlay-base ${isRelocking ? 'lock-overlay-animate' : ''}`} style={{ 
+                  position: 'absolute', inset: 0, 
                   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px 12px', zIndex: 10, gap: '10px'
                 }}>
                   <div style={{ 
