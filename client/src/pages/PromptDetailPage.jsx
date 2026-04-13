@@ -196,12 +196,11 @@ const PromptDetailPage = ({ adsSettings }) => {
         });
       }
       
-      // Relock automatically after copy if password-protected or premium
       if (prompt.isPremium || prompt.password) {
         setIsRelocking(true);
-        setIsUnlocked(false);
         setPin(''); // Reset PIN for next use
         setTimeout(() => {
+          setIsUnlocked(false);
           setIsRelocking(false);
         }, 1000);
       }
@@ -501,10 +500,10 @@ const PromptDetailPage = ({ adsSettings }) => {
               <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ 
                   position: 'absolute', inset: 0, padding: '25px', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.9rem', color: '#fff', lineHeight: 1.8,
-                  filter: (isUnlocked) ? 'none' : 'blur(12px)', 
-                  WebkitFilter: (isUnlocked) ? 'none' : 'blur(12px)',
-                  userSelect: (isUnlocked) ? 'text' : 'none', 
-                  overflowY: (isUnlocked) ? 'auto' : 'hidden',
+                  filter: (isUnlocked && !isRelocking) ? 'none' : 'blur(12px)', 
+                  WebkitFilter: (isUnlocked && !isRelocking) ? 'none' : 'blur(12px)',
+                  userSelect: (isUnlocked && !isRelocking) ? 'text' : 'none', 
+                  overflowY: (isUnlocked && !isRelocking) ? 'auto' : 'hidden',
                   transition: 'filter 0.5s ease-out, -webkit-filter 0.5s ease-out'
                 }}>
                   {prompt.promptText}
@@ -562,10 +561,9 @@ const PromptDetailPage = ({ adsSettings }) => {
                   </button>
                 )}
 
-                {!isUnlocked && (
-                  <div className={isRelocking ? 'lock-overlay-animate' : ''} style={{ 
-                    position: 'absolute', inset: 0, background: 'rgba(10, 10, 12, 0.8)', 
-                    backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)',
+                {(!isUnlocked || isRelocking) && (
+                  <div className={`lock-overlay-base ${isRelocking ? 'lock-overlay-animate' : ''}`} style={{ 
+                    position: 'absolute', inset: 0,
                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '30px', zIndex: 10, gap: '20px'
                   }}>
                     <div style={{ width: '100%', maxWidth: '200px' }}>

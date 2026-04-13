@@ -839,6 +839,12 @@ body.shorts-modal-open {
 }
 
 /* ── Relock Animation Definitions ──────────────────────── */
+.lock-overlay-base {
+  background: rgba(10, 10, 12, 0.8);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
 @keyframes lockOverlayDrop {
   0% {
     opacity: 0;
