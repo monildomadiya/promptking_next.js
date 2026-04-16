@@ -145,23 +145,23 @@ const CustomEditor = ({ value, onChange }) => {
         <select
           onChange={(e) => { exec('formatBlock', e.target.value); e.target.value = ''; }}
           defaultValue=""
-          style={{ padding: '5px 8px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white', fontSize: '0.82rem', cursor: 'pointer' }}
+          className="editor-select"
         >
-          <option value="" disabled>Format</option>
-          <option value="p">Paragraph</option>
-          <option value="h2">Heading 2</option>
-          <option value="h3">Heading 3</option>
-          <option value="h4">Heading 4</option>
+          <option value="" disabled style={{ background: '#111' }}>Format</option>
+          <option value="p" style={{ background: '#111' }}>Paragraph</option>
+          <option value="h2" style={{ background: '#111' }}>Heading 2</option>
+          <option value="h3" style={{ background: '#111' }}>Heading 3</option>
+          <option value="h4" style={{ background: '#111' }}>Heading 4</option>
         </select>
 
         {/* Font size */}
         <select
           onChange={(e) => { exec('fontSize', e.target.value); e.target.value = ''; }}
           defaultValue=""
-          style={{ padding: '5px 8px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white', fontSize: '0.82rem', cursor: 'pointer' }}
+          className="editor-select"
         >
-          <option value="" disabled>Size</option>
-          {[1,2,3,4,5,6,7].map(s => <option key={s} value={s}>Size {s}</option>)}
+          <option value="" disabled style={{ background: '#111' }}>Size</option>
+          {[1,2,3,4,5,6,7].map(s => <option key={s} value={s} style={{ background: '#111' }}>Size {s}</option>)}
         </select>
         <Divider />
 
@@ -251,6 +251,29 @@ const CustomEditor = ({ value, onChange }) => {
         .custom-editor-content .editor-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
         .custom-editor-content img { max-width: 100%; height: auto; border-radius: 12px; margin: 12px 0; display: block; }
         .custom-editor-content .yt-embed-wrap iframe { border-radius: 12px; }
+        
+        .editor-select {
+          padding: 5px 12px;
+          background: rgba(255, 255, 255, 0.05) !important;
+          border: 1px solid rgba(255, 255, 255, 0.1) !important;
+          border-radius: 10px;
+          color: white !important;
+          font-size: 0.82rem;
+          cursor: pointer;
+          transition: 0.2s;
+          outline: none;
+        }
+        
+        .editor-select:hover {
+          background: rgba(255, 255, 255, 0.1) !important;
+          border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .editor-select option {
+          background: #0e0e0e !important;
+          color: white !important;
+          padding: 10px;
+        }
       `}</style>
 
       {/* === YOUTUBE MODAL === */}
