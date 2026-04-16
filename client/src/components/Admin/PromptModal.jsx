@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../../api';
 import { X, Save, Image, Code, Star, Shield, Zap, Sparkles, Smartphone, PlusCircle, FileText, Activity } from '../Common/Icons';
 import CustomEditor from './CustomEditor';
@@ -18,6 +18,8 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
   });
   const [originalKey, setOriginalKey] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [galleryUploading, setGalleryUploading] = useState(false);
+  const galleryInputRef = useRef(null);
 
   useEffect(() => {
     api.get('/categories').then(res => setCategories(res.data));
@@ -250,9 +252,102 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
             </div>
 
             <div style={{ gridColumn: 'span 2' }}>
-              <Label text="Gallery Images (Optional)" />
-              <textarea 
-                placeholder="Enter image URLs, one per line..."
+              <Label text="Gallery Images (Optional)" icon={<Image size={14} />} />
+
+              {/* Upload Button */}
+              <input
+                ref={galleryInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                style={{ display: 'none' }}
+                onChange={async (e) => {
+                  const files = Array.from(e.target.files);
+                  if (!files.length) return;
+                  setGalleryUploading(true);
+                  try {
+                    const uploadedUrls = [];
+                    for (const file of files) {
+                      const fd = new FormData();
+                      fd.append('image', file);
+                      const res = await api.post('/admin/upload_image', fd, {
+                        headers: { 'Content-Type': 'multipart/form-data' }
+                      });
+                      if (res.data?.imageUrl) uploadedUrls.push(res.data.imageUrl);
+                    }
+                    const existing = (() => { try { return JSON.parse(formData.gallery_urls || '[]'); } catch(e) { return []; } })();
+                    setFormData({ ...formData, gallery_urls: JSON.stringify([...existing, ...uploadedUrls]) });
+                  } catch(err) {
+                    alert('Upload failed. Please try again.');
+                  } finally {
+                    setGalleryUploading(false);
+                    e.target.value = '';
+                  }
+                }}
+              />
+
+              <div
+                onClick={() => !galleryUploading && galleryInputRef.current?.click()}
+                style={{
+                  border: '2px dashed rgba(255,255,255,0.12)',
+                  borderRadius: '18px',
+                  padding: '28px',
+                  textAlign: 'center',
+                  cursor: galleryUploading ? 'wait' : 'pointer',
+                  background: 'rgba(255,255,255,0.02)',
+                  transition: '0.2s',
+                  marginBottom: '14px'
+                }}
+                onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent-main)'}
+                onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'}
+              >
+                {galleryUploading ? (
+                  <>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: '3px solid rgba(255,255,255,0.1)', borderTop: '3px solid var(--accent-main)', animation: 'rotation 0.8s linear infinite', margin: '0 auto 10px' }} />
+                    <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', margin: 0 }}>Uploading images...</p>
+                  </>
+                ) : (
+                  <>
+                    <Image size={28} style={{ color: 'rgba(255,255,255,0.25)', marginBottom: '10px' }} />
+                    <p style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 700, margin: '0 0 4px', fontSize: '0.95rem' }}>Click to Upload Images</p>
+                    <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem', margin: 0 }}>Select multiple images at once — JPG, PNG, WebP</p>
+                  </>
+                )}
+              </div>
+
+              {/* Uploaded Image Preview Grid */}
+              {(() => {
+                let imgs = [];
+                try { imgs = JSON.parse(formData.gallery_urls || '[]'); } catch(e) {}
+                if (!Array.isArray(imgs) || imgs.length === 0) return <Hint text="No gallery images yet. Upload or paste URLs below." />;
+                return (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px', marginBottom: '14px' }}>
+                    {imgs.map((url, idx) => (
+                      <div key={idx} style={{ position: 'relative', aspectRatio: '1/1', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: '#111' }}>
+                        <img src={url} alt={`Gallery ${idx+1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = imgs.filter((_, i) => i !== idx);
+                            setFormData({ ...formData, gallery_urls: JSON.stringify(updated) });
+                          }}
+                          style={{
+                            position: 'absolute', top: '5px', right: '5px',
+                            background: 'rgba(0,0,0,0.7)', border: 'none', color: 'white',
+                            width: '22px', height: '22px', borderRadius: '50%', cursor: 'pointer',
+                            fontSize: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            lineHeight: 1
+                          }}
+                        >✕</button>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+
+              {/* Manual URL Input */}
+              <textarea
+                placeholder="Or paste image URLs here, one per line..."
                 value={(() => {
                   try {
                     const parsed = JSON.parse(formData.gallery_urls || '[]');
@@ -264,9 +359,8 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                   setFormData({ ...formData, gallery_urls: JSON.stringify(urls) });
                 }}
                 className="glass-input"
-                style={{ width: '100%', minHeight: '100px', padding: '14px', borderRadius: '14px', fontSize: '0.9rem', lineHeight: '1.6' }}
+                style={{ width: '100%', minHeight: '80px', padding: '12px 14px', borderRadius: '12px', fontSize: '0.85rem', lineHeight: '1.6' }}
               />
-              <Hint text="These will be displayed as a responsive gallery below the main content." />
             </div>
 
             {/* Section: Security */}
