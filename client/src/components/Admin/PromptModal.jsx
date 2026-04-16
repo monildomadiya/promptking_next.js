@@ -18,8 +18,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
   });
   const [originalKey, setOriginalKey] = useState(null);
   const [categories, setCategories] = useState([]);
-  const [galleryUploading, setGalleryUploading] = useState(false);
-  const galleryInputRef = useRef(null);
+  const [galleryUrl, setGalleryUrl] = useState('');
 
   useEffect(() => {
     api.get('/categories').then(res => setCategories(res.data));
@@ -254,77 +253,60 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
             <div style={{ gridColumn: 'span 2' }}>
               <Label text="Gallery Images (Optional)" icon={<Image size={14} />} />
 
-              {/* Upload Button */}
-              <input
-                ref={galleryInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                style={{ display: 'none' }}
-                onChange={async (e) => {
-                  const files = Array.from(e.target.files);
-                  if (!files.length) return;
-                  setGalleryUploading(true);
-                  try {
-                    const uploadedUrls = [];
-                    for (const file of files) {
-                      const fd = new FormData();
-                      fd.append('image', file);
-                      const res = await api.post('/admin/upload_image', fd, {
-                        headers: { 'Content-Type': 'multipart/form-data' }
-                      });
-                      if (res.data?.imageUrl) uploadedUrls.push(res.data.imageUrl);
+              {/* URL Input Row */}
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '14px' }}>
+                <input
+                  type="text"
+                  placeholder="Paste image URL here..."
+                  value={galleryUrl}
+                  onChange={(e) => setGalleryUrl(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const url = galleryUrl.trim();
+                      if (!url) return;
+                      const existing = (() => { try { return JSON.parse(formData.gallery_urls || '[]'); } catch(err) { return []; } })();
+                      setFormData({ ...formData, gallery_urls: JSON.stringify([...existing, url]) });
+                      setGalleryUrl('');
                     }
-                    const existing = (() => { try { return JSON.parse(formData.gallery_urls || '[]'); } catch(e) { return []; } })();
-                    setFormData({ ...formData, gallery_urls: JSON.stringify([...existing, ...uploadedUrls]) });
-                  } catch(err) {
-                    alert('Upload failed. Please try again.');
-                  } finally {
-                    setGalleryUploading(false);
-                    e.target.value = '';
-                  }
-                }}
-              />
-
-              <div
-                onClick={() => !galleryUploading && galleryInputRef.current?.click()}
-                style={{
-                  border: '2px dashed rgba(255,255,255,0.12)',
-                  borderRadius: '18px',
-                  padding: '28px',
-                  textAlign: 'center',
-                  cursor: galleryUploading ? 'wait' : 'pointer',
-                  background: 'rgba(255,255,255,0.02)',
-                  transition: '0.2s',
-                  marginBottom: '14px'
-                }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent-main)'}
-                onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'}
-              >
-                {galleryUploading ? (
-                  <>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: '3px solid rgba(255,255,255,0.1)', borderTop: '3px solid var(--accent-main)', animation: 'rotation 0.8s linear infinite', margin: '0 auto 10px' }} />
-                    <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', margin: 0 }}>Uploading images...</p>
-                  </>
-                ) : (
-                  <>
-                    <Image size={28} style={{ color: 'rgba(255,255,255,0.25)', marginBottom: '10px' }} />
-                    <p style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 700, margin: '0 0 4px', fontSize: '0.95rem' }}>Click to Upload Images</p>
-                    <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem', margin: 0 }}>Select multiple images at once — JPG, PNG, WebP</p>
-                  </>
-                )}
+                  }}
+                  className="glass-input"
+                  style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', fontSize: '0.9rem' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const url = galleryUrl.trim();
+                    if (!url) return;
+                    const existing = (() => { try { return JSON.parse(formData.gallery_urls || '[]'); } catch(err) { return []; } })();
+                    setFormData({ ...formData, gallery_urls: JSON.stringify([...existing, url]) });
+                    setGalleryUrl('');
+                  }}
+                  style={{
+                    padding: '12px 20px', borderRadius: '12px', background: 'var(--accent-main)',
+                    color: 'white', border: 'none', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer',
+                    whiteSpace: 'nowrap'
+                  }}
+                >+ Add</button>
               </div>
 
-              {/* Uploaded Image Preview Grid */}
+              {/* Added URLs List */}
               {(() => {
                 let imgs = [];
                 try { imgs = JSON.parse(formData.gallery_urls || '[]'); } catch(e) {}
-                if (!Array.isArray(imgs) || imgs.length === 0) return <Hint text="No gallery images yet. Upload or paste URLs below." />;
+                if (!Array.isArray(imgs) || imgs.length === 0) {
+                  return <Hint text="No gallery images yet. Paste a URL above and click + Add." />;
+                }
                 return (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px', marginBottom: '14px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {imgs.map((url, idx) => (
-                      <div key={idx} style={{ position: 'relative', aspectRatio: '1/1', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: '#111' }}>
-                        <img src={url} alt={`Gallery ${idx+1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <div key={idx} style={{
+                        display: 'flex', alignItems: 'center', gap: '10px',
+                        background: 'rgba(255,255,255,0.03)', borderRadius: '10px',
+                        border: '1px solid rgba(255,255,255,0.06)', padding: '8px 12px'
+                      }}>
+                        <img src={url} alt={`img ${idx+1}`} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', flexShrink: 0, background: '#111' }} onError={e => e.target.style.display='none'} />
+                        <span style={{ flex: 1, fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{url}</span>
                         <button
                           type="button"
                           onClick={() => {
@@ -332,35 +314,18 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                             setFormData({ ...formData, gallery_urls: JSON.stringify(updated) });
                           }}
                           style={{
-                            position: 'absolute', top: '5px', right: '5px',
-                            background: 'rgba(0,0,0,0.7)', border: 'none', color: 'white',
-                            width: '22px', height: '22px', borderRadius: '50%', cursor: 'pointer',
-                            fontSize: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            lineHeight: 1
+                            background: 'rgba(229,9,20,0.15)', border: '1px solid rgba(229,9,20,0.3)',
+                            color: 'var(--accent-main)', width: '26px', height: '26px', borderRadius: '6px',
+                            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: '0.8rem', flexShrink: 0
                           }}
                         >✕</button>
                       </div>
                     ))}
+                    <Hint text={`${imgs.length} image${imgs.length > 1 ? 's' : ''} added to gallery.`} />
                   </div>
                 );
               })()}
-
-              {/* Manual URL Input */}
-              <textarea
-                placeholder="Or paste image URLs here, one per line..."
-                value={(() => {
-                  try {
-                    const parsed = JSON.parse(formData.gallery_urls || '[]');
-                    return Array.isArray(parsed) ? parsed.join('\n') : '';
-                  } catch(e) { return ''; }
-                })()}
-                onChange={(e) => {
-                  const urls = e.target.value.split('\n').map(u => u.trim()).filter(Boolean);
-                  setFormData({ ...formData, gallery_urls: JSON.stringify(urls) });
-                }}
-                className="glass-input"
-                style={{ width: '100%', minHeight: '80px', padding: '12px 14px', borderRadius: '12px', fontSize: '0.85rem', lineHeight: '1.6' }}
-              />
             </div>
 
             {/* Section: Security */}
