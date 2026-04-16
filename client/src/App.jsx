@@ -33,7 +33,7 @@ function AppContent() {
   const [filter, setFilter] = useState('all');
   const [isAdmin, setIsAdmin] = useState(false);
   const [settings, setSettings] = useState({});
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1100);
   const [headerHeight, setHeaderHeight] = useState(isMobile ? 85 : 130);
   const location = useLocation();
   const isAdminPath = /^\/admin-secure(\/|$)/i.test(location.pathname);

@@ -6,7 +6,7 @@ import AdSenseUnit from '../Ads/AdSenseUnit';
 
 const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilters, onLogoClick, settings, isAdmin, onHeightChange }) => {
   const [logoError, setLogoError] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1100);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -26,7 +26,7 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
   };
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    const handleResize = () => setIsMobile(window.innerWidth <= 1100);
     window.addEventListener('resize', handleResize);
     
     const handleScroll = () => {

@@ -111,7 +111,7 @@ const ArticlePage = () => {
           )}
           
           <h1 style={{ 
-            fontSize: '3rem', 
+            fontSize: window.innerWidth <= 1100 ? '2.2rem' : '3rem', 
             marginBottom: '30px', 
             lineHeight: 1.2, 
             fontWeight: 800, 
@@ -223,7 +223,7 @@ const ArticlePage = () => {
         .blog-content p { margin-bottom: 25px; }
         .blog-content img { max-width: 100%; border-radius: 15px; margin: 30px 0; }
         
-        @media (max-width: 1024px) {
+        @media (max-width: 1100px) {
           .article-layout { grid-template-columns: 1fr; }
           .sidebar { order: 2; margin-top: 40px; }
           .main-content { order: 1; }

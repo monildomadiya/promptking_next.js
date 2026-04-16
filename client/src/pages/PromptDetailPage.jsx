@@ -412,7 +412,12 @@ const PromptDetailPage = ({ adsSettings }) => {
             </div>
 
             {/* Media & Prompt Split Container */}
-            <div className="media-prompt-container">
+            <div className="media-prompt-container" style={{
+              display: 'flex',
+              flexDirection: window.innerWidth <= 1100 ? 'column' : 'row',
+              gap: '40px',
+              alignItems: 'flex-start'
+            }}>
               {/* Hero Section: Image Display */}
             <div className="hero-section glass-panel" style={{
               background: 'rgba(255, 255, 255, 0.02)',
@@ -422,9 +427,11 @@ const PromptDetailPage = ({ adsSettings }) => {
               padding: '12px',
               border: '1px solid rgba(255, 255, 255, 0.05)',
               boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
-              marginBottom: '40px',
+              marginBottom: window.innerWidth <= 1100 ? '20px' : '40px',
               position: 'relative',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              width: window.innerWidth <= 1100 ? '100%' : '55%',
+              flexShrink: 0
             }}>
               <div style={{ borderRadius: '24px', overflow: 'hidden', position: 'relative' }}>
                 {prompt.isImageSlider ? (
@@ -487,7 +494,12 @@ const PromptDetailPage = ({ adsSettings }) => {
             </div>
 
             {/* Right Column: Prompt Vault & Buttons */}
-            <div className="prompt-vault-column" style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+            <div className="prompt-vault-column" style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              width: window.innerWidth <= 1100 ? '100%' : '45%',
+              gap: '20px'
+            }}>
               {/* Interactive Vault Section */}
               <div id="box-detail" className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse' : ''} ${isRelocking ? 'vault-relock-animate' : ''}`} style={{
               background: 'rgba(15, 15, 20, 0.4)', 
@@ -626,14 +638,14 @@ const PromptDetailPage = ({ adsSettings }) => {
                           transition: 'all 0.3s ease'
                         }}
                         onMouseOver={(e) => { 
-                          const isMobile = window.innerWidth <= 768;
+                          const isMobile = window.innerWidth <= 1100;
                           if (!isMobile) {
                             e.currentTarget.style.color = 'white'; 
                             e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; 
                           }
                         }}
                         onMouseOut={(e) => { 
-                          const isMobile = window.innerWidth <= 768;
+                          const isMobile = window.innerWidth <= 1100;
                           if (!isMobile) {
                             e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; 
                             e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; 
