@@ -416,7 +416,8 @@ const PromptDetailPage = ({ adsSettings }) => {
               display: 'flex',
               flexDirection: window.innerWidth <= 1100 ? 'column' : 'row',
               gap: '40px',
-              alignItems: 'flex-start'
+              alignItems: window.innerWidth <= 1100 ? 'flex-start' : 'stretch',
+              marginBottom: window.innerWidth <= 1100 ? '0' : '40px'
             }}>
               {/* Hero Section: Image Display */}
             <div className="hero-section glass-panel" style={{
@@ -427,7 +428,7 @@ const PromptDetailPage = ({ adsSettings }) => {
               padding: '12px',
               border: '1px solid rgba(255, 255, 255, 0.05)',
               boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
-              marginBottom: window.innerWidth <= 1100 ? '20px' : '40px',
+              marginBottom: window.innerWidth <= 1100 ? '20px' : '0',
               position: 'relative',
               overflow: 'hidden',
               width: window.innerWidth <= 1100 ? '100%' : '55%',
@@ -510,7 +511,7 @@ const PromptDetailPage = ({ adsSettings }) => {
               overflow: 'hidden',
               display: 'flex', 
               flexDirection: 'column', 
-              marginBottom: '40px', 
+              marginBottom: window.innerWidth <= 1100 ? '20px' : '0', 
               border: isUnlocked ? (prompt.isPremium ? '2px solid #FFD700' : (isCopied ? '2px solid #27C93F' : '2px solid var(--accent-main)')) : '1px solid rgba(255,255,255,0.08)',
               boxShadow: isUnlocked ? (prompt.isPremium ? '0 15px 50px rgba(255, 215, 0, 0.15)' : (isCopied ? '0 15px 50px rgba(39, 201, 63, 0.3)' : '0 15px 50px rgba(229, 9, 20, 0.2)')) : 'none',
               transform: isUnlocked ? (isCopied && !prompt.isPremium ? 'scale(1.02)' : 'scale(1.01)') : 'scale(1)',
@@ -692,8 +693,8 @@ const PromptDetailPage = ({ adsSettings }) => {
                   border: 'none', padding: '18px', borderRadius: '20px', fontWeight: 900, fontSize: '1.1rem', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', transition: '0.3s ease',
                   boxShadow: isCopied ? '0 0 30px rgba(39, 201, 63, 0.3)' : '0 10px 30px rgba(0,0,0,0.3)',
-                  marginTop: '20px',
-                  marginBottom: '10px'
+                  marginTop: '0px',
+                  marginBottom: window.innerWidth <= 1100 ? '20px' : '0'
                 }}
               >
                 {isCopied ? <><Check size={22} /> Copied!</> : <><Copy size={22} /> Copy Full Prompt</>}
