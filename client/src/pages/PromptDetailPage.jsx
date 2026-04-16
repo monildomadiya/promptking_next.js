@@ -740,6 +740,37 @@ const PromptDetailPage = ({ adsSettings }) => {
               />
             </div>
 
+            {/* NEW: How to Use Prompt Section */}
+            <section className="how-to-use-section" style={{ padding: '30px 0', borderTop: '1px solid rgba(255,255,255,0.05)', marginTop: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
+                <div style={{ width: '4px', height: '24px', background: 'var(--accent-main)', borderRadius: '2px' }} />
+                <h2 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0, color: 'white' }}>
+                  How to Use this AI Prompt?
+                </h2>
+              </div>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+                {[
+                  { step: "01", title: "Copy Prompt", desc: "Click the copy button above to get the full prompt text with optimized parameters." },
+                  { step: "02", title: "Select AI Tool", desc: "Open ChatGPT, Midjourney, or Gemini depending on the prompt category." },
+                  { step: "03", title: "Paste & Edit", desc: "Paste the prompt and replace any [bracketed text] with your specific details." },
+                  { step: "04", title: "Generate Result", desc: "Hit enter and watch the AI create exactly what you've envisioned instantly." }
+                ].map((item, i) => (
+                  <div key={i} style={{ 
+                    background: 'rgba(255,255,255,0.03)', 
+                    padding: '24px', 
+                    borderRadius: '20px', 
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <div style={{ color: 'var(--accent-main)', fontSize: '0.8rem', fontWeight: 900, marginBottom: '10px', opacity: 0.6 }}>STEP {item.step}</div>
+                    <h4 style={{ color: 'white', fontSize: '1.1rem', fontWeight: 700, marginBottom: '10px' }}>{item.title}</h4>
+                    <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', lineHeight: 1.6, margin: 0 }}>{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
             {/* Gallery Section */}
             {(() => {
               let galleryImages = [];
