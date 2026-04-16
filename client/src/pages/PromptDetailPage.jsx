@@ -7,6 +7,7 @@ import Shimmer from '../components/Common/Shimmer';
 import YouTubeModal from '../components/Modals/YouTubeModal';
 import SEOMetadata from '../components/SEO/SEOMetadata';
 import AdSenseUnit from '../components/Ads/AdSenseUnit';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const PromptDetailPage = ({ adsSettings }) => {
   const { key } = useParams();
@@ -22,6 +23,27 @@ const PromptDetailPage = ({ adsSettings }) => {
   const [isRelocking, setIsRelocking] = useState(false);
   const [suggestedPrompts, setSuggestedPrompts] = useState([]);
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (lightboxIndex === null) return;
+      if (e.key === 'Escape') setLightboxIndex(null);
+      if (e.key === 'ArrowRight') setLightboxIndex(prev => {
+        let galleryImages = [];
+        try { const raw = prompt?.gallery_urls || prompt?.galleryUrls; if (raw) galleryImages = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch(err){}
+        return (prev + 1) % galleryImages.length;
+      });
+      if (e.key === 'ArrowLeft') setLightboxIndex(prev => {
+        let galleryImages = [];
+        try { const raw = prompt?.gallery_urls || prompt?.galleryUrls; if (raw) galleryImages = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch(err){}
+        return (prev - 1 + galleryImages.length) % galleryImages.length;
+      });
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [lightboxIndex, prompt]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -675,6 +697,23 @@ const PromptDetailPage = ({ adsSettings }) => {
               videoUrl={prompt.igLink} 
             />
 
+            <div style={{ 
+              marginTop: '10px', 
+              marginBottom: '30px', 
+              padding: '16px 20px', 
+              background: 'rgba(255, 255, 255, 0.02)', 
+              borderRadius: '16px', 
+              border: '1px solid rgba(255, 255, 255, 0.05)',
+              borderLeft: '4px solid var(--accent-main)'
+            }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '0.95rem', color: 'rgba(255,255,255,0.8)' }}>
+                <strong style={{ color: 'white' }}>Tip:</strong> Use different AI tools to get the best results.
+              </p>
+              <p style={{ margin: 0, fontSize: '0.95rem', color: 'rgba(255,255,255,0.8)' }}>
+                <strong style={{ color: 'white' }}>Note:</strong> The final edited image may vary based on the original photo.
+              </p>
+            </div>
+
             {/* Re-inserted copy button above */}
 
             {/* In-Content Ad Placement */}
@@ -700,6 +739,141 @@ const PromptDetailPage = ({ adsSettings }) => {
                 dangerouslySetInnerHTML={{ __html: prompt.description || '' }}
               />
             </div>
+
+            {/* Gallery Section */}
+            {(() => {
+              let galleryImages = [];
+              try {
+                const raw = prompt.gallery_urls || prompt.galleryUrls;
+                if (raw) galleryImages = typeof raw === 'string' ? JSON.parse(raw) : raw;
+              } catch(e) {}
+              if (!Array.isArray(galleryImages) || galleryImages.length === 0) return null;
+              return (
+                <div style={{ marginTop: '40px', marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                    <div style={{ width: '4px', height: '24px', background: 'var(--accent-main)', borderRadius: '2px' }} />
+                    <h3 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0 }}>Image Gallery</h3>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '12px' }}>
+                    {galleryImages.map((imgUrl, idx) => (
+                      <motion.div
+                        key={idx}
+                        onClick={() => setLightboxIndex(idx)}
+                        whileHover={{ scale: 1.04, y: -4 }}
+                        whileTap={{ scale: 0.97 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                        style={{
+                          cursor: 'pointer', borderRadius: '16px', overflow: 'hidden',
+                          aspectRatio: '1 / 1', border: '1px solid rgba(255,255,255,0.08)',
+                          background: '#111', position: 'relative', boxShadow: '0 8px 24px rgba(0,0,0,0.3)'
+                        }}
+                      >
+                        <img
+                          src={imgUrl} alt={`Gallery image ${idx + 1}`} loading="lazy"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                        />
+                        <div style={{
+                          position: 'absolute', inset: 0,
+                          background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 60%)',
+                          display: 'flex', alignItems: 'flex-end', padding: '10px 12px'
+                        }}>
+                          <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.72rem', fontWeight: 700 }}>View ↗</span>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Lightbox */}
+                  <AnimatePresence>
+                    {lightboxIndex !== null && (
+                      <motion.div
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        transition={{ duration: 0.22 }}
+                        onClick={() => setLightboxIndex(null)}
+                        style={{
+                          position: 'fixed', inset: 0, zIndex: 9999,
+                          background: 'rgba(0,0,0,0.93)', backdropFilter: 'blur(24px)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+                        }}
+                      >
+                        {/* Close */}
+                        <button
+                          onClick={() => setLightboxIndex(null)}
+                          style={{
+                            position: 'absolute', top: '20px', right: '24px', zIndex: 10001,
+                            background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+                            color: 'white', width: '44px', height: '44px', borderRadius: '50%',
+                            fontSize: '1.3rem', cursor: 'pointer', display: 'flex',
+                            alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', transition: '0.2s'
+                          }}
+                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(229,9,20,0.5)'}
+                          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+                        >✕</button>
+
+                        {/* Prev */}
+                        {galleryImages.length > 1 && (
+                          <button
+                            onClick={e => { e.stopPropagation(); setLightboxIndex((lightboxIndex - 1 + galleryImages.length) % galleryImages.length); }}
+                            style={{
+                              position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', zIndex: 10001,
+                              background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+                              color: 'white', width: '50px', height: '50px', borderRadius: '50%',
+                              fontSize: '1.5rem', cursor: 'pointer', display: 'flex',
+                              alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', transition: '0.2s'
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+                          >‹</button>
+                        )}
+
+                        {/* Image */}
+                        <motion.img
+                          key={lightboxIndex}
+                          initial={{ opacity: 0, scale: 0.88 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.88 }}
+                          transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+                          src={galleryImages[lightboxIndex]}
+                          alt={`Gallery image ${lightboxIndex + 1}`}
+                          onClick={e => e.stopPropagation()}
+                          style={{
+                            maxWidth: '90vw', maxHeight: '86vh', objectFit: 'contain',
+                            borderRadius: '20px', boxShadow: '0 40px 80px rgba(0,0,0,0.8)',
+                            border: '1px solid rgba(255,255,255,0.08)'
+                          }}
+                        />
+
+                        {/* Next */}
+                        {galleryImages.length > 1 && (
+                          <button
+                            onClick={e => { e.stopPropagation(); setLightboxIndex((lightboxIndex + 1) % galleryImages.length); }}
+                            style={{
+                              position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', zIndex: 10001,
+                              background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+                              color: 'white', width: '50px', height: '50px', borderRadius: '50%',
+                              fontSize: '1.5rem', cursor: 'pointer', display: 'flex',
+                              alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', transition: '0.2s'
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+                          >›</button>
+                        )}
+
+                        {/* Counter */}
+                        <div style={{
+                          position: 'absolute', bottom: '22px', left: '50%', transform: 'translateX(-50%)',
+                          background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(10px)',
+                          border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.7)',
+                          fontSize: '0.8rem', fontWeight: 700, padding: '6px 18px', borderRadius: '20px', letterSpacing: '1px'
+                        }}>
+                          {lightboxIndex + 1} / {galleryImages.length}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Sidebar (Right) */}

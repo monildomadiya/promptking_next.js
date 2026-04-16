@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { X, Image, Sparkles, PlusCircle, FileText, Save, Activity, Camera } from '../Common/Icons';
-import { Editor } from '@tinymce/tinymce-react';
+import CustomEditor from './CustomEditor';
 
 const BlogModal = ({ blog, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -102,34 +102,10 @@ const BlogModal = ({ blog, onClose, onSave }) => {
 
             <div style={{ marginTop: '10px' }}>
               <SectionTitle title="Story Canvas" />
-              <div style={{ borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', marginTop: '20px' }}>
-                <Editor
-                  tinymceScriptSrc="/tinymce/tinymce.min.js"
+              <div style={{ borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', marginTop: '20px', display: 'flex', flexDirection: 'column' }}>
+                <CustomEditor
                   value={formData.content}
-                  onEditorChange={(content) => setFormData({ ...formData, content })}
-                  init={{
-                    height: 600,
-                    base_url: '/tinymce',
-                    suffix: '.min',
-                    menubar: true,
-                    license_key: 'gpl',
-                    promotion: false,
-                    plugins: [
-                      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                      'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons',
-                      'codesample', 'accordion'
-                    ],
-                    toolbar: 'undo redo | accordion accordionremove | blocks fontfamily fontsize | ' +
-                      'bold italic underline strikethrough | forecolor backcolor removeformat | ' +
-                      'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | ' +
-                      'link image media table | emoticons codesample | fullscreen preview code help',
-                    skin: 'oxide-dark',
-                    content_css: 'dark',
-                    toolbar_mode: 'sliding',
-                    contextmenu: 'link image table',
-                    quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
-                  }}
+                  onChange={(content) => setFormData({ ...formData, content })}
                 />
               </div>
             </div>

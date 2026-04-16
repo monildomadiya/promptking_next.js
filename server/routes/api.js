@@ -43,6 +43,7 @@ const MOCK_DATA = {
       hide_prompt_box: 0,
       image_ratio: "4:5",
       is_premium: 1,
+      gallery_urls: '["https://images.unsplash.com/photo-1550751827-4bd374c3f58b", "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5"]',
       copy_count: 156,
       unlock_count: 42,
       like_count: 89
@@ -243,6 +244,7 @@ router.get('/get_data', async (req, res) => {
         imgBefore: p.img_before,
         igLink: p.ig_link,
         imageRatio: p.image_ratio,
+        galleryUrls: p.gallery_urls,
         isPremium: Boolean(p.is_premium)
       }));
       res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
@@ -277,6 +279,7 @@ router.get('/get_data', async (req, res) => {
       imgBefore: row.img_before,
       igLink: row.ig_link,
       imageRatio: row.image_ratio,
+      galleryUrls: row.gallery_urls,
       isPremium: Boolean(row.is_premium)
     }));
 
@@ -401,6 +404,7 @@ router.get('/prompt/:key', async (req, res) => {
       imgBefore: row.img_before,
       igLink: row.ig_link,
       imageRatio: row.image_ratio,
+      galleryUrls: row.gallery_urls,
       isPremium: Boolean(row.is_premium)
     };
     res.json(prompt);
@@ -431,6 +435,7 @@ const processSettings = (data) => {
 };
 
 router.get('/settings', async (req, res) => {
+  if (!isDbHealthy()) return fetchLiveSettings();
   try {
     const rows = await db`SELECT * FROM site_settings`;
     const settings = {};
@@ -724,7 +729,8 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
           is_image_slider = ${!!p.is_image_slider}, 
           image_ratio = ${p.image_ratio}, 
           password = ${p.password}, 
-          is_premium = ${!!p.is_premium} 
+          is_premium = ${!!p.is_premium},
+          gallery_urls = ${p.gallery_urls || null}
         WHERE prompt_key = ${originalKey}
       `;
     } else {
@@ -732,11 +738,11 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
       await db`
         INSERT INTO prompts (
           prompt_key, slug, title, description, ai_type, prompt_text, img_before, img_after, 
-          ig_link, is_image_slider, image_ratio, password, is_premium
+          ig_link, is_image_slider, image_ratio, password, is_premium, gallery_urls
         ) VALUES (
           ${finalKey}, ${finalSlug}, ${p.title}, ${p.description}, ${p.ai_type}, ${p.prompt_text}, 
           ${p.img_before}, ${p.img_after}, ${p.ig_link}, ${!!p.is_image_slider}, 
-          ${p.image_ratio}, ${p.password}, ${!!p.is_premium}
+          ${p.image_ratio}, ${p.password}, ${!!p.is_premium}, ${p.gallery_urls || null}
         )
       `;
     }

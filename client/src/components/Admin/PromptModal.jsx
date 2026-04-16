@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { X, Save, Image, Code, Star, Shield, Zap, Sparkles, Smartphone, PlusCircle, FileText, Activity } from '../Common/Icons';
-import { Editor } from '@tinymce/tinymce-react';
+import CustomEditor from './CustomEditor';
 
 const PromptModal = ({ prompt, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -13,7 +13,8 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     password: '',
     is_premium: false,
     image_ratio: '4 / 5',
-    is_image_slider: false
+    is_image_slider: false,
+    gallery_urls: '[]'
   });
   const [originalKey, setOriginalKey] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -25,7 +26,8 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
         ...prompt,
         is_image_slider: Boolean(prompt.is_image_slider),
         is_premium: prompt.is_premium !== undefined ? Boolean(prompt.is_premium) : (prompt.isPremium !== undefined ? Boolean(prompt.isPremium) : false),
-        description: prompt.description || ''
+        description: prompt.description || '',
+        gallery_urls: prompt.gallery_urls || prompt.galleryUrls || '[]'
       });
       setOriginalKey(prompt.prompt_key);
     } else {
@@ -176,32 +178,9 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
             <div style={{ gridColumn: 'span 2' }}>
               <Label text="Detailed Description" />
               <div style={{ borderRadius: '18px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
-                <Editor
-                  tinymceScriptSrc="/tinymce/tinymce.min.js"
+                <CustomEditor
                   value={formData.description}
-                  onEditorChange={(content) => setFormData({ ...formData, description: content })}
-                  init={{
-                    height: 400,
-                    base_url: '/tinymce',
-                    suffix: '.min',
-                    promotion: false,
-                    license_key: 'gpl',
-                    plugins: [
-                      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                      'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons',
-                      'codesample', 'accordion'
-                    ],
-                    toolbar: 'undo redo | accordion accordionremove | blocks fontfamily fontsize | ' +
-                      'bold italic underline strikethrough | forecolor backcolor removeformat | ' +
-                      'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | ' +
-                      'link image media table | emoticons codesample | fullscreen preview code help',
-                    skin: 'oxide-dark',
-                    content_css: 'dark',
-                    toolbar_mode: 'sliding',
-                    contextmenu: 'link image table',
-                    quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
-                  }}
+                  onChange={(content) => setFormData({ ...formData, description: content })}
                 />
               </div>
             </div>
@@ -268,6 +247,26 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                   style={{ width: '150px', padding: '10px 15px', borderRadius: '10px', fontSize: '0.85rem' }}
                 />
               </div>
+            </div>
+
+            <div style={{ gridColumn: 'span 2' }}>
+              <Label text="Gallery Images (Optional)" />
+              <textarea 
+                placeholder="Enter image URLs, one per line..."
+                value={(() => {
+                  try {
+                    const parsed = JSON.parse(formData.gallery_urls || '[]');
+                    return Array.isArray(parsed) ? parsed.join('\n') : '';
+                  } catch(e) { return ''; }
+                })()}
+                onChange={(e) => {
+                  const urls = e.target.value.split('\n').map(u => u.trim()).filter(Boolean);
+                  setFormData({ ...formData, gallery_urls: JSON.stringify(urls) });
+                }}
+                className="glass-input"
+                style={{ width: '100%', minHeight: '100px', padding: '14px', borderRadius: '14px', fontSize: '0.9rem', lineHeight: '1.6' }}
+              />
+              <Hint text="These will be displayed as a responsive gallery below the main content." />
             </div>
 
             {/* Section: Security */}
