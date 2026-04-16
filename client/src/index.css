@@ -9,6 +9,7 @@
 @font-face { font-family: 'Outfit'; src: url('./assets/fonts/Outfit-Black.ttf') format('truetype'); font-weight: 900; font-style: normal; font-display: swap; }
 
 :root {
+  color-scheme: dark;
   /* Modern HSL Color System */
   --accent-hue: 355; /* King Red */
   --accent-main: hsl(var(--accent-hue), 92%, 47%);
