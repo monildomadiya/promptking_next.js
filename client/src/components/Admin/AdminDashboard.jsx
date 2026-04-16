@@ -66,41 +66,59 @@ const inputStyle = {
 
 // --- COMPONENTS ---
 
-const NavItem = ({ item, active, onClick }) => (
+const NavItem = ({ item, active, onClick, isMobileView }) => (
   <motion.div
     variants={itemVariants}
-    whileHover={{ x: 5 }}
+    whileHover={{ scale: 1.02 }}
     whileTap={{ scale: 0.98 }}
     onClick={() => onClick(item.id)}
     style={{
       display: 'flex',
       alignItems: 'center',
       gap: '12px',
-      padding: '12px 16px',
+      padding: isMobileView ? '10px 18px' : '12px 16px',
       borderRadius: '12px',
       cursor: 'pointer',
-      marginBottom: '4px',
-      fontWeight: 600,
-      fontSize: '0.9rem',
+      marginBottom: isMobileView ? '0' : '4px',
+      fontWeight: 700,
+      fontSize: '0.85rem',
       transition: 'var(--transition-fast)',
       color: active ? 'white' : 'var(--text-dim)',
-      background: active ? 'var(--accent-glow)' : 'transparent',
-      border: `1px solid ${active ? 'var(--accent-glow)' : 'transparent'}`,
+      background: active ? 'var(--accent-glow)' : 'rgba(255,255,255,0.02)',
+      border: `1px solid ${active ? 'rgba(229, 9, 20, 0.3)' : 'rgba(255,255,255,0.05)'}`,
       position: 'relative',
+      whiteSpace: 'nowrap',
+      flexShrink: 0
     }}
   >
-    {item.icon}
+    <span style={{ color: active ? 'var(--accent-main)' : 'inherit', display: 'flex', alignItems: 'center' }}>
+      {item.icon}
+    </span>
     <span>{item.label}</span>
-    {active && (
+    {active && !isMobileView && (
       <motion.div
-        layoutId="activeTab"
+        layoutId="activeTabIndicator"
         style={{
           position: 'absolute',
           left: 0,
-          width: '3px',
-          height: '20px',
+          width: '4px',
+          height: '24px',
           background: 'var(--accent-main)',
           borderRadius: '0 4px 4px 0',
+        }}
+      />
+    )}
+    {active && isMobileView && (
+      <motion.div
+        layoutId="activeTabIndicatorMobile"
+        style={{
+          position: 'absolute',
+          bottom: '0',
+          left: '20%',
+          right: '20%',
+          height: '3px',
+          background: 'var(--accent-main)',
+          borderRadius: '4px 4px 0 0',
         }}
       />
     )}
@@ -613,6 +631,13 @@ const AdminDashboard = () => {
   const [settings, setSettings] = useState({});
   const [selectedKeys, setSelectedKeys] = useState([]);
   const [adminSearch, setAdminSearch] = useState('');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1100);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1100);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => { 
     checkAuth(); 
@@ -771,62 +796,117 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--surface-0)', color: 'white' }}>
-      {/* Sidebar */}
-      <motion.aside initial={{ x: -100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} style={{ width: '280px', background: 'var(--surface-1)', borderRight: '1px solid var(--glass-border)', padding: '32px 24px', position: 'fixed', height: '100vh', zIndex: 100, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '40px', width: '100%', padding: '0 10px' }}>
-          {settings.logo_url ? (
-            <img 
-              src={settings.logo_url} 
-              className="animated-logo"
-              style={{ height: '90px', maxWidth: '100%', objectFit: 'contain' }} 
-              alt="Logo" 
-            />
-          ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div className="animated-logo" style={{ width: '45px', height: '45px', background: 'var(--accent-gradient)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>PK</div>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.5px', fontFamily: 'var(--font-heading)' }}>KING ADMIN</h2>
-            </div>
-          )}
-        </div>
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: isMobile ? 'column' : 'row',
+      minHeight: '100vh', 
+      background: 'var(--surface-0)', 
+      color: 'white',
+      overflowX: 'hidden'
+    }}>
+      {/* Sidebar (Desktop Only) */}
+      {!isMobile && (
+        <motion.aside initial={{ x: -100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} style={{ width: '280px', background: 'var(--surface-1)', borderRight: '1px solid var(--glass-border)', padding: '32px 24px', position: 'fixed', height: '100vh', zIndex: 100, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '40px', width: '100%', padding: '0 10px' }}>
+            {settings.logo_url ? (
+              <img 
+                src={settings.logo_url} 
+                className="animated-logo"
+                style={{ height: '90px', maxWidth: '100%', objectFit: 'contain' }} 
+                alt="Logo" 
+              />
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div className="animated-logo" style={{ width: '45px', height: '45px', background: 'var(--accent-gradient)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>PK</div>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.5px', fontFamily: 'var(--font-heading)' }}>KING ADMIN</h2>
+              </div>
+            )}
+          </div>
 
-        <motion.nav variants={containerVariants} initial="hidden" animate="visible" style={{ flex: 1 }}>
-          {menuGroups.map((group, idx) => (
-            <div key={idx} style={{ marginBottom: '32px' }}>
-              <div style={{ paddingLeft: '16px', marginBottom: '16px', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '1.5px' }}>{group.title}</div>
-              {group.items.map(item => (
-                <NavItem key={item.id} item={item} active={view === item.id} onClick={(id) => { setView(id); fetchData(id.startsWith('settings') ? 'settings' : id); }} />
-              ))}
-            </div>
-          ))}
-        </motion.nav>
+          <motion.nav variants={containerVariants} initial="hidden" animate="visible" style={{ flex: 1 }}>
+            {menuGroups.map((group, idx) => (
+              <div key={idx} style={{ marginBottom: '32px' }}>
+                <div style={{ paddingLeft: '16px', marginBottom: '16px', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '1.5px' }}>{group.title}</div>
+                {group.items.map(item => (
+                  <NavItem key={item.id} item={item} active={view === item.id} onClick={(id) => { setView(id); fetchData(id.startsWith('settings') ? 'settings' : id); }} isMobileView={false} />
+                ))}
+              </div>
+            ))}
+          </motion.nav>
 
-        <div onClick={handleLogout} style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', borderRadius: '12px', color: 'var(--text-dim)', cursor: 'pointer', background: 'rgba(255,255,255,0.02)' }}>
-          <LogOut size={20} /> <span style={{ fontWeight: 600 }}>Sign Out</span>
+          <div onClick={handleLogout} style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', borderRadius: '12px', color: 'var(--text-dim)', cursor: 'pointer', background: 'rgba(255,255,255,0.02)' }}>
+            <LogOut size={20} /> <span style={{ fontWeight: 600 }}>Sign Out</span>
+          </div>
+        </motion.aside>
+      )}
+
+      {/* Mobile Top Navigation */}
+      {isMobile && (
+        <div style={{ 
+          position: 'sticky', top: 0, zIndex: 1000, 
+          background: 'rgba(10,10,12,0.85)', backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          width: '100%'
+        }}>
+          <div style={{ padding: '15px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div className="animated-logo" style={{ width: '32px', height: '32px', background: 'var(--accent-gradient)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.8rem' }}>PK</div>
+              <span style={{ fontWeight: 900, fontSize: '0.9rem', letterSpacing: '-0.5px' }}>KING ADMIN</span>
+            </div>
+            <div onClick={handleLogout} style={{ padding: '8px', color: 'var(--accent-main)' }}><LogOut size={20} /></div>
+          </div>
+          <div style={{ 
+            display: 'flex', overflowX: 'auto', padding: '0 20px 15px', gap: '10px',
+            msOverflowStyle: 'none', scrollbarWidth: 'none'
+          }}>
+            {menuGroups.flatMap(g => g.items).map(item => (
+              <NavItem 
+                key={item.id} 
+                item={item} 
+                active={view === item.id} 
+                onClick={(id) => { setView(id); fetchData(id.startsWith('settings') ? 'settings' : id); }} 
+                isMobileView={true} 
+              />
+            ))}
+          </div>
         </div>
-      </motion.aside>
+      )}
 
       {/* Main Content */}
-      <main style={{ flex: 1, marginLeft: '280px', padding: '40px' }}>
-        <motion.header initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '48px' }}>
+      <main style={{ 
+        flex: 1, 
+        marginLeft: isMobile ? '0' : '280px', 
+        padding: isMobile ? '25px 15px' : '40px',
+        width: '100%',
+        maxWidth: '100%',
+        boxSizing: 'border-box'
+      }}>
+        <motion.header initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} style={{ 
+          display: 'flex', 
+          flexDirection: isMobile ? 'column' : 'row',
+          justifyContent: 'space-between', 
+          alignItems: isMobile ? 'stretch' : 'flex-start', 
+          marginBottom: isMobile ? '30px' : '48px',
+          gap: isMobile ? '20px' : '0'
+        }}>
           <div>
-            <h1 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '8px', fontFamily: 'var(--font-heading)' }}>
+            <h1 style={{ fontSize: isMobile ? '1.5rem' : '2rem', fontWeight: 900, marginBottom: '8px', fontFamily: 'var(--font-heading)' }}>
               {view.replace('settings-', '').toUpperCase()}
             </h1>
-            <p style={{ color: 'var(--text-dim)', fontSize: '0.95rem' }}>Management control panel for PK PROMPT KING systems.</p>
+            <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem' }}>Management control panel for PK PROMPT KING systems.</p>
           </div>
           {['prompts', 'blogs', 'categories', 'faqs'].includes(view) && (
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
               {selectedKeys.length > 0 && view === 'prompts' && (
                 <ActionButton 
-                  label={`DELETE SELECTED (${selectedKeys.length})`} 
+                  label={`DELETE (${selectedKeys.length})`} 
                   color="var(--accent-main)" 
                   icon={<Trash size={18} />} 
                   onClick={handleBulkDelete} 
                 />
               )}
               {['prompts', 'blogs', 'categories', 'faqs'].includes(view) && (
-                <div style={{ position: 'relative', width: '250px' }}>
+                <div style={{ position: 'relative', flex: 1, minWidth: isMobile ? '100%' : '200px' }}>
                   <input
                     type="text"
                     placeholder={`Search ${view}...`}
@@ -843,13 +923,7 @@ const AdminDashboard = () => {
                   />
                 </div>
               )}
-              <ActionButton 
-                label="UI DEMO" 
-                color="rgba(255,255,255,0.05)" 
-                icon={<Activity size={18} />} 
-                onClick={() => setIsKingDialogOpen(true)} 
-              />
-              <ActionButton label="CREATE NEW" icon={<Plus size={18} />} onClick={() => { setEditingItem(null); setIsModalOpen(true); }} />
+              <ActionButton label="CREATE" icon={<Plus size={18} />} onClick={() => { setEditingItem(null); setIsModalOpen(true); }} />
             </div>
           )}
         </motion.header>
@@ -877,12 +951,16 @@ const AdminDashboard = () => {
           {view === 'settings-layout' && <LayoutPanel key="layout" />}
 
           {['prompts', 'blogs', 'categories', 'faqs'].includes(view) && (
-            <motion.div key="list" {...pageTransition} style={{ ...glassPanelStyle, overflow: 'hidden' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <motion.div key="list" {...pageTransition} style={{ 
+              ...glassPanelStyle, 
+              overflowX: 'auto',
+              WebkitOverflowScrolling: 'touch'
+            }}>
+              <table style={{ minWidth: isMobile ? '600px' : '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.01)' }}>
                     {view === 'prompts' && (
-                      <th style={{ padding: '24px', width: '50px' }}>
+                      <th style={{ padding: isMobile ? '16px' : '24px', width: '50px' }}>
                         <input 
                           type="checkbox" 
                           checked={filteredData.length > 0 && selectedKeys.length === filteredData.length} 
@@ -891,9 +969,9 @@ const AdminDashboard = () => {
                         />
                       </th>
                     )}
-                    <th style={{ padding: '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Resource Title</th>
-                    {view === 'prompts' && <th style={{ padding: '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Status</th>}
-                    <th style={{ padding: '24px', textAlign: 'right', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Controls</th>
+                    <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Resource Title</th>
+                    {view === 'prompts' && <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Status</th>}
+                    <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'right', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Controls</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -903,7 +981,7 @@ const AdminDashboard = () => {
                       background: selectedKeys.includes(item.prompt_key || item.id) ? 'rgba(229, 9, 20, 0.03)' : 'transparent'
                     }}>
                       {view === 'prompts' && (
-                        <td style={{ padding: '20px 24px' }}>
+                        <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
                           <input 
                             type="checkbox" 
                             checked={selectedKeys.includes(item.prompt_key || item.id)} 
@@ -912,22 +990,22 @@ const AdminDashboard = () => {
                           />
                         </td>
                       )}
-                      <td style={{ padding: '20px 24px' }}>
-                        <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '4px' }}>{item.prompt_key || item.title || item.name}</div>
-                        <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{item.title || item.question || item.slug}</div>
+                      <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
+                        <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '4px' }}>{item.prompt_key || item.title || item.name}</div>
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title || item.question || item.slug}</div>
                       </td>
                       {view === 'prompts' && (
-                        <td style={{ padding: '20px 24px' }}>
+                        <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
                           <div style={{ display: 'flex', gap: '8px' }}>
-                            <span style={{ padding: '4px 12px', background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700 }}>{item.is_premium ? 'PREMIUM' : 'FREE'}</span>
-                            <span style={{ padding: '4px 12px', background: 'rgba(255,191,38,0.1)', color: '#fbbf24', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700 }}>{item.unlock_count || 0}</span>
+                            <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.is_premium ? 'PRO' : 'FREE'}</span>
+                            <span style={{ padding: '4px 8px', background: 'rgba(255,191,38,0.1)', color: '#fbbf24', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.unlock_count || 0}</span>
                           </div>
                         </td>
                       )}
-                      <td style={{ padding: '20px 24px', textAlign: 'right' }}>
+                      <td style={{ padding: isMobile ? '16px' : '20px 24px', textAlign: 'right' }}>
                         <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                          <div onClick={() => { setEditingItem(item); setIsModalOpen(true); }} style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Edit size={16} color="var(--text-dim)" /></div>
-                          <div onClick={() => handleDelete(item)} style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(229, 9, 20, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Trash size={16} color="var(--accent-main)" /></div>
+                          <div onClick={() => { setEditingItem(item); setIsModalOpen(true); }} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Edit size={14} color="var(--text-dim)" /></div>
+                          <div onClick={() => handleDelete(item)} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(229, 9, 20, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Trash size={14} color="var(--accent-main)" /></div>
                         </div>
                       </td>
                     </motion.tr>
