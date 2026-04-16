@@ -751,10 +751,10 @@ const PromptDetailPage = ({ adsSettings }) => {
               
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
                 {[
-                  { step: "01", title: "Copy Prompt", desc: "Click the copy button above to get the full prompt text with optimized parameters." },
-                  { step: "02", title: "Select AI Tool", desc: "Open ChatGPT, Midjourney, or Gemini depending on the prompt category." },
-                  { step: "03", title: "Paste & Edit", desc: "Paste the prompt and replace any [bracketed text] with your specific details." },
-                  { step: "04", title: "Generate Result", desc: "Hit enter and watch the AI create exactly what you've envisioned instantly." }
+                  { step: "01", title: "Copy Prompt", desc: "Click the copy button above to instantly capture the full, optimized prompt text to your clipboard." },
+                  { step: "02", title: "Choose AI Tool", desc: "Open your favorite AI website like ChatGPT, Midjourney, or Bing. Trying different tools can give you even more amazing and professional results." },
+                  { step: "03", title: "Paste & Customize", desc: "Paste the prompt into the tool. You can easily tweak any part of the text to match your exact creative vision." },
+                  { step: "04", title: "Generate Magic", desc: "Press enter and watch as the AI generates stunning, high-quality results based on your custom prompt in seconds." }
                 ].map((item, i) => (
                   <div key={i} style={{ 
                     background: 'rgba(255,255,255,0.03)', 
