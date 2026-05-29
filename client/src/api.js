@@ -38,6 +38,7 @@ const api = {
       'Content-Type': 'application/json',
       ...options.headers
     };
+    if (body instanceof FormData) delete headers['Content-Type'];
     if (adminToken) headers['x-admin-token'] = adminToken;
     
     const res = await fetch(`${SERVER_URL}/api${url}`, {
