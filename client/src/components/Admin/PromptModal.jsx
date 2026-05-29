@@ -19,6 +19,33 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
   const [originalKey, setOriginalKey] = useState(null);
   const [categories, setCategories] = useState([]);
   const [galleryUrl, setGalleryUrl] = useState('');
+  const [isUploadingGallery, setIsUploadingGallery] = useState(false);
+  const galleryFileInputRef = useRef(null);
+
+  const handleGalleryUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const form = new FormData();
+    form.append('image', file);
+
+    try {
+      setIsUploadingGallery(true);
+      const res = await api.post('/admin/upload_image', form, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if (res.data.status === 'success') {
+        const url = res.data.imageUrl;
+        const existing = (() => { try { return JSON.parse(formData.gallery_urls || '[]'); } catch(err) { return []; } })();
+        setFormData(prev => ({ ...prev, gallery_urls: JSON.stringify([...existing, url]) }));
+      }
+    } catch (error) {
+      alert('Upload failed');
+    } finally {
+      setIsUploadingGallery(false);
+      if (galleryFileInputRef.current) galleryFileInputRef.current.value = '';
+    }
+  };
 
   useEffect(() => {
     api.get('/categories').then(res => setCategories(res.data));
@@ -287,7 +314,27 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                     color: 'white', border: 'none', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer',
                     whiteSpace: 'nowrap'
                   }}
-                >+ Add</button>
+                >+ Add URL</button>
+                
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  ref={galleryFileInputRef} 
+                  style={{ display: 'none' }} 
+                  onChange={handleGalleryUpload} 
+                />
+                <button
+                  type="button"
+                  onClick={() => galleryFileInputRef.current?.click()}
+                  disabled={isUploadingGallery}
+                  style={{
+                    padding: '12px 20px', borderRadius: '12px', background: 'rgba(255,255,255,0.1)',
+                    color: 'white', border: '1px solid rgba(255,255,255,0.2)', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer',
+                    whiteSpace: 'nowrap', opacity: isUploadingGallery ? 0.7 : 1
+                  }}
+                >
+                  {isUploadingGallery ? 'Uploading...' : 'Upload Image'}
+                </button>
               </div>
 
               {/* Added URLs List */}
@@ -433,31 +480,80 @@ const RatioButton = ({ ratio, active, onClick }) => (
   </button>
 );
 
-const ImageUpload = ({ url, onUpload }) => (
-  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-    <input 
-      type="text" 
-      placeholder="https://..."
-      value={url || ''}
-      onChange={(e) => onUpload(e.target.value)}
-      className="glass-input"
-      style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '0.85rem', color: 'white', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }}
-    />
-    <div style={{ 
-      height: '140px', borderRadius: '16px', border: '2px dashed rgba(255,255,255,0.1)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'rgba(255,255,255,0.02)', overflow: 'hidden'
-    }}>
-      {url ? (
-        <img src={url} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-      ) : (
-        <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.2)' }}>
-          <Image size={24} style={{ marginBottom: '8px' }} />
-          <p style={{ fontSize: '0.75rem', fontWeight: 600 }}>Image Preview</p>
-        </div>
-      )}
+const ImageUpload = ({ url, onUpload }) => {
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      setIsUploading(true);
+      const res = await api.post('/admin/upload_image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if (res.data.status === 'success') {
+        onUpload(res.data.imageUrl);
+      }
+    } catch (error) {
+      alert('Upload failed');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <div style={{ display: 'flex', gap: '10px' }}>
+        <input 
+          type="text" 
+          placeholder="https://..."
+          value={url || ''}
+          onChange={(e) => onUpload(e.target.value)}
+          className="glass-input"
+          style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', fontSize: '0.85rem', color: 'white', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }}
+        />
+        <input 
+          type="file" 
+          accept="image/*" 
+          ref={fileInputRef} 
+          style={{ display: 'none' }} 
+          onChange={handleFileChange} 
+        />
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+          style={{
+            padding: '0 20px', borderRadius: '12px', background: 'var(--accent-main)',
+            color: 'white', border: 'none', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
+            opacity: isUploading ? 0.7 : 1, whiteSpace: 'nowrap'
+          }}
+        >
+          {isUploading ? 'Uploading...' : 'Upload'}
+        </button>
+      </div>
+      <div style={{ 
+        height: '140px', borderRadius: '16px', border: '2px dashed rgba(255,255,255,0.1)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'rgba(255,255,255,0.02)', overflow: 'hidden'
+      }}>
+        {url ? (
+          <img src={url} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : (
+          <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.2)' }}>
+            <Image size={24} style={{ marginBottom: '8px' }} />
+            <p style={{ fontSize: '0.75rem', fontWeight: 600 }}>Image Preview</p>
+          </div>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default PromptModal;

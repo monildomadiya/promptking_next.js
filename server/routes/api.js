@@ -6,6 +6,20 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const sharp = require('sharp');
+const cloudinary = require('cloudinary').v2;
+
+const uploadToCloudinary = (buffer, options = {}) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      options,
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+    uploadStream.end(buffer);
+  });
+};
 
 // Safety Guard: Prevent infinite self-referential DDOS in production fallbacks
 const originalFetch = global.fetch;
@@ -597,18 +611,25 @@ router.post('/admin/save_settings', adminAuth, async (req, res) => {
 router.post('/admin/upload_logo', adminAuth, logoUpload.single('logo'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
   
-  const ext = path.extname(req.file.originalname).toLowerCase();
-  const isSvg = ext === '.svg';
-  const filename = isSvg ? `logo_${Date.now()}.svg` : `logo_${Date.now()}.webp`;
-  const filepath = path.join(uploadDir, filename);
-  
-  if (isSvg) {
-    fs.writeFileSync(filepath, req.file.buffer);
-  } else {
-    await sharp(req.file.buffer).webp({ quality: 85 }).toFile(filepath);
+  let logoUrl;
+  try {
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    const isSvg = ext === '.svg';
+    let bufferToUpload = req.file.buffer;
+    
+    if (!isSvg) {
+      bufferToUpload = await sharp(req.file.buffer).webp({ quality: 85 }).toBuffer();
+    }
+    
+    const result = await uploadToCloudinary(bufferToUpload, {
+      folder: 'promptking/logos',
+      resource_type: 'image'
+    });
+    logoUrl = result.secure_url;
+  } catch (error) {
+    console.error('Cloudinary Logo Upload Error:', error);
+    return res.status(500).json({ error: "Logo upload failed" });
   }
-  
-  const logoUrl = `/uploads/${filename}`;
   
   // Update memory cache
   localSettingsCache.logo_url = logoUrl;
@@ -630,13 +651,20 @@ router.post('/admin/upload_logo', adminAuth, logoUpload.single('logo'), async (r
 router.post('/admin/upload_image', adminAuth, logoUpload.single('image'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
   
-  const filename = `img_${Date.now()}.webp`;
-  const filepath = path.join(uploadDir, filename);
-  await sharp(req.file.buffer).webp({ quality: 80 }).toFile(filepath);
-  
-  const imageUrl = `/uploads/${filename}`;
-  // No DB persistence required for general image upload (usually for prompt editors)
-  res.json({ status: "success", imageUrl });
+  try {
+    const bufferToUpload = await sharp(req.file.buffer).webp({ quality: 80 }).toBuffer();
+    const result = await uploadToCloudinary(bufferToUpload, {
+      folder: 'promptking/images',
+      resource_type: 'image'
+    });
+    
+    const imageUrl = result.secure_url;
+    // No DB persistence required for general image upload (usually for prompt editors)
+    res.json({ status: "success", imageUrl });
+  } catch (error) {
+    console.error('Cloudinary Upload Error:', error);
+    res.status(500).json({ error: "Image upload failed" });
+  }
 });
 
 router.get('/admin/logout', (req, res) => {
