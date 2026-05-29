@@ -7,6 +7,8 @@ const fs = require('fs');
 const crypto = require('crypto');
 const sharp = require('sharp');
 const cloudinary = require('cloudinary').v2;
+cloudinary.config(true);
+
 
 const uploadToCloudinary = (buffer, options = {}) => {
   return new Promise((resolve, reject) => {
