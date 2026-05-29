@@ -6,7 +6,7 @@ const getBaseUrl = () => {
   if (typeof window !== 'undefined' && 
       !window.location.hostname.includes('localhost') && 
       !window.location.hostname.includes('127.0.0.1')) {
-    return 'https://promptking-q4qu.onrender.com';
+    return ''; // Uses the same domain for API requests (e.g., https://promptking.in/api)
   }
   
   return 'http://localhost:5000';
