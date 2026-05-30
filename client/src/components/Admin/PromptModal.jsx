@@ -47,6 +47,36 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     }
   };
 
+  const handleAddGalleryUrl = async () => {
+    const url = galleryUrl.trim();
+    if (!url) return;
+    
+    if (url.includes('res.cloudinary.com') || url.startsWith('data:') || url.startsWith('/uploads/')) {
+      const existing = (() => { try { return JSON.parse(formData.gallery_urls || '[]'); } catch(err) { return []; } })();
+      setFormData(prev => ({ ...prev, gallery_urls: JSON.stringify([...existing, url]) }));
+      setGalleryUrl('');
+      return;
+    }
+
+    try {
+      setIsUploadingGallery(true);
+      const res = await api.post('/admin/upload_image_url', { url });
+      if (res.data.status === 'success') {
+        const existing = (() => { try { return JSON.parse(formData.gallery_urls || '[]'); } catch(err) { return []; } })();
+        setFormData(prev => ({ ...prev, gallery_urls: JSON.stringify([...existing, res.data.imageUrl]) }));
+      } else {
+        throw new Error();
+      }
+    } catch (e) {
+      alert("Failed to upload from URL. Falling back to original URL.");
+      const existing = (() => { try { return JSON.parse(formData.gallery_urls || '[]'); } catch(err) { return []; } })();
+      setFormData(prev => ({ ...prev, gallery_urls: JSON.stringify([...existing, url]) }));
+    } finally {
+      setIsUploadingGallery(false);
+      setGalleryUrl('');
+    }
+  };
+
   useEffect(() => {
     api.get('/categories').then(res => setCategories(res.data));
     if (prompt) {
@@ -290,11 +320,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
-                      const url = galleryUrl.trim();
-                      if (!url) return;
-                      const existing = (() => { try { return JSON.parse(formData.gallery_urls || '[]'); } catch(err) { return []; } })();
-                      setFormData({ ...formData, gallery_urls: JSON.stringify([...existing, url]) });
-                      setGalleryUrl('');
+                      handleAddGalleryUrl();
                     }
                   }}
                   className="glass-input"
@@ -302,17 +328,12 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                 />
                 <button
                   type="button"
-                  onClick={() => {
-                    const url = galleryUrl.trim();
-                    if (!url) return;
-                    const existing = (() => { try { return JSON.parse(formData.gallery_urls || '[]'); } catch(err) { return []; } })();
-                    setFormData({ ...formData, gallery_urls: JSON.stringify([...existing, url]) });
-                    setGalleryUrl('');
-                  }}
+                  onClick={handleAddGalleryUrl}
+                  disabled={isUploadingGallery}
                   style={{
                     padding: '12px 20px', borderRadius: '12px', background: 'var(--accent-main)',
                     color: 'white', border: 'none', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer',
-                    whiteSpace: 'nowrap'
+                    whiteSpace: 'nowrap', opacity: isUploadingGallery ? 0.7 : 1
                   }}
                 >+ Add URL</button>
                 
@@ -482,7 +503,34 @@ const RatioButton = ({ ratio, active, onClick }) => (
 
 const ImageUpload = ({ url, onUpload }) => {
   const [isUploading, setIsUploading] = useState(false);
+  const [localUrl, setLocalUrl] = useState(url || '');
   const fileInputRef = useRef(null);
+
+  useEffect(() => { setLocalUrl(url || ''); }, [url]);
+
+  const handleUrlBlur = async () => {
+    const currentUrl = localUrl.trim();
+    if (!currentUrl || currentUrl === url) return;
+    if (currentUrl.includes('res.cloudinary.com') || currentUrl.startsWith('data:') || currentUrl.startsWith('/uploads/')) {
+       onUpload(currentUrl);
+       return;
+    }
+    
+    setIsUploading(true);
+    try {
+      const res = await api.post('/admin/upload_image_url', { url: currentUrl });
+      if (res.data.status === 'success') {
+         onUpload(res.data.imageUrl);
+      } else {
+         onUpload(currentUrl);
+      }
+    } catch (e) {
+      alert("Failed to upload from URL");
+      onUpload(currentUrl);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -513,8 +561,9 @@ const ImageUpload = ({ url, onUpload }) => {
         <input 
           type="text" 
           placeholder="https://..."
-          value={url || ''}
-          onChange={(e) => onUpload(e.target.value)}
+          value={localUrl}
+          onChange={(e) => setLocalUrl(e.target.value)}
+          onBlur={handleUrlBlur}
           className="glass-input"
           style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', fontSize: '0.85rem', color: 'white', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }}
         />

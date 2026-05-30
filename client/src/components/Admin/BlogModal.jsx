@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../../api';
 import { X, Image, Sparkles, PlusCircle, FileText, Save, Activity, Camera } from '../Common/Icons';
 import CustomEditor from './CustomEditor';
@@ -155,16 +155,91 @@ const Label = ({ text, icon }) => (
 );
 
 const ImageUpload = ({ url, onUpload }) => {
+  const [isUploading, setIsUploading] = useState(false);
+  const [localUrl, setLocalUrl] = useState(url || '');
+  const fileInputRef = useRef(null);
+
+  useEffect(() => { setLocalUrl(url || ''); }, [url]);
+
+  const handleUrlBlur = async () => {
+    const currentUrl = localUrl.trim();
+    if (!currentUrl || currentUrl === url) return;
+    if (currentUrl.includes('res.cloudinary.com') || currentUrl.startsWith('data:') || currentUrl.startsWith('/uploads/')) {
+       onUpload(currentUrl);
+       return;
+    }
+    
+    setIsUploading(true);
+    try {
+      const res = await api.post('/admin/upload_image_url', { url: currentUrl });
+      if (res.data.status === 'success') {
+         onUpload(res.data.imageUrl);
+      } else {
+         onUpload(currentUrl);
+      }
+    } catch (e) {
+      alert("Failed to upload from URL");
+      onUpload(currentUrl);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      setIsUploading(true);
+      const res = await api.post('/admin/upload_image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if (res.data.status === 'success') {
+        onUpload(res.data.imageUrl);
+      }
+    } catch (error) {
+      alert('Upload failed');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-      <input 
-        type="text" 
-        placeholder="https://..."
-        value={url || ''}
-        onChange={(e) => onUpload(e.target.value)}
-        className="glass-input"
-        style={{ width: '100%', padding: '14px 18px', borderRadius: '14px', fontSize: '0.9rem', color: 'white', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }}
-      />
+      <div style={{ display: 'flex', gap: '10px' }}>
+        <input 
+          type="text" 
+          placeholder="https://..."
+          value={localUrl}
+          onChange={(e) => setLocalUrl(e.target.value)}
+          onBlur={handleUrlBlur}
+          className="glass-input"
+          style={{ flex: 1, padding: '14px 18px', borderRadius: '14px', fontSize: '0.9rem', color: 'white', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }}
+        />
+        <input 
+          type="file" 
+          accept="image/*" 
+          ref={fileInputRef} 
+          style={{ display: 'none' }} 
+          onChange={handleFileChange} 
+        />
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+          style={{
+            padding: '0 20px', borderRadius: '14px', background: 'var(--accent-main)',
+            color: 'white', border: 'none', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer',
+            opacity: isUploading ? 0.7 : 1, whiteSpace: 'nowrap'
+          }}
+        >
+          {isUploading ? 'Uploading...' : 'Upload'}
+        </button>
+      </div>
       <div style={{ 
         height: '240px', borderRadius: '20px', border: '2px dashed rgba(255,255,255,0.1)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',

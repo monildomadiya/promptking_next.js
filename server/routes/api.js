@@ -669,6 +669,29 @@ router.post('/admin/upload_image', adminAuth, logoUpload.single('image'), async 
   }
 });
 
+router.post('/admin/upload_image_url', adminAuth, async (req, res) => {
+  const { url } = req.body;
+  if (!url) return res.status(400).json({ error: "No URL provided" });
+  
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to fetch image");
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    
+    const bufferToUpload = await sharp(buffer).webp({ quality: 80 }).toBuffer();
+    const result = await uploadToCloudinary(bufferToUpload, {
+      folder: 'promptking/images',
+      resource_type: 'image'
+    });
+    
+    res.json({ status: "success", imageUrl: result.secure_url });
+  } catch (error) {
+    console.error('Cloudinary Upload from URL Error:', error);
+    res.status(500).json({ error: "Failed to upload image from URL" });
+  }
+});
+
 router.get('/admin/logout', (req, res) => {
   const tokenHeader = req.headers['x-admin-token'];
   if (tokenHeader) validAdminTokens.delete(tokenHeader);
@@ -962,7 +985,7 @@ router.get('/sitemap.xml', async (req, res) => {
   
   try {
     // Attempt DB fetch if healthy
-    const db = require('./db');
+    const db = require('../db');
     prompts = await db`SELECT prompt_key FROM prompts WHERE prompt_key IS NOT NULL`;
     blogs = await db`SELECT slug FROM blogs`;
   } catch (err) {

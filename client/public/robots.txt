@@ -10,4 +10,4 @@ Disallow: /
 User-agent: Google-Extended
 Allow: /
 
-Sitemap: https://promptking.in/sitemap.xml
+Sitemap: https://promptking.in/api/sitemap.xml
