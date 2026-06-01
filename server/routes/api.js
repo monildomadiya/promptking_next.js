@@ -275,7 +275,7 @@ router.get('/get_data', async (req, res) => {
   }
 
   try {
-    const promptsRows = await db`SELECT * FROM prompts`;
+    const promptsRows = await db`SELECT * FROM prompts ORDER BY sort_order ASC, id ASC`;
     const categoriesRows = await db`SELECT * FROM categories ORDER BY name ASC`;
 
     const prompts = promptsRows.map(row => ({
@@ -784,6 +784,25 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
     console.warn('ADMIN PROMPTS DB FAILED, FETCHING LIVE:', error.message);
     lastDbFailure = Date.now();
     await fetchLiveAdminPrompts();
+  }
+});
+
+// --- REORDER PROMPTS ---
+router.post('/admin/reorder_prompts', adminAuth, async (req, res) => {
+  const { orderedKeys } = req.body;
+  if (!Array.isArray(orderedKeys) || orderedKeys.length === 0) {
+    return res.status(400).json({ error: 'orderedKeys array is required' });
+  }
+  try {
+    await db`ALTER TABLE prompts ADD COLUMN IF NOT EXISTS sort_order INT DEFAULT 0`;
+    const updates = orderedKeys.map((key, index) =>
+      db`UPDATE prompts SET sort_order = ${index} WHERE prompt_key = ${key}`
+    );
+    await Promise.all(updates);
+    res.json({ status: 'ok', updated: orderedKeys.length });
+  } catch (error) {
+    console.error('Reorder error:', error);
+    res.status(500).json({ error: 'Failed to save order' });
   }
 });
 

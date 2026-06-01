@@ -1,7 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../../api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragOverlay
+} from '@dnd-kit/core';
+import {
+  SortableContext, verticalListSortingStrategy, useSortable, arrayMove
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { 
   Table, Edit, Trash, Plus, Settings, FileText, 
   TableProperties, LogOut, ChevronRight, Layout, 
@@ -67,35 +74,38 @@ const inputStyle = {
 
 // --- COMPONENTS ---
 
-const NavItem = ({ item, active, onClick, isMobileView }) => (
+const NavItem = ({ item, active, onClick, isMobileView, collapsed }) => (
   <motion.div
     variants={itemVariants}
     whileHover={{ scale: 1.02 }}
     whileTap={{ scale: 0.98 }}
     onClick={() => onClick(item.id)}
+    title={collapsed ? item.label : ''}
     style={{
       display: 'flex',
       alignItems: 'center',
+      justifyContent: collapsed ? 'center' : 'flex-start',
       gap: '12px',
-      padding: isMobileView ? '10px 18px' : '12px 16px',
+      padding: isMobileView ? '10px 18px' : collapsed ? '12px' : '12px 16px',
       borderRadius: '12px',
       cursor: 'pointer',
       marginBottom: isMobileView ? '0' : '4px',
       fontWeight: 700,
       fontSize: '0.85rem',
-      transition: 'var(--transition-fast)',
+      transition: 'all 0.2s ease',
       color: active ? 'white' : 'var(--text-dim)',
       background: active ? 'var(--accent-glow)' : 'rgba(255,255,255,0.02)',
       border: `1px solid ${active ? 'rgba(229, 9, 20, 0.3)' : 'rgba(255,255,255,0.05)'}`,
       position: 'relative',
       whiteSpace: 'nowrap',
-      flexShrink: 0
+      flexShrink: 0,
+      overflow: 'hidden',
     }}
   >
-    <span style={{ color: active ? 'var(--accent-main)' : 'inherit', display: 'flex', alignItems: 'center' }}>
+    <span style={{ color: active ? 'var(--accent-main)' : 'inherit', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
       {item.icon}
     </span>
-    <span>{item.label}</span>
+    {!collapsed && <span>{item.label}</span>}
     {active && !isMobileView && (
       <motion.div
         layoutId="activeTabIndicator"
@@ -198,6 +208,72 @@ const Label = ({ text, icon }) => (
 const Hint = ({ text }) => (
   <small style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.7rem', marginTop: '6px', display: 'block', fontWeight: 500 }}>{text}</small>
 );
+
+// --- DRAG HANDLE ICON ---
+const DragHandleIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style={{ opacity: 0.4, flexShrink: 0 }}>
+    <circle cx="5" cy="4" r="1.2"/><circle cx="5" cy="8" r="1.2"/><circle cx="5" cy="12" r="1.2"/>
+    <circle cx="11" cy="4" r="1.2"/><circle cx="11" cy="8" r="1.2"/><circle cx="11" cy="12" r="1.2"/>
+  </svg>
+);
+
+// --- SORTABLE ROW for DnD ---
+const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, isMobile, isDragMode }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.prompt_key });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+    borderBottom: '1px solid rgba(255,255,255,0.03)',
+    background: isDragging
+      ? 'rgba(229,9,20,0.08)'
+      : isSelected
+      ? 'rgba(229, 9, 20, 0.03)'
+      : 'transparent',
+    cursor: isDragMode ? 'grab' : 'default',
+    userSelect: 'none',
+  };
+
+  return (
+    <tr ref={setNodeRef} style={style}>
+      <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {isDragMode ? (
+            <span {...attributes} {...listeners} style={{ cursor: 'grab', display: 'flex', alignItems: 'center', padding: '4px', borderRadius: '4px', color: 'var(--accent-main)' }} title="Drag to reorder">
+              <DragHandleIcon />
+            </span>
+          ) : (
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={() => onToggleSelect(item.prompt_key)}
+              style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: 'var(--accent-main)' }}
+            />
+          )}
+        </div>
+      </td>
+      <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '4px' }}>{item.prompt_key}</div>
+          {item.hide_prompt_box && <span style={{ fontSize: '0.65rem', color: '#fbbf24', border: '1px solid #fbbf24', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px' }}>HIDDEN</span>}
+        </div>
+        <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title || item.slug}</div>
+      </td>
+      <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.is_premium ? 'PRO' : 'FREE'}</span>
+          <span style={{ padding: '4px 8px', background: 'rgba(255,191,38,0.1)', color: '#fbbf24', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.unlock_count || 0}</span>
+        </div>
+      </td>
+      <td style={{ padding: isMobile ? '16px' : '20px 24px', textAlign: 'right' }}>
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+          <div onClick={() => onEdit(item)} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Edit size={14} color="var(--text-dim)" /></div>
+          <div onClick={() => onDelete(item)} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(229, 9, 20, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Trash size={14} color="var(--accent-main)" /></div>
+        </div>
+      </td>
+    </tr>
+  );
+};
 
 const BrandingPanel = ({ onSave }) => {
   const [settings, setSettings] = useState({});
@@ -633,6 +709,14 @@ const AdminDashboard = () => {
   const [settings, setSettings] = useState({});
   const [selectedKeys, setSelectedKeys] = useState([]);
   const [adminSearch, setAdminSearch] = useState('');
+  const [analyticsDays, setAnalyticsDays] = useState('30');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isDragMode, setIsDragMode] = useState(false);
+  const [isSavingOrder, setIsSavingOrder] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1100);
 
   useEffect(() => {
@@ -641,10 +725,43 @@ const AdminDashboard = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => { 
+  useEffect(() => {
     checkAuth(); 
     api.get('/admin/settings').then(res => setSettings(res.data));
   }, []);
+
+  // --- KEYBOARD SHORTCUTS ---
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Don't fire shortcuts when typing in inputs/textareas
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (!isAdmin) return;
+
+      switch (e.key) {
+        case 'Escape':
+          setIsModalOpen(false);
+          setIsKingDialogOpen(false);
+          break;
+        case 'n':
+        case 'N':
+          if (['prompts', 'blogs', 'categories', 'faqs'].includes(view)) {
+            setEditingItem(null);
+            setIsModalOpen(true);
+          }
+          break;
+        case '1': setView('dashboard'); break;
+        case '2': setView('prompts'); fetchData('prompts'); break;
+        case '3': setView('blogs'); fetchData('blogs'); break;
+        case '4': setView('categories'); fetchData('categories'); break;
+        case '5': setView('faqs'); fetchData('faqs'); break;
+        case '[': setSidebarCollapsed(c => !c); break;
+        default: break;
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isAdmin, view]);
 
   useEffect(() => {
     setSelectedKeys([]);
@@ -746,6 +863,31 @@ const AdminDashboard = () => {
     } catch (err) {
       alert("Deletion failed. See console for details.");
       console.error(err);
+    }
+  };
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setData((items) => {
+      const oldIndex = items.findIndex(i => i.prompt_key === active.id);
+      const newIndex = items.findIndex(i => i.prompt_key === over.id);
+      return arrayMove(items, oldIndex, newIndex);
+    });
+  };
+
+  const handleSaveOrder = async () => {
+    setIsSavingOrder(true);
+    try {
+      const orderedKeys = data.map(i => i.prompt_key);
+      await api.post('/admin/reorder_prompts', { orderedKeys });
+      setIsDragMode(false);
+      alert('Order saved successfully!');
+    } catch (e) {
+      alert('Failed to save order.');
+      console.error(e);
+    } finally {
+      setIsSavingOrder(false);
     }
   };
 
@@ -856,18 +998,61 @@ const AdminDashboard = () => {
     }}>
       {/* Sidebar (Desktop Only) */}
       {!isMobile && (
-        <motion.aside initial={{ x: -100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} style={{ width: '280px', background: 'var(--surface-1)', borderRight: '1px solid var(--glass-border)', padding: '32px 24px', position: 'fixed', height: '100vh', zIndex: 100, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '40px', width: '100%', padding: '0 10px' }}>
-            {settings.logo_url ? (
-              <img 
-                src={settings.logo_url} 
-                className="animated-logo"
-                style={{ height: '90px', maxWidth: '100%', objectFit: 'contain' }} 
-                alt="Logo" 
-              />
+        <motion.aside
+          initial={{ x: -100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1, width: sidebarCollapsed ? '72px' : '280px' }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          style={{
+            background: 'var(--surface-1)',
+            borderRight: '1px solid var(--glass-border)',
+            padding: sidebarCollapsed ? '32px 12px' : '32px 24px',
+            position: 'fixed',
+            height: '100vh',
+            zIndex: 100,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            transition: 'padding 0.3s ease'
+          }}
+        >
+          {/* Collapse Toggle Button */}
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setSidebarCollapsed(c => !c)}
+            title="Toggle sidebar [ ]"
+            style={{
+              position: 'absolute',
+              top: '20px',
+              right: '-14px',
+              width: '28px',
+              height: '28px',
+              borderRadius: '50%',
+              background: 'var(--surface-1)',
+              border: '1px solid var(--glass-border)',
+              color: 'var(--text-dim)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 101,
+              fontSize: '12px',
+              fontWeight: 900,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.4)'
+            }}
+          >
+            {sidebarCollapsed ? '›' : '‹'}
+          </motion.button>
+
+          {/* Logo */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '40px', width: '100%', overflow: 'hidden' }}>
+            {sidebarCollapsed ? (
+              <div className="animated-logo" style={{ width: '40px', height: '40px', background: 'var(--accent-gradient)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.75rem', flexShrink: 0 }}>PK</div>
+            ) : settings.logo_url ? (
+              <img src={settings.logo_url} className="animated-logo" style={{ height: '90px', maxWidth: '100%', objectFit: 'contain' }} alt="Logo" />
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div className="animated-logo" style={{ width: '45px', height: '45px', background: 'var(--accent-gradient)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>PK</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', whiteSpace: 'nowrap' }}>
+                <div className="animated-logo" style={{ width: '45px', height: '45px', background: 'var(--accent-gradient)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, flexShrink: 0 }}>PK</div>
                 <h2 style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.5px', fontFamily: 'var(--font-heading)' }}>KING ADMIN</h2>
               </div>
             )}
@@ -876,17 +1061,36 @@ const AdminDashboard = () => {
           <motion.nav variants={containerVariants} initial="hidden" animate="visible" style={{ flex: 1 }}>
             {menuGroups.map((group, idx) => (
               <div key={idx} style={{ marginBottom: '32px' }}>
-                <div style={{ paddingLeft: '16px', marginBottom: '16px', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '1.5px' }}>{group.title}</div>
+                {!sidebarCollapsed && (
+                  <div style={{ paddingLeft: '16px', marginBottom: '16px', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '1.5px' }}>{group.title}</div>
+                )}
+                {sidebarCollapsed && idx > 0 && (
+                  <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', margin: '8px 0 16px' }} />
+                )}
                 {group.items.map(item => (
-                  <NavItem key={item.id} item={item} active={view === item.id} onClick={(id) => { setView(id); fetchData(id.startsWith('settings') ? 'settings' : id); }} isMobileView={false} />
+                  <NavItem key={item.id} item={item} active={view === item.id} collapsed={sidebarCollapsed} onClick={(id) => { setView(id); fetchData(id.startsWith('settings') ? 'settings' : id); }} isMobileView={false} />
                 ))}
               </div>
             ))}
           </motion.nav>
 
-          <div onClick={handleLogout} style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', borderRadius: '12px', color: 'var(--text-dim)', cursor: 'pointer', background: 'rgba(255,255,255,0.02)' }}>
-            <LogOut size={20} /> <span style={{ fontWeight: 600 }}>Sign Out</span>
+          <div onClick={handleLogout} title={sidebarCollapsed ? 'Sign Out' : ''} style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: sidebarCollapsed ? 'center' : 'flex-start', gap: '12px', padding: sidebarCollapsed ? '14px' : '14px 16px', borderRadius: '12px', color: 'var(--text-dim)', cursor: 'pointer', background: 'rgba(255,255,255,0.02)' }}>
+            <LogOut size={20} />
+            {!sidebarCollapsed && <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>Sign Out</span>}
           </div>
+
+          {/* Keyboard Shortcuts Hint */}
+          {!sidebarCollapsed && (
+            <div style={{ marginTop: '12px', padding: '10px 12px', borderRadius: '10px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.25)', fontWeight: 700, letterSpacing: '1px', marginBottom: '6px' }}>SHORTCUTS</div>
+              <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.2)', lineHeight: '1.8' }}>
+                <span style={{ fontFamily: 'monospace', background: 'rgba(255,255,255,0.07)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>N</span>New item<br/>
+                <span style={{ fontFamily: 'monospace', background: 'rgba(255,255,255,0.07)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>1-5</span>Switch view<br/>
+                <span style={{ fontFamily: 'monospace', background: 'rgba(255,255,255,0.07)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>[</span>Toggle sidebar<br/>
+                <span style={{ fontFamily: 'monospace', background: 'rgba(255,255,255,0.07)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>Esc</span>Close modal
+              </div>
+            </div>
+          )}
         </motion.aside>
       )}
 
@@ -925,11 +1129,12 @@ const AdminDashboard = () => {
       {/* Main Content */}
       <main style={{ 
         flex: 1, 
-        marginLeft: isMobile ? '0' : '280px', 
+        marginLeft: isMobile ? '0' : sidebarCollapsed ? '72px' : '280px', 
         padding: isMobile ? '25px 15px' : '40px',
         width: '100%',
         maxWidth: '100%',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        transition: 'margin-left 0.3s ease'
       }}>
         <motion.header initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} style={{ 
           display: 'flex', 
@@ -949,27 +1154,12 @@ const AdminDashboard = () => {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
               {selectedKeys.length > 0 && view === 'prompts' && (
                 <>
-                  <ActionButton 
-                    label={`HIDE (${selectedKeys.length})`} 
-                    color="#fbbf24" 
-                    icon={<Layers size={18} />} 
-                    onClick={() => handleBulkVisibility(true)} 
-                  />
-                  <ActionButton 
-                    label={`SHOW (${selectedKeys.length})`} 
-                    color="#10a37f" 
-                    icon={<Layers size={18} />} 
-                    onClick={() => handleBulkVisibility(false)} 
-                  />
-                  <ActionButton 
-                    label={`DELETE (${selectedKeys.length})`} 
-                    color="var(--accent-main)" 
-                    icon={<Trash size={18} />} 
-                    onClick={handleBulkDelete} 
-                  />
+                  <ActionButton label={`HIDE (${selectedKeys.length})`} color="#fbbf24" icon={<Layers size={18} />} onClick={() => handleBulkVisibility(true)} />
+                  <ActionButton label={`SHOW (${selectedKeys.length})`} color="#10a37f" icon={<Layers size={18} />} onClick={() => handleBulkVisibility(false)} />
+                  <ActionButton label={`DELETE (${selectedKeys.length})`} color="var(--accent-main)" icon={<Trash size={18} />} onClick={handleBulkDelete} />
                 </>
               )}
-              {['prompts', 'blogs', 'categories', 'faqs'].includes(view) && (
+              {['prompts', 'blogs', 'categories', 'faqs'].includes(view) && !isDragMode && (
                 <div style={{ position: 'relative', flex: 1, minWidth: isMobile ? '100%' : '200px' }}>
                   <input
                     type="text"
@@ -987,7 +1177,32 @@ const AdminDashboard = () => {
                   />
                 </div>
               )}
-              <ActionButton label="CREATE" icon={<Plus size={18} />} onClick={() => { setEditingItem(null); setIsModalOpen(true); }} />
+              {view === 'prompts' && (
+                isDragMode ? (
+                  <>
+                    <ActionButton
+                      label={isSavingOrder ? 'SAVING...' : 'SAVE ORDER'}
+                      color="#10a37f"
+                      icon={<ChevronRight size={18} />}
+                      onClick={handleSaveOrder}
+                    />
+                    <ActionButton
+                      label="CANCEL"
+                      color="rgba(255,255,255,0.1)"
+                      icon={<Crown size={18} />}
+                      onClick={() => { setIsDragMode(false); fetchData('prompts'); }}
+                    />
+                  </>
+                ) : (
+                  <ActionButton
+                    label="REORDER"
+                    color="rgba(59,130,246,0.8)"
+                    icon={<Layers size={18} />}
+                    onClick={() => { setIsDragMode(true); setSelectedKeys([]); setAdminSearch(''); }}
+                  />
+                )
+              )}
+              {!isDragMode && <ActionButton label="CREATE" icon={<Plus size={18} />} onClick={() => { setEditingItem(null); setIsModalOpen(true); }} />}
             </div>
           )}
         </motion.header>
@@ -1077,70 +1292,78 @@ const AdminDashboard = () => {
           {view === 'settings-layout' && <LayoutPanel key="layout" />}
 
           {['prompts', 'blogs', 'categories', 'faqs'].includes(view) && (
-            <motion.div key="list" {...pageTransition} style={{ 
-              ...glassPanelStyle, 
-              overflowX: 'auto',
-              WebkitOverflowScrolling: 'touch'
-            }}>
-              <table style={{ minWidth: isMobile ? '600px' : '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.01)' }}>
-                    {view === 'prompts' && (
+            <motion.div key="list" {...pageTransition} style={{ ...glassPanelStyle, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+              {isDragMode && view === 'prompts' && (
+                <div style={{ padding: '12px 24px', background: 'rgba(59,130,246,0.08)', borderBottom: '1px solid rgba(59,130,246,0.2)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 700 }}>⠿ DRAG MODE ACTIVE</span>
+                  <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)' }}>— Drag the handle icons to reorder prompts, then click SAVE ORDER</span>
+                </div>
+              )}
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <table style={{ minWidth: isMobile ? '600px' : '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.01)' }}>
                       <th style={{ padding: isMobile ? '16px' : '24px', width: '50px' }}>
-                        <input 
-                          type="checkbox" 
-                          checked={filteredData.length > 0 && selectedKeys.length === filteredData.length} 
-                          onChange={() => toggleSelectAll(filteredData)}
-                          style={{ cursor: 'pointer', width: '18px', height: '18px', accentColor: 'var(--accent-main)' }}
-                        />
+                        {view === 'prompts' && !isDragMode && (
+                          <input type="checkbox" checked={filteredData.length > 0 && selectedKeys.length === filteredData.length} onChange={() => toggleSelectAll(filteredData)} style={{ cursor: 'pointer', width: '18px', height: '18px', accentColor: 'var(--accent-main)' }} />
+                        )}
                       </th>
-                    )}
-                    <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Resource Title</th>
-                    {view === 'prompts' && <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Status</th>}
-                    <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'right', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Controls</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredData.map((item, idx) => (
-                    <motion.tr key={idx} variants={itemVariants} initial="hidden" animate="visible" exit="hidden" custom={idx} style={{ 
-                      borderBottom: '1px solid rgba(255,255,255,0.03)',
-                      background: selectedKeys.includes(item.prompt_key || item.id) ? 'rgba(229, 9, 20, 0.03)' : 'transparent'
-                    }}>
-                      {view === 'prompts' && (
-                        <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
-                          <input 
-                            type="checkbox" 
-                            checked={selectedKeys.includes(item.prompt_key || item.id)} 
-                            onChange={() => toggleSelect(item.prompt_key || item.id)}
-                            style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: 'var(--accent-main)' }}
+                      <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Resource Title</th>
+                      {view === 'prompts' && <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Status</th>}
+                      <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'right', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Controls</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {view === 'prompts' && isDragMode ? (
+                      <SortableContext items={data.map(i => i.prompt_key)} strategy={verticalListSortingStrategy}>
+                        {data.map(item => (
+                          <SortableRow
+                            key={item.prompt_key}
+                            item={item}
+                            isSelected={selectedKeys.includes(item.prompt_key)}
+                            onToggleSelect={toggleSelect}
+                            onEdit={(i) => { setEditingItem(i); setIsModalOpen(true); }}
+                            onDelete={handleDelete}
+                            isMobile={isMobile}
+                            isDragMode={isDragMode}
                           />
-                        </td>
-                      )}
-                      <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '4px' }}>{item.prompt_key || item.title || item.name}</div>
-                          {item.hide_prompt_box && <span style={{fontSize: '0.65rem', color: '#fbbf24', border: '1px solid #fbbf24', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px'}}>HIDDEN</span>}
-                        </div>
-                        <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title || item.question || item.slug}</div>
-                      </td>
-                      {view === 'prompts' && (
-                        <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
-                          <div style={{ display: 'flex', gap: '8px' }}>
-                            <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.is_premium ? 'PRO' : 'FREE'}</span>
-                            <span style={{ padding: '4px 8px', background: 'rgba(255,191,38,0.1)', color: '#fbbf24', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.unlock_count || 0}</span>
-                          </div>
-                        </td>
-                      )}
-                      <td style={{ padding: isMobile ? '16px' : '20px 24px', textAlign: 'right' }}>
-                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                          <div onClick={() => { setEditingItem(item); setIsModalOpen(true); }} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Edit size={14} color="var(--text-dim)" /></div>
-                          <div onClick={() => handleDelete(item)} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(229, 9, 20, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Trash size={14} color="var(--accent-main)" /></div>
-                        </div>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
+                        ))}
+                      </SortableContext>
+                    ) : (
+                      filteredData.map((item, idx) => (
+                        <motion.tr key={idx} variants={itemVariants} initial="hidden" animate="visible" exit="hidden" custom={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', background: selectedKeys.includes(item.prompt_key || item.id) ? 'rgba(229, 9, 20, 0.03)' : 'transparent' }}>
+                          {view === 'prompts' && (
+                            <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
+                              <input type="checkbox" checked={selectedKeys.includes(item.prompt_key || item.id)} onChange={() => toggleSelect(item.prompt_key || item.id)} style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: 'var(--accent-main)' }} />
+                            </td>
+                          )}
+                          <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '4px' }}>{item.prompt_key || item.title || item.name}</div>
+                              {item.hide_prompt_box && <span style={{ fontSize: '0.65rem', color: '#fbbf24', border: '1px solid #fbbf24', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px' }}>HIDDEN</span>}
+                            </div>
+                            <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title || item.question || item.slug}</div>
+                          </td>
+                          {view === 'prompts' && (
+                            <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
+                              <div style={{ display: 'flex', gap: '8px' }}>
+                                <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.is_premium ? 'PRO' : 'FREE'}</span>
+                                <span style={{ padding: '4px 8px', background: 'rgba(255,191,38,0.1)', color: '#fbbf24', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.unlock_count || 0}</span>
+                              </div>
+                            </td>
+                          )}
+                          <td style={{ padding: isMobile ? '16px' : '20px 24px', textAlign: 'right' }}>
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                              <div onClick={() => { setEditingItem(item); setIsModalOpen(true); }} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Edit size={14} color="var(--text-dim)" /></div>
+                              <div onClick={() => handleDelete(item)} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(229, 9, 20, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Trash size={14} color="var(--accent-main)" /></div>
+                            </div>
+                          </td>
+                        </motion.tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </DndContext>
             </motion.div>
           )}
         </AnimatePresence>
