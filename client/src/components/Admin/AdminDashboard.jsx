@@ -729,6 +729,21 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleBulkVisibility = async (hide) => {
+    if (view !== 'prompts') return;
+    if (!window.confirm(`Bulk ${hide ? 'hide' : 'show'} ${selectedKeys.length} prompts?`)) return;
+    
+    try {
+      await api.post('/admin/hide_prompts_bulk', { keys: selectedKeys, hide });
+      setSelectedKeys([]);
+      fetchData(view);
+      alert(`Bulk ${hide ? 'hide' : 'show'} successful.`);
+    } catch (err) {
+      alert(`Bulk ${hide ? 'hide' : 'show'} failed.`);
+      console.error(err);
+    }
+  };
+
   const toggleSelect = (key) => {
     setSelectedKeys(prev => 
       prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
@@ -898,12 +913,26 @@ const AdminDashboard = () => {
           {['prompts', 'blogs', 'categories', 'faqs'].includes(view) && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
               {selectedKeys.length > 0 && view === 'prompts' && (
-                <ActionButton 
-                  label={`DELETE (${selectedKeys.length})`} 
-                  color="var(--accent-main)" 
-                  icon={<Trash size={18} />} 
-                  onClick={handleBulkDelete} 
-                />
+                <>
+                  <ActionButton 
+                    label={`HIDE (${selectedKeys.length})`} 
+                    color="#fbbf24" 
+                    icon={<Layers size={18} />} 
+                    onClick={() => handleBulkVisibility(true)} 
+                  />
+                  <ActionButton 
+                    label={`SHOW (${selectedKeys.length})`} 
+                    color="#10a37f" 
+                    icon={<Layers size={18} />} 
+                    onClick={() => handleBulkVisibility(false)} 
+                  />
+                  <ActionButton 
+                    label={`DELETE (${selectedKeys.length})`} 
+                    color="var(--accent-main)" 
+                    icon={<Trash size={18} />} 
+                    onClick={handleBulkDelete} 
+                  />
+                </>
               )}
               {['prompts', 'blogs', 'categories', 'faqs'].includes(view) && (
                 <div style={{ position: 'relative', flex: 1, minWidth: isMobile ? '100%' : '200px' }}>
@@ -991,7 +1020,10 @@ const AdminDashboard = () => {
                         </td>
                       )}
                       <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
-                        <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '4px' }}>{item.prompt_key || item.title || item.name}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '4px' }}>{item.prompt_key || item.title || item.name}</div>
+                          {item.hide_prompt_box && <span style={{fontSize: '0.65rem', color: '#fbbf24', border: '1px solid #fbbf24', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px'}}>HIDDEN</span>}
+                        </div>
                         <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title || item.question || item.slug}</div>
                       </td>
                       {view === 'prompts' && (

@@ -14,7 +14,8 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     is_premium: false,
     image_ratio: '4 / 5',
     is_image_slider: false,
-    gallery_urls: '[]'
+    gallery_urls: '[]',
+    hide_prompt_box: false
   });
   const [originalKey, setOriginalKey] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -84,6 +85,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
         ...prompt,
         is_image_slider: Boolean(prompt.is_image_slider),
         is_premium: prompt.is_premium !== undefined ? Boolean(prompt.is_premium) : (prompt.isPremium !== undefined ? Boolean(prompt.isPremium) : false),
+        hide_prompt_box: Boolean(prompt.hide_prompt_box || prompt.hidePromptBox),
         description: prompt.description || '',
         gallery_urls: prompt.gallery_urls || prompt.galleryUrls || '[]'
       });
@@ -262,9 +264,10 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
             <div style={{ gridColumn: 'span 2' }}>
               <div className="glass-card" style={{ padding: '25px', borderRadius: '20px' }}>
                 <Label text="Presentation Mode" />
-                <div style={{ display: 'flex', gap: '30px', marginTop: '15px' }}>
+                <div style={{ display: 'flex', gap: '30px', marginTop: '15px', flexWrap: 'wrap' }}>
                   <Checkbox label="Enable Contrast Slider" checked={formData.is_image_slider} onChange={(val) => setFormData({...formData, is_image_slider: val})} />
                   <Checkbox label="Premium Content" premium checked={formData.is_premium} onChange={(val) => setFormData({...formData, is_premium: val, password: val ? formData.password : ''})} />
+                  <Checkbox label="Hide Prompt from Users" checked={formData.hide_prompt_box} onChange={(val) => setFormData({...formData, hide_prompt_box: val})} />
                 </div>
               </div>
             </div>

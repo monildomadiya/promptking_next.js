@@ -14,7 +14,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
   const [loading, setLoading] = useState(true);
   const [activeUnlockedKey, setActiveUnlockedKey] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 9;
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [catSearch, setCatSearch] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -64,6 +64,8 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
 
 
   const filteredPrompts = prompts.filter(p => {
+    if (p.hidePromptBox || p.hide_prompt_box) return false;
+    
     const safeKey = (p.prompt_key || '').toLowerCase();
     const safeSearch = (search || '').toLowerCase();
     

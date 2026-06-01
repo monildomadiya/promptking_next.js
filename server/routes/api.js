@@ -783,7 +783,8 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
           image_ratio = ${p.image_ratio}, 
           password = ${p.password}, 
           is_premium = ${!!p.is_premium},
-          gallery_urls = ${p.gallery_urls || null}
+          gallery_urls = ${p.gallery_urls || null},
+          hide_prompt_box = ${!!p.hide_prompt_box}
         WHERE prompt_key = ${originalKey}
       `;
     } else {
@@ -791,11 +792,11 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
       await db`
         INSERT INTO prompts (
           prompt_key, slug, title, description, ai_type, prompt_text, img_before, img_after, 
-          ig_link, is_image_slider, image_ratio, password, is_premium, gallery_urls
+          ig_link, is_image_slider, image_ratio, password, is_premium, gallery_urls, hide_prompt_box
         ) VALUES (
           ${finalKey}, ${finalSlug}, ${p.title}, ${p.description}, ${p.ai_type}, ${p.prompt_text}, 
           ${p.img_before}, ${p.img_after}, ${p.ig_link}, ${!!p.is_image_slider}, 
-          ${p.image_ratio}, ${p.password}, ${!!p.is_premium}, ${p.gallery_urls || null}
+          ${p.image_ratio}, ${p.password}, ${!!p.is_premium}, ${p.gallery_urls || null}, ${!!p.hide_prompt_box}
         )
       `;
     }
@@ -832,6 +833,30 @@ router.post('/admin/delete_prompts_bulk', adminAuth, async (req, res) => {
   } catch (error) {
     console.error("[Admin] Bulk delete FAILED:", error);
     res.status(500).json({ error: "Bulk delete failed" });
+  }
+});
+
+router.post('/admin/hide_prompts_bulk', adminAuth, async (req, res) => {
+  const { keys, hide } = req.body;
+  if (!Array.isArray(keys) || keys.length === 0) {
+    return res.status(400).json({ error: "No keys provided for bulk hide/show" });
+  }
+
+  // Update mock data for fallback
+  MOCK_DATA.prompts.forEach(p => {
+    if (keys.includes(p.prompt_key)) {
+      p.hide_prompt_box = hide ? 1 : 0;
+    }
+  });
+
+  try {
+    const hideValue = hide ? 1 : 0;
+    await db`UPDATE prompts SET hide_prompt_box = ${hideValue} WHERE prompt_key IN ${keys}`;
+    res.json({ status: "success", count: keys.length });
+  } catch (error) {
+    console.warn("[Admin] Bulk hide/show DB FAILED, applied to mock data:", error.message);
+    lastDbFailure = Date.now();
+    res.json({ status: "success", count: keys.length, warning: "DB unreachable, applied to mock data" });
   }
 });
 
