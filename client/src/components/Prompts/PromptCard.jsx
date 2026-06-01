@@ -273,13 +273,16 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
         overflow: 'hidden',
         transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
         pointerEvents: (isUnlocked && prompt.isPremium) ? 'none' : 'auto',
-        marginBottom: (isUnlocked && prompt.isPremium) ? '0' : '8px'
+        marginBottom: (isUnlocked && prompt.isPremium) ? '0' : '8px',
+        margin: `-${cardPadding}px -${cardPadding}px 0 -${cardPadding}px`,
+        width: `calc(100% + ${cardPadding * 2}px)`,
+        borderRadius: '24px 24px 0 0'
       }}>
         {/* Image Section */}
         {prompt.isImageSlider ? (
           <div className="slider-container" style={{ 
-            aspectRatio: ratio, width: `calc(100% + ${cardPadding * 2}px)`, margin: `-${cardPadding}px -${cardPadding}px 15px -${cardPadding}px`,
-            position: 'relative', overflow: 'hidden', borderRadius: '20px 20px 0 0', borderBottom: '1px solid var(--border-color)',
+            aspectRatio: ratio, width: '100%', margin: `0 0 15px 0`,
+            position: 'relative', overflow: 'hidden', borderBottom: '1px solid var(--border-color)',
             minHeight: isMobile ? '140px' : '180px', background: '#111'
           }}>
             <img 
@@ -346,7 +349,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
 
           </div>
         ) : (prompt.imgAfter || prompt.imgBefore) && (
-          <div style={{ width: `calc(100% + ${cardPadding * 2}px)`, margin: `-${cardPadding}px -${cardPadding}px 15px -${cardPadding}px`, aspectRatio: ratio, background: '#111', borderRadius: '20px 20px 0 0', overflow: 'hidden', minHeight: isMobile ? '140px' : '180px', position: 'relative' }}>
+          <div style={{ width: '100%', margin: `0 0 15px 0`, aspectRatio: ratio, background: '#111', overflow: 'hidden', minHeight: isMobile ? '140px' : '180px', position: 'relative' }}>
             <img 
               src={optimizeImage(prompt.imgAfter || prompt.imgBefore, isMobile ? 450 : 600)} 
               alt={prompt.title} 
@@ -362,7 +365,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
           </div>
         )}
         {/* Header Info */}
-        <Link to={`/prompt/${prompt.slug || prompt.prompt_key || prompt.key}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+        <Link to={`/prompt/${prompt.slug || prompt.prompt_key || prompt.key}`} style={{ color: 'inherit', textDecoration: 'none', display: 'block', padding: `0 ${cardPadding}px` }}>
           <h3 style={{ 
             fontSize: '1rem', 
             fontWeight: 500, 

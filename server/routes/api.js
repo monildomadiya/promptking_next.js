@@ -485,6 +485,9 @@ router.post('/record_copy', async (req, res) => {
   const { key } = req.body;
   try {
     await db`UPDATE prompts SET copy_count = copy_count + 1 WHERE prompt_key = ${key}`;
+    try {
+      await db`INSERT INTO analytics_events (prompt_key, event_type) VALUES (${key}, 'copy')`;
+    } catch(err) { console.warn('Analytics logging failed:', err.message); }
     res.json({ status: "success" });
   } catch (error) {
     console.error(error);
@@ -497,12 +500,17 @@ router.post('/record_unlock', async (req, res) => {
   const { key } = req.body;
   try {
     await db`UPDATE prompts SET unlock_count = unlock_count + 1 WHERE prompt_key = ${key}`;
+    try {
+      await db`INSERT INTO analytics_events (prompt_key, event_type) VALUES (${key}, 'unlock')`;
+    } catch(err) { console.warn('Analytics logging failed:', err.message); }
     res.json({ status: "success" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to record unlock" });
   }
 });
+
+// --- ADMIN ANALYTICS MOVED BELOW ADMINAUTH ---
 
 // --- 5. USER PROFILE (REMOVED) ---
 // User profile management was removed.
@@ -532,6 +540,49 @@ const adminAuth = (req, res, next) => {
 router.get('/admin/check_auth', (req, res) => {
   const tokenHeader = req.headers['x-admin-token'];
   res.json({ isAdmin: !!(req.session.isAdmin || (tokenHeader && validAdminTokens.has(tokenHeader))) });
+});
+
+// --- ADMIN ANALYTICS ---
+router.get('/admin/analytics', adminAuth, async (req, res) => {
+  const daysStr = req.query.days || '30';
+  try {
+    let rows;
+    if (daysStr === 'all') {
+      rows = await db`SELECT DATE(created_at) as date, event_type, COUNT(*) as count FROM analytics_events GROUP BY DATE(created_at), event_type ORDER BY date ASC`;
+    } else {
+      const days = parseInt(daysStr, 10);
+      rows = await db`SELECT DATE(created_at) as date, event_type, COUNT(*) as count FROM analytics_events WHERE created_at >= DATE_SUB(NOW(), INTERVAL ${days} DAY) GROUP BY DATE(created_at), event_type ORDER BY date ASC`;
+    }
+    const dataMap = {};
+    rows.forEach(r => {
+      let dateStr = r.date;
+      if (typeof r.date === 'object' && r.date !== null) {
+        const offset = r.date.getTimezoneOffset() * 60000;
+        dateStr = (new Date(r.date - offset)).toISOString().split('T')[0];
+      } else if (typeof r.date === 'string') {
+        dateStr = r.date.split('T')[0];
+      }
+      if (!dataMap[dateStr]) dataMap[dateStr] = { date: dateStr, copy: 0, unlock: 0 };
+      dataMap[dateStr][r.event_type] = Number(r.count);
+    });
+    const formattedData = Object.values(dataMap).sort((a, b) => a.date.localeCompare(b.date));
+    res.json(formattedData);
+  } catch (error) {
+    console.error('Analytics Error:', error);
+    res.status(500).json({ error: "Failed to fetch analytics" });
+  }
+});
+
+// --- ADMIN ANALYTICS RESET ---
+router.post('/admin/analytics/reset', adminAuth, async (req, res) => {
+  try {
+    await db`UPDATE prompts SET copy_count = 0, unlock_count = 0, like_count = 0`;
+    await db`TRUNCATE TABLE analytics_events`;
+    res.json({ status: "success" });
+  } catch (error) {
+    console.error('Analytics Reset Error:', error);
+    res.status(500).json({ error: "Failed to reset analytics" });
+  }
 });
 
 router.post('/admin/login', (req, res) => {
@@ -736,6 +787,12 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
   }
 });
 
+const pingGoogleSitemap = () => {
+  fetch('http://www.google.com/ping?sitemap=https://promptking.in/api/sitemap.xml')
+    .then(r => console.log('Pinged Google Sitemap:', r.status))
+    .catch(e => console.error('Failed to ping Google:', e.message));
+};
+
 router.post('/admin/save_prompt', adminAuth, async (req, res) => {
   const p = req.body;
   const originalKey = p.originalKey;
@@ -800,6 +857,7 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
         )
       `;
     }
+    pingGoogleSitemap();
     res.json({ status: "success" });
   } catch (error) {
     console.error(error);
@@ -897,6 +955,7 @@ router.post('/admin/save_blog', adminAuth, async (req, res) => {
     } else {
       await db`INSERT INTO blogs (title, slug, content, featured_image) VALUES (${b.title}, ${finalSlug}, ${b.content}, ${b.featured_image})`;
     }
+    pingGoogleSitemap();
     res.json({ status: "success" });
   } catch (error) {
     console.error("Save blog error:", error);
@@ -1011,14 +1070,24 @@ router.get('/sitemap.xml', async (req, res) => {
   try {
     // Attempt DB fetch if healthy
     const db = require('../db');
-    prompts = await db`SELECT prompt_key FROM prompts WHERE prompt_key IS NOT NULL`;
-    blogs = await db`SELECT slug FROM blogs`;
+    prompts = await db`SELECT prompt_key, updated_at, created_at, img_after, img_before FROM prompts WHERE prompt_key IS NOT NULL`;
+    blogs = await db`SELECT slug, updated_at, created_at, featured_image FROM blogs WHERE slug IS NOT NULL`;
   } catch (err) {
     console.warn("Sitemap: DB failed, serving static pages only", err.message);
   }
 
+  const escapeXml = (str) => {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  };
+  
+  const formatDate = (d) => {
+    const date = d ? new Date(d) : new Date();
+    return !isNaN(date.getTime()) ? date.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+  };
+
   try {
-    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n`;
     
     // Static Pages
     const staticPages = ['', '/blog', '/faq', '/about', '/privacy', '/terms', '/disclaimer', '/contact'];
@@ -1028,12 +1097,18 @@ router.get('/sitemap.xml', async (req, res) => {
 
     // Dynamic Prompts
     prompts.forEach(p => {
-      xml += `  <url>\n    <loc>${baseUrl}/prompt/${p.prompt_key}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>\n`;
+      const img = p.img_after || p.img_before;
+      xml += `  <url>\n    <loc>${baseUrl}/prompt/${escapeXml(p.prompt_key)}</loc>\n    <lastmod>${formatDate(p.updated_at || p.created_at)}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n`;
+      if (img) xml += `    <image:image>\n      <image:loc>${escapeXml(img.startsWith('/') ? baseUrl + img : img)}</image:loc>\n    </image:image>\n`;
+      xml += `  </url>\n`;
     });
 
     // Dynamic Blogs
     blogs.forEach(b => {
-      xml += `  <url>\n    <loc>${baseUrl}/article/${b.slug}</loc>\n    <changefreq>monthly</changefreq>\n    <priority>0.5</priority>\n  </url>\n`;
+      const img = b.featured_image;
+      xml += `  <url>\n    <loc>${baseUrl}/article/${escapeXml(b.slug)}</loc>\n    <lastmod>${formatDate(b.updated_at || b.created_at)}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n`;
+      if (img) xml += `    <image:image>\n      <image:loc>${escapeXml(img.startsWith('/') ? baseUrl + img : img)}</image:loc>\n    </image:image>\n`;
+      xml += `  </url>\n`;
     });
 
     xml += `</urlset>`;

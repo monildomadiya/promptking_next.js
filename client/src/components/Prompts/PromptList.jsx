@@ -14,7 +14,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
   const [loading, setLoading] = useState(true);
   const [activeUnlockedKey, setActiveUnlockedKey] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
+  const itemsPerPage = isMobile ? 8 : 9;
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [catSearch, setCatSearch] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -180,6 +180,8 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
               </button>
             </div>
           )}
+          
+          
           <div className="masonry-grid-react" style={{ 
             display: 'flex', 
             gap: isMobile ? '12px' : '20px', 
@@ -216,8 +218,6 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
               ));
             })()}
           </div>
-
-          <MagicKingIntro isMobile={isMobile} />
 
           {filteredPrompts.length > itemsPerPage && (
             <div className="pagination-container" style={{ display: 'flex', justifyContent: 'center', marginTop: '30px', gap: '8px', alignItems: 'center' }}>
@@ -306,6 +306,8 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
               </button>
             </div>
           )}
+
+          <MagicKingIntro isMobile={isMobile} />
         </div>
 
         {!isMobile && (

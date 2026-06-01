@@ -82,6 +82,25 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Initialize database tables
+(async () => {
+  try {
+    const db = require('./db');
+    await db`
+      CREATE TABLE IF NOT EXISTS analytics_events (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        prompt_key VARCHAR(100) NOT NULL,
+        event_type ENUM('copy', 'unlock') NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_created_type (created_at, event_type)
+      )
+    `;
+    console.log("Analytics table initialized.");
+  } catch (error) {
+    console.error("Failed to initialize analytics table:", error.message);
+  }
+})();
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

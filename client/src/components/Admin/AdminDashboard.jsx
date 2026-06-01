@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { 
   Table, Edit, Trash, Plus, Settings, FileText, 
   TableProperties, LogOut, ChevronRight, Layout, 
@@ -624,6 +625,7 @@ const AdminDashboard = () => {
   const [password, setPassword] = useState('');
   const [view, setView] = useState('dashboard');
   const [data, setData] = useState([]);
+  const [analyticsData, setAnalyticsData] = useState([]);
   const [stats, setStats] = useState({ prompts: 0, copies: 0, unlocks: 0, likes: 0 });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isKingDialogOpen, setIsKingDialogOpen] = useState(false);
@@ -653,7 +655,10 @@ const AdminDashboard = () => {
     try {
       const response = await api.get('/admin/check_auth');
       setIsAdmin(response.data.isAdmin);
-      if (response.data.isAdmin) fetchData('prompts');
+      if (response.data.isAdmin) {
+        fetchData('prompts');
+        fetchAnalytics();
+      }
     } catch (e) { console.error(e); }
   };
 
@@ -669,6 +674,7 @@ const AdminDashboard = () => {
         localStorage.setItem('adminToken', response.data.token);
         setIsAdmin(true);
         fetchData('prompts');
+        fetchAnalytics();
       } else {
         alert("Authentication failed.");
       }
@@ -699,6 +705,35 @@ const AdminDashboard = () => {
         });
       }
     } catch (e) { console.error(e); }
+  };
+
+  const fetchAnalytics = async (days = analyticsDays) => {
+    try {
+      const response = await api.get(`/admin/analytics?days=${days}`);
+      if (Array.isArray(response.data)) {
+        setAnalyticsData(response.data);
+      } else {
+        console.warn("Analytics response was not an array:", response.data);
+        setAnalyticsData([]);
+      }
+    } catch (e) { console.error(e); }
+  };
+
+  useEffect(() => {
+    if (isAdmin) fetchAnalytics(analyticsDays);
+  }, [analyticsDays]);
+
+  const handleResetAnalytics = async () => {
+    if (!window.confirm("CRITICAL WARNING: This will permanently wipe all interaction history (copies, unlocks, likes) from the system. Are you absolutely sure?")) return;
+    try {
+      await api.post('/admin/analytics/reset');
+      fetchData('prompts');
+      fetchAnalytics(analyticsDays);
+      alert("Analytics data has been completely reset.");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to reset analytics data.");
+    }
   };
 
   const handleDelete = async (item) => {
@@ -966,10 +1001,72 @@ const AdminDashboard = () => {
                 <StatCard label="Unlocks Generated" value={stats.unlocks} color="#fbbf24" icon={<Layers size={24} />} />
                 <StatCard label="Social Likes" value={stats.likes} color="#ec4899" icon={<Activity size={24} />} />
               </div>
-              <div style={{ ...glassPanelStyle, padding: '40px', textAlign: 'center' }}>
-                <Activity size={48} style={{ opacity: 0.1, marginBottom: '20px' }} />
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '8px' }}>Analytics Engine</h3>
-                <p style={{ color: 'var(--text-dim)' }}>Live traffic and conversion metrics integration is in progress.</p>
+              <div style={{ ...glassPanelStyle, padding: '30px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
+                  <SectionTitle title="Engagement Analytics" />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <select
+                      value={analyticsDays}
+                      onChange={(e) => setAnalyticsDays(e.target.value)}
+                      style={{
+                        padding: '8px 12px',
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '8px',
+                        color: 'white',
+                        outline: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <option value="7" style={{background: '#111'}}>Last 7 Days</option>
+                      <option value="30" style={{background: '#111'}}>Last 30 Days</option>
+                      <option value="90" style={{background: '#111'}}>Last 90 Days</option>
+                      <option value="all" style={{background: '#111'}}>All Time</option>
+                    </select>
+                    <button
+                      onClick={handleResetAnalytics}
+                      style={{
+                        padding: '8px 16px',
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        color: '#ef4444',
+                        border: '1px solid rgba(239, 68, 68, 0.3)',
+                        borderRadius: '8px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        transition: '0.2s',
+                      }}
+                      onMouseOver={(e) => e.target.style.background = 'rgba(239, 68, 68, 0.2)'}
+                      onMouseOut={(e) => e.target.style.background = 'rgba(239, 68, 68, 0.1)'}
+                    >
+                      Reset Data
+                    </button>
+                  </div>
+                </div>
+                <div style={{ width: '100%', height: '400px', marginTop: '10px' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={analyticsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="colorCopy" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                        </linearGradient>
+                        <linearGradient id="colorUnlock" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#fbbf24" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#fbbf24" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <XAxis dataKey="date" stroke="rgba(255,255,255,0.3)" tick={{fill: 'rgba(255,255,255,0.5)', fontSize: 12}} />
+                      <YAxis stroke="rgba(255,255,255,0.3)" tick={{fill: 'rgba(255,255,255,0.5)', fontSize: 12}} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: 'rgba(10, 10, 10, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                        itemStyle={{ color: 'white', fontWeight: 700 }}
+                      />
+                      <Area type="monotone" dataKey="copy" name="Copies" stroke="#3b82f6" fillOpacity={1} fill="url(#colorCopy)" />
+                      <Area type="monotone" dataKey="unlock" name="Unlocks" stroke="#fbbf24" fillOpacity={1} fill="url(#colorUnlock)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
             </motion.div>
           )}
