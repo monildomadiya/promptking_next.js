@@ -381,197 +381,199 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
       </div>
 
       {/* Prompt Area */}
-      <div style={{ transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }}>
-        <div id={`box-${prompt.key}`} className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isSnapping ? 'thanos-snap' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse' : ''} ${isRelocking ? 'vault-relock-animate' : ''}`} style={{
-            background: 'rgba(15, 15, 20, 0.4)', 
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            borderRadius: '20px', 
-            position: 'relative', 
-            overflow: 'hidden',
-            display: 'flex', 
-            flexDirection: 'column', 
-            margin: (isUnlocked && prompt.isPremium) ? '0' : '0 0 15px 0', 
-            border: isUnlocked ? (prompt.isPremium ? '1px solid #FFD700' : (isCopied ? '1px solid #27C93F' : '1px solid var(--accent-main)')) : '1px solid rgba(255,255,255,0.06)',
-            boxShadow: isUnlocked ? (prompt.isPremium ? (isMobile ? '0 0 20px rgba(255, 215, 0, 0.1)' : '0 0 40px rgba(255, 215, 0, 0.15)') : (isCopied ? '0 0 30px rgba(39, 201, 63, 0.3)' : (isMobile ? '0 0 15px rgba(229, 9, 20, 0.15)' : '0 0 40px rgba(229, 9, 20, 0.2)'))) : 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 10px 30px rgba(0,0,0,0.5)',
-            minHeight: isUnlocked ? (prompt.isPremium ? (isMobile ? '300px' : '380px') : (isMobile ? '170px' : '180px')) : '140px',
-            transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-            transform: isUnlocked ? (isCopied && !prompt.isPremium ? (isMobile ? 'scale(1.02)' : 'scale(1.03)') : 'scale(1.01)') : 'scale(1)'
-          }}>
-            {/* macOS Style Header */}
-            <div style={{ 
-              background: 'transparent', 
-              padding: isMobile ? '8px 10px' : '12px 15px', 
-              borderBottom: '1px solid rgba(255,255,255,0.04)', 
+      {!(prompt.hidePromptBox || prompt.hide_prompt_box) && (
+        <div style={{ transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }}>
+          <div id={`box-${prompt.key}`} className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isSnapping ? 'thanos-snap' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse' : ''} ${isRelocking ? 'vault-relock-animate' : ''}`} style={{
+              background: 'rgba(15, 15, 20, 0.4)', 
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              borderRadius: '20px', 
+              position: 'relative', 
+              overflow: 'hidden',
               display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'space-between',
-              gap: '12px' 
+              flexDirection: 'column', 
+              margin: (isUnlocked && prompt.isPremium) ? '0' : '0 0 15px 0', 
+              border: isUnlocked ? (prompt.isPremium ? '1px solid #FFD700' : (isCopied ? '1px solid #27C93F' : '1px solid var(--accent-main)')) : '1px solid rgba(255,255,255,0.06)',
+              boxShadow: isUnlocked ? (prompt.isPremium ? (isMobile ? '0 0 20px rgba(255, 215, 0, 0.1)' : '0 0 40px rgba(255, 215, 0, 0.15)') : (isCopied ? '0 0 30px rgba(39, 201, 63, 0.3)' : (isMobile ? '0 0 15px rgba(229, 9, 20, 0.15)' : '0 0 40px rgba(229, 9, 20, 0.2)'))) : 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 10px 30px rgba(0,0,0,0.5)',
+              minHeight: isUnlocked ? (prompt.isPremium ? (isMobile ? '300px' : '380px') : (isMobile ? '170px' : '180px')) : '140px',
+              transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+              transform: isUnlocked ? (isCopied && !prompt.isPremium ? (isMobile ? 'scale(1.02)' : 'scale(1.03)') : 'scale(1.01)') : 'scale(1)'
             }}>
-              <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
-                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#FF5F56' }}></div>
-                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#FFBD2E' }}></div>
-                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#27C93F' }}></div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, minWidth: 0 }}>
-                <span className={`badge ${badgeClass}`} style={{ 
-                  fontSize: isMobile ? '10px' : '11px', 
-                  padding: isMobile ? '2px 8px' : '3px 10px',
-                  borderRadius: '6px',
-                  fontWeight: 900,
-                  textTransform: 'uppercase',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: `1px solid ${brandColor || 'rgba(255,255,255,0.2)'}`,
-                  color: brandColor || 'white',
-                  letterSpacing: '0.5px',
-                  whiteSpace: 'nowrap'
-                }}>{prompt.aiType || 'AI'}</span>
-              </div>
-            </div>
-            
-            <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <div className="unlocked-prompt-content" style={{ 
-                position: 'absolute', inset: 0, padding: isMobile ? '15px 15px 45px 15px' : '24px 24px 60px 24px', 
-                fontFamily: '"JetBrains Mono", "Fira Code", Consolas, monospace', 
-                fontSize: isMobile ? '0.82rem' : '0.9rem', color: '#a1a1aa', lineHeight: isMobile ? 1.6 : 1.8,
-                filter: (isUnlocked && !isRelocking) ? 'none' : 'blur(10px)', 
-                WebkitFilter: (isUnlocked && !isRelocking) ? 'none' : 'blur(10px)',
-                userSelect: (isUnlocked && !isRelocking) ? 'text' : 'none', 
-                overflowY: (isUnlocked && !isRelocking) ? 'auto' : 'hidden',
-                transition: 'filter 0.5s ease-out, -webkit-filter 0.5s ease-out'
+              {/* macOS Style Header */}
+              <div style={{ 
+                background: 'transparent', 
+                padding: isMobile ? '8px 10px' : '12px 15px', 
+                borderBottom: '1px solid rgba(255,255,255,0.04)', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between',
+                gap: '12px' 
               }}>
-                <HighlightText text={prompt.promptText} highlight={searchTerm} />
-              </div>
-
-              {isUnlocked && (
-                <button 
-                  onClick={handleCopy}
-                  aria-label="Copy prompt text"
-                  style={{
-                    position: 'absolute',
-                    bottom: '12px',
-                    right: '12px',
-                    background: isCopied ? 'var(--accent-main)' : 'rgba(255,255,255,0.1)',
-                    border: '1px solid rgba(255,255,255,0.2)',
-                    color: 'white',
-                    padding: '8px 15px',
-                    borderRadius: '10px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    backdropFilter: 'blur(10px)',
-                    zIndex: 20,
-                    transition: 'all 0.3s ease',
-                    animation: isCopied ? 'copyButtonPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)' : 'none'
-                  }}
-                  className="pro-card-hover"
-                >
-                  {isCopied ? <Check size={14} /> : <Copy size={14} />}
-                  {isCopied ? 'Copied!' : 'Copy'}
-
-                  {/* Floating Toast Indicator */}
-                  {isCopied && (
-                    <span style={{
-                      position: 'absolute',
-                      top: '-35px',
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      background: 'var(--accent-main)',
-                      color: 'white',
-                      padding: '3px 10px',
-                      borderRadius: '20px',
-                      fontSize: '0.65rem',
-                      fontWeight: 800,
-                      whiteSpace: 'nowrap',
-                      boxShadow: '0 4px 15px rgba(229, 9, 20, 0.4)',
-                      animation: 'toastFloatUp 0.6s ease-out forwards',
-                      zIndex: 100
-                    }}>
-                      Success!
-                    </span>
-                  )}
-                </button>
-              )}
-
-              {(!isUnlocked || isRelocking) && (
-                <div className={`lock-overlay-base ${isRelocking ? 'lock-overlay-animate' : ''}`} style={{ 
-                  position: 'absolute', inset: 0, 
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px 12px', zIndex: 10, gap: '10px'
-                }}>
-                  <div style={{ 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    width: '100%'
-                  }}>
-                    <form onSubmit={(e) => e.preventDefault()} style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                      <input 
-                        type="password" 
-                        placeholder="••••" 
-                        value={pin}
-                        onChange={(e) => checkAutoUnlock(e.target.value)}
-                        style={{ 
-                          width: isMobile ? '110px' : '140px',
-                          height: isMobile ? '36px' : '42px',
-                          borderRadius: '100px',
-                          border: showError ? '2px solid #ff4444' : '1px solid rgba(255,255,255,0.2)',
-                          background: 'rgba(255,255,255,0.08)',
-                          color: 'white', 
-                          textAlign: 'center', 
-                          outline: 'none', 
-                          letterSpacing: isMobile ? '4px' : '8px', 
-                          fontSize: '16px', 
-                          transition: 'all 0.3s ease',
-                          backdropFilter: 'blur(10px)',
-                          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                          padding: 0
-                        }} 
-                      />
-                    </form>
-                  </div>
-
-                  {showError && <p style={{ color: '#ff4444', fontSize: '0.75rem', marginTop: '8px', fontWeight: 600 }}>Incorrect PIN</p>}
-                  
-                  {prompt.igLink && (
-                    <button 
-                      onClick={() => setShowVideoModal(true)}
-                      aria-label="Get PIN from video"
-                      style={{ 
-                        background: 'transparent', 
-                        fontSize: isMobile ? '0.7rem' : '0.85rem', color: 'rgba(255,255,255,0.6)', 
-                        display: 'flex', alignItems: 'center', gap: isMobile ? '4px' : '8px', 
-                        flexDirection: isMobile ? 'column' : 'row',
-                        textDecoration: 'none', border: 'none', cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                        textAlign: 'center'
-                      }}
-                      onMouseOver={(e) => { if (!isMobile) e.currentTarget.style.color = 'white'; }}
-                      onMouseOut={(e) => { if (!isMobile) e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
-                    >
-                      {prompt.igLink.includes('instagram') ? (
-                        <Instagram size={16} color="currentColor" />
-                      ) : (
-                        <Youtube size={16} color="currentColor" />
-                      )}
-                      Get PIN from {prompt.igLink.includes('instagram') ? 'Reel' : 'Short'}
-                    </button>
-                  )}
+                <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#FF5F56' }}></div>
+                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#FFBD2E' }}></div>
+                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#27C93F' }}></div>
                 </div>
-              )}
+                <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, minWidth: 0 }}>
+                  <span className={`badge ${badgeClass}`} style={{ 
+                    fontSize: isMobile ? '10px' : '11px', 
+                    padding: isMobile ? '2px 8px' : '3px 10px',
+                    borderRadius: '6px',
+                    fontWeight: 900,
+                    textTransform: 'uppercase',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: `1px solid ${brandColor || 'rgba(255,255,255,0.2)'}`,
+                    color: brandColor || 'white',
+                    letterSpacing: '0.5px',
+                    whiteSpace: 'nowrap'
+                  }}>{prompt.aiType || 'AI'}</span>
+                </div>
+              </div>
+              
+              <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="unlocked-prompt-content" style={{ 
+                  position: 'absolute', inset: 0, padding: isMobile ? '15px 15px 45px 15px' : '24px 24px 60px 24px', 
+                  fontFamily: '"JetBrains Mono", "Fira Code", Consolas, monospace', 
+                  fontSize: isMobile ? '0.82rem' : '0.9rem', color: '#a1a1aa', lineHeight: isMobile ? 1.6 : 1.8,
+                  filter: (isUnlocked && !isRelocking) ? 'none' : 'blur(10px)', 
+                  WebkitFilter: (isUnlocked && !isRelocking) ? 'none' : 'blur(10px)',
+                  userSelect: (isUnlocked && !isRelocking) ? 'text' : 'none', 
+                  overflowY: (isUnlocked && !isRelocking) ? 'auto' : 'hidden',
+                  transition: 'filter 0.5s ease-out, -webkit-filter 0.5s ease-out'
+                }}>
+                  <HighlightText text={prompt.promptText} highlight={searchTerm} />
+                </div>
+
+                {isUnlocked && (
+                  <button 
+                    onClick={handleCopy}
+                    aria-label="Copy prompt text"
+                    style={{
+                      position: 'absolute',
+                      bottom: '12px',
+                      right: '12px',
+                      background: isCopied ? 'var(--accent-main)' : 'rgba(255,255,255,0.1)',
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      color: 'white',
+                      padding: '8px 15px',
+                      borderRadius: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      backdropFilter: 'blur(10px)',
+                      zIndex: 20,
+                      transition: 'all 0.3s ease',
+                      animation: isCopied ? 'copyButtonPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)' : 'none'
+                    }}
+                    className="pro-card-hover"
+                  >
+                    {isCopied ? <Check size={14} /> : <Copy size={14} />}
+                    {isCopied ? 'Copied!' : 'Copy'}
+
+                    {/* Floating Toast Indicator */}
+                    {isCopied && (
+                      <span style={{
+                        position: 'absolute',
+                        top: '-35px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        background: 'var(--accent-main)',
+                        color: 'white',
+                        padding: '3px 10px',
+                        borderRadius: '20px',
+                        fontSize: '0.65rem',
+                        fontWeight: 800,
+                        whiteSpace: 'nowrap',
+                        boxShadow: '0 4px 15px rgba(229, 9, 20, 0.4)',
+                        animation: 'toastFloatUp 0.6s ease-out forwards',
+                        zIndex: 100
+                      }}>
+                        Success!
+                      </span>
+                    )}
+                  </button>
+                )}
+
+                {(!isUnlocked || isRelocking) && (
+                  <div className={`lock-overlay-base ${isRelocking ? 'lock-overlay-animate' : ''}`} style={{ 
+                    position: 'absolute', inset: 0, 
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px 12px', zIndex: 10, gap: '10px'
+                  }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      width: '100%'
+                    }}>
+                      <form onSubmit={(e) => e.preventDefault()} style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                        <input 
+                          type="password" 
+                          placeholder="••••" 
+                          value={pin}
+                          onChange={(e) => checkAutoUnlock(e.target.value)}
+                          style={{ 
+                            width: isMobile ? '110px' : '140px',
+                            height: isMobile ? '36px' : '42px',
+                            borderRadius: '100px',
+                            border: showError ? '2px solid #ff4444' : '1px solid rgba(255,255,255,0.2)',
+                            background: 'rgba(255,255,255,0.08)',
+                            color: 'white', 
+                            textAlign: 'center', 
+                            outline: 'none', 
+                            letterSpacing: isMobile ? '4px' : '8px', 
+                            fontSize: '16px', 
+                            transition: 'all 0.3s ease',
+                            backdropFilter: 'blur(10px)',
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                            padding: 0
+                          }} 
+                        />
+                      </form>
+                    </div>
+
+                    {showError && <p style={{ color: '#ff4444', fontSize: '0.75rem', marginTop: '8px', fontWeight: 600 }}>Incorrect PIN</p>}
+                    
+                    {prompt.igLink && (
+                      <button 
+                        onClick={() => setShowVideoModal(true)}
+                        aria-label="Get PIN from video"
+                        style={{ 
+                          background: 'transparent', 
+                          fontSize: isMobile ? '0.7rem' : '0.85rem', color: 'rgba(255,255,255,0.6)', 
+                          display: 'flex', alignItems: 'center', gap: isMobile ? '4px' : '8px', 
+                          flexDirection: isMobile ? 'column' : 'row',
+                          textDecoration: 'none', border: 'none', cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          textAlign: 'center'
+                        }}
+                        onMouseOver={(e) => { if (!isMobile) e.currentTarget.style.color = 'white'; }}
+                        onMouseOut={(e) => { if (!isMobile) e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
+                      >
+                        {prompt.igLink.includes('instagram') ? (
+                          <Instagram size={16} color="currentColor" />
+                        ) : (
+                          <Youtube size={16} color="currentColor" />
+                        )}
+                        Get PIN from {prompt.igLink.includes('instagram') ? 'Reel' : 'Short'}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+              
             </div>
             
+            <YouTubeModal 
+              isOpen={showVideoModal} 
+              onClose={() => setShowVideoModal(false)} 
+              videoUrl={prompt.igLink} 
+            />
           </div>
-          
-          <YouTubeModal 
-            isOpen={showVideoModal} 
-            onClose={() => setShowVideoModal(false)} 
-            videoUrl={prompt.igLink} 
-          />
-        </div>
+        )}
 
 
 

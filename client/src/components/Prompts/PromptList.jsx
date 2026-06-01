@@ -64,8 +64,6 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
 
 
   const filteredPrompts = prompts.filter(p => {
-    if (p.hidePromptBox || p.hide_prompt_box) return false;
-    
     const safeKey = (p.prompt_key || '').toLowerCase();
     const safeSearch = (search || '').toLowerCase();
     
