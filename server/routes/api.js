@@ -275,7 +275,16 @@ router.get('/get_data', async (req, res) => {
   }
 
   try {
-    const promptsRows = await db`SELECT * FROM prompts ORDER BY sort_order ASC, id ASC`;
+    let promptsRows;
+    try {
+      promptsRows = await db`SELECT * FROM prompts ORDER BY sort_order ASC, id ASC`;
+    } catch (colErr) {
+      if (colErr.message.includes('Unknown column')) {
+        promptsRows = await db`SELECT * FROM prompts`;
+      } else {
+        throw colErr;
+      }
+    }
     const categoriesRows = await db`SELECT * FROM categories ORDER BY name ASC`;
 
     const prompts = promptsRows.map(row => ({
