@@ -72,6 +72,14 @@ const PromptDetailPage = ({ adsSettings }) => {
       if (!(p.is_premium || p.isPremium)) {
         setIsUnlocked(true);
       }
+      
+      // Track page view once the prompt is loaded
+      try {
+        await api.post('/record_unlock', { key: p.prompt_key || p.key });
+      } catch (err) {
+        console.error("Failed to record view:", err);
+      }
+      
       setLoading(false);
     } catch (err) {
       console.error("Error fetching prompt:", err);
@@ -123,12 +131,6 @@ const PromptDetailPage = ({ adsSettings }) => {
           window.scrollTo({ top: y, behavior: 'smooth' });
         }
       }, 100);
-
-      try {
-        await api.post('/record_unlock', { key: prompt.key }); // Record as unlock
-      } catch (err) {
-        console.error("Failed to record correct attempt:", err);
-      }
     } else if (inputPass.length >= targetPass.length) {
       setShowError(true);
       setTimeout(() => {
