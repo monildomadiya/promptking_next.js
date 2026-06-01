@@ -2,10 +2,16 @@ import React from 'react';
 import { Shield, Lock, Eye, FileText, CheckCircle, ShieldCheck } from '../components/Common/Icons';
 
 import SocialSidebar from '../components/Prompts/SocialSidebar';
+import SEOMetadata from '../components/SEO/SEOMetadata';
 
 const PrivacyPage = () => {
   return (
     <div className="layout-with-sidebar">
+      <SEOMetadata 
+        title="Privacy Policy - PromptKing"
+        description="Learn how PromptKing handles your data, cookies, and privacy."
+        url="https://promptking.in/privacy"
+      />
       <div className="main-content-area">
         <header className="blog-hero" style={{ marginBottom: '40px' }}>
           <div style={{ 

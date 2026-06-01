@@ -287,7 +287,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
           }}>
             <img 
               src={optimizeImage(prompt.imgAfter, isMobile ? 450 : 600)} 
-              alt="After" 
+              alt={`${prompt.title} - ${prompt.aiType || 'AI'} Prompt Result (After)`} 
               loading={isPriority ? "eager" : "lazy"} 
               fetchpriority={isPriority ? "high" : "auto"}
               onLoad={() => setIsLoaded(true)}
@@ -297,7 +297,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
             />
             <img 
               src={optimizeImage(prompt.imgBefore, isMobile ? 450 : 600)} 
-              alt="Before" 
+              alt={`${prompt.title} - Original Input Image (Before)`} 
               loading={isPriority ? "eager" : "lazy"}
               fetchpriority={isPriority ? "high" : "auto"}
               width="400"
@@ -352,7 +352,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
           <div style={{ width: '100%', margin: `0 0 15px 0`, aspectRatio: ratio, background: '#111', overflow: 'hidden', minHeight: isMobile ? '140px' : '180px', position: 'relative' }}>
             <img 
               src={optimizeImage(prompt.imgAfter || prompt.imgBefore, isMobile ? 450 : 600)} 
-              alt={prompt.title} 
+              alt={`${prompt.title} - ${prompt.aiType || 'AI'} Prompt Example`} 
               loading={isPriority ? "eager" : "lazy"} 
               fetchpriority={isPriority ? "high" : "auto"}
               onLoad={() => setIsLoaded(true)}

@@ -2,10 +2,17 @@ import React from 'react';
 import { Target, Rocket, Award, Shield, Zap, Sparkles } from '../components/Common/Icons';
 
 import SocialSidebar from '../components/Prompts/SocialSidebar';
+import SEOMetadata from '../components/SEO/SEOMetadata';
 
 const AboutPage = () => {
   return (
     <div className="layout-with-sidebar">
+      <SEOMetadata 
+        title="About Us - PromptKing"
+        description="Learn about PromptKing, our mission, and why we are the premier enterprise-grade library for high-performance AI prompts."
+        url="https://promptking.in/about"
+        breadcrumb={[{ name: 'Home', url: 'https://promptking.in/' }, { name: 'About', url: 'https://promptking.in/about' }]}
+      />
       <div className="main-content-area">
         <header className="blog-hero" style={{ marginBottom: '40px' }}>
           <div style={{ 

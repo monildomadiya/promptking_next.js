@@ -2,10 +2,16 @@ import React from 'react';
 import { Gavel, Scale, FileSignature, AlertCircle } from '../components/Common/Icons';
 
 import SocialSidebar from '../components/Prompts/SocialSidebar';
+import SEOMetadata from '../components/SEO/SEOMetadata';
 
 const TermsPage = () => {
   return (
     <div className="layout-with-sidebar">
+      <SEOMetadata 
+        title="Terms & Conditions - PromptKing"
+        description="Your guide to using PromptKing respectfully and legally. Terms of service and conditions."
+        url="https://promptking.in/terms"
+      />
       <div className="main-content-area">
         <header className="blog-hero" style={{ marginBottom: '40px' }}>
           <div style={{ 

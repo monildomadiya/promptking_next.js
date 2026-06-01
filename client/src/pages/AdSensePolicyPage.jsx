@@ -2,10 +2,16 @@ import React from 'react';
 import { ShieldCheck, Info, ExternalLink, Globe, Cookie } from '../components/Common/Icons';
 
 import SocialSidebar from '../components/Prompts/SocialSidebar';
+import SEOMetadata from '../components/SEO/SEOMetadata';
 
 const AdSensePolicyPage = () => {
   return (
     <div className="layout-with-sidebar">
+      <SEOMetadata 
+        title="AdSense Policy - PromptKing"
+        description="Transparency regarding our relationship with Google AdSense and third-party advertising."
+        url="https://promptking.in/adsense-policy"
+      />
       <div className="main-content-area">
         <header className="blog-hero" style={{ marginBottom: '40px' }}>
           <div style={{ 

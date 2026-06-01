@@ -36,6 +36,43 @@
     gtag('js', new Date());
     gtag('config', 'G-1HK9T17LSR');
   </script>
+  <!-- JSON-LD Schema Markup for SEO and Knowledge Panel -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://promptking.in/#website",
+          "url": "https://promptking.in/",
+          "name": "PromptKing",
+          "description": "The ultimate premium library for AI engineering and creative workflows.",
+          "potentialAction": [{
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://promptking.in/?search={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }]
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://promptking.in/#organization",
+          "name": "PromptKing",
+          "url": "https://promptking.in/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://promptking.in/favicon.png"
+          },
+          "sameAs": [
+            "https://youtube.com/@promptking",
+            "https://instagram.com/promptking"
+          ]
+        }
+      ]
+    }
+  </script>
 </head>
 
 <body>

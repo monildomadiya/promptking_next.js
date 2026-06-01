@@ -2,10 +2,16 @@ import React from 'react';
 import { AlertTriangle, Info, ExternalLink, Cpu, ShieldCheck } from '../components/Common/Icons';
 
 import SocialSidebar from '../components/Prompts/SocialSidebar';
+import SEOMetadata from '../components/SEO/SEOMetadata';
 
 const DisclaimerPage = () => {
   return (
     <div className="layout-with-sidebar">
+      <SEOMetadata 
+        title="Disclaimer - PromptKing"
+        description="Important information regarding our content, AI technology, and limitation of liability."
+        url="https://promptking.in/disclaimer"
+      />
       <div className="main-content-area">
         <header className="blog-hero" style={{ marginBottom: '40px' }}>
           <div style={{ 

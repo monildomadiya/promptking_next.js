@@ -89,6 +89,8 @@ if (READ_ONLY) {
 }
 
 // Import and use routes
+const sitemapRoute = require('./routes/sitemap');
+app.use('/sitemap.xml', sitemapRoute);
 const apiRoutes = require('./routes/api');
 app.use('/api', apiRoutes);
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, MessageCircle, Send, CheckCircle, Sparkles, Instagram, Youtube, Twitter } from '../components/Common/Icons';
 import SocialSidebar from '../components/Prompts/SocialSidebar';
+import SEOMetadata from '../components/SEO/SEOMetadata';
 
 const ContactPage = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -21,6 +22,12 @@ const ContactPage = () => {
 
   return (
     <div className="layout-with-sidebar">
+      <SEOMetadata 
+        title="Contact Us - PromptKing"
+        description="Get in touch with the PromptKing team. We're here to help with support, collaboration, and feedback."
+        url="https://promptking.in/contact"
+        breadcrumb={[{ name: 'Home', url: 'https://promptking.in/' }, { name: 'Contact', url: 'https://promptking.in/contact' }]}
+      />
       <div className="main-content-area">
         <header className="blog-hero" style={{ marginBottom: '40px' }}>
           <div style={{ 
