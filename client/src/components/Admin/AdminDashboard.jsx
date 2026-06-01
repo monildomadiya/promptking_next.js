@@ -12,7 +12,8 @@ import { CSS } from '@dnd-kit/utilities';
 import { 
   Table, Edit, Trash, Plus, Settings, FileText, 
   TableProperties, LogOut, ChevronRight, Layout, 
-  Share2, Palette, Activity, Users, Layers, Crown
+  Share2, Palette, Activity, Users, Layers, Crown,
+  Eye, Copy
 } from '../Common/Icons';
 import PromptModal from './PromptModal';
 import BlogModal from './BlogModal';
@@ -260,9 +261,14 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, isMob
         <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title || item.slug}</div>
       </td>
       <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.is_premium ? 'PRO' : 'FREE'}</span>
-          <span style={{ padding: '4px 8px', background: 'rgba(255,191,38,0.1)', color: '#fbbf24', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.unlock_count || 0}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Opened (Views)">
+            <Eye size={12} /> {item.unlock_count || 0}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(16,163,127,0.1)', color: '#10a37f', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Copied">
+            <Copy size={12} /> {item.copy_count || 0}
+          </div>
         </div>
       </td>
       <td style={{ padding: isMobile ? '16px' : '20px 24px', textAlign: 'right' }}>
@@ -1346,9 +1352,14 @@ const AdminDashboard = () => {
                           </td>
                           {view === 'prompts' && (
                             <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
-                              <div style={{ display: 'flex', gap: '8px' }}>
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.is_premium ? 'PRO' : 'FREE'}</span>
-                                <span style={{ padding: '4px 8px', background: 'rgba(255,191,38,0.1)', color: '#fbbf24', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.unlock_count || 0}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Opened (Views)">
+                                  <Eye size={12} /> {item.unlock_count || 0}
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(16,163,127,0.1)', color: '#10a37f', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Copied">
+                                  <Copy size={12} /> {item.copy_count || 0}
+                                </div>
                               </div>
                             </td>
                           )}
