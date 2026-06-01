@@ -120,9 +120,10 @@ app.use((err, req, res, next) => {
         INDEX idx_created_type (created_at, event_type)
       )
     `;
-    console.log("Analytics table initialized.");
+    await db`ALTER TABLE prompts ADD COLUMN IF NOT EXISTS sort_order INT DEFAULT 0`;
+    console.log("Database tables initialized.");
   } catch (error) {
-    console.error("Failed to initialize analytics table:", error.message);
+    console.error("Failed to initialize database tables:", error.message);
   }
 })();
 
