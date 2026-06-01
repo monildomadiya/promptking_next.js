@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "postgres": "^3.4.8"
+    "postgres": "^3.4.8",
+    "puppeteer": "^25.1.0"
   }
 }
