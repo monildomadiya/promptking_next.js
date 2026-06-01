@@ -13,13 +13,14 @@ import {
   Table, Edit, Trash, Plus, Settings, FileText, 
   TableProperties, LogOut, ChevronRight, Layout, 
   Share2, Palette, Activity, Users, Layers, Crown,
-  Eye, Copy
+  Eye, Copy, PieChart
 } from '../Common/Icons';
 import PromptModal from './PromptModal';
 import BlogModal from './BlogModal';
 import FAQModal from './FAQModal';
 import CategoryModal from './CategoryModal';
 import KingDialog from '../Modals/KingDialog';
+import GoogleAnalyticsPanel from './GoogleAnalyticsPanel';
 
 // --- ANIMATION VARIANTS ---
 const containerVariants = {
@@ -987,6 +988,7 @@ const AdminDashboard = () => {
     ]},
     { title: 'SYSTEM CONFIG', items: [
       { id: 'settings-branding', label: 'Branding', icon: <Palette size={20} /> },
+      { id: 'settings-ga', label: 'Google Analytics', icon: <PieChart size={20} /> },
       { id: 'settings-social', label: 'Channels', icon: <Share2 size={20} /> },
       { id: 'settings-ads', label: 'Ads Management', icon: <Activity size={20} /> },
       { id: 'settings-layout', label: 'Layout', icon: <Layers size={20} /> },
@@ -1293,6 +1295,7 @@ const AdminDashboard = () => {
           )}
 
           {view === 'settings-branding' && <BrandingPanel key="branding" onSave={() => fetchData('settings')} />}
+          {view === 'settings-ga' && <GoogleAnalyticsPanel key="ga" />}
           {view === 'settings-social' && <SocialPanel key="social" onSave={() => fetchData('settings')} />}
           {view === 'settings-ads' && <AdsPanel key="ads" onSave={() => fetchData('settings')} />}
           {view === 'settings-layout' && <LayoutPanel key="layout" />}

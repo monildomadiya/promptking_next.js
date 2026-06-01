@@ -346,4 +346,6 @@ export const Monitor = (props) => (
   <IconWrapper {...props}><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></IconWrapper>
 );
 
-
+export const PieChart = (props) => (
+  <IconWrapper {...props}><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></IconWrapper>
+);
