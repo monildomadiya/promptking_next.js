@@ -633,26 +633,6 @@ router.post('/admin/login', (req, res) => {
 });
 
 
-// --- GOOGLE ANALYTICS CONFIG ---
-router.post('/admin/ga_config', adminAuth, async (req, res) => {
-  try {
-    const { jsonKey } = req.body;
-    if (!jsonKey) {
-      return res.status(400).json({ error: "No JSON key provided" });
-    }
-    try {
-      JSON.parse(jsonKey);
-    } catch(e) {
-      return res.status(400).json({ error: "Invalid JSON format" });
-    }
-    // Simulate successful save (Placeholder for Phase 2)
-    res.json({ status: "success", message: "GA config received" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
 // Admin Settings
 router.get('/admin/settings', adminAuth, async (req, res) => {
   try {
