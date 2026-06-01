@@ -2,7 +2,18 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '.env') });
+const fs = require('fs');
+
+// Load .env.local first if it exists (local dev override), otherwise fall back to .env
+const localEnvPath = path.join(__dirname, '.env.local');
+const defaultEnvPath = path.join(__dirname, '.env');
+if (fs.existsSync(localEnvPath)) {
+  require('dotenv').config({ path: localEnvPath });
+  console.log('[ENV] Loaded .env.local (LOCAL DEV MODE)');
+} else {
+  require('dotenv').config({ path: defaultEnvPath });
+  console.log('[ENV] Loaded .env (PRODUCTION MODE)');
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -62,6 +73,20 @@ app.get('/api/health-check', async (req, res) => {
     dbType: "MySQL"
   });
 });
+
+// --- READ-ONLY GUARD (for local dev safety) ---
+const READ_ONLY = process.env.READ_ONLY === 'true';
+if (READ_ONLY) {
+  app.use((req, res, next) => {
+    if (req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE') {
+      return res.status(403).json({ 
+        error: 'READ_ONLY mode is active. Write operations are disabled in local dev to protect the live database.'
+      });
+    }
+    next();
+  });
+  console.warn('⚠️  READ_ONLY mode is ACTIVE. All write operations are blocked.');
+}
 
 // Import and use routes
 const apiRoutes = require('./routes/api');

@@ -3,6 +3,7 @@ client/node_modules/
 server/node_modules/
 .env
 server/.env
+server/.env.local
 *.log
 dist/
 client/dist/
@@ -14,4 +15,3 @@ test_publish.js
 debug.log
 server/debug.log
 supabase_schema.sql
-server/.env
