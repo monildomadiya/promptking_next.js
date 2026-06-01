@@ -302,9 +302,14 @@ router.get('/get_data', async (req, res) => {
     res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
     res.json({ prompts, likes: {}, categories: categoriesRows });
   } catch (error) {
-    console.warn('LOCAL DB FAILED, FETCHING LIVE DATA FROM PRODUCTION API:', error.message);
-    lastDbFailure = Date.now();
-    await fetchLiveData();
+    console.error('DATABASE ERROR:', error.message);
+    // Prevent infinite loop on live server: only fetch live data if running locally
+    if (process.env.NODE_ENV !== 'production' && process.env.DB_HOST !== '107.172.39.165') {
+      lastDbFailure = Date.now();
+      await fetchLiveData();
+    } else {
+      res.status(500).json({ error: "Database error", details: error.message });
+    }
   }
 });
 
@@ -781,9 +786,13 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
     }));
     res.json(formatted);
   } catch (error) {
-    console.warn('ADMIN PROMPTS DB FAILED, FETCHING LIVE:', error.message);
-    lastDbFailure = Date.now();
-    await fetchLiveAdminPrompts();
+    console.error('ADMIN PROMPTS DB ERROR:', error.message);
+    if (process.env.NODE_ENV !== 'production' && process.env.DB_HOST !== '107.172.39.165') {
+      lastDbFailure = Date.now();
+      await fetchLiveAdminPrompts();
+    } else {
+      res.status(500).json({ error: "Database error", details: error.message });
+    }
   }
 });
 
