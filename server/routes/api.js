@@ -905,13 +905,13 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
           img_before = ${p.img_before}, 
           img_after = ${p.img_after}, 
           ig_link = ${p.ig_link}, 
-          is_image_slider = ${!!p.is_image_slider}, 
+          is_image_slider = ${p.is_image_slider ? 1 : 0}, 
           image_ratio = ${p.image_ratio}, 
           password = ${p.password}, 
-          is_premium = ${!!p.is_premium},
+          is_premium = ${p.is_premium ? 1 : 0},
           gallery_urls = ${p.gallery_urls || null},
-          hide_prompt_box = ${!!p.hide_prompt_box},
-          is_featured = ${!!p.is_featured}
+          hide_prompt_box = ${p.hide_prompt_box ? 1 : 0},
+          is_featured = ${p.is_featured ? 1 : 0}
         WHERE prompt_key = ${originalKey}
       `;
     } else {
@@ -922,8 +922,8 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
           ig_link, is_image_slider, image_ratio, password, is_premium, gallery_urls, hide_prompt_box, is_featured
         ) VALUES (
           ${finalKey}, ${finalSlug}, ${p.title}, ${p.description}, ${p.ai_type}, ${p.prompt_text}, 
-          ${p.img_before}, ${p.img_after}, ${p.ig_link}, ${!!p.is_image_slider}, 
-          ${p.image_ratio}, ${p.password}, ${!!p.is_premium}, ${p.gallery_urls || null}, ${!!p.hide_prompt_box}, ${!!p.is_featured}
+          ${p.img_before}, ${p.img_after}, ${p.ig_link}, ${p.is_image_slider ? 1 : 0}, 
+          ${p.image_ratio}, ${p.password}, ${p.is_premium ? 1 : 0}, ${p.gallery_urls || null}, ${p.hide_prompt_box ? 1 : 0}, ${p.is_featured ? 1 : 0}
         )
       `;
     }
@@ -993,7 +993,8 @@ router.post('/admin/toggle_featured', adminAuth, async (req, res) => {
   const { key, is_featured } = req.body;
   if (!key) return res.status(400).json({ error: 'key is required' });
   try {
-    await db`UPDATE prompts SET is_featured = ${!!is_featured} WHERE prompt_key = ${key}`;
+    const featuredValue = is_featured ? 1 : 0;
+    await db`UPDATE prompts SET is_featured = ${featuredValue} WHERE prompt_key = ${key}`;
     res.json({ status: 'success', key, is_featured: !!is_featured });
   } catch (error) {
     console.error('Toggle featured error:', error);
