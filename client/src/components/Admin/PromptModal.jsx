@@ -85,9 +85,9 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
       setFormData({
         ...prompt,
         is_image_slider: Boolean(prompt.is_image_slider),
-        is_premium: prompt.is_premium !== undefined ? Boolean(prompt.is_premium) : (prompt.isPremium !== undefined ? Boolean(prompt.isPremium) : false),
-        hide_prompt_box: Boolean(prompt.hide_prompt_box || prompt.hidePromptBox),
-        is_featured: prompt.is_featured !== undefined ? Boolean(prompt.is_featured) : (prompt.isFeatured !== undefined ? Boolean(prompt.isFeatured) : false),
+        is_premium: prompt.is_premium == 1 || prompt.is_premium === true || prompt.is_premium === 'true' || prompt.isPremium == 1 || prompt.isPremium === true || prompt.isPremium === 'true',
+        hide_prompt_box: prompt.hide_prompt_box == 1 || prompt.hide_prompt_box === true || prompt.hide_prompt_box === 'true' || prompt.hidePromptBox == 1 || prompt.hidePromptBox === true || prompt.hidePromptBox === 'true',
+        is_featured: prompt.is_featured == 1 || prompt.is_featured === true || prompt.is_featured === 'true' || prompt.isFeatured == 1 || prompt.isFeatured === true || prompt.isFeatured === 'true',
         description: prompt.description || '',
         gallery_urls: prompt.gallery_urls || prompt.galleryUrls || '[]'
       });

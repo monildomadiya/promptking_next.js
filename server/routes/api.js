@@ -809,7 +809,10 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
       unlock_count: Number(r.unlock_count || 0),
       like_count: Number(r.like_count || 0),
       correct_attempts: Number(r.correct_attempts || 0),
-      wrong_attempts: Number(r.wrong_attempts || 0)
+      wrong_attempts: Number(r.wrong_attempts || 0),
+      is_featured: r.is_featured == 1 || r.is_featured === true || r.is_featured === 'true',
+      is_premium: r.is_premium == 1 || r.is_premium === true || r.is_premium === 'true',
+      hide_prompt_box: r.hide_prompt_box == 1 || r.hide_prompt_box === true || r.hide_prompt_box === 'true'
     }));
     res.json(formatted);
   } catch (error) {
