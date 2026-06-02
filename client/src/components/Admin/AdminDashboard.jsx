@@ -219,7 +219,13 @@ const DragHandleIcon = () => (
 );
 
 // --- SORTABLE ROW for DnD ---
-const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, isMobile, isDragMode }) => {
+const StarIcon = ({ filled, size = 16 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? '#FFD700' : 'none'} stroke={filled ? '#FFD700' : 'rgba(255,255,255,0.3)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  </svg>
+);
+
+const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onToggleFeatured, isMobile, isDragMode }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.prompt_key });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -273,7 +279,21 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, isMob
         </div>
       </td>
       <td style={{ padding: isMobile ? '16px' : '20px 24px', textAlign: 'right' }}>
-        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', alignItems: 'center' }}>
+          <div
+            onClick={() => onToggleFeatured(item)}
+            title={item.is_featured ? 'Unfeature this prompt' : 'Feature this prompt'}
+            style={{
+              width: '32px', height: '32px', borderRadius: '8px',
+              background: item.is_featured ? 'rgba(255, 215, 0, 0.15)' : 'rgba(255,255,255,0.03)',
+              border: item.is_featured ? '1px solid rgba(255,215,0,0.4)' : '1px solid rgba(255,255,255,0.06)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              boxShadow: item.is_featured ? '0 0 10px rgba(255,215,0,0.2)' : 'none'
+            }}
+          >
+            <StarIcon filled={item.is_featured} size={14} />
+          </div>
           <div onClick={() => onEdit(item)} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Edit size={14} color="var(--text-dim)" /></div>
           <div onClick={() => onDelete(item)} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(229, 9, 20, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Trash size={14} color="var(--accent-main)" /></div>
         </div>
@@ -929,6 +949,19 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleToggleFeatured = async (item) => {
+    const newFeatured = !item.is_featured;
+    // Optimistic UI update
+    setData(prev => prev.map(p => p.prompt_key === item.prompt_key ? { ...p, is_featured: newFeatured } : p));
+    try {
+      await api.post('/admin/toggle_featured', { key: item.prompt_key, is_featured: newFeatured });
+    } catch (err) {
+      // Revert on failure
+      setData(prev => prev.map(p => p.prompt_key === item.prompt_key ? { ...p, is_featured: item.is_featured } : p));
+      alert('Failed to update featured status.');
+    }
+  };
+
   const toggleSelect = (key) => {
     setSelectedKeys(prev => 
       prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
@@ -1358,6 +1391,7 @@ const AdminDashboard = () => {
                             onToggleSelect={toggleSelect}
                             onEdit={(i) => { setEditingItem(i); setIsModalOpen(true); }}
                             onDelete={handleDelete}
+                            onToggleFeatured={handleToggleFeatured}
                             isMobile={isMobile}
                             isDragMode={isDragMode}
                           />
@@ -1392,7 +1426,23 @@ const AdminDashboard = () => {
                             </td>
                           )}
                           <td style={{ padding: isMobile ? '16px' : '20px 24px', textAlign: 'right' }}>
-                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                              {view === 'prompts' && (
+                                <div
+                                  onClick={() => handleToggleFeatured(item)}
+                                  title={item.is_featured ? 'Unfeature this prompt' : 'Feature this prompt'}
+                                  style={{
+                                    width: '32px', height: '32px', borderRadius: '8px',
+                                    background: item.is_featured ? 'rgba(255, 215, 0, 0.15)' : 'rgba(255,255,255,0.03)',
+                                    border: item.is_featured ? '1px solid rgba(255,215,0,0.4)' : '1px solid rgba(255,255,255,0.06)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                                    transition: 'all 0.2s ease',
+                                    boxShadow: item.is_featured ? '0 0 10px rgba(255,215,0,0.2)' : 'none'
+                                  }}
+                                >
+                                  <StarIcon filled={item.is_featured} size={14} />
+                                </div>
+                              )}
                               <div onClick={() => { setEditingItem(item); setIsModalOpen(true); }} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Edit size={14} color="var(--text-dim)" /></div>
                               <div onClick={() => handleDelete(item)} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(229, 9, 20, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Trash size={14} color="var(--accent-main)" /></div>
                             </div>

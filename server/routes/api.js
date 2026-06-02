@@ -988,6 +988,19 @@ router.post('/admin/hide_prompts_bulk', adminAuth, async (req, res) => {
   }
 });
 
+// --- TOGGLE FEATURED ---
+router.post('/admin/toggle_featured', adminAuth, async (req, res) => {
+  const { key, is_featured } = req.body;
+  if (!key) return res.status(400).json({ error: 'key is required' });
+  try {
+    await db`UPDATE prompts SET is_featured = ${!!is_featured} WHERE prompt_key = ${key}`;
+    res.json({ status: 'success', key, is_featured: !!is_featured });
+  } catch (error) {
+    console.error('Toggle featured error:', error);
+    res.status(500).json({ error: 'Failed to toggle featured status' });
+  }
+});
+
 // Admin Blog CRUD
 router.get('/admin/blogs', adminAuth, async (req, res) => {
   if (!isDbHealthy()) return fetchLiveAdminBlogs();
