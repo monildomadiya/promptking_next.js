@@ -1,0 +1,107 @@
+{% assign upload_path = '/apps/mask-shape-upload/upload' %}
+<script src="{{ 'mask-shape-upload.js' | asset_url }}" defer></script>
+
+<div
+  class="mask-shape-customizer"
+  data-mask-shape-root
+  data-upload-path="{{ upload_path }}"
+  data-clip-heart-id="mask-heart-{{ block.id }}"
+  data-require-upload="{{ block.settings.require_upload }}"
+  style="margin: 1.5rem 0; padding: 1.25rem; border: 1px solid rgba(0,0,0,.12); border-radius: 12px; max-width: 420px;"
+>
+  <svg class="mask-shape-svg-defs" aria-hidden="true" width="0" height="0" style="position:absolute">
+    <defs>
+      <clipPath id="mask-heart-{{ block.id }}" clipPathUnits="objectBoundingBox">
+        <path d="M0.5,0.82 C0.45,0.75 0,0.48 0,0.28 C0,0.12 0.12,0.02 0.26,0.02 C0.38,0.02 0.48,0.12 0.5,0.22 C0.52,0.12 0.62,0.02 0.74,0.02 C0.88,0.02 1,0.12 1,0.28 C1,0.48 0.55,0.75 0.5,0.82 Z"></path>
+      </clipPath>
+    </defs>
+  </svg>
+
+  {% if block.settings.heading != blank %}
+    <h3 class="mask-shape-heading" style="margin: 0 0 1rem; font-size: 1.1rem;">
+      {{ block.settings.heading }}
+    </h3>
+  {% endif %}
+
+  <div
+    class="mask-shape-preview-wrap"
+    style="aspect-ratio: 1; max-width: 280px; margin: 0 auto 1rem; background: linear-gradient(135deg,#f0f0f0,#e2e2e2); border-radius: 12px; overflow: hidden;"
+  >
+    <div
+      data-mask-preview-inner
+      style="width: 100%; height: 100%; background-color: #ddd; background-size: cover; background-position: center;"
+    ></div>
+  </div>
+
+  <fieldset style="border: none; padding: 0; margin: 0 0 1rem;">
+    <legend style="font-weight: 600; margin-bottom: 0.5rem; padding: 0;">
+      {{ 'mask_shape.shape_label' | t }}
+    </legend>
+    <div class="mask-shape-swatches" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+      <label style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.65rem; border: 1px solid #ccc; border-radius: 999px; font-size: 0.85rem;">
+        <input type="radio" name="mask-shape-{{ block.id }}" value="circle" data-mask-shape-radio checked>
+        <span>Circle</span>
+      </label>
+      <label style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.65rem; border: 1px solid #ccc; border-radius: 999px; font-size: 0.85rem;">
+        <input type="radio" name="mask-shape-{{ block.id }}" value="square" data-mask-shape-radio>
+        <span>Square</span>
+      </label>
+      <label style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.65rem; border: 1px solid #ccc; border-radius: 999px; font-size: 0.85rem;">
+        <input type="radio" name="mask-shape-{{ block.id }}" value="rounded" data-mask-shape-radio>
+        <span>Rounded</span>
+      </label>
+      <label style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.65rem; border: 1px solid #ccc; border-radius: 999px; font-size: 0.85rem;">
+        <input type="radio" name="mask-shape-{{ block.id }}" value="hexagon" data-mask-shape-radio>
+        <span>Hexagon</span>
+      </label>
+      <label style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.65rem; border: 1px solid #ccc; border-radius: 999px; font-size: 0.85rem;">
+        <input type="radio" name="mask-shape-{{ block.id }}" value="star" data-mask-shape-radio>
+        <span>Star</span>
+      </label>
+      <label style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.65rem; border: 1px solid #ccc; border-radius: 999px; font-size: 0.85rem;">
+        <input type="radio" name="mask-shape-{{ block.id }}" value="heart" data-mask-shape-radio>
+        <span>Heart</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <div class="mask-shape-upload-field" style="margin-bottom: 0.75rem;">
+    <label for="mask-file-{{ block.id }}" style="display: block; font-weight: 600; margin-bottom: 0.35rem;">
+      {{ 'mask_shape.upload_label' | t }}
+    </label>
+    <input
+      id="mask-file-{{ block.id }}"
+      type="file"
+      accept="image/*"
+      data-mask-file
+      style="max-width: 100%;"
+    >
+  </div>
+
+  <p data-mask-status style="min-height: 1.25rem; margin: 0; font-size: 0.9rem;"></p>
+
+  <p style="margin: 0.75rem 0 0; font-size: 0.8rem; opacity: 0.8;">
+    {{ 'mask_shape.add_note' | t }}
+  </p>
+</div>
+
+{% schema %}
+{
+  "name": "Mask shape image upload",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Customize your design"
+    },
+    {
+      "type": "checkbox",
+      "id": "require_upload",
+      "label": "Require image upload before add to cart",
+      "default": false
+    }
+  ]
+}
+{% endschema %}
