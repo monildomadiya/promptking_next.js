@@ -720,6 +720,7 @@ const AdminDashboard = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isDragMode, setIsDragMode] = useState(false);
   const [isSavingOrder, setIsSavingOrder] = useState(false);
+  const [sortBy, setSortBy] = useState('default');
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -951,6 +952,12 @@ const AdminDashboard = () => {
     const title = String(item.title || item.name || '').toLowerCase();
     const aiType = String(item.ai_type || item.aiType || '').toLowerCase();
     return promptKey.includes(search) || title.includes(search) || aiType.includes(search);
+  }).sort((a, b) => {
+    if (view === 'prompts') {
+      if (sortBy === 'views_desc') return (Number(b.unlock_count) || 0) - (Number(a.unlock_count) || 0);
+      if (sortBy === 'copies_desc') return (Number(b.copy_count) || 0) - (Number(a.copy_count) || 0);
+    }
+    return 0;
   }) : [];
 
   if (!isAdmin) {
@@ -1183,6 +1190,26 @@ const AdminDashboard = () => {
                     }}
                   />
                 </div>
+              )}
+              {view === 'prompts' && !isDragMode && (
+                <select 
+                  value={sortBy} 
+                  onChange={e => setSortBy(e.target.value)}
+                  style={{
+                    padding: '10px 16px',
+                    fontSize: '0.85rem',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '10px',
+                    color: 'white',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option style={{background: '#111'}} value="default">Default Order</option>
+                  <option style={{background: '#111'}} value="views_desc">Most Views</option>
+                  <option style={{background: '#111'}} value="copies_desc">Most Copies</option>
+                </select>
               )}
               {view === 'prompts' && (
                 isDragMode ? (

@@ -876,57 +876,3 @@ body.shorts-modal-open {
 .vault-relock-animate {
   animation: lockVaultPulse 0.6s ease-out forwards;
 }
-/ *  
- P r o m p t  
- D e t a i l  
- P a g e  
- A d j u s t m e n t s  
- * /  
- .detail-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 350px;
-  gap: 40px;
-}
-@media (max-width: 1100px) {
-  .detail-layout {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-}
-.media-prompt-container {
-  display: flex;
-  flex-direction: row;
-  gap: 40px;
-  align-items: stretch;
-  margin-bottom: 40px;
-}
-@media (max-width: 1100px) {
-  .media-prompt-container {
-    flex-direction: column;
-    align-items: flex-start;
-    margin-bottom: 0;
-    gap: 20px;
-  }
-}
-.media-prompt-container .hero-section {
-  width: 55%;
-  flex-shrink: 0;
-  margin-bottom: 0 !important;
-}
-.media-prompt-container .prompt-vault-column,
-.media-prompt-container .prompt-area {
-  width: 45%;
-  flex: 1;
-  margin-bottom: 0 !important;
-}
-@media (max-width: 1100px) {
-  .media-prompt-container .hero-section {
-    width: 100%;
-    margin-bottom: 20px !important;
-  }
-  .media-prompt-container .prompt-vault-column,
-  .media-prompt-container .prompt-area {
-    width: 100%;
-    margin-bottom: 20px !important;
-  }
-}

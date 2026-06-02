@@ -241,6 +241,14 @@ router.get('/get_data', async (req, res) => {
       const liveRes = await fetch('https://api.promptking.in/api/get_data');
       if (!liveRes.ok) throw new Error(`Live API responded with ${liveRes.status}`);
       const data = await liveRes.json();
+      
+      if (data.prompts) {
+        data.prompts = data.prompts.map(p => ({
+          ...p,
+          isFeatured: p.isFeatured !== undefined ? p.isFeatured : (p.prompt_key === 'PK001' || p.prompt_key === 'PK004' ? true : false)
+        }));
+      }
+      
       res.json(data);
     } catch (liveError) {
       console.error('CRITICAL ERROR: LIVE API FALLBACK FAILED:', liveError.message);
@@ -775,7 +783,13 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
     try {
       const liveRes = await fetch('https://api.promptking.in/api/admin/prompts');
       if (!liveRes.ok) throw new Error("Live API failed");
-      res.json(await liveRes.json());
+      const data = await liveRes.json();
+      const mapped = data.map(p => ({
+        ...p,
+        isFeatured: p.isFeatured !== undefined ? p.isFeatured : (p.prompt_key === 'PK001' || p.prompt_key === 'PK004' ? true : false),
+        is_featured: p.is_featured !== undefined ? p.is_featured : (p.prompt_key === 'PK001' || p.prompt_key === 'PK004' ? 1 : 0)
+      }));
+      res.json(mapped);
     } catch (e) {
       // Last-ditch mock data for UI safety
       res.json(MOCK_DATA.prompts.map(p => ({

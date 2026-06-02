@@ -244,7 +244,7 @@ const PromptDetailPage = ({ adsSettings }) => {
         {/* Back Link Shimmer */}
         <Shimmer height="20px" width="180px" style={{ marginBottom: '30px' }} />
         
-        <div className="detail-layout">
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: '40px' }} className="detail-layout">
           <div>
             {/* Header Shimmer */}
             <div style={{ marginBottom: '35px' }}>
@@ -378,7 +378,7 @@ const PromptDetailPage = ({ adsSettings }) => {
         </Link>
 
         {/* 2-Column Grid */}
-        <div className="detail-layout">
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: '40px' }} className="detail-layout">
           
           {/* Main Content (Left) */}
           <div ref={contentRef} className="detail-main-content">
@@ -414,7 +414,13 @@ const PromptDetailPage = ({ adsSettings }) => {
             </div>
 
             {/* Media & Prompt Split Container */}
-            <div className="media-prompt-container">
+            <div className="media-prompt-container" style={{
+              display: 'flex',
+              flexDirection: window.innerWidth <= 1100 ? 'column' : 'row',
+              gap: '40px',
+              alignItems: window.innerWidth <= 1100 ? 'flex-start' : 'stretch',
+              marginBottom: window.innerWidth <= 1100 ? '0' : '40px'
+            }}>
               {/* Hero Section: Image Display */}
             <div className="hero-section glass-panel" style={{
               background: 'rgba(255, 255, 255, 0.02)',
@@ -424,8 +430,11 @@ const PromptDetailPage = ({ adsSettings }) => {
               padding: '12px',
               border: '1px solid rgba(255, 255, 255, 0.05)',
               boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
+              marginBottom: window.innerWidth <= 1100 ? '20px' : '0',
               position: 'relative',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              width: window.innerWidth <= 1100 ? '100%' : 'calc(60% - 20px)',
+              flexShrink: 0
             }}>
               <div style={{ borderRadius: '24px', overflow: 'hidden', position: 'relative' }}>
                 {prompt.isImageSlider ? (
@@ -491,6 +500,7 @@ const PromptDetailPage = ({ adsSettings }) => {
             <div className="prompt-vault-column" style={{ 
               display: 'flex', 
               flexDirection: 'column', 
+              width: window.innerWidth <= 1100 ? '100%' : 'calc(40% - 20px)',
               gap: '20px'
             }}>
               {/* Interactive Vault Section */}
@@ -503,6 +513,7 @@ const PromptDetailPage = ({ adsSettings }) => {
               overflow: 'hidden',
               display: 'flex', 
               flexDirection: 'column', 
+              marginBottom: window.innerWidth <= 1100 ? '20px' : '0', 
               border: isUnlocked ? (prompt.isPremium ? '2px solid #FFD700' : (isCopied ? '2px solid #27C93F' : '2px solid var(--accent-main)')) : '1px solid rgba(255,255,255,0.08)',
               boxShadow: isUnlocked ? (prompt.isPremium ? '0 15px 50px rgba(255, 215, 0, 0.15)' : (isCopied ? '0 15px 50px rgba(39, 201, 63, 0.3)' : '0 15px 50px rgba(229, 9, 20, 0.2)')) : 'none',
               transform: isUnlocked ? (isCopied && !prompt.isPremium ? 'scale(1.02)' : 'scale(1.01)') : 'scale(1)',
@@ -684,7 +695,8 @@ const PromptDetailPage = ({ adsSettings }) => {
                   border: 'none', padding: '18px', borderRadius: '20px', fontWeight: 900, fontSize: '1.1rem', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', transition: '0.3s ease',
                   boxShadow: isCopied ? '0 0 30px rgba(39, 201, 63, 0.3)' : '0 10px 30px rgba(0,0,0,0.3)',
-                  marginTop: '0px'
+                  marginTop: '0px',
+                  marginBottom: window.innerWidth <= 1100 ? '20px' : '0'
                 }}
               >
                 {isCopied ? <><Check size={22} /> Copied!</> : <><Copy size={22} /> Copy Full Prompt</>}
@@ -1070,7 +1082,32 @@ const PromptDetailPage = ({ adsSettings }) => {
         .midjourney { color: #a855f7; background: rgba(168, 85, 247, 0.08) !important; border-color: rgba(168, 85, 247, 0.3) !important; }
         .blog-content img { max-width: 100%; border-radius: 15px; margin: 20px 0; }
         .blog-content h2, .blog-content h3 { color: white; margin-top: 35px; margin-bottom: 20px; }
-        @media (max-width: 1100px) {
+        
+        @media (min-width: 1025px) {
+          .media-prompt-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: stretch;
+            margin-bottom: 40px;
+          }
+          .media-prompt-container .hero-section {
+            margin-bottom: 0 !important;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+          }
+          .media-prompt-container .hero-section > div {
+            flex: 1;
+            display: flex;
+            align-items: center;
+          }
+          .media-prompt-container .prompt-area {
+            margin-bottom: 0 !important;
+          }
+        }
+        
+        @media (max-width: 1024px) {
           .detail-layout { grid-template-columns: 1fr !important; }
           .detail-sidebar { display: none; }
         }
