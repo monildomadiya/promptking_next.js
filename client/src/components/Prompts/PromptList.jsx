@@ -79,6 +79,10 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
     }
     
     return matchesSearch && matchesFilter;
+  }).sort((a, b) => {
+    if (a.isFeatured && !b.isFeatured) return -1;
+    if (!a.isFeatured && b.isFeatured) return 1;
+    return 0;
   });
 
   // Calculate counts for categories and types
