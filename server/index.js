@@ -122,8 +122,25 @@ app.use((err, req, res, next) => {
         INDEX idx_created_type (created_at, event_type)
       )
     `;
-    await db`ALTER TABLE prompts ADD COLUMN IF NOT EXISTS sort_order INT DEFAULT 0`;
-    await db`ALTER TABLE prompts ADD COLUMN IF NOT EXISTS is_featured TINYINT(1) NOT NULL DEFAULT 0`;
+
+    try {
+      const checkSort = await db`SHOW COLUMNS FROM prompts LIKE 'sort_order'`;
+      if (checkSort.length === 0) {
+        await db`ALTER TABLE prompts ADD COLUMN sort_order INT DEFAULT 0`;
+      }
+    } catch (e) {
+      console.warn("Failed to check/add sort_order:", e.message);
+    }
+
+    try {
+      const checkFeatured = await db`SHOW COLUMNS FROM prompts LIKE 'is_featured'`;
+      if (checkFeatured.length === 0) {
+        await db`ALTER TABLE prompts ADD COLUMN is_featured TINYINT(1) NOT NULL DEFAULT 0`;
+      }
+    } catch (e) {
+      console.warn("Failed to check/add is_featured:", e.message);
+    }
+
     console.log("Database tables initialized.");
   } catch (error) {
     console.error("Failed to initialize database tables:", error.message);
