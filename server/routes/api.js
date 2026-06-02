@@ -273,7 +273,7 @@ router.get('/get_data', async (req, res) => {
         isPremium: Boolean(p.is_premium),
         isFeatured: Boolean(p.is_featured)
       }));
-      res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.json({ 
         prompts: mockPrompts, 
         likes: {}, 
@@ -325,7 +325,7 @@ router.get('/get_data', async (req, res) => {
       isFeatured: parseDbBool(row.is_featured)
     }));
 
-    res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.json({ prompts, likes: {}, categories: categoriesRows });
   } catch (error) {
     console.error('DATABASE ERROR:', error.message);
@@ -354,7 +354,7 @@ router.get('/blogs', async (req, res) => {
 
   try {
     const rows = await db`SELECT * FROM blogs ORDER BY created_at DESC`;
-    res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.json(rows);
   } catch (error) {
     console.warn('LOCAL DB FAILED, FETCHING LIVE BLOGS:', error.message);
@@ -378,7 +378,7 @@ router.get('/faqs', async (req, res) => {
 
   try {
     const rows = await db`SELECT * FROM faqs ORDER BY created_at DESC`;
-    res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.json(rows);
   } catch (error) {
     console.warn('LOCAL DB FAILED, FETCHING LIVE FAQS:', error.message);
@@ -402,7 +402,7 @@ router.get('/categories', async (req, res) => {
 
   try {
     const rows = await db`SELECT * FROM categories ORDER BY name ASC`;
-    res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.json(rows);
   } catch (error) {
     console.warn('LOCAL DB FAILED, FETCHING LIVE CATEGORIES:', error.message);
@@ -493,7 +493,7 @@ router.get('/settings', async (req, res) => {
     const rows = await db`SELECT * FROM site_settings`;
     const settings = {};
     rows.forEach(r => { settings[r.setting_key] = r.setting_value; });
-    res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.json(processSettings(settings));
   } catch (error) {
     console.warn('LOCAL DB FAILED, FETCHING LIVE SETTINGS:', error.message);
