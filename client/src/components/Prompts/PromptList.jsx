@@ -114,8 +114,17 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
   if (loading) {
     return (
       <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px', width: '100%' }}>
-        <div className="home-layout-grid">
-          <div className="masonry-grid-react" id="skeletonContainer" style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+        <div className="home-layout-grid" style={{ 
+          display: isMobile ? 'flex' : 'grid', 
+          flexDirection: 'column' 
+        }}>
+          <div className="masonry-grid-react" id="skeletonContainer" style={{ 
+            display: 'flex', 
+            gap: isMobile ? '12px' : '20px', 
+            alignItems: 'flex-start',
+            flexWrap: 'nowrap',
+            flexDirection: 'row'
+          }}>
             {(() => {
               const items = [1, 2, 3, 4, 5, 6];
               const cols = isMobile ? 2 : 3;
@@ -134,7 +143,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
               });
 
               return columns.map((colItems, i) => (
-                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '25px', minWidth: 0 }}>
+                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: isMobile ? '12px' : '25px', minWidth: 0 }}>
                   {colItems}
                 </div>
               ));

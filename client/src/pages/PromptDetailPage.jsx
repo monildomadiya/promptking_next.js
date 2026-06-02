@@ -244,7 +244,7 @@ const PromptDetailPage = ({ adsSettings }) => {
         {/* Back Link Shimmer */}
         <Shimmer height="20px" width="180px" style={{ marginBottom: '30px' }} />
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: '40px' }} className="detail-layout">
+        <div className="detail-layout">
           <div>
             {/* Header Shimmer */}
             <div style={{ marginBottom: '35px' }}>
@@ -378,7 +378,7 @@ const PromptDetailPage = ({ adsSettings }) => {
         </Link>
 
         {/* 2-Column Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: '40px' }} className="detail-layout">
+        <div className="detail-layout">
           
           {/* Main Content (Left) */}
           <div ref={contentRef} className="detail-main-content">
@@ -414,13 +414,7 @@ const PromptDetailPage = ({ adsSettings }) => {
             </div>
 
             {/* Media & Prompt Split Container */}
-            <div className="media-prompt-container" style={{
-              display: 'flex',
-              flexDirection: window.innerWidth <= 1100 ? 'column' : 'row',
-              gap: '40px',
-              alignItems: window.innerWidth <= 1100 ? 'flex-start' : 'stretch',
-              marginBottom: window.innerWidth <= 1100 ? '0' : '40px'
-            }}>
+            <div className="media-prompt-container">
               {/* Hero Section: Image Display */}
             <div className="hero-section glass-panel" style={{
               background: 'rgba(255, 255, 255, 0.02)',
@@ -430,11 +424,8 @@ const PromptDetailPage = ({ adsSettings }) => {
               padding: '12px',
               border: '1px solid rgba(255, 255, 255, 0.05)',
               boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
-              marginBottom: window.innerWidth <= 1100 ? '20px' : '0',
               position: 'relative',
-              overflow: 'hidden',
-              width: window.innerWidth <= 1100 ? '100%' : '55%',
-              flexShrink: 0
+              overflow: 'hidden'
             }}>
               <div style={{ borderRadius: '24px', overflow: 'hidden', position: 'relative' }}>
                 {prompt.isImageSlider ? (
@@ -500,7 +491,6 @@ const PromptDetailPage = ({ adsSettings }) => {
             <div className="prompt-vault-column" style={{ 
               display: 'flex', 
               flexDirection: 'column', 
-              width: window.innerWidth <= 1100 ? '100%' : '45%',
               gap: '20px'
             }}>
               {/* Interactive Vault Section */}
@@ -513,7 +503,6 @@ const PromptDetailPage = ({ adsSettings }) => {
               overflow: 'hidden',
               display: 'flex', 
               flexDirection: 'column', 
-              marginBottom: window.innerWidth <= 1100 ? '20px' : '0', 
               border: isUnlocked ? (prompt.isPremium ? '2px solid #FFD700' : (isCopied ? '2px solid #27C93F' : '2px solid var(--accent-main)')) : '1px solid rgba(255,255,255,0.08)',
               boxShadow: isUnlocked ? (prompt.isPremium ? '0 15px 50px rgba(255, 215, 0, 0.15)' : (isCopied ? '0 15px 50px rgba(39, 201, 63, 0.3)' : '0 15px 50px rgba(229, 9, 20, 0.2)')) : 'none',
               transform: isUnlocked ? (isCopied && !prompt.isPremium ? 'scale(1.02)' : 'scale(1.01)') : 'scale(1)',
@@ -695,8 +684,7 @@ const PromptDetailPage = ({ adsSettings }) => {
                   border: 'none', padding: '18px', borderRadius: '20px', fontWeight: 900, fontSize: '1.1rem', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', transition: '0.3s ease',
                   boxShadow: isCopied ? '0 0 30px rgba(39, 201, 63, 0.3)' : '0 10px 30px rgba(0,0,0,0.3)',
-                  marginTop: '0px',
-                  marginBottom: window.innerWidth <= 1100 ? '20px' : '0'
+                  marginTop: '0px'
                 }}
               >
                 {isCopied ? <><Check size={22} /> Copied!</> : <><Copy size={22} /> Copy Full Prompt</>}
