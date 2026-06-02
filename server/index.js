@@ -123,6 +123,7 @@ app.use((err, req, res, next) => {
       )
     `;
     await db`ALTER TABLE prompts ADD COLUMN IF NOT EXISTS sort_order INT DEFAULT 0`;
+    await db`ALTER TABLE prompts ADD COLUMN IF NOT EXISTS is_featured TINYINT(1) NOT NULL DEFAULT 0`;
     console.log("Database tables initialized.");
   } catch (error) {
     console.error("Failed to initialize database tables:", error.message);

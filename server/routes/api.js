@@ -434,10 +434,15 @@ router.get('/prompt/:key', async (req, res) => {
     if (rows.length === 0) return res.status(404).json({ error: "Prompt not found" });
 
     const row = rows[0];
+    const parseDbBool = (val) => {
+      if (val === null || val === undefined) return false;
+      if (Buffer.isBuffer(val)) return val[0] === 1;
+      return val == 1 || val === true || val === 'true';
+    };
     const prompt = {
       ...row,
-      isImageSlider: Boolean(row.is_image_slider),
-      hidePromptBox: Boolean(row.hide_prompt_box),
+      isImageSlider: parseDbBool(row.is_image_slider),
+      hidePromptBox: parseDbBool(row.hide_prompt_box),
       copyCount: Number(row.copy_count),
       unlockCount: Number(row.unlock_count),
       likeCount: Number(row.like_count),
@@ -452,8 +457,8 @@ router.get('/prompt/:key', async (req, res) => {
       igLink: row.ig_link,
       imageRatio: row.image_ratio,
       galleryUrls: row.gallery_urls,
-      isPremium: Boolean(row.is_premium),
-      isFeatured: Boolean(row.is_featured)
+      isPremium: parseDbBool(row.is_premium),
+      isFeatured: parseDbBool(row.is_featured)
     };
     res.json(prompt);
   } catch (error) {
