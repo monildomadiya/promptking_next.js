@@ -15,7 +15,8 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     image_ratio: '4 / 5',
     is_image_slider: false,
     gallery_urls: '[]',
-    hide_prompt_box: false
+    hide_prompt_box: false,
+    is_featured: false
   });
   const [originalKey, setOriginalKey] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -86,6 +87,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
         is_image_slider: Boolean(prompt.is_image_slider),
         is_premium: prompt.is_premium !== undefined ? Boolean(prompt.is_premium) : (prompt.isPremium !== undefined ? Boolean(prompt.isPremium) : false),
         hide_prompt_box: Boolean(prompt.hide_prompt_box || prompt.hidePromptBox),
+        is_featured: prompt.is_featured !== undefined ? Boolean(prompt.is_featured) : (prompt.isFeatured !== undefined ? Boolean(prompt.isFeatured) : false),
         description: prompt.description || '',
         gallery_urls: prompt.gallery_urls || prompt.galleryUrls || '[]'
       });
@@ -268,6 +270,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                   <Checkbox label="Enable Contrast Slider" checked={formData.is_image_slider} onChange={(val) => setFormData({...formData, is_image_slider: val})} />
                   <Checkbox label="Premium Content" premium checked={formData.is_premium} onChange={(val) => setFormData({...formData, is_premium: val, password: val ? formData.password : ''})} />
                   <Checkbox label="Hide Prompt from Users" checked={formData.hide_prompt_box} onChange={(val) => setFormData({...formData, hide_prompt_box: val})} />
+                  <Checkbox label="Feature Prompt" checked={formData.is_featured} onChange={(val) => setFormData({...formData, is_featured: val})} />
                 </div>
               </div>
             </div>

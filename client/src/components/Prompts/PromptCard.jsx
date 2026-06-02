@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Copy, Check, Eye, Lock, Unlock, Youtube, ArrowRight, Crown, Code, Instagram, Layout, Zap, Sparkles, Image, MessageSquare, Laptop, ChevronLeft, ChevronRight } from '../Common/Icons';
+import { Copy, Check, Eye, Lock, Unlock, Youtube, ArrowRight, Crown, Code, Instagram, Layout, Zap, Sparkles, Image, MessageSquare, Laptop, ChevronLeft, ChevronRight, Star } from '../Common/Icons';
 import api, { SERVER_URL } from '../../api';
 import confetti from 'canvas-confetti';
 import YouTubeModal from '../Modals/YouTubeModal';
@@ -247,6 +247,30 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
           pointerEvents: 'none'
         }}>
           <Crown size={18} fill="#FFD700" color="#FFD700" />
+        </div>
+      )}
+
+      {/* Featured Badge - Top Left */}
+      {prompt.isFeatured && (
+        <div style={{
+          position: 'absolute', 
+          top: '12px', 
+          left: '12px', 
+          background: 'rgba(229, 9, 20, 0.9)',
+          backdropFilter: 'blur(12px)', 
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)', 
+          borderRadius: '50px',
+          padding: '4px 12px',
+          display: 'flex', 
+          alignItems: 'center',
+          gap: '4px',
+          zIndex: 50, 
+          boxShadow: '0 4px 20px rgba(229, 9, 20, 0.4)',
+          pointerEvents: 'none'
+        }}>
+          <Star size={12} fill="#FFF" color="#FFF" />
+          <span style={{ color: 'white', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Featured</span>
         </div>
       )}
 

@@ -59,6 +59,7 @@ const MOCK_DATA = {
       hide_prompt_box: 0,
       image_ratio: "4:5",
       is_premium: 1,
+      is_featured: 1,
       gallery_urls: '["https://images.unsplash.com/photo-1550751827-4bd374c3f58b", "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5"]',
       copy_count: 156,
       unlock_count: 42,
@@ -159,7 +160,7 @@ const generateUniqueSlug = async (title, currentId = null, table = 'prompts', id
 const logoUpload = multer({ 
   storage: memoryStorage,
   fileFilter: (req, file, cb) => {
-    const allowed = ['.png', '.jpg', '.jpeg', '.svg', '.webp'];
+    const allowed = ['.png', '.jpg', '.jpeg', '.svg', '.webp', '.avif'];
     const ext = path.extname(file.originalname).toLowerCase();
     if (allowed.includes(ext)) cb(null, true);
     else cb(new Error("Invalid image type"));
@@ -261,7 +262,8 @@ router.get('/get_data', async (req, res) => {
         igLink: p.ig_link,
         imageRatio: p.image_ratio,
         galleryUrls: p.gallery_urls,
-        isPremium: Boolean(p.is_premium)
+        isPremium: Boolean(p.is_premium),
+        isFeatured: Boolean(p.is_featured)
       }));
       res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
       res.json({ 
@@ -305,7 +307,8 @@ router.get('/get_data', async (req, res) => {
       igLink: row.ig_link,
       imageRatio: row.image_ratio,
       galleryUrls: row.gallery_urls,
-      isPremium: Boolean(row.is_premium)
+      isPremium: Boolean(row.is_premium),
+      isFeatured: Boolean(row.is_featured)
     }));
 
     res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
@@ -435,7 +438,8 @@ router.get('/prompt/:key', async (req, res) => {
       igLink: row.ig_link,
       imageRatio: row.image_ratio,
       galleryUrls: row.gallery_urls,
-      isPremium: Boolean(row.is_premium)
+      isPremium: Boolean(row.is_premium),
+      isFeatured: Boolean(row.is_featured)
     };
     res.json(prompt);
   } catch (error) {
@@ -878,7 +882,8 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
           password = ${p.password}, 
           is_premium = ${!!p.is_premium},
           gallery_urls = ${p.gallery_urls || null},
-          hide_prompt_box = ${!!p.hide_prompt_box}
+          hide_prompt_box = ${!!p.hide_prompt_box},
+          is_featured = ${!!p.is_featured}
         WHERE prompt_key = ${originalKey}
       `;
     } else {
@@ -886,11 +891,11 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
       await db`
         INSERT INTO prompts (
           prompt_key, slug, title, description, ai_type, prompt_text, img_before, img_after, 
-          ig_link, is_image_slider, image_ratio, password, is_premium, gallery_urls, hide_prompt_box
+          ig_link, is_image_slider, image_ratio, password, is_premium, gallery_urls, hide_prompt_box, is_featured
         ) VALUES (
           ${finalKey}, ${finalSlug}, ${p.title}, ${p.description}, ${p.ai_type}, ${p.prompt_text}, 
           ${p.img_before}, ${p.img_after}, ${p.ig_link}, ${!!p.is_image_slider}, 
-          ${p.image_ratio}, ${p.password}, ${!!p.is_premium}, ${p.gallery_urls || null}, ${!!p.hide_prompt_box}
+          ${p.image_ratio}, ${p.password}, ${!!p.is_premium}, ${p.gallery_urls || null}, ${!!p.hide_prompt_box}, ${!!p.is_featured}
         )
       `;
     }

@@ -1070,32 +1070,7 @@ const PromptDetailPage = ({ adsSettings }) => {
         .midjourney { color: #a855f7; background: rgba(168, 85, 247, 0.08) !important; border-color: rgba(168, 85, 247, 0.3) !important; }
         .blog-content img { max-width: 100%; border-radius: 15px; margin: 20px 0; }
         .blog-content h2, .blog-content h3 { color: white; margin-top: 35px; margin-bottom: 20px; }
-        
-        @media (min-width: 1025px) {
-          .media-prompt-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            align-items: stretch;
-            margin-bottom: 40px;
-          }
-          .media-prompt-container .hero-section {
-            margin-bottom: 0 !important;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-          }
-          .media-prompt-container .hero-section > div {
-            flex: 1;
-            display: flex;
-            align-items: center;
-          }
-          .media-prompt-container .prompt-area {
-            margin-bottom: 0 !important;
-          }
-        }
-        
-        @media (max-width: 1024px) {
+        @media (max-width: 1100px) {
           .detail-layout { grid-template-columns: 1fr !important; }
           .detail-sidebar { display: none; }
         }
