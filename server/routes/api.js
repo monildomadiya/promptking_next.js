@@ -865,10 +865,10 @@ const pingGoogleSitemap = () => {
 router.post('/admin/save_prompt', adminAuth, async (req, res) => {
   const p = req.body;
   const originalKey = p.originalKey;
-  const newKey = p.prompt_key?.trim();
+  let newKey = p.prompt_key?.trim();
 
   try {
-    // Format validation
+    // Format validation (only for manually set keys)
     if (newKey) {
       if (!/^PK[0-9]+$/.test(newKey)) {
         return res.status(400).json({ error: "Invalid ID format. Must start with 'PK' followed by numbers only (e.g. PK001)." });
@@ -879,8 +879,20 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
     if (newKey) {
       const existing = await db`SELECT prompt_key FROM prompts WHERE prompt_key = ${newKey}`;
       if (existing.length > 0) {
-        if (!originalKey || (originalKey !== newKey)) {
+        if (originalKey && originalKey === newKey) {
+          // Editing same prompt — key unchanged, that's fine
+        } else if (originalKey) {
+          // Editing prompt and trying to change to a key that's taken
           return res.status(400).json({ error: "Choose a different ID. This ID is already taken and must be unique." });
+        } else {
+          // New prompt: auto-generated key already exists — generate a new unique one
+          let attempts = 0;
+          do {
+            newKey = 'PK' + Math.floor(1000 + Math.random() * 9000);
+            const check = await db`SELECT prompt_key FROM prompts WHERE prompt_key = ${newKey}`;
+            if (check.length === 0) break;
+            attempts++;
+          } while (attempts < 10);
         }
       }
     }
