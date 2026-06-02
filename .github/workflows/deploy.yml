@@ -1,0 +1,23 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [ "main" ] 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploying code via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            # 1. તમારા સર્વરમાં જ્યાં વેબસાઈટ પડી છે તે ફોલ્ડરમાં જવાનો કમાન્ડ 
+            cd /var/www/your-website-folder
+            
+            # 2. ગિટહબમાંથી નવો કોડ લેવાનો કમાન્ડ
+            git pull origin main
