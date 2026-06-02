@@ -482,11 +482,14 @@ const Hint = ({ text }) => (
 );
 
 const Checkbox = ({ label, checked, onChange, premium }) => (
-  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 600, color: premium ? '#FFC107' : 'white' }}>
-    <div style={{ position: 'relative', width: '22px', height: '22px', borderRadius: '6px', border: `2px solid ${checked ? (premium ? '#FFC107' : 'var(--accent-main)') : 'rgba(255,255,255,0.2)'}`, background: checked ? (premium ? 'rgba(255,193,7,0.1)' : 'rgba(229,9,20,0.1)') : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.2s' }}>
+  <label
+    onClick={(e) => { e.preventDefault(); onChange(!checked); }}
+    style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 600, color: premium ? '#FFC107' : 'white', userSelect: 'none' }}
+  >
+    <div style={{ position: 'relative', width: '22px', height: '22px', borderRadius: '6px', border: `2px solid ${checked ? (premium ? '#FFC107' : 'var(--accent-main)') : 'rgba(255,255,255,0.2)'}`, background: checked ? (premium ? 'rgba(255,193,7,0.1)' : 'rgba(229,9,20,0.1)') : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.2s', flexShrink: 0 }}>
       {checked && <div style={{ width: '10px', height: '10px', borderRadius: '2px', background: premium ? '#FFC107' : 'var(--accent-main)' }} />}
     </div>
-    <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} style={{ display: 'none' }} />
+    <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} style={{ position: 'absolute', opacity: 0, width: 0, height: 0, pointerEvents: 'none' }} readOnly />
     {label}
   </label>
 );
