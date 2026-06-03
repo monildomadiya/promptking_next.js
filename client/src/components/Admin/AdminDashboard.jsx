@@ -260,12 +260,24 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
         </div>
       </td>
       <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '4px' }}>{item.prompt_key}</div>
-          {item.hide_prompt_box && <span style={{ fontSize: '0.65rem', color: '#fbbf24', border: '1px solid #fbbf24', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px' }}>HIDDEN</span>}
-          {item.is_featured && <span style={{ fontSize: '0.65rem', color: '#fff', background: 'rgba(229, 9, 20, 0.8)', border: '1px solid rgba(229, 9, 20, 1)', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px', fontWeight: 'bold' }}>FEATURED</span>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {item.img_after && (
+            <img 
+              src={item.img_after} 
+              alt={item.title || 'Result'} 
+              style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }} 
+              onError={e => e.target.style.display = 'none'} 
+            />
+          )}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '4px' }}>{item.prompt_key}</div>
+              {item.hide_prompt_box && <span style={{ fontSize: '0.65rem', color: '#fbbf24', border: '1px solid #fbbf24', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px' }}>HIDDEN</span>}
+              {item.is_featured && <span style={{ fontSize: '0.65rem', color: '#fff', background: 'rgba(229, 9, 20, 0.8)', border: '1px solid rgba(229, 9, 20, 1)', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px', fontWeight: 'bold' }}>FEATURED</span>}
+            </div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: 600, maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title || item.slug}</div>
+          </div>
         </div>
-        <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title || item.slug}</div>
       </td>
       <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
