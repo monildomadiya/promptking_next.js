@@ -265,7 +265,7 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
             <img 
               src={item.img_after} 
               alt={item.title || 'Result'} 
-              style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }} 
+              style={{ width: '72px', height: '72px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }} 
               onError={e => e.target.style.display = 'none'} 
             />
           )}
@@ -275,7 +275,7 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
               {item.hide_prompt_box && <span style={{ fontSize: '0.65rem', color: '#fbbf24', border: '1px solid #fbbf24', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px' }}>HIDDEN</span>}
               {item.is_featured && <span style={{ fontSize: '0.65rem', color: '#fff', background: 'rgba(229, 9, 20, 0.8)', border: '1px solid rgba(229, 9, 20, 1)', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px', fontWeight: 'bold' }}>FEATURED</span>}
             </div>
-            <div style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: 600, maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title || item.slug}</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '1.1rem', fontWeight: 600, maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title || item.slug}</div>
           </div>
         </div>
       </td>
@@ -894,6 +894,20 @@ const AdminDashboard = () => {
   };
 
   const handleDelete = async (item) => {
+    const enteredPassword = window.prompt("Enter admin password to confirm deletion:");
+    if (!enteredPassword) return;
+
+    try {
+      const loginRes = await api.post('/admin/login', { password: enteredPassword });
+      if (!loginRes.data || !loginRes.data.token) {
+        alert("Incorrect password. Deletion cancelled.");
+        return;
+      }
+    } catch (err) {
+      alert("Authentication error.");
+      return;
+    }
+
     if (!window.confirm("Permanent delete? This cannot be undone.")) return;
     const id = item.prompt_key || item.id;
     const type = view === 'prompts' ? 'prompt' : (view === 'blogs' ? 'blog' : (view === 'categories' ? 'category' : 'faq'));
@@ -933,6 +947,21 @@ const AdminDashboard = () => {
 
   const handleBulkDelete = async () => {
     if (view !== 'prompts') return;
+    
+    const enteredPassword = window.prompt("Enter admin password to confirm bulk deletion:");
+    if (!enteredPassword) return;
+
+    try {
+      const loginRes = await api.post('/admin/login', { password: enteredPassword });
+      if (!loginRes.data || !loginRes.data.token) {
+        alert("Incorrect password. Deletion cancelled.");
+        return;
+      }
+    } catch (err) {
+      alert("Authentication error.");
+      return;
+    }
+
     if (!window.confirm(`Delete ${selectedKeys.length} prompts permanently?`)) return;
     
     try {
