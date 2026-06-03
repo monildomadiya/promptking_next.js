@@ -36,13 +36,15 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
       const res = await api.post('/admin/upload_image', form, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      if (res.data.status === 'success') {
+      if (res.data && res.data.status === 'success') {
         const url = res.data.imageUrl;
         const existing = (() => { try { return JSON.parse(formData.gallery_urls || '[]'); } catch(err) { return []; } })();
         setFormData(prev => ({ ...prev, gallery_urls: JSON.stringify([...existing, url]) }));
+      } else {
+        alert(res.data?.error || 'Server rejected the gallery image.');
       }
     } catch (error) {
-      alert('Upload failed');
+      alert('Upload failed: ' + error.message);
     } finally {
       setIsUploadingGallery(false);
       if (galleryFileInputRef.current) galleryFileInputRef.current.value = '';
@@ -63,14 +65,14 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     try {
       setIsUploadingGallery(true);
       const res = await api.post('/admin/upload_image_url', { url });
-      if (res.data.status === 'success') {
+      if (res.data && res.data.status === 'success') {
         const existing = (() => { try { return JSON.parse(formData.gallery_urls || '[]'); } catch(err) { return []; } })();
         setFormData(prev => ({ ...prev, gallery_urls: JSON.stringify([...existing, res.data.imageUrl]) }));
       } else {
-        throw new Error();
+        throw new Error(res.data?.error || "Invalid response");
       }
     } catch (e) {
-      alert("Failed to upload from URL. Falling back to original URL.");
+      alert("Failed to upload from URL (" + e.message + "). Falling back to original URL.");
       const existing = (() => { try { return JSON.parse(formData.gallery_urls || '[]'); } catch(err) { return []; } })();
       setFormData(prev => ({ ...prev, gallery_urls: JSON.stringify([...existing, url]) }));
     } finally {
@@ -528,13 +530,14 @@ const ImageUpload = ({ url, onUpload }) => {
     setIsUploading(true);
     try {
       const res = await api.post('/admin/upload_image_url', { url: currentUrl });
-      if (res.data.status === 'success') {
+      if (res.data && res.data.status === 'success') {
          onUpload(res.data.imageUrl);
       } else {
+         alert(res.data?.error || "Failed to upload from URL");
          onUpload(currentUrl);
       }
     } catch (e) {
-      alert("Failed to upload from URL");
+      alert("Failed to upload from URL (" + e.message + ")");
       onUpload(currentUrl);
     } finally {
       setIsUploading(false);
@@ -553,11 +556,13 @@ const ImageUpload = ({ url, onUpload }) => {
       const res = await api.post('/admin/upload_image', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      if (res.data.status === 'success') {
+      if (res.data && res.data.status === 'success') {
         onUpload(res.data.imageUrl);
+      } else {
+        alert(res.data?.error || 'Server rejected the image (file might be too large or invalid format).');
       }
     } catch (error) {
-      alert('Upload failed');
+      alert('Upload failed: ' + error.message);
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';

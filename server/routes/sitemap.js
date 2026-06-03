@@ -9,6 +9,7 @@ router.get('/', async (req, res) => {
     // Fetch dynamic content
     const prompts = await db`SELECT prompt_key, slug, created_at FROM prompts`;
     const blogs = await db`SELECT slug, created_at FROM blogs`;
+    const categories = await db`SELECT slug, created_at FROM categories`;
     
     // Start XML string
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -50,6 +51,16 @@ router.get('/', async (req, res) => {
     <loc>${baseUrl}/article/${blog.slug}</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>`;
+    });
+
+    // Dynamic Categories
+    categories.forEach(category => {
+      xml += `
+  <url>
+    <loc>${baseUrl}/category/${category.slug}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>`;
     });
 

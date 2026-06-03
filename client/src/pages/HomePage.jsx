@@ -20,7 +20,6 @@ const HomePage = ({ search, filter, setFilter, isMobile }) => {
       <SEOMetadata 
         title="PromptKing - The Ultimate AI Prompts Library for ChatGPT, Midjourney & Gemini"
         description="Discover the world's best AI prompt library. Get premium & free prompts for ChatGPT, Midjourney, Gemini, DALL-E and more. Unlock professional-grade AI results instantly."
-        keywords="ai prompts, chatgpt prompts, midjourney prompts, gemini prompts, best ai prompts 2025, premium ai prompts, prompt engineering, free ai prompts, ai art prompts"
         url="https://promptking.in/"
         schema={schema}
       />

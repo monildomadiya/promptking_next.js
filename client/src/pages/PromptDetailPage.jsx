@@ -362,7 +362,6 @@ const PromptDetailPage = ({ adsSettings }) => {
         description={prompt.description?.slice(0, 160) || `Unlock the "${prompt.title}" AI prompt on PromptKing. Works with ${prompt.aiType || 'AI'}.`}
         image={prompt.img_after || prompt.img_before || 'https://promptking.in/favicon.png'}
         url={`https://promptking.in/prompt/${prompt.key}`}
-        keywords={`${prompt.aiType || 'AI'} prompt, ${prompt.title}, prompt engineering, PromptKing, chatgpt prompts`}
         schema={promptSchema}
         breadcrumb={[
           { name: 'Home', url: 'https://promptking.in/' },
