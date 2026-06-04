@@ -141,6 +141,15 @@ app.use((err, req, res, next) => {
       console.warn("Failed to check/add is_featured:", e.message);
     }
 
+    try {
+      const checkMeta = await db`SHOW COLUMNS FROM prompts LIKE 'meta_title'`;
+      if (checkMeta.length === 0) {
+        await db`ALTER TABLE prompts ADD COLUMN meta_title VARCHAR(255) DEFAULT ''`;
+      }
+    } catch (e) {
+      console.warn("Failed to check/add meta_title:", e.message);
+    }
+
     console.log("Database tables initialized.");
   } catch (error) {
     console.error("Failed to initialize database tables:", error.message);

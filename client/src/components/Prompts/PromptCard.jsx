@@ -250,29 +250,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
         </div>
       )}
 
-      {/* Featured Badge - Top Left */}
-      {prompt.isFeatured && (
-        <div style={{
-          position: 'absolute', 
-          top: '12px', 
-          left: '12px', 
-          background: 'rgba(229, 9, 20, 0.9)',
-          backdropFilter: 'blur(12px)', 
-          WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)', 
-          borderRadius: '50px',
-          padding: '4px 12px',
-          display: 'flex', 
-          alignItems: 'center',
-          gap: '4px',
-          zIndex: 50, 
-          boxShadow: '0 4px 20px rgba(229, 9, 20, 0.4)',
-          pointerEvents: 'none'
-        }}>
-          <Star size={12} fill="#FFF" color="#FFF" />
-          <span style={{ color: 'white', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Featured</span>
-        </div>
-      )}
+
 
       {isHighlighted && (
         <div style={{
@@ -390,6 +368,12 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
         )}
         {/* Header Info */}
         <Link to={`/prompt/${prompt.slug || prompt.prompt_key || prompt.key}`} style={{ color: 'inherit', textDecoration: 'none', display: 'block', padding: `0 ${cardPadding}px` }}>
+          {prompt.isFeatured && (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(229, 9, 20, 0.1)', border: '1px solid rgba(229, 9, 20, 0.3)', color: '#ff4d4d', padding: '2px 8px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>
+              <Star size={10} fill="#ff4d4d" color="#ff4d4d" />
+              Featured
+            </div>
+          )}
           <h3 style={{ 
             fontSize: '1rem', 
             fontWeight: 500, 

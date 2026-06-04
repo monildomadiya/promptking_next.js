@@ -1137,7 +1137,7 @@ const AdminDashboard = () => {
             {sidebarCollapsed ? (
               <div className="animated-logo" style={{ width: '40px', height: '40px', background: 'var(--accent-gradient)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.75rem', flexShrink: 0 }}>PK</div>
             ) : settings.logo_url ? (
-              <img src={settings.logo_url} className="animated-logo" style={{ height: '90px', maxWidth: '100%', objectFit: 'contain' }} alt="Logo" />
+              <img src={settings.logo_url} style={{ height: '90px', maxWidth: '100%', objectFit: 'contain' }} alt="Logo" />
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', whiteSpace: 'nowrap' }}>
                 <div className="animated-logo" style={{ width: '45px', height: '45px', background: 'var(--accent-gradient)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, flexShrink: 0 }}>PK</div>
@@ -1320,8 +1320,8 @@ const AdminDashboard = () => {
             <motion.div key="dashboard" {...pageTransition}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px', marginBottom: '48px' }}>
                 <StatCard label="Total Prompts" value={stats.prompts} color="#ff4d4d" icon={<TableProperties size={24} />} />
-                <StatCard label="Copy Interactions" value={stats.copies} color="#3b82f6" icon={<Activity size={24} />} />
-                <StatCard label="Unlocks Generated" value={stats.unlocks} color="#fbbf24" icon={<Layers size={24} />} />
+                <StatCard label="Total Copies" value={stats.copies} color="#3b82f6" icon={<Activity size={24} />} />
+                <StatCard label="Total Opens" value={stats.unlocks} color="#fbbf24" icon={<Layers size={24} />} />
                 <StatCard label="Social Likes" value={stats.likes} color="#ec4899" icon={<Activity size={24} />} />
               </div>
               <div style={{ ...glassPanelStyle, padding: '30px' }}>
@@ -1447,11 +1447,24 @@ const AdminDashboard = () => {
                             </td>
                           )}
                           <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '4px' }}>{item.prompt_key || item.title || item.name}</div>
-                              {item.hide_prompt_box && <span style={{ fontSize: '0.65rem', color: '#fbbf24', border: '1px solid #fbbf24', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px' }}>HIDDEN</span>}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              {view === 'prompts' && item.img_after && (
+                                <img 
+                                  src={item.img_after} 
+                                  alt={item.title || 'Result'} 
+                                  style={{ width: '72px', height: '72px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }} 
+                                  onError={e => e.target.style.display = 'none'} 
+                                />
+                              )}
+                              <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '4px' }}>{item.prompt_key || item.title || item.name}</div>
+                                  {item.hide_prompt_box && <span style={{ fontSize: '0.65rem', color: '#fbbf24', border: '1px solid #fbbf24', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px' }}>HIDDEN</span>}
+                                  {view === 'prompts' && item.is_featured && <span style={{ fontSize: '0.65rem', color: '#fff', background: 'rgba(229, 9, 20, 0.8)', border: '1px solid rgba(229, 9, 20, 1)', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px', fontWeight: 'bold' }}>FEATURED</span>}
+                                </div>
+                                <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title || item.question || item.slug}</div>
+                              </div>
                             </div>
-                            <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title || item.question || item.slug}</div>
                           </td>
                           {view === 'prompts' && (
                             <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>

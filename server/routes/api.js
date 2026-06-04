@@ -231,9 +231,19 @@ router.get('/optimize', async (req, res) => {
 
 // --- 2. FETCH PROMPTS ---
 router.get('/get_data', async (req, res) => {
+  const isLiveServer = req.headers.host && req.headers.host.includes('promptking.in');
+  
   if (!isDbHealthy()) {
-    console.log('Skipping DB query (Circuit Breaker active), fetching Live Data...');
-    return fetchLiveData();
+    console.log('Skipping DB query (Circuit Breaker active)...');
+    if (!isLiveServer) {
+      return fetchLiveData();
+    } else {
+      return res.json({
+        prompts: MOCK_DATA.prompts,
+        likes: {},
+        categories: MOCK_DATA.categories
+      });
+    }
   }
 
   async function fetchLiveData() {
@@ -330,7 +340,7 @@ router.get('/get_data', async (req, res) => {
     res.json({ prompts, likes: {}, categories: categoriesRows });
   } catch (error) {
     console.error('DATABASE ERROR:', error.message);
-    if (process.env.NODE_ENV !== 'production') {
+    if (!isLiveServer && process.env.NODE_ENV !== 'production') {
       lastDbFailure = Date.now();
       await fetchLiveData();
     } else {
@@ -844,7 +854,8 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
     res.json(formatted);
   } catch (error) {
     console.error('ADMIN PROMPTS DB ERROR:', error.message);
-    if (process.env.NODE_ENV !== 'production') {
+    const isLiveServer = req.headers.host && req.headers.host.includes('promptking.in');
+    if (!isLiveServer && process.env.NODE_ENV !== 'production') {
       lastDbFailure = Date.now();
       await fetchLiveAdminPrompts();
     } else {
