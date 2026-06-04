@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../../api';
-import { Search, Layout, Menu, X, Filter, Crown, Layers, ChevronDown, Camera, Activity } from '../Common/Icons';
+import { Search, Layout, Menu, X, Filter, Crown, Layers, ChevronDown, Camera, Activity, Coffee } from '../Common/Icons';
 import AdSenseUnit from '../Ads/AdSenseUnit';
 
 const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilters, onLogoClick, settings, isAdmin, onHeightChange }) => {
@@ -193,6 +193,27 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                       <Crown size={18} fill={filter === 'premium' ? '#FFC107' : 'none'} style={{ display: 'block' }} />
                     </button>
                   )}
+                  <a 
+                    href="https://ko-fi.com/M5H720SAJV"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Buy me a coffee"
+                    aria-label="Buy me a coffee"
+                    style={{ 
+                      width: '38px', height: '38px', borderRadius: '50%', 
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                      background: 'rgba(255, 193, 7, 0.15)',
+                      border: '1px solid rgba(255, 193, 7, 0.3)',
+                      color: '#FFC107',
+                      transition: '0.3s',
+                      backdropFilter: 'blur(10px)',
+                      padding: 0,
+                      textDecoration: 'none'
+                    }}
+                    className="coffee-btn-hover"
+                  >
+                    <Coffee size={18} style={{ display: 'block' }} />
+                  </a>
                     <div 
                       className="glass-button-secondary"
                       onClick={() => setIsSearchExpanded(true)}
@@ -297,6 +318,29 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                     </button>
                   </div>
                 )}
+                <a 
+                  href="https://ko-fi.com/M5H720SAJV"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="coffee-btn-hover"
+                  style={{ 
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                    height: '42px', borderRadius: '21px', 
+                    padding: '0 16px',
+                    cursor: 'pointer',
+                    background: 'rgba(255, 193, 7, 0.15)',
+                    border: '1px solid rgba(255, 193, 7, 0.3)',
+                    color: '#FFC107',
+                    transition: '0.3s',
+                    backdropFilter: 'blur(10px)',
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                    fontSize: '14px'
+                  }}
+                >
+                  <Coffee size={18} />
+                  <span>Buy me a coffee</span>
+                </a>
               </div>
             )}
           </div>

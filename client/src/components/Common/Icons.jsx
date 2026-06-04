@@ -349,3 +349,7 @@ export const Monitor = (props) => (
 export const PieChart = (props) => (
   <IconWrapper {...props}><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></IconWrapper>
 );
+
+export const Coffee = (props) => (
+  <IconWrapper {...props}><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="9" x2="9" y1="2" y2="4"/><line x1="13" x2="13" y1="2" y2="4"/></IconWrapper>
+);

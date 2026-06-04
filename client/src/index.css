@@ -305,6 +305,33 @@ button:active {
   }
 }
 
+@keyframes coffeeGlow {
+  0% {
+    box-shadow: 0 0 5px rgba(255, 193, 7, 0.1);
+    border-color: rgba(255, 193, 7, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.3);
+    border-color: rgba(255, 193, 7, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(255, 193, 7, 0.1);
+    border-color: rgba(255, 193, 7, 0.3);
+  }
+}
+
+.coffee-btn-hover {
+  transition: all 0.25s ease;
+  animation: coffeeGlow 3s infinite ease-in-out;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .coffee-btn-hover:hover {
+    background: rgba(255, 193, 7, 0.25) !important;
+    border-color: rgba(255, 193, 7, 0.6) !important;
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   .user-profile-pill:hover {
     background: rgba(255, 255, 255, 0.1) !important;
