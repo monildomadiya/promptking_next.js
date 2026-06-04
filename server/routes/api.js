@@ -330,12 +330,15 @@ router.get('/get_data', async (req, res) => {
     res.json({ prompts, likes: {}, categories: categoriesRows });
   } catch (error) {
     console.error('DATABASE ERROR:', error.message);
-    // Prevent infinite loop on live server: only fetch live data if running locally
     if (process.env.NODE_ENV !== 'production' && process.env.DB_HOST !== '107.172.39.165') {
       lastDbFailure = Date.now();
       await fetchLiveData();
     } else {
-      res.status(500).json({ error: "Database error", details: error.message });
+      res.json({
+        prompts: MOCK_DATA.prompts,
+        likes: {},
+        categories: MOCK_DATA.categories
+      });
     }
   }
 });
@@ -835,7 +838,12 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
       lastDbFailure = Date.now();
       await fetchLiveAdminPrompts();
     } else {
-      res.status(500).json({ error: "Database error", details: error.message });
+      res.json(MOCK_DATA.prompts.map(p => ({
+        ...p,
+        copy_count: Number(p.copy_count || 0),
+        unlock_count: Number(p.unlock_count || 0),
+        like_count: Number(p.like_count || 0),
+      })));
     }
   }
 });
@@ -1026,6 +1034,7 @@ router.get('/admin/blogs', adminAuth, async (req, res) => {
   async function fetchLiveAdminBlogs() {
     try {
       const liveRes = await fetch('https://api.promptking.in/api/admin/blogs');
+      if (!liveRes.ok) throw new Error("Live API failed");
       res.json(await liveRes.json());
     } catch (e) { res.json([]); }
   }
@@ -1080,6 +1089,7 @@ router.get('/admin/faqs', adminAuth, async (req, res) => {
   async function fetchLiveAdminFaqs() {
     try {
       const liveRes = await fetch('https://api.promptking.in/api/admin/faqs');
+      if (!liveRes.ok) throw new Error("Live API failed");
       res.json(await liveRes.json());
     } catch (e) { res.json([]); }
   }
@@ -1124,6 +1134,7 @@ router.get('/admin/categories', adminAuth, async (req, res) => {
   async function fetchLiveAdminCategories() {
     try {
       const liveRes = await fetch('https://api.promptking.in/api/admin/categories');
+      if (!liveRes.ok) throw new Error("Live API failed");
       res.json(await liveRes.json());
     } catch (e) { res.json(MOCK_DATA.categories); }
   }
