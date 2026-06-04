@@ -66,6 +66,7 @@ const PromptDetailPage = ({ adsSettings }) => {
         imageRatio: p.image_ratio || p.imageRatio,
         isImageSlider: p.is_image_slider || p.isImageSlider,
         igLink: p.ig_link || p.igLink,
+        metaTitle: p.meta_title || p.metaTitle,
         copyCount: p.copy_count || p.copy_count,
         key: p.prompt_key || p.key
       });
@@ -358,7 +359,7 @@ const PromptDetailPage = ({ adsSettings }) => {
   return (
     <div className="detail-page-wrapper" style={{ background: 'var(--surface-0)', minHeight: '100vh', color: 'white' }}>
       <SEOMetadata 
-        title={`${prompt.title} - ${prompt.aiType || 'AI'} Prompt | PromptKing`}
+        title={prompt.metaTitle || `${prompt.title} - ${prompt.aiType || 'AI'} Prompt | PromptKing`}
         description={prompt.description?.slice(0, 160) || `Unlock the "${prompt.title}" AI prompt on PromptKing. Works with ${prompt.aiType || 'AI'}.`}
         image={prompt.img_after || prompt.img_before || 'https://promptking.in/favicon.png'}
         url={`https://promptking.in/prompt/${prompt.key}`}

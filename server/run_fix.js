@@ -18,6 +18,19 @@ async function fix() {
     }
 
     try {
+      const check = await db`SHOW COLUMNS FROM prompts LIKE 'meta_title'`;
+      if (check.length === 0) {
+        console.log("Adding meta_title...");
+        await db`ALTER TABLE prompts ADD COLUMN meta_title VARCHAR(255) DEFAULT ''`;
+        console.log("meta_title added.");
+      } else {
+        console.log("meta_title already exists.");
+      }
+    } catch (err) {
+      console.log("Error checking/adding meta_title:", err.message);
+    }
+
+    try {
       const check = await db`SHOW COLUMNS FROM prompts LIKE 'sort_order'`;
       if (check.length === 0) {
         console.log("Adding sort_order...");

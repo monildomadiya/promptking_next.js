@@ -322,7 +322,8 @@ router.get('/get_data', async (req, res) => {
       imageRatio: row.image_ratio,
       galleryUrls: row.gallery_urls,
       isPremium: parseDbBool(row.is_premium),
-      isFeatured: parseDbBool(row.is_featured)
+      isFeatured: parseDbBool(row.is_featured),
+      metaTitle: row.meta_title
     }));
 
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -458,7 +459,8 @@ router.get('/prompt/:key', async (req, res) => {
       imageRatio: row.image_ratio,
       galleryUrls: row.gallery_urls,
       isPremium: parseDbBool(row.is_premium),
-      isFeatured: parseDbBool(row.is_featured)
+      isFeatured: parseDbBool(row.is_featured),
+      metaTitle: row.meta_title
     };
     res.json(prompt);
   } catch (error) {
@@ -813,7 +815,7 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
   }
 
   try {
-    const rows = await db`SELECT * FROM prompts`;
+    const rows = await db`SELECT * FROM prompts ORDER BY sort_order ASC, id ASC`;
     const formatted = rows.map(r => ({
       ...r,
       copy_count: Number(r.copy_count || 0),
@@ -823,7 +825,8 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
       wrong_attempts: Number(r.wrong_attempts || 0),
       is_featured: r.is_featured == 1 || r.is_featured === true || r.is_featured === 'true',
       is_premium: r.is_premium == 1 || r.is_premium === true || r.is_premium === 'true',
-      hide_prompt_box: r.hide_prompt_box == 1 || r.hide_prompt_box === true || r.hide_prompt_box === 'true'
+      hide_prompt_box: r.hide_prompt_box == 1 || r.hide_prompt_box === true || r.hide_prompt_box === 'true',
+      metaTitle: r.meta_title
     }));
     res.json(formatted);
   } catch (error) {
@@ -911,6 +914,7 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
           prompt_key = ${newKey || originalKey}, 
           slug = ${finalSlug}, 
           title = ${p.title}, 
+          meta_title = ${p.meta_title || ''},
           description = ${p.description}, 
           ai_type = ${p.ai_type}, 
           prompt_text = ${p.prompt_text}, 
@@ -930,11 +934,12 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
       const finalKey = newKey || ('PK' + Date.now().toString().slice(-8) + Math.floor(Math.random() * 100));
       await db`
         INSERT INTO prompts (
-          prompt_key, slug, title, description, ai_type, prompt_text, img_before, img_after, 
+          prompt_key, slug, title, meta_title, description, ai_type, prompt_text, img_before, img_after, 
           ig_link, is_image_slider, image_ratio, password, is_premium, gallery_urls, hide_prompt_box, is_featured
         ) VALUES (
-          ${finalKey}, ${finalSlug}, ${p.title}, ${p.description}, ${p.ai_type}, ${p.prompt_text}, 
+          ${finalKey}, ${finalSlug}, ${p.title}, ${p.meta_title || ''}, ${p.description}, ${p.ai_type}, ${p.prompt_text}, 
           ${p.img_before}, ${p.img_after}, ${p.ig_link}, ${p.is_image_slider ? 1 : 0}, 
+
           ${p.image_ratio}, ${p.password}, ${p.is_premium ? 1 : 0}, ${p.gallery_urls || null}, ${p.hide_prompt_box ? 1 : 0}, ${p.is_featured ? 1 : 0}
         )
       `;

@@ -8,6 +8,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     prompt_key: '',
     slug: '',
     title: '',
+    meta_title: '',
     description: '',
     ai_type: 'ChatGPT',
     password: '',
@@ -91,6 +92,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
         hide_prompt_box: prompt.hide_prompt_box == 1 || prompt.hide_prompt_box === true || prompt.hide_prompt_box === 'true' || prompt.hidePromptBox == 1 || prompt.hidePromptBox === true || prompt.hidePromptBox === 'true',
         is_featured: prompt.is_featured == 1 || prompt.is_featured === true || prompt.is_featured === 'true' || prompt.isFeatured == 1 || prompt.isFeatured === true || prompt.isFeatured === 'true',
         description: prompt.description || '',
+        meta_title: prompt.meta_title || prompt.metaTitle || '',
         gallery_urls: prompt.gallery_urls || prompt.galleryUrls || '[]'
       });
       setOriginalKey(prompt.prompt_key);
@@ -232,6 +234,18 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                   <option key={cat.id} value={cat.name}>{cat.name}</option>
                 ))}
               </select>
+            </div>
+
+            <div style={{ gridColumn: 'span 2' }}>
+              <Label text="Meta Title (SEO)" />
+              <input 
+                type="text" 
+                value={formData.meta_title} 
+                onChange={(e) => setFormData({ ...formData, meta_title: e.target.value })}
+                className="glass-input"
+                style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
+                placeholder="Custom SEO Title (defaults to Display Title if empty)"
+              />
             </div>
 
             {/* Section: Rich Content */}
