@@ -265,6 +265,7 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
             <img 
               src={item.img_after} 
               alt={item.title || 'Result'} 
+              className="admin-thumb-hover"
               style={{ width: '72px', height: '72px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }} 
               onError={e => e.target.style.display = 'none'} 
             />
@@ -1452,6 +1453,7 @@ const AdminDashboard = () => {
                                 <img 
                                   src={item.img_after} 
                                   alt={item.title || 'Result'} 
+                                  className="admin-thumb-hover"
                                   style={{ width: '72px', height: '72px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }} 
                                   onError={e => e.target.style.display = 'none'} 
                                 />

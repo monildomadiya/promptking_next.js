@@ -876,7 +876,6 @@ router.post('/admin/reorder_prompts', adminAuth, async (req, res) => {
     return res.status(400).json({ error: 'orderedKeys array is required' });
   }
   try {
-    await db`ALTER TABLE prompts ADD COLUMN IF NOT EXISTS sort_order INT DEFAULT 0`;
     const updates = orderedKeys.map((key, index) =>
       db`UPDATE prompts SET sort_order = ${index} WHERE prompt_key = ${key}`
     );

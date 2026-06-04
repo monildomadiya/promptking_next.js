@@ -168,6 +168,22 @@ html {
   transition: all 0.3s ease !important;
 }
 
+.admin-thumb-hover {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+  cursor: zoom-in;
+  position: relative;
+  z-index: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .admin-thumb-hover:hover {
+    transform: scale(3.5);
+    z-index: 100;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+    border-radius: 4px !important;
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   .glass-button-secondary:hover {
     background: rgba(229, 9, 20, 0.1) !important;
