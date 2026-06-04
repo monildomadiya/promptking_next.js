@@ -82,7 +82,12 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
   }).sort((a, b) => {
     if (a.isFeatured && !b.isFeatured) return -1;
     if (!a.isFeatured && b.isFeatured) return 1;
-    return 0;
+    
+    // Sort by custom order defined in Admin Panel
+    if (a.sort_order !== b.sort_order) {
+      return (a.sort_order || 0) - (b.sort_order || 0);
+    }
+    return (a.id || 0) - (b.id || 0);
   });
 
   // Calculate counts for categories and types
