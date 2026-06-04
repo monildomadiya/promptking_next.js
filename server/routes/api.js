@@ -297,7 +297,7 @@ router.get('/get_data', async (req, res) => {
   try {
     let promptsRows;
     try {
-      promptsRows = await db`SELECT * FROM prompts ORDER BY sort_order ASC, id ASC`;
+      promptsRows = await db`SELECT * FROM prompts ORDER BY sort_order ASC, prompt_key ASC`;
     } catch (colErr) {
       if (colErr.message.includes('Unknown column')) {
         promptsRows = await db`SELECT * FROM prompts`;
@@ -831,7 +831,7 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
   try {
     let rows;
     try {
-      rows = await db`SELECT * FROM prompts ORDER BY sort_order ASC, id ASC`;
+      rows = await db`SELECT * FROM prompts ORDER BY sort_order ASC, prompt_key ASC`;
     } catch (colErr) {
       if (colErr.message.includes('Unknown column')) {
         rows = await db`SELECT * FROM prompts`;

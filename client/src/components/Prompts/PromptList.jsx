@@ -87,7 +87,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
     if (a.sort_order !== b.sort_order) {
       return (a.sort_order || 0) - (b.sort_order || 0);
     }
-    return (a.id || 0) - (b.id || 0);
+    return (a.prompt_key || '').localeCompare(b.prompt_key || '');
   });
 
   // Calculate counts for categories and types
