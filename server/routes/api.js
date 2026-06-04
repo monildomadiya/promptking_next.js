@@ -819,7 +819,16 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
   }
 
   try {
-    const rows = await db`SELECT * FROM prompts ORDER BY sort_order ASC, id ASC`;
+    let rows;
+    try {
+      rows = await db`SELECT * FROM prompts ORDER BY sort_order ASC, id ASC`;
+    } catch (colErr) {
+      if (colErr.message.includes('Unknown column')) {
+        rows = await db`SELECT * FROM prompts`;
+      } else {
+        throw colErr;
+      }
+    }
     const formatted = rows.map(r => ({
       ...r,
       copy_count: Number(r.copy_count || 0),
