@@ -330,7 +330,7 @@ router.get('/get_data', async (req, res) => {
     res.json({ prompts, likes: {}, categories: categoriesRows });
   } catch (error) {
     console.error('DATABASE ERROR:', error.message);
-    if (process.env.NODE_ENV !== 'production' && process.env.DB_HOST !== '107.172.39.165') {
+    if (process.env.NODE_ENV !== 'production') {
       lastDbFailure = Date.now();
       await fetchLiveData();
     } else {
@@ -797,9 +797,10 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
 
   async function fetchLiveAdminPrompts() {
     try {
-      const liveRes = await fetch('https://api.promptking.in/api/admin/prompts');
+      const liveRes = await fetch('https://api.promptking.in/api/get_data');
       if (!liveRes.ok) throw new Error("Live API failed");
-      const data = await liveRes.json();
+      const result = await liveRes.json();
+      const data = result.prompts || [];
       const mapped = data.map(p => ({
         ...p,
         isFeatured: p.isFeatured !== undefined ? p.isFeatured : (p.prompt_key === 'PK001' || p.prompt_key === 'PK004' ? true : false),
@@ -834,7 +835,7 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
     res.json(formatted);
   } catch (error) {
     console.error('ADMIN PROMPTS DB ERROR:', error.message);
-    if (process.env.NODE_ENV !== 'production' && process.env.DB_HOST !== '107.172.39.165') {
+    if (process.env.NODE_ENV !== 'production') {
       lastDbFailure = Date.now();
       await fetchLiveAdminPrompts();
     } else {
@@ -1033,7 +1034,7 @@ router.get('/admin/blogs', adminAuth, async (req, res) => {
 
   async function fetchLiveAdminBlogs() {
     try {
-      const liveRes = await fetch('https://api.promptking.in/api/admin/blogs');
+      const liveRes = await fetch('https://api.promptking.in/api/blogs');
       if (!liveRes.ok) throw new Error("Live API failed");
       res.json(await liveRes.json());
     } catch (e) { res.json([]); }
@@ -1088,7 +1089,7 @@ router.get('/admin/faqs', adminAuth, async (req, res) => {
 
   async function fetchLiveAdminFaqs() {
     try {
-      const liveRes = await fetch('https://api.promptking.in/api/admin/faqs');
+      const liveRes = await fetch('https://api.promptking.in/api/faqs');
       if (!liveRes.ok) throw new Error("Live API failed");
       res.json(await liveRes.json());
     } catch (e) { res.json([]); }
@@ -1133,7 +1134,7 @@ router.get('/admin/categories', adminAuth, async (req, res) => {
 
   async function fetchLiveAdminCategories() {
     try {
-      const liveRes = await fetch('https://api.promptking.in/api/admin/categories');
+      const liveRes = await fetch('https://api.promptking.in/api/categories');
       if (!liveRes.ok) throw new Error("Live API failed");
       res.json(await liveRes.json());
     } catch (e) { res.json(MOCK_DATA.categories); }
