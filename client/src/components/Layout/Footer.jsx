@@ -231,6 +231,24 @@ const Footer = ({ onLogoClick }) => {
             />
           </a>
 
+          {/* Startup Fame Badge */}
+          <a
+            href="https://startupfa.me/s/promptking?utm_source=promptking.in"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
+            onMouseEnter={e => e.currentTarget.style.opacity = 1}
+            onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
+          >
+            <img
+              src="https://startupfa.me/badges/featured-badge-small.webp"
+              alt="PromptKing - Featured on Startup Fame"
+              width="224"
+              height="36"
+              style={{ display: 'block' }}
+            />
+          </a>
+
           {!isMobile && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10a37f', boxShadow: '0 0 10px #10a37f' }} />
