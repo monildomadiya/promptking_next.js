@@ -682,6 +682,8 @@ router.post('/admin/login', (req, res) => {
 
 // --- WEBAUTHN (FINGERPRINT/PASSKEY) ---
 const rpName = 'PromptKing Admin';
+let globalRegistrationChallenge = null;
+let globalAuthChallenge = null;
 
 router.get('/admin/webauthn/generate-registration-options', adminAuth, async (req, res) => {
   if (!generateRegistrationOptions) {
@@ -720,7 +722,7 @@ router.get('/admin/webauthn/generate-registration-options', adminAuth, async (re
       },
     });
 
-    req.session.webAuthnChallenge = options.challenge;
+    globalRegistrationChallenge = options.challenge;
     res.json(options);
   } catch (err) {
     console.error('WebAuthn Registration Options Error:', err);
@@ -733,7 +735,8 @@ router.post('/admin/webauthn/verify-registration', adminAuth, async (req, res) =
     return res.status(500).json({ error: "WebAuthn module missing. Run 'npm install' on server." });
   }
   try {
-    const expectedChallenge = req.session.webAuthnChallenge;
+  try {
+    const expectedChallenge = globalRegistrationChallenge;
     const expectedOrigin = req.headers.origin || (process.env.NODE_ENV === 'production' ? 'https://promptking.in' : `http://localhost:5173`);
     const rpID = new URL(expectedOrigin).hostname;
 
@@ -764,7 +767,7 @@ router.post('/admin/webauthn/verify-registration', adminAuth, async (req, res) =
         VALUES (${credentialIdString}, ${publicKeyString}, ${counter}, ${transportsStr})
       `;
 
-      req.session.webAuthnChallenge = null;
+      globalRegistrationChallenge = null;
       res.json({ verified: true });
     } else {
       res.status(400).json({ error: 'Verification failed' });
@@ -800,7 +803,7 @@ router.get('/admin/webauthn/generate-authentication-options', async (req, res) =
       userVerification: 'preferred',
     });
 
-    req.session.webAuthnChallenge = options.challenge;
+    globalAuthChallenge = options.challenge;
     res.json(options);
   } catch (err) {
     console.error('WebAuthn Authentication Options Error:', err);
@@ -813,7 +816,7 @@ router.post('/admin/webauthn/verify-authentication', async (req, res) => {
     return res.status(500).json({ error: "WebAuthn module missing. Run 'npm install' on server." });
   }
   try {
-    const expectedChallenge = req.session.webAuthnChallenge;
+    const expectedChallenge = globalAuthChallenge;
     const expectedOrigin = req.headers.origin || (process.env.NODE_ENV === 'production' ? 'https://promptking.in' : `http://localhost:5173`);
     const rpID = new URL(expectedOrigin).hostname;
 
@@ -848,7 +851,7 @@ router.post('/admin/webauthn/verify-authentication', async (req, res) => {
 
       await db`UPDATE admin_passkeys SET counter = ${newCounter} WHERE credential_id = ${passkey.credential_id}`;
 
-      req.session.webAuthnChallenge = null;
+      globalAuthChallenge = null;
 
       // Issue secure session token
       const token = crypto.randomUUID();
