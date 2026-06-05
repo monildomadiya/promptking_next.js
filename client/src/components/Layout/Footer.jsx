@@ -223,7 +223,7 @@ const Footer = ({ onLogoClick }) => {
             onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
           >
             <img
-              src="https://findly.tools/badges/findly-tools-badge-light.svg"
+              src="https://findly.tools/badges/findly-tools-badge-dark.svg"
               alt="Featured on Findly.tools"
               width="175"
               height="55"
@@ -241,10 +241,10 @@ const Footer = ({ onLogoClick }) => {
             onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
           >
             <img
-              src="https://startupfa.me/badges/featured-badge-small.webp"
+              src="https://startupfa.me/badges/featured/dark.webp"
               alt="PromptKing - Featured on Startup Fame"
-              width="224"
-              height="36"
+              width="171"
+              height="54"
               style={{ display: 'block' }}
             />
           </a>
