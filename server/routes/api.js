@@ -735,7 +735,6 @@ router.post('/admin/webauthn/verify-registration', adminAuth, async (req, res) =
     return res.status(500).json({ error: "WebAuthn module missing. Run 'npm install' on server." });
   }
   try {
-  try {
     const expectedChallenge = globalRegistrationChallenge;
     const expectedOrigin = req.headers.origin || (process.env.NODE_ENV === 'production' ? 'https://promptking.in' : `http://localhost:5173`);
     const rpID = new URL(expectedOrigin).hostname;
