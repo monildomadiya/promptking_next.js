@@ -720,7 +720,8 @@ router.get('/admin/webauthn/generate-registration-options', adminAuth, async (re
       },
     });
 
-    await db`INSERT INTO site_settings (setting_key, setting_value) VALUES ('webauthn_challenge', ${options.challenge}) ON DUPLICATE KEY UPDATE setting_value = ${options.challenge}`;
+    await db`DELETE FROM site_settings WHERE setting_key = 'webauthn_challenge'`;
+    await db`INSERT INTO site_settings (setting_key, setting_value) VALUES ('webauthn_challenge', ${options.challenge})`;
     res.json(options);
   } catch (err) {
     console.error('WebAuthn Registration Options Error:', err);
@@ -801,7 +802,8 @@ router.get('/admin/webauthn/generate-authentication-options', async (req, res) =
       userVerification: 'preferred',
     });
 
-    await db`INSERT INTO site_settings (setting_key, setting_value) VALUES ('webauthn_challenge', ${options.challenge}) ON DUPLICATE KEY UPDATE setting_value = ${options.challenge}`;
+    await db`DELETE FROM site_settings WHERE setting_key = 'webauthn_challenge'`;
+    await db`INSERT INTO site_settings (setting_key, setting_value) VALUES ('webauthn_challenge', ${options.challenge})`;
     res.json(options);
   } catch (err) {
     console.error('WebAuthn Authentication Options Error:', err);
