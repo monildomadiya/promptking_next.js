@@ -768,15 +768,29 @@ router.post('/admin/webauthn/verify-registration', adminAuth, async (req, res) =
 
     if (verification.verified) {
       const { registrationInfo } = verification;
-      const { credentialID, credentialPublicKey, counter } = registrationInfo;
 
-      const credentialIdString = Buffer.from(credentialID).toString('base64url');
-      const publicKeyString = Buffer.from(credentialPublicKey).toString('base64url');
-      const transportsStr = req.body.response?.transports ? req.body.response.transports.join(',') : '';
+      // @simplewebauthn/server v13+ uses credential object instead of credentialID/credentialPublicKey
+      let credentialIdString, publicKeyString, counter, transportsStr;
+      if (registrationInfo.credential) {
+        // v13+ API
+        credentialIdString = registrationInfo.credential.id;
+        publicKeyString = Buffer.from(registrationInfo.credential.publicKey).toString('base64url');
+        counter = registrationInfo.credential.counter || 0;
+        transportsStr = registrationInfo.credential.transports ? registrationInfo.credential.transports.join(',') : '';
+      } else {
+        // older API fallback
+        credentialIdString = Buffer.from(registrationInfo.credentialID).toString('base64url');
+        publicKeyString = Buffer.from(registrationInfo.credentialPublicKey).toString('base64url');
+        counter = registrationInfo.counter || 0;
+        transportsStr = req.body.response?.transports ? req.body.response.transports.join(',') : '';
+      }
+
+      console.log('[WebAuthn] Saving credential ID:', credentialIdString?.substring(0, 20) + '...');
 
       await db`
         INSERT INTO admin_passkeys (credential_id, public_key, counter, transports)
         VALUES (${credentialIdString}, ${publicKeyString}, ${counter}, ${transportsStr})
+        ON DUPLICATE KEY UPDATE public_key = ${publicKeyString}, counter = ${counter}
       `;
 
       webAuthnChallenges.delete(WEBAUTHN_REG_KEY);
@@ -846,14 +860,28 @@ router.post('/admin/webauthn/verify-authentication', async (req, res) => {
     }
 
     const passkey = passkeys[0];
+
+    // Build authenticator - try both v13 and older API formats
+    const credentialPublicKeyBuffer = new Uint8Array(Buffer.from(passkey.public_key, 'base64url'));
+    const credentialIDBuffer = new Uint8Array(Buffer.from(passkey.credential_id, 'base64url'));
+
+    console.log('[WebAuthn] Authenticating with credential:', passkey.credential_id?.substring(0, 20) + '...');
+
     const verification = await verifyAuthenticationResponse({
       response: body,
       expectedChallenge,
       expectedOrigin,
       expectedRPID: rpID,
+      credential: {
+        id: passkey.credential_id,
+        publicKey: credentialPublicKeyBuffer,
+        counter: Number(passkey.counter),
+        transports: passkey.transports ? passkey.transports.split(',') : undefined,
+      },
+      // fallback for older versions
       authenticator: {
-        credentialID: new Uint8Array(Buffer.from(passkey.credential_id, 'base64url')),
-        credentialPublicKey: new Uint8Array(Buffer.from(passkey.public_key, 'base64url')),
+        credentialID: credentialIDBuffer,
+        credentialPublicKey: credentialPublicKeyBuffer,
         counter: Number(passkey.counter),
       },
     });
