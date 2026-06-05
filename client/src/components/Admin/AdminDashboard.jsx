@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { startRegistration, startAuthentication } from '@simplewebauthn/browser';
 import api from '../../api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -737,63 +736,6 @@ const AdsPanel = ({ onSave }) => {
   );
 };
 
-const SecurityPanel = () => {
-  const handleRegisterFingerprint = async () => {
-    try {
-      const resp = await api.get('/admin/webauthn/generate-registration-options');
-      const options = resp.data;
-      if (options.error) { alert(options.error); return; }
-      
-      const authResp = await startRegistration(options);
-      
-      const verificationResp = await api.post('/admin/webauthn/verify-registration', authResp);
-      if (verificationResp.data && verificationResp.data.verified) {
-        alert("✅ Fingerprint registered successfully! You can now use it to login.");
-      } else if (verificationResp.data && verificationResp.data.error) {
-        alert("❌ Backend Error: " + verificationResp.data.error);
-      } else {
-        alert("DEBUG - Full response: " + JSON.stringify(verificationResp.data));
-      }
-    } catch (e) {
-      console.error("WebAuthn Registration Error:", e);
-      if (e.response && e.response.data && e.response.data.error) {
-        alert(e.response.data.error);
-      } else if (e.name === 'NotAllowedError') {
-        alert("Registration cancelled or not allowed by browser.");
-      } else {
-        alert("Registration Error: " + (e.message || "failed or cancelled"));
-      }
-    }
-  };
-
-  return (
-    <motion.div {...pageTransition} style={{ ...glassPanelStyle, padding: '32px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
-        <div style={{ width: '45px', height: '45px', borderRadius: '12px', background: 'rgba(16,163,127,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Crown size={22} color="#10a37f" />
-        </div>
-        <div>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '2px' }}>Security Settings</h3>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Manage biometric authentication.</p>
-        </div>
-      </div>
-      <p style={{ color: 'var(--text-dim)', marginBottom: '24px' }}>
-        Register your device's fingerprint or passkey (e.g., Windows Hello, Touch ID, or mobile biometrics) to enable fast, secure login without a password.
-      </p>
-      <button 
-        onClick={handleRegisterFingerprint}
-        className="glass-button-secondary"
-        style={{ 
-          padding: '16px 24px', borderRadius: '12px', background: 'var(--accent-gradient)', 
-          color: 'white', border: 'none', fontWeight: 800, cursor: 'pointer',
-          boxShadow: '0 8px 24px var(--accent-glow)'
-        }}
-      >
-        Register Fingerprint / Passkey
-      </button>
-    </motion.div>
-  );
-};
 
 const AdminDashboard = () => {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -897,40 +839,6 @@ const AdminDashboard = () => {
       }
     } catch (e) { 
       alert("Network or authentication error."); 
-    }
-  };
-
-  const handleFingerprintLogin = async () => {
-    try {
-      const resp = await api.get('/admin/webauthn/generate-authentication-options');
-      const options = resp.data;
-      if (options.error) {
-        alert(options.error);
-        return;
-      }
-      
-      const authResp = await startAuthentication(options);
-      
-      const verificationResp = await api.post('/admin/webauthn/verify-authentication', authResp);
-      if (verificationResp.data && verificationResp.data.verified) {
-        localStorage.setItem('adminToken', verificationResp.data.token);
-        setIsAdmin(true);
-        fetchData('prompts');
-        fetchAnalytics();
-      } else if (verificationResp.data && verificationResp.data.error) {
-        alert("Backend Error: " + verificationResp.data.error);
-      } else {
-        alert("Fingerprint authentication failed.");
-      }
-    } catch (e) {
-      console.error("WebAuthn Login Error:", e);
-      if (e.response && e.response.data && e.response.data.error) {
-        alert(e.response.data.error);
-      } else if (e.name === 'NotAllowedError') {
-        alert("Login cancelled or not allowed.");
-      } else {
-        alert("Login Error: " + (e.message || "failed or cancelled"));
-      }
     }
   };
 
@@ -1148,35 +1056,6 @@ const AdminDashboard = () => {
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ ...inputStyle, textAlign: 'center', marginBottom: '24px', letterSpacing: '4px', fontSize: '1.2rem' }} placeholder="••••" />
             <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} style={{ width: '100%', padding: '16px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '12px', color: 'white', fontWeight: 800, cursor: 'pointer', boxShadow: '0 8px 24px var(--accent-glow)' }}>INITIALIZE ACCESS</motion.button>
           </form>
-          
-          <div style={{ margin: '20px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontWeight: 600 }}>OR</span>
-            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
-          </div>
-          
-          <motion.button 
-            type="button" 
-            onClick={handleFingerprintLogin} 
-            whileHover={{ scale: 1.02 }} 
-            whileTap={{ scale: 0.98 }} 
-            style={{ 
-              width: '100%', 
-              padding: '16px', 
-              background: 'rgba(255,255,255,0.05)', 
-              border: '1px solid rgba(255,255,255,0.1)', 
-              borderRadius: '12px', 
-              color: 'white', 
-              fontWeight: 800, 
-              cursor: 'pointer', 
-              display: 'flex', 
-              justifyContent: 'center', 
-              alignItems: 'center', 
-              gap: '8px' 
-            }}
-          >
-            <Crown size={20} /> FINGERPRINT / PASSKEY
-          </motion.button>
         </motion.div>
       </div>
     );
@@ -1195,7 +1074,6 @@ const AdminDashboard = () => {
       { id: 'settings-social', label: 'Channels', icon: <Share2 size={20} /> },
       { id: 'settings-ads', label: 'Ads Management', icon: <Activity size={20} /> },
       { id: 'settings-layout', label: 'Layout', icon: <Layers size={20} /> },
-      { id: 'settings-security', label: 'Security', icon: <Crown size={20} /> },
     ]}
   ];
 
