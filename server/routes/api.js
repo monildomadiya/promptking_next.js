@@ -825,7 +825,6 @@ router.post('/admin/webauthn/verify-authentication', async (req, res) => {
 
     const { body } = req;
 
-  try {
     const passkeys = await db`SELECT * FROM admin_passkeys WHERE credential_id = ${body.id}`;
     if (passkeys.length === 0) {
       return res.status(400).json({ error: 'Fingerprint not recognized' });
