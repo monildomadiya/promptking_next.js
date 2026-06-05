@@ -606,16 +606,7 @@ const SocialPanel = ({ onSave }) => {
   );
 };
 
-const LayoutPanel = () => (
-  <motion.div {...pageTransition} style={{ ...glassPanelStyle, padding: '32px', textAlign: 'center' }}>
-    <Layers size={48} style={{ margin: '40px auto 20px', color: 'var(--accent-main)', opacity: 0.3 }} />
-    <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '12px' }}>Advanced Layout Engine</h3>
-    <p style={{ color: 'var(--text-dim)', maxWidth: '400px', margin: '0 auto 40px' }}>
-      Fine-grained control over header heights, spacing modules, and responsive breakpoints is currently in development.
-    </p>
-    <div style={{ height: '2px', background: 'linear-gradient(90deg, transparent, var(--accent-glow), transparent)', width: '200px', margin: '0 auto' }} />
-  </motion.div>
-);
+
 
 const AdsPanel = ({ onSave }) => {
   const [settings, setSettings] = useState({});
@@ -1073,7 +1064,6 @@ const AdminDashboard = () => {
       { id: 'settings-branding', label: 'Branding', icon: <Palette size={20} /> },
       { id: 'settings-social', label: 'Channels', icon: <Share2 size={20} /> },
       { id: 'settings-ads', label: 'Ads Management', icon: <Activity size={20} /> },
-      { id: 'settings-layout', label: 'Layout', icon: <Layers size={20} /> },
     ]}
   ];
 
@@ -1399,7 +1389,6 @@ const AdminDashboard = () => {
           {view === 'settings-branding' && <BrandingPanel key="branding" onSave={() => fetchData('settings')} />}
           {view === 'settings-social' && <SocialPanel key="social" onSave={() => fetchData('settings')} />}
           {view === 'settings-ads' && <AdsPanel key="ads" onSave={() => fetchData('settings')} />}
-          {view === 'settings-layout' && <LayoutPanel key="layout" />}
           {view === 'settings-security' && <SecurityPanel key="security" />}
 
           {['prompts', 'blogs', 'categories', 'faqs'].includes(view) && (
