@@ -249,6 +249,24 @@ const Footer = ({ onLogoClick }) => {
             />
           </a>
 
+          {/* Twelve Tools Badge */}
+          <a
+            href="https://twelve.tools"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
+            onMouseEnter={e => e.currentTarget.style.opacity = 1}
+            onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
+          >
+            <img
+              src="https://twelve.tools/badge2-dark.svg"
+              alt="Featured on Twelve Tools"
+              width="200"
+              height="54"
+              style={{ display: 'block' }}
+            />
+          </a>
+
           {!isMobile && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10a37f', boxShadow: '0 0 10px #10a37f' }} />
