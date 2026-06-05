@@ -688,7 +688,8 @@ router.get('/admin/webauthn/generate-registration-options', adminAuth, async (re
     return res.status(500).json({ error: "WebAuthn module missing. Run 'npm install' on server." });
   }
   try {
-    const rpID = req.hostname;
+    const expectedOrigin = req.headers.origin || (process.env.NODE_ENV === 'production' ? 'https://promptking.in' : `http://localhost:5173`);
+    const rpID = new URL(expectedOrigin).hostname;
     
     // Create a pseudo-user for the admin
     const user = {
@@ -733,8 +734,8 @@ router.post('/admin/webauthn/verify-registration', adminAuth, async (req, res) =
   }
   try {
     const expectedChallenge = req.session.webAuthnChallenge;
-    const rpID = req.hostname;
-    const expectedOrigin = req.headers.origin || (process.env.NODE_ENV === 'production' ? 'https://promptking.in' : `http://${req.hostname}:5173`);
+    const expectedOrigin = req.headers.origin || (process.env.NODE_ENV === 'production' ? 'https://promptking.in' : `http://localhost:5173`);
+    const rpID = new URL(expectedOrigin).hostname;
 
     if (!expectedChallenge) {
       return res.status(400).json({ error: 'Challenge not found or expired' });
@@ -779,7 +780,8 @@ router.get('/admin/webauthn/generate-authentication-options', async (req, res) =
     return res.status(500).json({ error: "WebAuthn module missing. Run 'npm install' on server." });
   }
   try {
-    const rpID = req.hostname;
+    const expectedOrigin = req.headers.origin || (process.env.NODE_ENV === 'production' ? 'https://promptking.in' : `http://localhost:5173`);
+    const rpID = new URL(expectedOrigin).hostname;
 
     const passkeys = await db`SELECT credential_id, transports FROM admin_passkeys`;
     const allowCredentials = passkeys.map(pk => ({
@@ -812,8 +814,8 @@ router.post('/admin/webauthn/verify-authentication', async (req, res) => {
   }
   try {
     const expectedChallenge = req.session.webAuthnChallenge;
-    const rpID = req.hostname;
-    const expectedOrigin = req.headers.origin || (process.env.NODE_ENV === 'production' ? 'https://promptking.in' : `http://${req.hostname}:5173`);
+    const expectedOrigin = req.headers.origin || (process.env.NODE_ENV === 'production' ? 'https://promptking.in' : `http://localhost:5173`);
+    const rpID = new URL(expectedOrigin).hostname;
 
     if (!expectedChallenge) {
       return res.status(400).json({ error: 'Challenge not found or expired' });
