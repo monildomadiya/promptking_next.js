@@ -683,16 +683,12 @@ router.post('/admin/login', (req, res) => {
 // --- WEBAUTHN (FINGERPRINT/PASSKEY) ---
 const rpName = 'PromptKing Admin';
 
-// In-memory challenge store (maps ip to current challenge)
-const webAuthnChallenges = new Map();
-
 router.get('/admin/webauthn/generate-registration-options', adminAuth, async (req, res) => {
   if (!generateRegistrationOptions) {
     return res.status(500).json({ error: "WebAuthn module missing. Run 'npm install' on server." });
   }
   try {
-    const ip = req.ip || req.connection.remoteAddress;
-    const rpID = process.env.NODE_ENV === 'production' ? 'promptking.in' : 'localhost';
+    const rpID = req.hostname;
     
     // Create a pseudo-user for the admin
     const user = {
@@ -723,7 +719,7 @@ router.get('/admin/webauthn/generate-registration-options', adminAuth, async (re
       },
     });
 
-    webAuthnChallenges.set(ip, options.challenge);
+    req.session.webAuthnChallenge = options.challenge;
     res.json(options);
   } catch (err) {
     console.error('WebAuthn Registration Options Error:', err);
@@ -736,9 +732,9 @@ router.post('/admin/webauthn/verify-registration', adminAuth, async (req, res) =
     return res.status(500).json({ error: "WebAuthn module missing. Run 'npm install' on server." });
   }
   try {
-    const ip = req.ip || req.connection.remoteAddress;
-    const expectedChallenge = webAuthnChallenges.get(ip);
-    const rpID = process.env.NODE_ENV === 'production' ? 'promptking.in' : 'localhost';
+    const expectedChallenge = req.session.webAuthnChallenge;
+    const rpID = req.hostname;
+    const expectedOrigin = req.headers.origin || (process.env.NODE_ENV === 'production' ? 'https://promptking.in' : `http://${req.hostname}:5173`);
 
     if (!expectedChallenge) {
       return res.status(400).json({ error: 'Challenge not found or expired' });
@@ -749,8 +745,9 @@ router.post('/admin/webauthn/verify-registration', adminAuth, async (req, res) =
     const verification = await verifyRegistrationResponse({
       response: body,
       expectedChallenge,
-      expectedOrigin: process.env.NODE_ENV === 'production' ? 'https://promptking.in' : ['http://localhost:5173', 'http://localhost:5000'],
+      expectedOrigin,
       expectedRPID: rpID,
+      requireUserVerification: true,
     });
 
     if (verification.verified) {
@@ -766,7 +763,7 @@ router.post('/admin/webauthn/verify-registration', adminAuth, async (req, res) =
         VALUES (${credentialIdString}, ${publicKeyString}, ${counter}, ${transportsStr})
       `;
 
-      webAuthnChallenges.delete(ip);
+      req.session.webAuthnChallenge = null;
       res.json({ verified: true });
     } else {
       res.status(400).json({ error: 'Verification failed' });
@@ -782,8 +779,7 @@ router.get('/admin/webauthn/generate-authentication-options', async (req, res) =
     return res.status(500).json({ error: "WebAuthn module missing. Run 'npm install' on server." });
   }
   try {
-    const ip = req.ip || req.connection.remoteAddress;
-    const rpID = process.env.NODE_ENV === 'production' ? 'promptking.in' : 'localhost';
+    const rpID = req.hostname;
 
     const passkeys = await db`SELECT credential_id, transports FROM admin_passkeys`;
     const allowCredentials = passkeys.map(pk => ({
@@ -802,7 +798,7 @@ router.get('/admin/webauthn/generate-authentication-options', async (req, res) =
       userVerification: 'preferred',
     });
 
-    webAuthnChallenges.set(ip, options.challenge);
+    req.session.webAuthnChallenge = options.challenge;
     res.json(options);
   } catch (err) {
     console.error('WebAuthn Authentication Options Error:', err);
@@ -815,9 +811,9 @@ router.post('/admin/webauthn/verify-authentication', async (req, res) => {
     return res.status(500).json({ error: "WebAuthn module missing. Run 'npm install' on server." });
   }
   try {
-    const ip = req.ip || req.connection.remoteAddress;
-    const expectedChallenge = webAuthnChallenges.get(ip);
-    const rpID = process.env.NODE_ENV === 'production' ? 'promptking.in' : 'localhost';
+    const expectedChallenge = req.session.webAuthnChallenge;
+    const rpID = req.hostname;
+    const expectedOrigin = req.headers.origin || (process.env.NODE_ENV === 'production' ? 'https://promptking.in' : `http://${req.hostname}:5173`);
 
     if (!expectedChallenge) {
       return res.status(400).json({ error: 'Challenge not found or expired' });
@@ -835,7 +831,7 @@ router.post('/admin/webauthn/verify-authentication', async (req, res) => {
     const verification = await verifyAuthenticationResponse({
       response: body,
       expectedChallenge,
-      expectedOrigin: process.env.NODE_ENV === 'production' ? 'https://promptking.in' : ['http://localhost:5173', 'http://localhost:5000'],
+      expectedOrigin,
       expectedRPID: rpID,
       authenticator: {
         credentialID: new Uint8Array(Buffer.from(passkey.credential_id, 'base64url')),
@@ -850,7 +846,7 @@ router.post('/admin/webauthn/verify-authentication', async (req, res) => {
 
       await db`UPDATE admin_passkeys SET counter = ${newCounter} WHERE credential_id = ${passkey.credential_id}`;
 
-      webAuthnChallenges.delete(ip);
+      req.session.webAuthnChallenge = null;
 
       // Issue secure session token
       const token = crypto.randomUUID();
