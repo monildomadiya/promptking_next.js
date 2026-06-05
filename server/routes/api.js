@@ -722,10 +722,11 @@ router.get('/admin/webauthn/generate-registration-options', adminAuth, async (re
       userName: 'admin',
       userDisplayName: 'Administrator',
       attestationType: 'none',
-      excludeCredentials,
+      excludeCredentials: [], // Don't exclude - allow re-registration
       authenticatorSelection: {
-        residentKey: 'preferred',
-        userVerification: 'preferred',
+        residentKey: 'discouraged',
+        userVerification: 'discouraged',
+        authenticatorAttachment: 'platform',
       },
     });
 
