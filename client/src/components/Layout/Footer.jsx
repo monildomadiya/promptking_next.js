@@ -199,7 +199,6 @@ const Footer = ({ onLogoClick }) => {
           </div>
         </div>
 
-        {/* Bottom Bar */}
         <div style={{ 
           paddingTop: '30px', 
           borderTop: '1px solid rgba(255,255,255,0.05)', 
@@ -213,6 +212,25 @@ const Footer = ({ onLogoClick }) => {
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
             &copy; {currentYear} PromptKing. All rights reserved.
           </p>
+
+          {/* Findly.tools Badge */}
+          <a
+            href="https://findly.tools/promptking?utm_source=promptking"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
+            onMouseEnter={e => e.currentTarget.style.opacity = 1}
+            onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
+          >
+            <img
+              src="https://findly.tools/badges/findly-tools-badge-light.svg"
+              alt="Featured on Findly.tools"
+              width="175"
+              height="55"
+              style={{ display: 'block' }}
+            />
+          </a>
+
           {!isMobile && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10a37f', boxShadow: '0 0 10px #10a37f' }} />
