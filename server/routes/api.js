@@ -771,7 +771,7 @@ router.post('/admin/webauthn/verify-registration', adminAuth, async (req, res) =
     }
   } catch (error) {
     console.error('WebAuthn Registration Verification Error:', error);
-    res.status(500).json({ error: 'Failed to verify registration' });
+    res.status(500).json({ error: 'Failed to verify registration: ' + (error.message || '') });
   }
 });
 
@@ -861,7 +861,7 @@ router.post('/admin/webauthn/verify-authentication', async (req, res) => {
     }
   } catch (error) {
     console.error('WebAuthn Auth Verification Error:', error);
-    res.status(500).json({ error: 'Failed to verify authentication' });
+    res.status(500).json({ error: 'Failed to verify authentication: ' + (error.message || '') });
   }
 });
 

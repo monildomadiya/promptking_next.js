@@ -749,6 +749,8 @@ const SecurityPanel = () => {
       const verificationResp = await api.post('/admin/webauthn/verify-registration', authResp);
       if (verificationResp.data && verificationResp.data.verified) {
         alert("Fingerprint registered successfully! You can now use it to login.");
+      } else if (verificationResp.data && verificationResp.data.error) {
+        alert("Backend Error: " + verificationResp.data.error);
       } else {
         alert("Fingerprint registration failed.");
       }
@@ -915,6 +917,8 @@ const AdminDashboard = () => {
         setIsAdmin(true);
         fetchData('prompts');
         fetchAnalytics();
+      } else if (verificationResp.data && verificationResp.data.error) {
+        alert("Backend Error: " + verificationResp.data.error);
       } else {
         alert("Fingerprint authentication failed.");
       }
