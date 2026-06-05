@@ -682,23 +682,32 @@ router.post('/admin/login', (req, res) => {
 
 // --- WEBAUTHN (FINGERPRINT/PASSKEY) ---
 const rpName = 'PromptKing Admin';
+// Use a simple Map with timestamp to store challenges (keyed by IP)
+const webAuthnChallenges = new Map();
+
+function getRP(req) {
+  // Always use the browser's origin to derive rpID
+  const origin = req.headers.origin || req.headers.referer || 'https://promptking.in';
+  try {
+    const url = new URL(origin);
+    return { rpID: url.hostname, expectedOrigin: url.origin };
+  } catch {
+    return { rpID: 'promptking.in', expectedOrigin: 'https://promptking.in' };
+  }
+}
+
+// Use a stable key for this admin - there's only one admin so a fixed key is fine
+const WEBAUTHN_REG_KEY = 'admin_reg_challenge';
+const WEBAUTHN_AUTH_KEY = 'admin_auth_challenge';
 
 router.get('/admin/webauthn/generate-registration-options', adminAuth, async (req, res) => {
   if (!generateRegistrationOptions) {
     return res.status(500).json({ error: "WebAuthn module missing. Run 'npm install' on server." });
   }
   try {
-    const expectedOrigin = req.headers.origin || (process.env.NODE_ENV === 'production' ? 'https://promptking.in' : `http://localhost:5173`);
-    const rpID = new URL(expectedOrigin).hostname;
-    
-    // Create a pseudo-user for the admin
-    const user = {
-      id: 'admin',
-      username: 'admin',
-      displayName: 'Administrator'
-    };
+    const { rpID, expectedOrigin } = getRP(req);
+    console.log('[WebAuthn] Register options - rpID:', rpID, 'origin:', expectedOrigin);
 
-    // Get existing credentials
     const passkeys = await db`SELECT credential_id, transports FROM admin_passkeys`;
     const excludeCredentials = passkeys.map(pk => ({
       id: pk.credential_id,
@@ -709,23 +718,26 @@ router.get('/admin/webauthn/generate-registration-options', adminAuth, async (re
     const options = await generateRegistrationOptions({
       rpName,
       rpID,
-      userID: new Uint8Array(Buffer.from(user.id)),
-      userName: user.username,
-      userDisplayName: user.displayName,
+      userID: new Uint8Array(Buffer.from('admin-user-id')),
+      userName: 'admin',
+      userDisplayName: 'Administrator',
       attestationType: 'none',
       excludeCredentials,
       authenticatorSelection: {
-        residentKey: 'required',
+        residentKey: 'preferred',
         userVerification: 'preferred',
       },
     });
 
-    await db`DELETE FROM site_settings WHERE setting_key = 'webauthn_challenge'`;
-    await db`INSERT INTO site_settings (setting_key, setting_value) VALUES ('webauthn_challenge', ${options.challenge})`;
+    // Store challenge in memory map (fixed key since there's only one admin)
+    webAuthnChallenges.set(WEBAUTHN_REG_KEY, options.challenge);
+    setTimeout(() => webAuthnChallenges.delete(WEBAUTHN_REG_KEY), 5 * 60 * 1000);
+    console.log('[WebAuthn] Challenge stored. Keys:', [...webAuthnChallenges.keys()]);
+
     res.json(options);
   } catch (err) {
-    console.error('WebAuthn Registration Options Error:', err);
-    res.status(500).json({ error: 'Failed to generate registration options' });
+    console.error('[WebAuthn] Registration Options Error:', err);
+    res.status(500).json({ error: 'Failed to generate registration options: ' + err.message });
   }
 });
 
@@ -734,46 +746,47 @@ router.post('/admin/webauthn/verify-registration', adminAuth, async (req, res) =
     return res.status(500).json({ error: "WebAuthn module missing. Run 'npm install' on server." });
   }
   try {
-    const challengeRow = await db`SELECT setting_value FROM site_settings WHERE setting_key = 'webauthn_challenge'`;
-    const expectedChallenge = challengeRow.length > 0 ? challengeRow[0].setting_value : null;
-    const expectedOrigin = req.headers.origin || (process.env.NODE_ENV === 'production' ? 'https://promptking.in' : `http://localhost:5173`);
-    const rpID = new URL(expectedOrigin).hostname;
+    const { rpID, expectedOrigin } = getRP(req);
+    const expectedChallenge = webAuthnChallenges.get(WEBAUTHN_REG_KEY);
+
+    console.log('[WebAuthn] Verify registration - rpID:', rpID, 'origin:', expectedOrigin);
+    console.log('[WebAuthn] challenge found:', !!expectedChallenge, 'All keys:', [...webAuthnChallenges.keys()]);
 
     if (!expectedChallenge) {
-      return res.status(400).json({ error: 'Challenge not found or expired' });
+      return res.status(400).json({ error: 'Challenge not found or expired. Please click Register Fingerprint again.' });
     }
 
-    const { body } = req;
-
     const verification = await verifyRegistrationResponse({
-      response: body,
+      response: req.body,
       expectedChallenge,
       expectedOrigin,
       expectedRPID: rpID,
-      requireUserVerification: true,
+      requireUserVerification: false,
     });
+
+    console.log('[WebAuthn] Verification result:', verification.verified);
 
     if (verification.verified) {
       const { registrationInfo } = verification;
       const { credentialID, credentialPublicKey, counter } = registrationInfo;
-      
+
       const credentialIdString = Buffer.from(credentialID).toString('base64url');
       const publicKeyString = Buffer.from(credentialPublicKey).toString('base64url');
-      const transportsStr = body.response.transports ? body.response.transports.join(',') : '';
+      const transportsStr = req.body.response?.transports ? req.body.response.transports.join(',') : '';
 
       await db`
         INSERT INTO admin_passkeys (credential_id, public_key, counter, transports)
         VALUES (${credentialIdString}, ${publicKeyString}, ${counter}, ${transportsStr})
       `;
 
-      await db`DELETE FROM site_settings WHERE setting_key = 'webauthn_challenge'`;
+      webAuthnChallenges.delete(WEBAUTHN_REG_KEY);
       res.json({ verified: true });
     } else {
-      res.status(400).json({ error: 'Verification failed' });
+      res.status(400).json({ error: 'Verification failed - credential not verified' });
     }
   } catch (error) {
-    console.error('WebAuthn Registration Verification Error:', error);
-    res.status(500).json({ error: 'Failed to verify registration: ' + (error.message || '') });
+    console.error('[WebAuthn] Registration Verification Error:', error);
+    res.status(500).json({ error: 'Failed to verify registration: ' + error.message });
   }
 });
 
@@ -782,19 +795,19 @@ router.get('/admin/webauthn/generate-authentication-options', async (req, res) =
     return res.status(500).json({ error: "WebAuthn module missing. Run 'npm install' on server." });
   }
   try {
-    const expectedOrigin = req.headers.origin || (process.env.NODE_ENV === 'production' ? 'https://promptking.in' : `http://localhost:5173`);
-    const rpID = new URL(expectedOrigin).hostname;
+    const { rpID, expectedOrigin } = getRP(req);
+    console.log('[WebAuthn] Auth options - rpID:', rpID, 'origin:', expectedOrigin);
 
     const passkeys = await db`SELECT credential_id, transports FROM admin_passkeys`;
+    if (passkeys.length === 0) {
+      return res.status(404).json({ error: 'No fingerprints registered. Please login with password to register.' });
+    }
+
     const allowCredentials = passkeys.map(pk => ({
       id: pk.credential_id,
       type: 'public-key',
       transports: pk.transports ? pk.transports.split(',') : ['internal'],
     }));
-
-    if (allowCredentials.length === 0) {
-      return res.status(404).json({ error: 'No fingerprints registered. Please login with password to register.' });
-    }
 
     const options = await generateAuthenticationOptions({
       rpID,
@@ -802,12 +815,13 @@ router.get('/admin/webauthn/generate-authentication-options', async (req, res) =
       userVerification: 'preferred',
     });
 
-    await db`DELETE FROM site_settings WHERE setting_key = 'webauthn_challenge'`;
-    await db`INSERT INTO site_settings (setting_key, setting_value) VALUES ('webauthn_challenge', ${options.challenge})`;
+    webAuthnChallenges.set(WEBAUTHN_AUTH_KEY, options.challenge);
+    setTimeout(() => webAuthnChallenges.delete(WEBAUTHN_AUTH_KEY), 5 * 60 * 1000);
+
     res.json(options);
   } catch (err) {
-    console.error('WebAuthn Authentication Options Error:', err);
-    res.status(500).json({ error: 'Failed to generate authentication options' });
+    console.error('[WebAuthn] Authentication Options Error:', err);
+    res.status(500).json({ error: 'Failed to generate authentication options: ' + err.message });
   }
 });
 
@@ -816,24 +830,22 @@ router.post('/admin/webauthn/verify-authentication', async (req, res) => {
     return res.status(500).json({ error: "WebAuthn module missing. Run 'npm install' on server." });
   }
   try {
-    const challengeRow = await db`SELECT setting_value FROM site_settings WHERE setting_key = 'webauthn_challenge'`;
-    const expectedChallenge = challengeRow.length > 0 ? challengeRow[0].setting_value : null;
-    const expectedOrigin = req.headers.origin || (process.env.NODE_ENV === 'production' ? 'https://promptking.in' : `http://localhost:5173`);
-    const rpID = new URL(expectedOrigin).hostname;
+    const { rpID, expectedOrigin } = getRP(req);
+    const expectedChallenge = webAuthnChallenges.get(WEBAUTHN_AUTH_KEY);
+
+    console.log('[WebAuthn] Verify auth - rpID:', rpID, 'challenge found:', !!expectedChallenge);
 
     if (!expectedChallenge) {
-      return res.status(400).json({ error: 'Challenge not found or expired' });
+      return res.status(400).json({ error: 'Challenge not found or expired. Please try again.' });
     }
 
     const { body } = req;
-
     const passkeys = await db`SELECT * FROM admin_passkeys WHERE credential_id = ${body.id}`;
     if (passkeys.length === 0) {
-      return res.status(400).json({ error: 'Fingerprint not recognized' });
+      return res.status(400).json({ error: 'Fingerprint not recognized. Please register again.' });
     }
 
     const passkey = passkeys[0];
-
     const verification = await verifyAuthenticationResponse({
       response: body,
       expectedChallenge,
@@ -848,24 +860,19 @@ router.post('/admin/webauthn/verify-authentication', async (req, res) => {
 
     if (verification.verified) {
       const { authenticationInfo } = verification;
-      const { newCounter } = authenticationInfo;
+      await db`UPDATE admin_passkeys SET counter = ${authenticationInfo.newCounter} WHERE credential_id = ${passkey.credential_id}`;
+      webAuthnChallenges.delete(WEBAUTHN_AUTH_KEY);
 
-      await db`UPDATE admin_passkeys SET counter = ${newCounter} WHERE credential_id = ${passkey.credential_id}`;
-
-      await db`DELETE FROM site_settings WHERE setting_key = 'webauthn_challenge'`;
-
-      // Issue secure session token
       const token = crypto.randomUUID();
       validAdminTokens.add(token);
-      
       req.session.isAdmin = true;
       res.json({ verified: true, token });
     } else {
-      res.status(400).json({ error: 'Verification failed' });
+      res.status(400).json({ error: 'Authentication failed - credential not verified' });
     }
   } catch (error) {
-    console.error('WebAuthn Auth Verification Error:', error);
-    res.status(500).json({ error: 'Failed to verify authentication: ' + (error.message || '') });
+    console.error('[WebAuthn] Auth Verification Error:', error);
+    res.status(500).json({ error: 'Failed to verify authentication: ' + error.message });
   }
 });
 

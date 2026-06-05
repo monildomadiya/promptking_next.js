@@ -748,11 +748,11 @@ const SecurityPanel = () => {
       
       const verificationResp = await api.post('/admin/webauthn/verify-registration', authResp);
       if (verificationResp.data && verificationResp.data.verified) {
-        alert("Fingerprint registered successfully! You can now use it to login.");
+        alert("✅ Fingerprint registered successfully! You can now use it to login.");
       } else if (verificationResp.data && verificationResp.data.error) {
-        alert("Backend Error: " + verificationResp.data.error);
+        alert("❌ Backend Error: " + verificationResp.data.error);
       } else {
-        alert("Fingerprint registration failed.");
+        alert("DEBUG - Full response: " + JSON.stringify(verificationResp.data));
       }
     } catch (e) {
       console.error("WebAuthn Registration Error:", e);
