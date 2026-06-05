@@ -213,109 +213,118 @@ const Footer = ({ onLogoClick }) => {
             &copy; {currentYear} PromptKing. All rights reserved.
           </p>
 
-          {/* Findly.tools Badge */}
-          <a
-            href="https://findly.tools/promptking?utm_source=promptking"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.opacity = 1}
-            onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
-          >
-            <img
-              src="https://findly.tools/badges/findly-tools-badge-dark.svg"
-              alt="Featured on Findly.tools"
-              width="175"
-              height="55"
-              style={{ display: 'block' }}
-            />
-          </a>
+          {/* Featured Badges Container */}
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            flexWrap: 'wrap', 
+            gap: '15px' 
+          }}>
+            {/* Findly.tools Badge */}
+            <a
+              href="https://findly.tools/promptking?utm_source=promptking"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.opacity = 1}
+              onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
+            >
+              <img
+                src="https://findly.tools/badges/findly-tools-badge-dark.svg"
+                alt="Featured on Findly.tools"
+                width="175"
+                height="55"
+                style={{ display: 'block' }}
+              />
+            </a>
 
-          {/* Startup Fame Badge */}
-          <a
-            href="https://startupfa.me/s/promptking?utm_source=promptking.in"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.opacity = 1}
-            onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
-          >
-            <img
-              src="https://startupfa.me/badges/featured/dark.webp"
-              alt="PromptKing - Featured on Startup Fame"
-              width="171"
-              height="54"
-              style={{ display: 'block' }}
-            />
-          </a>
+            {/* Startup Fame Badge */}
+            <a
+              href="https://startupfa.me/s/promptking?utm_source=promptking.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.opacity = 1}
+              onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
+            >
+              <img
+                src="https://startupfa.me/badges/featured/dark.webp"
+                alt="PromptKing - Featured on Startup Fame"
+                width="171"
+                height="54"
+                style={{ display: 'block' }}
+              />
+            </a>
 
-          {/* Twelve Tools Badge */}
-          <a
-            href="https://twelve.tools"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.opacity = 1}
-            onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
-          >
-            <img
-              src="https://twelve.tools/badge2-dark.svg"
-              alt="Featured on Twelve Tools"
-              width="200"
-              height="54"
-              style={{ display: 'block' }}
-            />
-          </a>
+            {/* Twelve Tools Badge */}
+            <a
+              href="https://twelve.tools"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.opacity = 1}
+              onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
+            >
+              <img
+                src="https://twelve.tools/badge2-dark.svg"
+                alt="Featured on Twelve Tools"
+                width="200"
+                height="54"
+                style={{ display: 'block' }}
+              />
+            </a>
 
-          {/* Turbo0 Badge */}
-          <a 
-            href="https://turbo0.com/item/promptking" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.opacity = 1}
-            onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
-          >
-            <img 
-              src="https://img.turbo0.com/badge-listed-dark.svg" 
-              alt="Listed on Turbo0" 
-              style={{ display: 'block', height: '54px', width: 'auto' }} 
-            />
-          </a>
+            {/* Turbo0 Badge */}
+            <a 
+              href="https://turbo0.com/item/promptking" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.opacity = 1}
+              onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
+            >
+              <img 
+                src="https://img.turbo0.com/badge-listed-dark.svg" 
+                alt="Listed on Turbo0" 
+                style={{ display: 'block', height: '54px', width: 'auto' }} 
+              />
+            </a>
 
-          {/* ShowMeBestAI Badge */}
-          <a
-            href="https://showmebest.ai"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.opacity = 1}
-            onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
-          >
-            <img
-              src="https://showmebest.ai/badge/feature-badge-dark.webp"
-              alt="Featured on ShowMeBestAI"
-              width="220"
-              height="60"
-              style={{ display: 'block' }}
-            />
-          </a>
+            {/* ShowMeBestAI Badge */}
+            <a
+              href="https://showmebest.ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.opacity = 1}
+              onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
+            >
+              <img
+                src="https://showmebest.ai/badge/feature-badge-dark.webp"
+                alt="Featured on ShowMeBestAI"
+                width="220"
+                height="60"
+                style={{ display: 'block' }}
+              />
+            </a>
 
-          {/* Days Launch Badge */}
-          <a 
-            href="https://dayslaunch.com" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.opacity = 1}
-            onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
-          > 
-            <img 
-              src="https://dayslaunch.com/badages-awards.svg"
-              alt="Featured on Days Launch" 
-              style={{ display: 'block', height: '54px', width: 'auto' }}
-            />
-          </a>
+            {/* Days Launch Badge */}
+            <a 
+              href="https://dayslaunch.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.opacity = 1}
+              onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
+            > 
+              <img 
+                src="https://dayslaunch.com/badages-awards.svg"
+                alt="Featured on Days Launch" 
+                style={{ display: 'block', height: '54px', width: 'auto' }}
+              />
+            </a>
+          </div>
 
           {!isMobile && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
