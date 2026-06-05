@@ -753,10 +753,13 @@ const SecurityPanel = () => {
         alert("Fingerprint registration failed.");
       }
     } catch (e) {
+      console.error("WebAuthn Registration Error:", e);
       if (e.response && e.response.data && e.response.data.error) {
         alert(e.response.data.error);
+      } else if (e.name === 'NotAllowedError') {
+        alert("Registration cancelled or not allowed by browser.");
       } else {
-        alert("Registration failed or cancelled.");
+        alert("Registration Error: " + (e.message || "failed or cancelled"));
       }
     }
   };
@@ -916,10 +919,13 @@ const AdminDashboard = () => {
         alert("Fingerprint authentication failed.");
       }
     } catch (e) {
+      console.error("WebAuthn Login Error:", e);
       if (e.response && e.response.data && e.response.data.error) {
         alert(e.response.data.error);
+      } else if (e.name === 'NotAllowedError') {
+        alert("Login cancelled or not allowed.");
       } else {
-        alert("Fingerprint authentication cancelled or failed.");
+        alert("Login Error: " + (e.message || "failed or cancelled"));
       }
     }
   };
