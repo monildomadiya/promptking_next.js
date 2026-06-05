@@ -1,12 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-const {
-  generateRegistrationOptions,
-  verifyRegistrationResponse,
-  generateAuthenticationOptions,
-  verifyAuthenticationResponse,
-} = require('@simplewebauthn/server');
+let generateRegistrationOptions, verifyRegistrationResponse, generateAuthenticationOptions, verifyAuthenticationResponse;
+try {
+  const webauthn = require('@simplewebauthn/server');
+  generateRegistrationOptions = webauthn.generateRegistrationOptions;
+  verifyRegistrationResponse = webauthn.verifyRegistrationResponse;
+  generateAuthenticationOptions = webauthn.generateAuthenticationOptions;
+  verifyAuthenticationResponse = webauthn.verifyAuthenticationResponse;
+} catch (e) {
+  console.warn("WebAuthn module not installed. Fingerprint login will not work until you run 'npm install'.");
+}
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -683,17 +687,20 @@ const rpName = 'PromptKing Admin';
 const webAuthnChallenges = new Map();
 
 router.get('/admin/webauthn/generate-registration-options', adminAuth, async (req, res) => {
-  const ip = req.ip || req.connection.remoteAddress;
-  const rpID = process.env.NODE_ENV === 'production' ? 'promptking.in' : 'localhost';
-  
-  // Create a pseudo-user for the admin
-  const user = {
-    id: 'admin',
-    username: 'admin',
-    displayName: 'Administrator'
-  };
-
+  if (!generateRegistrationOptions) {
+    return res.status(500).json({ error: "WebAuthn module missing. Run 'npm install' on server." });
+  }
   try {
+    const ip = req.ip || req.connection.remoteAddress;
+    const rpID = process.env.NODE_ENV === 'production' ? 'promptking.in' : 'localhost';
+    
+    // Create a pseudo-user for the admin
+    const user = {
+      id: 'admin',
+      username: 'admin',
+      displayName: 'Administrator'
+    };
+
     // Get existing credentials
     const passkeys = await db`SELECT credential_id, transports FROM admin_passkeys`;
     const excludeCredentials = passkeys.map(pk => ({
@@ -725,17 +732,20 @@ router.get('/admin/webauthn/generate-registration-options', adminAuth, async (re
 });
 
 router.post('/admin/webauthn/verify-registration', adminAuth, async (req, res) => {
-  const ip = req.ip || req.connection.remoteAddress;
-  const expectedChallenge = webAuthnChallenges.get(ip);
-  const rpID = process.env.NODE_ENV === 'production' ? 'promptking.in' : 'localhost';
-
-  if (!expectedChallenge) {
-    return res.status(400).json({ error: 'Challenge not found or expired' });
+  if (!verifyRegistrationResponse) {
+    return res.status(500).json({ error: "WebAuthn module missing. Run 'npm install' on server." });
   }
-
-  const { body } = req;
-
   try {
+    const ip = req.ip || req.connection.remoteAddress;
+    const expectedChallenge = webAuthnChallenges.get(ip);
+    const rpID = process.env.NODE_ENV === 'production' ? 'promptking.in' : 'localhost';
+
+    if (!expectedChallenge) {
+      return res.status(400).json({ error: 'Challenge not found or expired' });
+    }
+
+    const { body } = req;
+
     const verification = await verifyRegistrationResponse({
       response: body,
       expectedChallenge,
@@ -768,10 +778,13 @@ router.post('/admin/webauthn/verify-registration', adminAuth, async (req, res) =
 });
 
 router.get('/admin/webauthn/generate-authentication-options', async (req, res) => {
-  const ip = req.ip || req.connection.remoteAddress;
-  const rpID = process.env.NODE_ENV === 'production' ? 'promptking.in' : 'localhost';
-
+  if (!generateAuthenticationOptions) {
+    return res.status(500).json({ error: "WebAuthn module missing. Run 'npm install' on server." });
+  }
   try {
+    const ip = req.ip || req.connection.remoteAddress;
+    const rpID = process.env.NODE_ENV === 'production' ? 'promptking.in' : 'localhost';
+
     const passkeys = await db`SELECT credential_id, transports FROM admin_passkeys`;
     const allowCredentials = passkeys.map(pk => ({
       id: pk.credential_id,
@@ -798,15 +811,19 @@ router.get('/admin/webauthn/generate-authentication-options', async (req, res) =
 });
 
 router.post('/admin/webauthn/verify-authentication', async (req, res) => {
-  const ip = req.ip || req.connection.remoteAddress;
-  const expectedChallenge = webAuthnChallenges.get(ip);
-  const rpID = process.env.NODE_ENV === 'production' ? 'promptking.in' : 'localhost';
-
-  if (!expectedChallenge) {
-    return res.status(400).json({ error: 'Challenge not found or expired' });
+  if (!verifyAuthenticationResponse) {
+    return res.status(500).json({ error: "WebAuthn module missing. Run 'npm install' on server." });
   }
+  try {
+    const ip = req.ip || req.connection.remoteAddress;
+    const expectedChallenge = webAuthnChallenges.get(ip);
+    const rpID = process.env.NODE_ENV === 'production' ? 'promptking.in' : 'localhost';
 
-  const { body } = req;
+    if (!expectedChallenge) {
+      return res.status(400).json({ error: 'Challenge not found or expired' });
+    }
+
+    const { body } = req;
 
   try {
     const passkeys = await db`SELECT * FROM admin_passkeys WHERE credential_id = ${body.id}`;
