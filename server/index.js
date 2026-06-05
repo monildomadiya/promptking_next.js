@@ -114,6 +114,17 @@ app.use((err, req, res, next) => {
   try {
     const db = require('./db');
     await db`
+      CREATE TABLE IF NOT EXISTS admin_passkeys (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        credential_id VARCHAR(500) UNIQUE NOT NULL,
+        public_key TEXT NOT NULL,
+        counter BIGINT DEFAULT 0,
+        transports VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+
+    await db`
       CREATE TABLE IF NOT EXISTS analytics_events (
         id INT AUTO_INCREMENT PRIMARY KEY,
         prompt_key VARCHAR(100) NOT NULL,

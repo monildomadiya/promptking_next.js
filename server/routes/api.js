@@ -1,6 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const {
+  generateRegistrationOptions,
+  verifyRegistrationResponse,
+  generateAuthenticationOptions,
+  verifyAuthenticationResponse,
+} = require('@simplewebauthn/server');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -670,6 +676,180 @@ router.post('/admin/login', (req, res) => {
   }
 });
 
+// --- WEBAUTHN (FINGERPRINT/PASSKEY) ---
+const rpName = 'PromptKing Admin';
+
+// In-memory challenge store (maps ip to current challenge)
+const webAuthnChallenges = new Map();
+
+router.get('/admin/webauthn/generate-registration-options', adminAuth, async (req, res) => {
+  const ip = req.ip || req.connection.remoteAddress;
+  const rpID = process.env.NODE_ENV === 'production' ? 'promptking.in' : 'localhost';
+  
+  // Create a pseudo-user for the admin
+  const user = {
+    id: 'admin',
+    username: 'admin',
+    displayName: 'Administrator'
+  };
+
+  try {
+    // Get existing credentials
+    const passkeys = await db`SELECT credential_id, transports FROM admin_passkeys`;
+    const excludeCredentials = passkeys.map(pk => ({
+      id: pk.credential_id,
+      type: 'public-key',
+      transports: pk.transports ? pk.transports.split(',') : ['internal'],
+    }));
+
+    const options = await generateRegistrationOptions({
+      rpName,
+      rpID,
+      userID: new Uint8Array(Buffer.from(user.id)),
+      userName: user.username,
+      userDisplayName: user.displayName,
+      attestationType: 'none',
+      excludeCredentials,
+      authenticatorSelection: {
+        residentKey: 'required',
+        userVerification: 'preferred',
+      },
+    });
+
+    webAuthnChallenges.set(ip, options.challenge);
+    res.json(options);
+  } catch (err) {
+    console.error('WebAuthn Registration Options Error:', err);
+    res.status(500).json({ error: 'Failed to generate registration options' });
+  }
+});
+
+router.post('/admin/webauthn/verify-registration', adminAuth, async (req, res) => {
+  const ip = req.ip || req.connection.remoteAddress;
+  const expectedChallenge = webAuthnChallenges.get(ip);
+  const rpID = process.env.NODE_ENV === 'production' ? 'promptking.in' : 'localhost';
+
+  if (!expectedChallenge) {
+    return res.status(400).json({ error: 'Challenge not found or expired' });
+  }
+
+  const { body } = req;
+
+  try {
+    const verification = await verifyRegistrationResponse({
+      response: body,
+      expectedChallenge,
+      expectedOrigin: process.env.NODE_ENV === 'production' ? 'https://promptking.in' : ['http://localhost:5173', 'http://localhost:5000'],
+      expectedRPID: rpID,
+    });
+
+    if (verification.verified) {
+      const { registrationInfo } = verification;
+      const { credentialID, credentialPublicKey, counter } = registrationInfo;
+      
+      const credentialIdString = Buffer.from(credentialID).toString('base64url');
+      const publicKeyString = Buffer.from(credentialPublicKey).toString('base64url');
+      const transportsStr = body.response.transports ? body.response.transports.join(',') : '';
+
+      await db`
+        INSERT INTO admin_passkeys (credential_id, public_key, counter, transports)
+        VALUES (${credentialIdString}, ${publicKeyString}, ${counter}, ${transportsStr})
+      `;
+
+      webAuthnChallenges.delete(ip);
+      res.json({ verified: true });
+    } else {
+      res.status(400).json({ error: 'Verification failed' });
+    }
+  } catch (error) {
+    console.error('WebAuthn Registration Verification Error:', error);
+    res.status(500).json({ error: 'Failed to verify registration' });
+  }
+});
+
+router.get('/admin/webauthn/generate-authentication-options', async (req, res) => {
+  const ip = req.ip || req.connection.remoteAddress;
+  const rpID = process.env.NODE_ENV === 'production' ? 'promptking.in' : 'localhost';
+
+  try {
+    const passkeys = await db`SELECT credential_id, transports FROM admin_passkeys`;
+    const allowCredentials = passkeys.map(pk => ({
+      id: pk.credential_id,
+      type: 'public-key',
+      transports: pk.transports ? pk.transports.split(',') : ['internal'],
+    }));
+
+    if (allowCredentials.length === 0) {
+      return res.status(404).json({ error: 'No fingerprints registered. Please login with password to register.' });
+    }
+
+    const options = await generateAuthenticationOptions({
+      rpID,
+      allowCredentials,
+      userVerification: 'preferred',
+    });
+
+    webAuthnChallenges.set(ip, options.challenge);
+    res.json(options);
+  } catch (err) {
+    console.error('WebAuthn Authentication Options Error:', err);
+    res.status(500).json({ error: 'Failed to generate authentication options' });
+  }
+});
+
+router.post('/admin/webauthn/verify-authentication', async (req, res) => {
+  const ip = req.ip || req.connection.remoteAddress;
+  const expectedChallenge = webAuthnChallenges.get(ip);
+  const rpID = process.env.NODE_ENV === 'production' ? 'promptking.in' : 'localhost';
+
+  if (!expectedChallenge) {
+    return res.status(400).json({ error: 'Challenge not found or expired' });
+  }
+
+  const { body } = req;
+
+  try {
+    const passkeys = await db`SELECT * FROM admin_passkeys WHERE credential_id = ${body.id}`;
+    if (passkeys.length === 0) {
+      return res.status(400).json({ error: 'Fingerprint not recognized' });
+    }
+
+    const passkey = passkeys[0];
+
+    const verification = await verifyAuthenticationResponse({
+      response: body,
+      expectedChallenge,
+      expectedOrigin: process.env.NODE_ENV === 'production' ? 'https://promptking.in' : ['http://localhost:5173', 'http://localhost:5000'],
+      expectedRPID: rpID,
+      authenticator: {
+        credentialID: new Uint8Array(Buffer.from(passkey.credential_id, 'base64url')),
+        credentialPublicKey: new Uint8Array(Buffer.from(passkey.public_key, 'base64url')),
+        counter: Number(passkey.counter),
+      },
+    });
+
+    if (verification.verified) {
+      const { authenticationInfo } = verification;
+      const { newCounter } = authenticationInfo;
+
+      await db`UPDATE admin_passkeys SET counter = ${newCounter} WHERE credential_id = ${passkey.credential_id}`;
+
+      webAuthnChallenges.delete(ip);
+
+      // Issue secure session token
+      const token = crypto.randomUUID();
+      validAdminTokens.add(token);
+      
+      req.session.isAdmin = true;
+      res.json({ verified: true, token });
+    } else {
+      res.status(400).json({ error: 'Verification failed' });
+    }
+  } catch (error) {
+    console.error('WebAuthn Auth Verification Error:', error);
+    res.status(500).json({ error: 'Failed to verify authentication' });
+  }
+});
 
 // Admin Settings
 router.get('/admin/settings', adminAuth, async (req, res) => {
