@@ -1253,8 +1253,6 @@ router.get('/sitemap.xml', async (req, res) => {
 });
 
 // --- CONTACT FORM ---
-const nodemailer = require('nodemailer');
-
 router.post('/contact', async (req, res) => {
   const { name, email, message } = req.body;
   if (!name || !email || !message) {
@@ -1262,6 +1260,7 @@ router.post('/contact', async (req, res) => {
   }
 
   try {
+    const nodemailer = require('nodemailer');
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
