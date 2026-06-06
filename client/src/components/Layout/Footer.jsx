@@ -257,24 +257,6 @@ const Footer = ({ onLogoClick }) => {
               />
             </a>
 
-            {/* Twelve Tools Badge */}
-            <a
-              href="https://twelve.tools"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
-              onMouseEnter={e => e.currentTarget.style.opacity = 1}
-              onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
-            >
-              <img
-                src="https://twelve.tools/badge2-dark.svg"
-                alt="Featured on Twelve Tools"
-                width="200"
-                height="54"
-                style={{ display: 'block' }}
-              />
-            </a>
-
             {/* Turbo0 Badge */}
             <a 
               href="https://turbo0.com/item/promptking" 
@@ -291,39 +273,7 @@ const Footer = ({ onLogoClick }) => {
               />
             </a>
 
-            {/* ShowMeBestAI Badge */}
-            <a
-              href="https://showmebest.ai"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
-              onMouseEnter={e => e.currentTarget.style.opacity = 1}
-              onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
-            >
-              <img
-                src="https://showmebest.ai/badge/feature-badge-dark.webp"
-                alt="Featured on ShowMeBestAI"
-                width="220"
-                height="60"
-                style={{ display: 'block' }}
-              />
-            </a>
 
-            {/* Days Launch Badge */}
-            <a 
-              href="https://dayslaunch.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
-              onMouseEnter={e => e.currentTarget.style.opacity = 1}
-              onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
-            > 
-              <img 
-                src="https://dayslaunch.com/badages-awards.svg"
-                alt="Featured on Days Launch" 
-                style={{ display: 'block', height: '54px', width: 'auto' }}
-              />
-            </a>
           </div>
 
           {!isMobile && (

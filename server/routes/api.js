@@ -1252,4 +1252,38 @@ router.get('/sitemap.xml', async (req, res) => {
   }
 });
 
+// --- CONTACT FORM ---
+const nodemailer = require('nodemailer');
+
+router.post('/contact', async (req, res) => {
+  const { name, email, message } = req.body;
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER || 'promptking.in@gmail.com',
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER || 'promptking.in@gmail.com',
+      to: 'promptking.in@gmail.com',
+      subject: `New Contact Form Submission from ${name}`,
+      text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+      replyTo: email
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.json({ status: "success", message: "Message sent successfully" });
+  } catch (error) {
+    console.error('Contact Form Email Error:', error);
+    res.status(500).json({ error: "Failed to send message" });
+  }
+});
+
 module.exports = router;

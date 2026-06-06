@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Mail, MessageCircle, Send, CheckCircle, Sparkles, Instagram, Youtube, Twitter } from '../components/Common/Icons';
 import SocialSidebar from '../components/Prompts/SocialSidebar';
 import SEOMetadata from '../components/SEO/SEOMetadata';
-
+import api from '../api';
 const ContactPage = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
@@ -11,13 +11,18 @@ const ContactPage = () => {
     message: ''
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simulate API call
-    setIsSubmitted(true);
-    setTimeout(() => {
-      setFormData({ name: '', email: '', message: '' });
-    }, 2000);
+    try {
+      await api.post('/contact', formData);
+      setIsSubmitted(true);
+      setTimeout(() => {
+        setFormData({ name: '', email: '', message: '' });
+      }, 2000);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to send message. Please try again later.');
+    }
   };
 
   return (
@@ -64,7 +69,7 @@ const ContactPage = () => {
                 <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Email Us</h3>
               </div>
               <p style={{ color: 'var(--text-dim)', fontSize: '0.95rem', marginBottom: '10px' }}>For support & collaboration inquiries:</p>
-              <a href="mailto:support@promptking.in" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '1.1rem', wordBreak: 'break-all' }}>support@promptking.in</a>
+              <a href="mailto:promptking.in@gmail.com" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '1.1rem', wordBreak: 'break-all' }}>promptking.in@gmail.com</a>
             </div>
 
             <div className="glass-card" style={{ padding: '30px', borderRadius: '30px', background: 'rgba(255,255,255,0.02)' }}>
