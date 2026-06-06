@@ -30,6 +30,7 @@ const api = {
     });
     
     const data = await res.json();
+    if (!res.ok) throw new Error(data.error || data.message || 'API Error');
     return { data: transformUploadPaths(data) };
   },
   post: async (url, body = {}, options = {}) => {
@@ -50,6 +51,7 @@ const api = {
     });
     
     const data = await res.json();
+    if (!res.ok) throw new Error(data.error || data.message || 'API Error');
     return { data: transformUploadPaths(data) };
   },
   delete: async (url, options = {}) => {
@@ -70,6 +72,7 @@ const api = {
     });
     
     const data = await res.json();
+    if (!res.ok) throw new Error(data.error || data.message || 'API Error');
     return { data: transformUploadPaths(data) };
   }
 };

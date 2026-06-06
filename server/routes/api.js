@@ -1259,19 +1259,36 @@ router.post('/contact', async (req, res) => {
     return res.status(400).json({ error: "All fields are required" });
   }
 
+  // First, save the message to the database as a reliable backup
+  let savedToDb = false;
+  try {
+    await db`INSERT INTO contact_messages (name, email, message) VALUES (${name}, ${email}, ${message})`;
+    savedToDb = true;
+  } catch (dbErr) {
+    console.error('Failed to save contact message to DB:', dbErr);
+  }
+
   try {
     const nodemailer = require('nodemailer');
+    const emailUser = process.env.EMAIL_USER || 'promptking.in@gmail.com';
+    const emailPass = process.env.EMAIL_PASS;
+
+    if (!emailPass) {
+       console.warn('EMAIL_PASS not configured. Message saved to DB only.');
+       return res.json({ status: "success", message: "Message saved to database. Email bypassed." });
+    }
+
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.EMAIL_USER || 'promptking.in@gmail.com',
-        pass: process.env.EMAIL_PASS
+        user: emailUser,
+        pass: emailPass
       }
     });
 
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'promptking.in@gmail.com',
-      to: 'promptking.in@gmail.com',
+      from: emailUser,
+      to: emailUser,
       subject: `New Contact Form Submission from ${name}`,
       text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
       replyTo: email
@@ -1281,7 +1298,12 @@ router.post('/contact', async (req, res) => {
     res.json({ status: "success", message: "Message sent successfully" });
   } catch (error) {
     console.error('Contact Form Email Error:', error);
-    res.status(500).json({ error: "Failed to send message" });
+    if (savedToDb) {
+       // If it failed to send but was saved to the DB, it's a partial success.
+       // The user still "Received" the message in the backend DB.
+       return res.json({ status: "success", message: "Message saved to DB, but email delivery failed" });
+    }
+    res.status(500).json({ error: "Failed to send message and database is unavailable" });
   }
 });
 
