@@ -1065,6 +1065,20 @@ const AdminDashboard = () => {
   };
 
   const filteredData = Array.isArray(data) ? data.filter(item => {
+    let match = true;
+    if (view === 'prompts') {
+      if (filterStatus === 'published') match = !item.is_draft && !(item.publish_date && new Date(item.publish_date) > new Date()) && !item.hide_prompt_box;
+      else if (filterStatus === 'draft') match = !!item.is_draft;
+      else if (filterStatus === 'scheduled') match = item.publish_date && new Date(item.publish_date) > new Date();
+      else if (filterStatus === 'hidden') match = !!item.hide_prompt_box;
+
+      if (match && filterAccess !== 'all') {
+        if (filterAccess === 'pro') match = !!item.is_premium;
+        else if (filterAccess === 'free') match = !item.is_premium;
+      }
+    }
+    if (!match) return false;
+
     if (!adminSearch) return true;
     const search = adminSearch.toLowerCase();
     const promptKey = String(item.prompt_key || '').toLowerCase();
@@ -1484,7 +1498,7 @@ const AdminDashboard = () => {
                       </SortableContext>
                     ) : (
                       filteredData.map((item, idx) => (
-                        <motion.tr key={idx} variants={itemVariants} initial="hidden" animate="visible" exit="hidden" custom={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', background: selectedKeys.includes(item.prompt_key || item.id) ? 'rgba(229, 9, 20, 0.03)' : 'transparent' }}>
+                        <motion.tr key={idx} variants={itemVariants} initial="hidden" animate="visible" exit="hidden" custom={idx} onContextMenu={(e) => handleContextMenu(e, item)} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', background: selectedKeys.includes(item.prompt_key || item.id) ? 'rgba(229, 9, 20, 0.03)' : 'transparent' }}>
                           {view === 'prompts' && (
                             <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
                               <input type="checkbox" checked={selectedKeys.includes(item.prompt_key || item.id)} onChange={() => toggleSelect(item.prompt_key || item.id)} style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: 'var(--accent-main)' }} />
