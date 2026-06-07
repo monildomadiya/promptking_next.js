@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { X, Save, PlusCircle, Activity } from '../Common/Icons';
@@ -29,7 +30,7 @@ const CategoryModal = ({ category, onClose, onSave }) => {
       await api.post('/admin/save_category', { ...formData, id: category?.id });
       onSave();
     } catch (error) {
-      alert("Failed to save category");
+      toast.error("Failed to save category");
     }
   };
 

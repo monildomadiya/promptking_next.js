@@ -297,7 +297,7 @@ router.get('/get_data', async (req, res) => {
   try {
     let promptsRows;
     try {
-      promptsRows = await db`SELECT * FROM prompts ORDER BY sort_order ASC, prompt_key ASC`;
+      promptsRows = await db`SELECT * FROM prompts WHERE is_draft = 0 AND (publish_date IS NULL OR publish_date <= NOW()) ORDER BY sort_order ASC, prompt_key ASC`;
     } catch (colErr) {
       if (colErr.message.includes('Unknown column')) {
         promptsRows = await db`SELECT * FROM prompts`;
@@ -333,7 +333,9 @@ router.get('/get_data', async (req, res) => {
       galleryUrls: row.gallery_urls,
       isPremium: parseDbBool(row.is_premium),
       isFeatured: parseDbBool(row.is_featured),
-      metaTitle: row.meta_title
+      metaTitle: row.meta_title,
+      is_draft: parseDbBool(row.is_draft),
+      publish_date: row.publish_date
     }));
 
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -849,6 +851,8 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
       is_featured: r.is_featured == 1 || r.is_featured === true || r.is_featured === 'true',
       is_premium: r.is_premium == 1 || r.is_premium === true || r.is_premium === 'true',
       hide_prompt_box: r.hide_prompt_box == 1 || r.hide_prompt_box === true || r.hide_prompt_box === 'true',
+      is_draft: r.is_draft == 1 || r.is_draft === true || r.is_draft === 'true',
+      publish_date: r.publish_date,
       metaTitle: r.meta_title
     }));
     res.json(formatted);
@@ -955,7 +959,9 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
           is_premium = ${p.is_premium ? 1 : 0},
           gallery_urls = ${p.gallery_urls || null},
           hide_prompt_box = ${p.hide_prompt_box ? 1 : 0},
-          is_featured = ${p.is_featured ? 1 : 0}
+          is_featured = ${p.is_featured ? 1 : 0},
+          is_draft = ${p.is_draft ? 1 : 0},
+          publish_date = ${p.publish_date || null}
         WHERE prompt_key = ${originalKey}
       `;
     } else {
@@ -963,12 +969,12 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
       await db`
         INSERT INTO prompts (
           prompt_key, slug, title, meta_title, description, ai_type, prompt_text, img_before, img_after, 
-          ig_link, is_image_slider, image_ratio, password, is_premium, gallery_urls, hide_prompt_box, is_featured
+          ig_link, is_image_slider, image_ratio, password, is_premium, gallery_urls, hide_prompt_box, is_featured, is_draft, publish_date
         ) VALUES (
           ${finalKey}, ${finalSlug}, ${p.title}, ${p.meta_title || ''}, ${p.description}, ${p.ai_type}, ${p.prompt_text}, 
           ${p.img_before}, ${p.img_after}, ${p.ig_link}, ${p.is_image_slider ? 1 : 0}, 
 
-          ${p.image_ratio}, ${p.password}, ${p.is_premium ? 1 : 0}, ${p.gallery_urls || null}, ${p.hide_prompt_box ? 1 : 0}, ${p.is_featured ? 1 : 0}
+          ${p.image_ratio}, ${p.password}, ${p.is_premium ? 1 : 0}, ${p.gallery_urls || null}, ${p.hide_prompt_box ? 1 : 0}, ${p.is_featured ? 1 : 0}, ${p.is_draft ? 1 : 0}, ${p.publish_date || null}
         )
       `;
     }
@@ -1202,7 +1208,7 @@ router.get('/sitemap.xml', async (req, res) => {
   try {
     // Attempt DB fetch if healthy
     const db = require('../db');
-    prompts = await db`SELECT prompt_key, updated_at, created_at, img_after, img_before FROM prompts WHERE prompt_key IS NOT NULL`;
+    prompts = await db`SELECT prompt_key, updated_at, created_at, img_after, img_before FROM prompts WHERE prompt_key IS NOT NULL AND is_draft = 0 AND (publish_date IS NULL OR publish_date <= NOW())`;
     blogs = await db`SELECT slug, updated_at, created_at, featured_image FROM blogs WHERE slug IS NOT NULL`;
   } catch (err) {
     console.warn("Sitemap: DB failed, serving static pages only", err.message);

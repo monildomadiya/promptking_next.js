@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import React, { useRef, useEffect, useState } from 'react';
 
 const CustomEditor = ({ value, onChange }) => {
@@ -85,7 +86,7 @@ const CustomEditor = ({ value, onChange }) => {
 
   const handleYoutubeEmbed = () => {
     const id = getYoutubeId(youtubeUrl);
-    if (!id) { alert('Invalid YouTube URL'); return; }
+    if (!id) { toast.error('Invalid YouTube URL'); return; }
     const html = `<div class="yt-embed-wrap" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin:20px 0;"><iframe src="https://www.youtube.com/embed/${id}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;border-radius:12px;" allowfullscreen loading="lazy"></iframe></div><p></p>`;
     restoreRange();
     insertHTML(html);

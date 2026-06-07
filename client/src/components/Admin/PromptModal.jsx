@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../../api';
 import { X, Save, Image, Code, Star, Shield, Zap, Sparkles, Smartphone, PlusCircle, FileText, Activity } from '../Common/Icons';
@@ -17,7 +18,9 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     is_image_slider: false,
     gallery_urls: '[]',
     hide_prompt_box: false,
-    is_featured: false
+    is_featured: false,
+    is_draft: false,
+    publish_date: ''
   });
   const [originalKey, setOriginalKey] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -42,10 +45,10 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
         const existing = (() => { try { return JSON.parse(formData.gallery_urls || '[]'); } catch(err) { return []; } })();
         setFormData(prev => ({ ...prev, gallery_urls: JSON.stringify([...existing, url]) }));
       } else {
-        alert(res.data?.error || 'Server rejected the gallery image.');
+        toast.error(res.data?.error || 'Server rejected the gallery image.');
       }
     } catch (error) {
-      alert('Upload failed: ' + error.message);
+      toast.error('Upload failed: ' + error.message);
     } finally {
       setIsUploadingGallery(false);
       if (galleryFileInputRef.current) galleryFileInputRef.current.value = '';
@@ -73,7 +76,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
         throw new Error(res.data?.error || "Invalid response");
       }
     } catch (e) {
-      alert("Failed to upload from URL (" + e.message + "). Falling back to original URL.");
+      toast.error("Failed to upload from URL (" + e.message + "). Falling back to original URL.");
       const existing = (() => { try { return JSON.parse(formData.gallery_urls || '[]'); } catch(err) { return []; } })();
       setFormData(prev => ({ ...prev, gallery_urls: JSON.stringify([...existing, url]) }));
     } finally {
@@ -91,6 +94,8 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
         is_premium: prompt.is_premium == 1 || prompt.is_premium === true || prompt.is_premium === 'true' || prompt.isPremium == 1 || prompt.isPremium === true || prompt.isPremium === 'true',
         hide_prompt_box: prompt.hide_prompt_box == 1 || prompt.hide_prompt_box === true || prompt.hide_prompt_box === 'true' || prompt.hidePromptBox == 1 || prompt.hidePromptBox === true || prompt.hidePromptBox === 'true',
         is_featured: prompt.is_featured == 1 || prompt.is_featured === true || prompt.is_featured === 'true' || prompt.isFeatured == 1 || prompt.isFeatured === true || prompt.isFeatured === 'true',
+        is_draft: prompt.is_draft == 1 || prompt.is_draft === true || prompt.is_draft === 'true',
+        publish_date: prompt.publish_date ? new Date(new Date(prompt.publish_date).getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0,16) : '',
         description: prompt.description || '',
         meta_title: prompt.meta_title || prompt.metaTitle || '',
         gallery_urls: prompt.gallery_urls || prompt.galleryUrls || '[]'
@@ -114,7 +119,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
  
     // Validation: Premium content MUST have a password
     if (formData.is_premium && (!formData.password || formData.password.trim() === '')) {
-      alert("⚠️ SECURITY REQUIRED: Premium content must have an unlock PIN/Password.");
+      toast.error("⚠️ SECURITY REQUIRED: Premium content must have an unlock PIN/Password.");
       return;
     }
 
@@ -123,7 +128,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
       onSave();
     } catch (error) {
       const msg = error.response?.data?.error || "Failed to save prompt";
-      alert(msg);
+      toast.error(msg);
     }
   };
 
@@ -287,6 +292,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                   <Checkbox label="Premium Content" premium checked={formData.is_premium} onChange={(val) => setFormData({...formData, is_premium: val, password: val ? formData.password : ''})} />
                   <Checkbox label="Hide Prompt from Users" checked={formData.hide_prompt_box} onChange={(val) => setFormData({...formData, hide_prompt_box: val})} />
                   <Checkbox label="Feature Prompt" checked={formData.is_featured} onChange={(val) => setFormData({...formData, is_featured: val})} />
+                  <Checkbox label="Save as Draft" checked={formData.is_draft} onChange={(val) => setFormData({...formData, is_draft: val})} />
                 </div>
               </div>
             </div>
@@ -449,6 +455,18 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
               />
             </div>
 
+            <div style={{ gridColumn: 'span 1' }}>
+              <Label text="Scheduled Publish Date (Optional)" />
+              <input 
+                type="datetime-local" 
+                value={formData.publish_date || ''}
+                onChange={(e) => setFormData({ ...formData, publish_date: e.target.value })}
+                className="glass-input"
+                style={{ width: '100%', padding: '14px', borderRadius: '14px', colorScheme: 'dark' }}
+              />
+              <Hint text="Leave empty to publish immediately (unless saved as draft)" />
+            </div>
+
           </div>
 
           <div className="glass-divider" style={{ margin: '40px 0' }} />
@@ -547,11 +565,11 @@ const ImageUpload = ({ url, onUpload }) => {
       if (res.data && res.data.status === 'success') {
          onUpload(res.data.imageUrl);
       } else {
-         alert(res.data?.error || "Failed to upload from URL");
+         toast.error(res.data?.error || "Failed to upload from URL");
          onUpload(currentUrl);
       }
     } catch (e) {
-      alert("Failed to upload from URL (" + e.message + ")");
+      toast.error("Failed to upload from URL (" + e.message + ")");
       onUpload(currentUrl);
     } finally {
       setIsUploading(false);
@@ -573,10 +591,10 @@ const ImageUpload = ({ url, onUpload }) => {
       if (res.data && res.data.status === 'success') {
         onUpload(res.data.imageUrl);
       } else {
-        alert(res.data?.error || 'Server rejected the image (file might be too large or invalid format).');
+        toast.error(res.data?.error || 'Server rejected the image (file might be too large or invalid format).');
       }
     } catch (error) {
-      alert('Upload failed: ' + error.message);
+      toast.error('Upload failed: ' + error.message);
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';

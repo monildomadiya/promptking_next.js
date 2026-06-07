@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import React, { useState, useEffect } from 'react';
 import { X, Save, Sparkle } from '../Common/Icons';
 import api from '../../api';
@@ -34,7 +35,7 @@ const FAQModal = ({ faq, onClose, onSave }) => {
       });
       onSave();
     } catch (error) {
-      alert("Failed to save FAQ");
+      toast.error("Failed to save FAQ");
     }
   };
 

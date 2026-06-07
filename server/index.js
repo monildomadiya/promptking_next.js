@@ -151,6 +151,24 @@ app.use((err, req, res, next) => {
     }
 
     try {
+      const checkDraft = await db`SHOW COLUMNS FROM prompts LIKE 'is_draft'`;
+      if (checkDraft.length === 0) {
+        await db`ALTER TABLE prompts ADD COLUMN is_draft TINYINT(1) NOT NULL DEFAULT 0`;
+      }
+    } catch (e) {
+      console.warn("Failed to check/add is_draft:", e.message);
+    }
+
+    try {
+      const checkPublishDate = await db`SHOW COLUMNS FROM prompts LIKE 'publish_date'`;
+      if (checkPublishDate.length === 0) {
+        await db`ALTER TABLE prompts ADD COLUMN publish_date DATETIME DEFAULT NULL`;
+      }
+    } catch (e) {
+      console.warn("Failed to check/add publish_date:", e.message);
+    }
+
+    try {
       await db`
         CREATE TABLE IF NOT EXISTS contact_messages (
           id INT AUTO_INCREMENT PRIMARY KEY,

@@ -20,6 +20,9 @@ import BlogModal from './BlogModal';
 import FAQModal from './FAQModal';
 import CategoryModal from './CategoryModal';
 import KingDialog from '../Modals/KingDialog';
+import toast, { Toaster } from 'react-hot-toast';
+import CommandPalette from './CommandPalette';
+import ContextMenu from './ContextMenu';
 
 // --- ANIMATION VARIANTS ---
 const containerVariants = {
@@ -225,7 +228,7 @@ const StarIcon = ({ filled, size = 16 }) => (
   </svg>
 );
 
-const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onToggleFeatured, isMobile, isDragMode }) => {
+const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onToggleFeatured, isMobile, isDragMode, onContextMenu }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.prompt_key });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -242,7 +245,7 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
   };
 
   return (
-    <tr ref={setNodeRef} style={style}>
+    <tr ref={setNodeRef} style={style} onContextMenu={(e) => onContextMenu && onContextMenu(e, item)}>
       <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {isDragMode ? (
@@ -274,6 +277,8 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '4px' }}>{item.prompt_key}</div>
               {item.hide_prompt_box && <span style={{ fontSize: '0.65rem', color: '#fbbf24', border: '1px solid #fbbf24', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px' }}>HIDDEN</span>}
+              {item.is_draft && <span style={{ fontSize: '0.65rem', color: '#9ca3af', border: '1px solid #9ca3af', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px', marginLeft: '4px' }}>DRAFT</span>}
+              {item.publish_date && new Date(item.publish_date) > new Date() && <span style={{ fontSize: '0.65rem', color: '#3b82f6', border: '1px solid #3b82f6', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px', marginLeft: '4px' }}>SCHEDULED</span>}
               {item.is_featured && <span style={{ fontSize: '0.65rem', color: '#fff', background: 'rgba(229, 9, 20, 0.8)', border: '1px solid rgba(229, 9, 20, 1)', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px', fontWeight: 'bold' }}>FEATURED</span>}
             </div>
             <div style={{ color: 'var(--text-muted)', fontSize: '1.1rem', fontWeight: 600, maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title || item.slug}</div>
@@ -329,7 +334,7 @@ const BrandingPanel = ({ onSave }) => {
       await api.post('/admin/save_settings', settings);
       onSave();
       window.dispatchEvent(new CustomEvent('settingsUpdated'));
-      alert("Branding settings applied!");
+      toast.success("Branding settings applied!");
     } catch(e) { console.error(e); }
     finally { setIsSaving(false); }
   };
@@ -390,11 +395,11 @@ const BrandingPanel = ({ onSave }) => {
                        const res = await api.post('/admin/upload_logo', formData);
                        if (res.data.status === 'success') {
                          setSettings({ ...settings, logo_url: res.data.logoUrl });
-                         alert("Logo uploaded successfully!");
+                         toast.success("Logo uploaded successfully!");
                        }
                      } catch (err) {
                        console.error(err);
-                       alert("Failed to upload logo.");
+                       toast.error("Failed to upload logo.");
                      }
                    }
                  }}
@@ -522,7 +527,7 @@ const SocialPanel = ({ onSave }) => {
     try {
       await api.post('/admin/save_settings', settings);
       onSave();
-      alert("Social links updated!");
+      toast.success("Social links updated!");
     } catch(e) { console.error(e); }
     finally { setIsSaving(false); }
   };
@@ -621,7 +626,7 @@ const AdsPanel = ({ onSave }) => {
     try {
       await api.post('/admin/save_settings', settings);
       onSave();
-      alert("Ads configuration updated! Changes may take a moment to propagate.");
+      toast.success("Ads configuration updated! Changes may take a moment to propagate.");
     } catch(e) { console.error(e); }
     finally { setIsSaving(false); }
   };
@@ -746,6 +751,10 @@ const AdminDashboard = () => {
   const [isDragMode, setIsDragMode] = useState(false);
   const [isSavingOrder, setIsSavingOrder] = useState(false);
   const [sortBy, setSortBy] = useState('default');
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [contextMenu, setContextMenu] = useState({ isOpen: false, x: 0, y: 0, item: null });
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterAccess, setFilterAccess] = useState('all');
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -789,6 +798,13 @@ const AdminDashboard = () => {
         case '4': setView('categories'); fetchData('categories'); break;
         case '5': setView('faqs'); fetchData('faqs'); break;
         case '[': setSidebarCollapsed(c => !c); break;
+        case 'k':
+        case 'K':
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            setIsCommandPaletteOpen(o => !o);
+          }
+          break;
         default: break;
       }
     };
@@ -817,7 +833,7 @@ const AdminDashboard = () => {
     try {
       const response = await api.post('/admin/login', { password });
       if (response.data && response.data.error) {
-        alert(response.data.error);
+        toast.error(response.data.error);
         return;
       }
       if (response.data && response.data.token) {
@@ -826,10 +842,46 @@ const AdminDashboard = () => {
         fetchData('prompts');
         fetchAnalytics();
       } else {
-        alert("Authentication failed.");
+        toast.error("Authentication failed.");
       }
     } catch (e) { 
-      alert("Network or authentication error."); 
+      toast.error("Network or authentication error."); 
+    }
+  };
+
+  
+  const handleContextMenu = (e, item) => {
+    e.preventDefault();
+    setContextMenu({ isOpen: true, x: e.clientX, y: e.clientY, item });
+  };
+
+  const getContextMenuActions = () => {
+    if (!contextMenu.item) return [];
+    return [
+      { label: 'Edit', icon: <Edit size={14} />, onClick: () => setEditingItem(contextMenu.item) },
+      { label: 'Toggle Featured', icon: <Crown size={14} />, onClick: () => handleToggleFeatured(contextMenu.item) },
+      { type: 'divider' },
+      { label: 'Delete', icon: <Trash size={14} />, danger: true, onClick: () => handleDelete(contextMenu.item) }
+    ];
+  };
+
+  const handleCommandAction = (action, item) => {
+    setIsCommandPaletteOpen(false);
+    switch (action) {
+      case 'NEW_PROMPT': setView('prompts'); setEditingItem(null); setIsModalOpen(true); break;
+      case 'NEW_BLOG': setView('blogs'); setEditingItem(null); setIsModalOpen(true); break;
+      case 'NAV_SETTINGS': setView('settings'); break;
+      case 'NAV_BRANDING': setView('branding'); break;
+      case 'RESET_ANALYTICS': handleResetAnalytics(); break;
+      case 'LOGOUT': handleLogout(); break;
+      case 'EDIT_ITEM': 
+        if (item.prompt_key) setView('prompts');
+        else if (item.slug && item.content) setView('blogs');
+        else if (item.answer) setView('faqs');
+        setEditingItem(item); 
+        setIsModalOpen(true); 
+        break;
+      default: break;
     }
   };
 
@@ -879,10 +931,10 @@ const AdminDashboard = () => {
       await api.post('/admin/analytics/reset');
       fetchData('prompts');
       fetchAnalytics(analyticsDays);
-      alert("Analytics data has been completely reset.");
+      toast.success("Analytics data has been completely reset.");
     } catch (error) {
       console.error(error);
-      alert("Failed to reset analytics data.");
+      toast.error("Failed to reset analytics data.");
     }
   };
 
@@ -893,11 +945,11 @@ const AdminDashboard = () => {
     try {
       const loginRes = await api.post('/admin/login', { password: enteredPassword });
       if (!loginRes.data || !loginRes.data.token) {
-        alert("Incorrect password. Deletion cancelled.");
+        toast.error("Incorrect password. Deletion cancelled.");
         return;
       }
     } catch (err) {
-      alert("Authentication error.");
+      toast.error("Authentication error.");
       return;
     }
 
@@ -908,7 +960,7 @@ const AdminDashboard = () => {
       await api.delete(`/admin/delete_${type}/${id}`);
       fetchData(view);
     } catch (err) {
-      alert("Deletion failed. See console for details.");
+      toast.error("Deletion failed. See console for details.");
       console.error(err);
     }
   };
@@ -929,9 +981,9 @@ const AdminDashboard = () => {
       const orderedKeys = data.map(i => i.prompt_key);
       await api.post('/admin/reorder_prompts', { orderedKeys });
       setIsDragMode(false);
-      alert('Order saved successfully!');
+      toast.success('Order saved successfully!');
     } catch (e) {
-      alert('Failed to save order.');
+      toast.error('Failed to save order.');
       console.error(e);
     } finally {
       setIsSavingOrder(false);
@@ -947,11 +999,11 @@ const AdminDashboard = () => {
     try {
       const loginRes = await api.post('/admin/login', { password: enteredPassword });
       if (!loginRes.data || !loginRes.data.token) {
-        alert("Incorrect password. Deletion cancelled.");
+        toast.error("Incorrect password. Deletion cancelled.");
         return;
       }
     } catch (err) {
-      alert("Authentication error.");
+      toast.error("Authentication error.");
       return;
     }
 
@@ -961,9 +1013,9 @@ const AdminDashboard = () => {
       await api.post('/admin/delete_prompts_bulk', { keys: selectedKeys });
       setSelectedKeys([]);
       fetchData(view);
-      alert("Bulk deletion successful.");
+      toast.success("Bulk deletion successful.");
     } catch (err) {
-      alert("Bulk deletion failed.");
+      toast.error("Bulk deletion failed.");
       console.error(err);
     }
   };
@@ -976,9 +1028,9 @@ const AdminDashboard = () => {
       await api.post('/admin/hide_prompts_bulk', { keys: selectedKeys, hide });
       setSelectedKeys([]);
       fetchData(view);
-      alert(`Bulk ${hide ? 'hide' : 'show'} successful.`);
+      toast.success(`Bulk ${hide ? 'hide' : 'show'} successful.`);
     } catch (err) {
-      alert(`Bulk ${hide ? 'hide' : 'show'} failed.`);
+      toast.error(`Bulk ${hide ? 'hide' : 'show'} failed.`);
       console.error(err);
     }
   };
@@ -992,7 +1044,7 @@ const AdminDashboard = () => {
     } catch (err) {
       // Revert on failure
       setData(prev => prev.map(p => p.prompt_key === item.prompt_key ? { ...p, is_featured: item.is_featured } : p));
-      alert('Failed to update featured status.');
+      toast.error('Failed to update featured status.');
     }
   };
 
@@ -1453,6 +1505,8 @@ const AdminDashboard = () => {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                   <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '4px' }}>{item.prompt_key || item.title || item.name}</div>
                                   {item.hide_prompt_box && <span style={{ fontSize: '0.65rem', color: '#fbbf24', border: '1px solid #fbbf24', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px' }}>HIDDEN</span>}
+              {item.is_draft && <span style={{ fontSize: '0.65rem', color: '#9ca3af', border: '1px solid #9ca3af', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px', marginLeft: '4px' }}>DRAFT</span>}
+              {item.publish_date && new Date(item.publish_date) > new Date() && <span style={{ fontSize: '0.65rem', color: '#3b82f6', border: '1px solid #3b82f6', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px', marginLeft: '4px' }}>SCHEDULED</span>}
                                   {view === 'prompts' && item.is_featured && <span style={{ fontSize: '0.65rem', color: '#fff', background: 'rgba(229, 9, 20, 0.8)', border: '1px solid rgba(229, 9, 20, 1)', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px', fontWeight: 'bold' }}>FEATURED</span>}
                                 </div>
                                 <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title || item.question || item.slug}</div>

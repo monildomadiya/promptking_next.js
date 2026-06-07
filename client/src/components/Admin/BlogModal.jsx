@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../../api';
 import { X, Image, Sparkles, PlusCircle, FileText, Save, Activity, Camera } from '../Common/Icons';
@@ -34,7 +35,7 @@ const BlogModal = ({ blog, onClose, onSave }) => {
       await api.post('/admin/save_blog', formData);
       onSave();
     } catch (error) {
-      alert("Failed to save blog");
+      toast.error("Failed to save blog");
     }
   };
 
@@ -178,7 +179,7 @@ const ImageUpload = ({ url, onUpload }) => {
          onUpload(currentUrl);
       }
     } catch (e) {
-      alert("Failed to upload from URL");
+      toast.error("Failed to upload from URL");
       onUpload(currentUrl);
     } finally {
       setIsUploading(false);
@@ -201,7 +202,7 @@ const ImageUpload = ({ url, onUpload }) => {
         onUpload(res.data.imageUrl);
       }
     } catch (error) {
-      alert('Upload failed');
+      toast.error('Upload failed');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
