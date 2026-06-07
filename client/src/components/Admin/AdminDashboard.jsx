@@ -1191,11 +1191,11 @@ const AdminDashboard = () => {
           </motion.button>
 
           {/* Logo */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '40px', width: '100%', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '40px', width: '100%' }}>
             {sidebarCollapsed ? (
               <div className="animated-logo" style={{ width: '40px', height: '40px', background: 'var(--accent-gradient)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.75rem', flexShrink: 0 }}>PK</div>
             ) : settings.logo_url ? (
-              <img src={settings.logo_url} style={{ height: '90px', maxWidth: '100%', objectFit: 'contain' }} alt="Logo" />
+              <img src={settings.logo_url} style={{ maxHeight: '90px', maxWidth: '100%', objectFit: 'contain', padding: '0 10px' }} alt="Logo" />
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', whiteSpace: 'nowrap' }}>
                 <div className="animated-logo" style={{ width: '45px', height: '45px', background: 'var(--accent-gradient)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, flexShrink: 0 }}>PK</div>
