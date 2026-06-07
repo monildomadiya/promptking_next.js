@@ -23,6 +23,7 @@ import KingDialog from '../Modals/KingDialog';
 import toast, { Toaster } from 'react-hot-toast';
 import CommandPalette from './CommandPalette';
 import ContextMenu from './ContextMenu';
+import KingLogo from '../../assets/prompt-king.webp';
 
 // --- ANIMATION VARIANTS ---
 const containerVariants = {
