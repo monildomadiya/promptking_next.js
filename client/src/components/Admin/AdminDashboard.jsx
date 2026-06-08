@@ -1652,11 +1652,13 @@ const AdminDashboard = () => {
                 <table style={{ minWidth: isMobile ? '600px' : '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.01)' }}>
-                      <th style={{ padding: isMobile ? '16px' : '24px', width: '50px' }}>
-                        {view === 'prompts' && !isDragMode && (
-                          <input type="checkbox" checked={filteredData.length > 0 && selectedKeys.length === filteredData.length} onChange={() => toggleSelectAll(filteredData)} style={{ cursor: 'pointer', width: '18px', height: '18px', accentColor: 'var(--accent-main)' }} />
-                        )}
-                      </th>
+                      {view === 'prompts' && (
+                        <th style={{ padding: isMobile ? '16px' : '24px', width: '50px' }}>
+                          {!isDragMode && (
+                            <input type="checkbox" checked={filteredData.length > 0 && selectedKeys.length === filteredData.length} onChange={() => toggleSelectAll(filteredData)} style={{ cursor: 'pointer', width: '18px', height: '18px', accentColor: 'var(--accent-main)' }} />
+                          )}
+                        </th>
+                      )}
                       <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Resource Title</th>
                       {view === 'prompts' && <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Status</th>}
                       <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'right', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Controls</th>
