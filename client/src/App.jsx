@@ -5,6 +5,7 @@ import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
 import api, { SERVER_URL } from './api';
 import GoogleAdSense from './components/Ads/GoogleAdSense';
+import { optimizeImage } from './utils/imageUtils';
 import './index.css';
 
 // Lazy load pages for better performance
@@ -106,17 +107,7 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const optimizeImage = (url, width = 600) => {
-    if (!url) return url;
-    let rawUrl = url;
-    if (url.startsWith(SERVER_URL)) {
-      rawUrl = url.replace(SERVER_URL, '');
-    }
-    if (rawUrl.startsWith('/uploads/') || rawUrl.includes('images.unsplash.com') || rawUrl.includes('i.pinimg.com')) {
-      return `${SERVER_URL}/api/optimize?src=${encodeURIComponent(rawUrl)}&w=${width}`;
-    }
-    return url;
-  };
+
 
   return (
     <div className="App">

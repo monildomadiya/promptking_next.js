@@ -5,6 +5,7 @@ import Shimmer from '../components/Common/Shimmer';
 import { ArrowLeft, Clock, Calendar, Share2, ShieldCheck, Tag, User } from '../components/Common/Icons';
 import SEOMetadata from '../components/SEO/SEOMetadata';
 import SocialSidebar from '../components/Prompts/SocialSidebar';
+import { optimizeImage } from '../utils/imageUtils';
 
 const ArticlePage = () => {
   const { slug } = useParams();
@@ -167,7 +168,7 @@ const ArticlePage = () => {
           {blog.featured_image && (
             <div style={{ marginBottom: '40px' }}>
               <img 
-                src={blog.featured_image} 
+                src={optimizeImage(blog.featured_image, 1200)} 
                 alt={blog.featured_image_alt || blog.title} 
                 style={{ width: '100%', borderRadius: '30px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }} 
               />
@@ -340,7 +341,7 @@ const ArticlePage = () => {
                   }} className="sidebar-blog-card">
                     {item.featured_image && (
                       <div style={{ width: '70px', height: '54px', borderRadius: '12px', overflow: 'hidden', flexShrink: 0, border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <img src={item.featured_image} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={optimizeImage(item.featured_image, 150)} alt={item.title} loading="lazy" width="70" height="54" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       </div>
                     )}
                     <div style={{ flex: 1 }}>

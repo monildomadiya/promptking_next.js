@@ -386,10 +386,10 @@ router.get('/blogs', async (req, res) => {
   try {
     let rows;
     try {
-      rows = await db`SELECT b.*, a.name AS author_name, a.image AS author_image, a.description AS author_description FROM blogs b LEFT JOIN authors a ON b.author_id = a.id WHERE b.status = 'published' OR b.status IS NULL ORDER BY b.created_at DESC`;
+      rows = await db`SELECT b.id, b.slug, b.title, b.featured_image, b.featured_image_alt, b.excerpt, SUBSTRING(b.content, 1, 300) AS content_fallback, b.status, b.published_at, b.read_time, b.created_at, a.name AS author_name, a.image AS author_image FROM blogs b LEFT JOIN authors a ON b.author_id = a.id WHERE b.status = 'published' OR b.status IS NULL ORDER BY b.created_at DESC`;
     } catch (colErr) {
       if (colErr.message.includes('Unknown column')) {
-        rows = await db`SELECT b.*, a.name AS author_name, a.image AS author_image, a.description AS author_description FROM blogs b LEFT JOIN authors a ON b.author_id = a.id ORDER BY b.created_at DESC`;
+        rows = await db`SELECT b.id, b.slug, b.title, b.featured_image, b.featured_image_alt, b.excerpt, SUBSTRING(b.content, 1, 300) AS content_fallback, b.status, b.published_at, b.read_time, b.created_at, a.name AS author_name, a.image AS author_image FROM blogs b LEFT JOIN authors a ON b.author_id = a.id ORDER BY b.created_at DESC`;
       } else {
         throw colErr;
       }

@@ -5,6 +5,7 @@ import api from '../api';
 import Shimmer from '../components/Common/Shimmer';
 import SocialSidebar from '../components/Prompts/SocialSidebar';
 import SEOMetadata from '../components/SEO/SEOMetadata';
+import { optimizeImage } from '../utils/imageUtils';
 
 const BlogPage = () => {
   const [blogs, setBlogs] = useState([]);
@@ -126,7 +127,7 @@ const BlogPage = () => {
               >
                 {blog.featured_image && (
                   <div className="blog-card-image-wrapper">
-                    <img src={blog.featured_image} alt={blog.featured_image_alt || blog.title} loading="lazy" />
+                    <img src={optimizeImage(blog.featured_image, 500)} alt={blog.featured_image_alt || blog.title} loading="lazy" width="500" height="280" style={{ objectFit: 'cover' }} />
                     <div style={{ 
                       position: 'absolute', 
                       top: '20px', 
@@ -148,7 +149,7 @@ const BlogPage = () => {
                 <div className="blog-card-content">
                   <h2 className="blog-card-title">{blog.title}</h2>
                   <p className="blog-card-excerpt">
-                    {blog.excerpt || (blog.content ? blog.content.replace(/<[^>]*>?/gm, '').substring(0, 160) + '...' : 'Dive into this insightful piece about AI and creativity...')}
+                    {blog.excerpt || (blog.content_fallback ? blog.content_fallback.replace(/<[^>]*>?/gm, '').substring(0, 160) + '...' : 'Dive into this insightful piece about AI and creativity...')}
                   </p>
                   <div className="blog-card-footer">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
