@@ -980,6 +980,7 @@ const AdminDashboard = () => {
     await api.get('/admin/logout');
     localStorage.removeItem('adminToken');
     setIsAdmin(false);
+    setPassword('');
   };
 
   const fetchData = async (currentView) => {
