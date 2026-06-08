@@ -13,7 +13,7 @@ import {
   Table, Edit, Trash, Plus, Settings, FileText, 
   TableProperties, LogOut, ChevronRight, Layout, 
   Share2, Palette, Activity, Users, Layers, Crown,
-  Eye, Copy
+  Eye, Copy, ExternalLink
 } from '../Common/Icons';
 import PromptModal from './PromptModal';
 import BlogModal from './BlogModal';
