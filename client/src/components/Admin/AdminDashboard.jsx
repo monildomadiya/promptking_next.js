@@ -81,6 +81,89 @@ const inputStyle = {
 
 // --- COMPONENTS ---
 
+const AdminOtpInput = ({ value, onChange, length = 10 }) => {
+  const inputRefs = React.useRef([]);
+
+  const handleChange = (e, index) => {
+    const val = e.target.value;
+    const char = val.slice(-1);
+    const newArr = value.split('');
+    while (newArr.length <= index) newArr.push('');
+    newArr[index] = char || '';
+    
+    onChange(newArr.join(''));
+    if (char && index < length - 1) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === 'Backspace') {
+      const newArr = value.split('');
+      if (!newArr[index] && index > 0) {
+        inputRefs.current[index - 1]?.focus();
+        newArr[index - 1] = '';
+      } else {
+        newArr[index] = '';
+      }
+      onChange(newArr.join(''));
+    } else if (e.key === 'ArrowLeft' && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    } else if (e.key === 'ArrowRight' && index < length - 1) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text').slice(0, length);
+    onChange(pasted);
+    const focusIndex = Math.min(pasted.length, length - 1);
+    inputRefs.current[focusIndex]?.focus();
+  };
+
+  return (
+    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '24px', flexWrap: 'wrap' }}>
+      {Array.from({ length }).map((_, i) => (
+        <input
+          key={i}
+          ref={el => inputRefs.current[i] = el}
+          type="password"
+          inputMode="numeric"
+          value={value[i] || ''}
+          onChange={e => handleChange(e, i)}
+          onKeyDown={e => handleKeyDown(e, i)}
+          onPaste={handlePaste}
+          style={{
+            width: '36px',
+            height: '46px',
+            textAlign: 'center',
+            fontSize: '1.4rem',
+            fontWeight: 'bold',
+            borderRadius: '10px',
+            border: '1px solid rgba(255,255,255,0.1)',
+            background: 'rgba(255,255,255,0.05)',
+            color: 'white',
+            outline: 'none',
+            transition: '0.2s',
+            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)'
+          }}
+          onFocus={e => {
+            e.target.style.borderColor = 'var(--accent-main)';
+            e.target.style.background = 'rgba(255,255,255,0.1)';
+            e.target.style.boxShadow = '0 0 10px rgba(229, 9, 20, 0.2)';
+          }}
+          onBlur={e => {
+            e.target.style.borderColor = 'rgba(255,255,255,0.1)';
+            e.target.style.background = 'rgba(255,255,255,0.05)';
+            e.target.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.2)';
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
 const NavItem = ({ item, active, onClick, isMobileView, collapsed }) => (
   <motion.div
     variants={itemVariants}
@@ -1106,7 +1189,7 @@ const AdminDashboard = () => {
           <h2 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '8px', fontFamily: 'var(--font-heading)', color: 'white' }}>Admin Portal</h2>
           <p style={{ color: 'var(--text-dim)', marginBottom: '32px', fontSize: '0.9rem', fontWeight: 500 }}>Authenticated Access Only</p>
           <form onSubmit={handleLogin}>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ ...inputStyle, textAlign: 'center', marginBottom: '24px', letterSpacing: '4px', fontSize: '1.2rem' }} placeholder="••••" />
+            <AdminOtpInput value={password} onChange={setPassword} length={10} />
             <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} style={{ width: '100%', padding: '16px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '12px', color: 'white', fontWeight: 800, cursor: 'pointer', boxShadow: '0 8px 24px var(--accent-glow)' }}>INITIALIZE ACCESS</motion.button>
           </form>
         </motion.div>
