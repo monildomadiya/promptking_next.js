@@ -949,10 +949,12 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
       finalSlug = await generateUniqueSlug(finalSlug, originalKey);
     }
 
+    let finalKey = newKey;
     if (originalKey) {
+      finalKey = newKey || originalKey;
       await db`
         UPDATE prompts SET 
-          prompt_key = ${newKey || originalKey}, 
+          prompt_key = ${finalKey}, 
           slug = ${finalSlug}, 
           title = ${p.title}, 
           meta_title = ${p.meta_title || ''},
@@ -974,7 +976,7 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
         WHERE prompt_key = ${originalKey}
       `;
     } else {
-      const finalKey = newKey || ('PK' + Date.now().toString().slice(-8) + Math.floor(Math.random() * 100));
+      finalKey = newKey || ('PK' + Date.now().toString().slice(-8) + Math.floor(Math.random() * 100));
       await db`
         INSERT INTO prompts (
           prompt_key, slug, title, meta_title, description, ai_type, prompt_text, img_before, img_after, 
@@ -988,7 +990,7 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
       `;
     }
     pingGoogleSitemap();
-    logAdminAction(originalKey ? "Updated Prompt" : "Created Prompt", { key: finalKey || originalKey, title: p.title });
+    logAdminAction(originalKey ? "Updated Prompt" : "Created Prompt", { key: finalKey, title: p.title });
     res.json({ status: "success" });
   } catch (error) {
     console.error(error);
