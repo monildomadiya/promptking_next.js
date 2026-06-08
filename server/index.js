@@ -24,7 +24,8 @@ app.use(cors({
   },
   credentials: true
 }));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 let compression;
 try {
   compression = require('compression');
@@ -221,6 +222,53 @@ app.use((err, req, res, next) => {
       }
     } catch (e) {
       console.warn("Failed to check/add author_id to blogs:", e.message);
+    }
+
+    // Add all potentially missing columns to blogs table
+    const blogColumns = [
+      { name: 'author_id', def: 'INT NULL' },
+      { name: 'author_name', def: 'VARCHAR(255) NULL DEFAULT NULL' },
+      { name: 'author_image', def: 'VARCHAR(500) NULL DEFAULT NULL' },
+      { name: 'author_description', def: 'TEXT NULL' },
+      { name: 'read_time', def: 'VARCHAR(100) NULL DEFAULT NULL' },
+      { name: 'focus_keyword', def: 'VARCHAR(255) NULL DEFAULT NULL' },
+      { name: 'canonical_url', def: 'VARCHAR(500) NULL DEFAULT NULL' },
+      { name: 'featured_image_alt', def: 'VARCHAR(500) NULL DEFAULT NULL' },
+      { name: 'featured_image_caption', def: 'VARCHAR(500) NULL DEFAULT NULL' },
+      { name: 'og_title', def: 'VARCHAR(255) NULL DEFAULT NULL' },
+      { name: 'og_description', def: 'TEXT NULL' },
+      { name: 'og_image', def: 'VARCHAR(500) NULL DEFAULT NULL' },
+      { name: 'twitter_title', def: 'VARCHAR(255) NULL DEFAULT NULL' },
+      { name: 'twitter_description', def: 'TEXT NULL' },
+      { name: 'twitter_image', def: 'VARCHAR(500) NULL DEFAULT NULL' },
+      { name: 'faqs', def: 'LONGTEXT NULL' },
+      { name: 'enable_table_of_contents', def: 'TINYINT(1) NOT NULL DEFAULT 1' },
+      { name: 'status', def: "VARCHAR(50) NOT NULL DEFAULT 'published'" },
+      { name: 'published_at', def: 'DATETIME NULL' },
+      { name: 'slug', def: 'VARCHAR(500) NULL DEFAULT NULL' },
+      { name: 'excerpt', def: 'TEXT NULL' },
+      { name: 'category', def: 'VARCHAR(255) NULL DEFAULT NULL' },
+      { name: 'tags', def: 'TEXT NULL' },
+      { name: 'meta_title', def: 'VARCHAR(255) NULL DEFAULT NULL' },
+      { name: 'meta_description', def: 'TEXT NULL' },
+    ];
+    for (const col of blogColumns) {
+      try {
+        const exists = await db`SHOW COLUMNS FROM blogs LIKE ${col.name}`;
+        if (exists.length === 0) {
+          const mysql = require('mysql2/promise');
+          const pool = mysql.createPool({
+            host: process.env.DB_HOST, user: process.env.DB_USER,
+            password: process.env.DB_PASS, database: process.env.DB_NAME,
+            port: 3306, ssl: { rejectUnauthorized: false }
+          });
+          await pool.query(`ALTER TABLE blogs ADD COLUMN \`${col.name}\` ${col.def}`);
+          await pool.end();
+          console.log(`Added column: blogs.${col.name}`);
+        }
+      } catch (e) {
+        console.warn(`Could not add column ${col.name}:`, e.message);
+      }
     }
 
     console.log("Database tables initialized.");
