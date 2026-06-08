@@ -199,6 +199,30 @@ app.use((err, req, res, next) => {
       console.warn("Failed to check/add contact_messages:", e.message);
     }
 
+    try {
+      await db`
+        CREATE TABLE IF NOT EXISTS authors (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          name VARCHAR(255) NOT NULL,
+          image VARCHAR(255),
+          description TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+      `;
+    } catch (e) {
+      console.warn("Failed to check/add authors table:", e.message);
+    }
+
+    try {
+      const checkAuthorId = await db`SHOW COLUMNS FROM blogs LIKE 'author_id'`;
+      if (checkAuthorId.length === 0) {
+        await db`ALTER TABLE blogs ADD COLUMN author_id INT NULL AFTER author_name`;
+      }
+    } catch (e) {
+      console.warn("Failed to check/add author_id to blogs:", e.message);
+    }
+
     console.log("Database tables initialized.");
   } catch (error) {
     console.error("Failed to initialize database tables:", error.message);
