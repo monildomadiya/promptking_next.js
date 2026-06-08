@@ -1,7 +1,7 @@
 import toast from 'react-hot-toast';
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../../api';
-import { X, Save, Image, Code, Star, Shield, Zap, Sparkles, Smartphone, PlusCircle, FileText, Activity } from '../Common/Icons';
+import { X, Save, Image, Code, Star, Shield, Zap, Sparkles, Smartphone, PlusCircle, FileText, Activity, CheckCircle, Trash2, Camera } from '../Common/Icons';
 import CustomEditor from './CustomEditor';
 
 const PromptModal = ({ prompt, onClose, onSave }) => {
@@ -10,6 +10,17 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     slug: '',
     title: '',
     meta_title: '',
+    meta_description: '',
+    focus_keyword: '',
+    canonical_url: '',
+    og_title: '',
+    og_description: '',
+    og_image: '',
+    twitter_title: '',
+    twitter_description: '',
+    twitter_image: '',
+    faqs: [],
+    tags: '',
     description: '',
     ai_type: 'ChatGPT',
     password: '',
@@ -31,15 +42,11 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
   const handleGalleryUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     const form = new FormData();
     form.append('image', file);
-
     try {
       setIsUploadingGallery(true);
-      const res = await api.post('/admin/upload_image', form, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await api.post('/admin/upload_image', form, { headers: { 'Content-Type': 'multipart/form-data' } });
       if (res.data && res.data.status === 'success') {
         const url = res.data.imageUrl;
         const existing = (() => { try { return JSON.parse(formData.gallery_urls || '[]'); } catch(err) { return []; } })();
@@ -58,14 +65,12 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
   const handleAddGalleryUrl = async () => {
     const url = galleryUrl.trim();
     if (!url) return;
-    
     if (url.includes('res.cloudinary.com') || url.startsWith('data:') || url.startsWith('/uploads/')) {
       const existing = (() => { try { return JSON.parse(formData.gallery_urls || '[]'); } catch(err) { return []; } })();
       setFormData(prev => ({ ...prev, gallery_urls: JSON.stringify([...existing, url]) }));
       setGalleryUrl('');
       return;
     }
-
     try {
       setIsUploadingGallery(true);
       const res = await api.post('/admin/upload_image_url', { url });
@@ -88,6 +93,9 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
   useEffect(() => {
     api.get('/categories').then(res => setCategories(res.data));
     if (prompt) {
+      let parsedFaqs = [];
+      try { parsedFaqs = typeof prompt.faqs === 'string' ? JSON.parse(prompt.faqs) : (prompt.faqs || []); } catch(e) {}
+
       setFormData({
         ...prompt,
         is_image_slider: Boolean(prompt.is_image_slider),
@@ -98,31 +106,61 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
         publish_date: prompt.publish_date ? new Date(new Date(prompt.publish_date).getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0,16) : '',
         description: prompt.description || '',
         meta_title: prompt.meta_title || prompt.metaTitle || '',
+        meta_description: prompt.meta_description || '',
+        focus_keyword: prompt.focus_keyword || '',
+        canonical_url: prompt.canonical_url || '',
+        og_title: prompt.og_title || '',
+        og_description: prompt.og_description || '',
+        og_image: prompt.og_image || '',
+        twitter_title: prompt.twitter_title || '',
+        twitter_description: prompt.twitter_description || '',
+        twitter_image: prompt.twitter_image || '',
+        faqs: parsedFaqs,
+        tags: typeof prompt.tags === 'string' ? prompt.tags : '',
         gallery_urls: prompt.gallery_urls || prompt.galleryUrls || '[]'
       });
       setOriginalKey(prompt.prompt_key);
     } else {
-      // Auto-generate a unique ID for new prompts (PK + 4 random digits)
       const uniqueId = 'PK' + Math.floor(1000 + Math.random() * 9000);
       setFormData(prev => ({ ...prev, prompt_key: uniqueId }));
     }
 
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') onClose();
-    };
+    const handleEsc = (e) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
   }, [prompt, onClose]);
 
+  // FAQ helpers
+  const addFaq = () => setFormData(prev => ({ ...prev, faqs: [...prev.faqs, { question: '', answer: '' }] }));
+  const updateFaq = (index, field, value) => {
+    const newFaqs = [...formData.faqs];
+    newFaqs[index][field] = value;
+    setFormData(prev => ({ ...prev, faqs: newFaqs }));
+  };
+  const removeFaq = (index) => {
+    const newFaqs = [...formData.faqs];
+    newFaqs.splice(index, 1);
+    setFormData(prev => ({ ...prev, faqs: newFaqs }));
+  };
+
+  // SEO Score
+  const getSeoScore = () => {
+    let score = 0;
+    if (formData.meta_title) score++;
+    if (formData.meta_description) score++;
+    if (formData.slug) score++;
+    if (formData.focus_keyword) score++;
+    if (formData.img_after || formData.img_before) score++;
+    if (formData.faqs && formData.faqs.length >= 1) score++;
+    return score;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
- 
-    // Validation: Premium content MUST have a password
     if (formData.is_premium && (!formData.password || formData.password.trim() === '')) {
       toast.error("⚠️ SECURITY REQUIRED: Premium content must have an unlock PIN/Password.");
       return;
     }
-
     try {
       await api.post('/admin/save_prompt', { ...formData, originalKey });
       onSave();
@@ -137,8 +175,17 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
       position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3000,
       padding: '20px'
     }}>
-      <div className="glass-modal" style={{ 
-        width: '100%', maxWidth: '1000px', maxHeight: '95vh', overflowY: 'auto', position: 'relative',
+      <style>{`
+        .prompt-modal .glass-input {
+          width: 100%;
+          padding: 12px 16px;
+          border-radius: 12px;
+          box-sizing: border-box;
+          font-family: inherit;
+        }
+      `}</style>
+      <div className="glass-modal prompt-modal" style={{ 
+        width: '100%', maxWidth: '1200px', maxHeight: '95vh', overflowY: 'auto', position: 'relative',
         display: 'flex', flexDirection: 'column'
       }}>
         {/* Modal Header */}
@@ -152,344 +199,453 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
               {prompt ? 'Edit Masterpiece' : 'Create New Prompt'}
             </h2>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-dim)', fontWeight: 500 }}>
-              Refine every detail of your prompt experience.
+              Refine every detail — content, visuals & SEO.
             </p>
           </div>
-          <button 
-            onClick={onClose}
-            className="glass-button-secondary"
-            style={{ width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-          >
-            <X size={20} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div style={{ 
+              display: 'flex', alignItems: 'center', gap: '8px', 
+              background: 'rgba(255,255,255,0.05)', padding: '8px 16px', borderRadius: '20px',
+              border: '1px solid rgba(255,255,255,0.1)'
+            }}>
+              <CheckCircle size={16} color={getSeoScore() >= 5 ? '#4CAF50' : '#FF9800'} />
+              <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>SEO Score: {getSeoScore()}/6</span>
+            </div>
+            <button 
+              onClick={onClose}
+              className="glass-button-secondary"
+              style={{ width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
-        
-        <form onSubmit={handleSubmit} style={{ padding: '40px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
-            
-            {/* Section: Basic Info */}
-            <div style={{ gridColumn: 'span 2' }}>
-              <SectionTitle title="Identity & SEO" />
-            </div>
 
-            <div style={{ gridColumn: 'span 1' }}>
-              <Label text="Prompt Identifier" icon={<Shield size={14} />} />
-              <input 
-                type="text" 
-                placeholder="PK101"
-                value={formData.prompt_key} 
-                onChange={(e) => {
-                  let val = e.target.value.toUpperCase();
-                  if (!val.startsWith('PK')) val = 'PK' + val.replace(/[^0-9]/g, '').slice(0, 4);
-                  else val = 'PK' + val.slice(2).replace(/[^0-9]/g, '').slice(0, 4);
-                  setFormData({ ...formData, prompt_key: val });
-                }}
-                className="glass-input"
-                style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
-              />
-              <Hint text="Unique ID (e.g. PK001)" />
-            </div>
+        <form onSubmit={handleSubmit} style={{ padding: '40px', display: 'flex', gap: '40px', alignItems: 'flex-start' }}>
+          
+          {/* ── LEFT COLUMN ── */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '40px' }}>
 
-            <div style={{ gridColumn: 'span 1' }}>
-              <Label text="Display Title" />
-              <input 
-                type="text" 
-                value={formData.title} 
-                onChange={(e) => {
-                  const newTitle = e.target.value;
-                  const newSlug = newTitle.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-                  setFormData({ ...formData, title: newTitle, slug: newSlug });
-                }}
-                className="glass-input"
-                style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
-                required 
-              />
-            </div>
+            {/* 1. Identity & Core */}
+            <div>
+              <SectionTitle title="1. Identity & Core" />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label text="Prompt Identifier" icon={<Shield size={14} />} />
+                  <input 
+                    type="text" 
+                    placeholder="PK101"
+                    value={formData.prompt_key} 
+                    onChange={(e) => {
+                      let val = e.target.value.toUpperCase();
+                      if (!val.startsWith('PK')) val = 'PK' + val.replace(/[^0-9]/g, '').slice(0, 4);
+                      else val = 'PK' + val.slice(2).replace(/[^0-9]/g, '').slice(0, 4);
+                      setFormData({ ...formData, prompt_key: val });
+                    }}
+                    className="glass-input"
+                    style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
+                  />
+                  <Hint text="Unique ID (e.g. PK001)" />
+                </div>
 
-            <div style={{ gridColumn: 'span 1' }}>
-              <Label text="SEO Slug" />
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <input 
-                  type="text" 
-                  value={formData.slug} 
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') })}
-                  className="glass-input"
-                  style={{ flex: 1, padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
-                />
-                <button 
-                  type="button"
-                  onClick={() => setFormData({ ...formData, slug: formData.title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') })}
-                  className="glass-button-secondary"
-                  style={{ padding: '0 20px', borderRadius: '14px', fontWeight: 700, fontSize: '0.8rem' }}
-                >
-                  AUTO
-                </button>
-              </div>
-            </div>
+                <div>
+                  <Label text="Display Title" />
+                  <input 
+                    type="text" 
+                    value={formData.title} 
+                    onChange={(e) => {
+                      const newTitle = e.target.value;
+                      const newSlug = newTitle.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+                      setFormData({ ...formData, title: newTitle, slug: newSlug });
+                    }}
+                    className="glass-input"
+                    style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
+                    required 
+                  />
+                </div>
 
-            <div style={{ gridColumn: 'span 1' }}>
-              <Label text="AI Category" />
-              <select 
-                value={formData.ai_type}
-                onChange={(e) => setFormData({ ...formData, ai_type: e.target.value })}
-                className="glass-input"
-                style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', appearance: 'none' }}
-              >
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.name}>{cat.name}</option>
-                ))}
-              </select>
-            </div>
+                <div>
+                  <Label text="SEO Slug" />
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <input 
+                      type="text" 
+                      value={formData.slug} 
+                      onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') })}
+                      className="glass-input"
+                      style={{ flex: 1, padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => setFormData({ ...formData, slug: formData.title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') })}
+                      className="glass-button-secondary"
+                      style={{ padding: '0 20px', borderRadius: '14px', fontWeight: 700, fontSize: '0.8rem' }}
+                    >
+                      AUTO
+                    </button>
+                  </div>
+                  {formData.slug && <small style={{ color: 'var(--text-dim)', display: 'block', marginTop: '5px' }}>Preview: /prompt/{formData.prompt_key}</small>}
+                </div>
 
-            <div style={{ gridColumn: 'span 2' }}>
-              <Label text="Meta Title (SEO)" />
-              <input 
-                type="text" 
-                value={formData.meta_title} 
-                onChange={(e) => setFormData({ ...formData, meta_title: e.target.value })}
-                className="glass-input"
-                style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
-                placeholder="Custom SEO Title (defaults to Display Title if empty)"
-              />
-            </div>
+                <div>
+                  <Label text="AI Category" />
+                  <select 
+                    value={formData.ai_type}
+                    onChange={(e) => setFormData({ ...formData, ai_type: e.target.value })}
+                    className="glass-input"
+                    style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', appearance: 'none' }}
+                  >
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.name}>{cat.name}</option>
+                    ))}
+                  </select>
+                </div>
 
-            {/* Section: Rich Content */}
-            <div style={{ gridColumn: 'span 2', marginTop: '20px' }}>
-              <SectionTitle title="Experience Content" />
-            </div>
-
-            <div style={{ gridColumn: 'span 2' }}>
-              <Label text="Detailed Description" />
-              <div style={{ borderRadius: '18px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
-                <CustomEditor
-                  value={formData.description}
-                  onChange={(content) => setFormData({ ...formData, description: content })}
-                />
-              </div>
-            </div>
-
-            <div style={{ gridColumn: 'span 2' }}>
-              <Label text="Raw Prompt Machine Source" icon={<Zap size={14} />} />
-              <textarea 
-                value={formData.prompt_text}
-                onChange={(e) => setFormData({ ...formData, prompt_text: e.target.value })}
-                className="glass-input"
-                style={{ width: '100%', minHeight: '180px', padding: '20px', borderRadius: '18px', fontSize: '0.95rem', fontFamily: 'monospace', lineHeight: '1.6' }}
-                required
-              />
-            </div>
-
-            {/* Section: Visuals */}
-            <div style={{ gridColumn: 'span 2', marginTop: '20px' }}>
-              <SectionTitle title="Visual Engineering" />
-            </div>
-
-            <div style={{ gridColumn: 'span 2' }}>
-              <div className="glass-card" style={{ padding: '25px', borderRadius: '20px' }}>
-                <Label text="Presentation Mode" />
-                <div style={{ display: 'flex', gap: '30px', marginTop: '15px', flexWrap: 'wrap' }}>
-                  <Checkbox label="Enable Contrast Slider" checked={formData.is_image_slider} onChange={(val) => setFormData({...formData, is_image_slider: val})} />
-                  <Checkbox label="Premium Content" premium checked={formData.is_premium} onChange={(val) => setFormData({...formData, is_premium: val, password: val ? formData.password : ''})} />
-                  <Checkbox label="Hide Prompt from Users" checked={formData.hide_prompt_box} onChange={(val) => setFormData({...formData, hide_prompt_box: val})} />
-                  <Checkbox label="Feature Prompt" checked={formData.is_featured} onChange={(val) => setFormData({...formData, is_featured: val})} />
-                  <Checkbox label="Save as Draft" checked={formData.is_draft} onChange={(val) => setFormData({...formData, is_draft: val})} />
+                <div style={{ gridColumn: 'span 2' }}>
+                  <Label text="Tags (comma separated)" />
+                  <input
+                    type="text"
+                    value={formData.tags}
+                    onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                    className="glass-input"
+                    style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
+                    placeholder="AI portrait, Midjourney, photography style"
+                  />
+                  <Hint text="Helps with internal search & SEO" />
                 </div>
               </div>
             </div>
 
-            <div style={{ gridColumn: 'span 1' }}>
-              <Label text="Hero Image (Result)" />
-              <ImageUpload 
-                url={formData.img_after} 
-                onUpload={(url) => setFormData({ ...formData, img_after: url })} 
-              />
-            </div>
-
-            <div style={{ gridColumn: 'span 1' }}>
-              <Label text={formData.is_image_slider ? 'Comparison Image (Before)' : 'Secondary Image'} />
-              <ImageUpload 
-                url={formData.img_before} 
-                onUpload={(url) => setFormData({ ...formData, img_before: url })} 
-              />
-            </div>
-
-            <div style={{ gridColumn: 'span 2' }}>
-              <Label text="Aspect Ratio Configuration" />
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '10px' }}>
-                {['1 / 1', '16 / 9', '4 / 5', '21 / 9', '4 / 3'].map(ratio => (
-                  <RatioButton 
-                    key={ratio} 
-                    ratio={ratio} 
-                    active={formData.image_ratio === ratio} 
-                    onClick={() => setFormData({ ...formData, image_ratio: ratio })} 
+            {/* 2. SEO Settings */}
+            <div>
+              <SectionTitle title="2. SEO Settings" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div>
+                  <Label text="SEO Meta Title" />
+                  <input 
+                    type="text" 
+                    value={formData.meta_title} 
+                    onChange={(e) => setFormData({ ...formData, meta_title: e.target.value })}
+                    className="glass-input"
+                    style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
+                    placeholder="Custom SEO title (defaults to Display Title if empty)"
                   />
-                ))}
-                <input 
-                  type="text" 
-                  placeholder="Custom (e.g. 3 / 2)"
-                  value={formData.image_ratio}
-                  onChange={(e) => setFormData({ ...formData, image_ratio: e.target.value })}
-                  className="glass-input"
-                  style={{ width: '150px', padding: '10px 15px', borderRadius: '10px', fontSize: '0.85rem' }}
-                />
+                  <small style={{ color: formData.meta_title.length > 60 ? 'var(--accent-main)' : 'var(--text-dim)', float: 'right', marginTop: '5px' }}>
+                    {formData.meta_title.length} / 60
+                  </small>
+                </div>
+
+                <div>
+                  <Label text="Meta Description" />
+                  <textarea 
+                    value={formData.meta_description} 
+                    onChange={(e) => setFormData({ ...formData, meta_description: e.target.value })}
+                    className="glass-input"
+                    rows={3}
+                    style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', resize: 'vertical' }}
+                    placeholder="Short description for search engines (120-160 chars ideal)..."
+                  />
+                  <small style={{ color: (formData.meta_description.length < 120 && formData.meta_description.length > 0) || formData.meta_description.length > 160 ? 'var(--accent-main)' : 'var(--text-dim)', float: 'right', marginTop: '5px' }}>
+                    {formData.meta_description.length} / 160
+                  </small>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                  <div>
+                    <Label text="Focus Keyword" />
+                    <input 
+                      type="text" 
+                      value={formData.focus_keyword} 
+                      onChange={(e) => setFormData({ ...formData, focus_keyword: e.target.value })}
+                      className="glass-input"
+                      style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
+                      placeholder="e.g. cinematic portrait prompt"
+                    />
+                  </div>
+                  <div>
+                    <Label text="Canonical URL" />
+                    <input 
+                      type="url" 
+                      value={formData.canonical_url} 
+                      onChange={(e) => setFormData({ ...formData, canonical_url: e.target.value })}
+                      className="glass-input"
+                      style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
+                      placeholder="Defaults to this prompt's URL"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div style={{ gridColumn: 'span 2' }}>
-              <Label text="Gallery Images (Optional)" icon={<Image size={14} />} />
+            {/* 3. Experience Content */}
+            <div>
+              <SectionTitle title="3. Experience Content" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div>
+                  <Label text="Detailed Description" />
+                  <div style={{ borderRadius: '18px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <CustomEditor
+                      value={formData.description}
+                      onChange={(content) => setFormData({ ...formData, description: content })}
+                    />
+                  </div>
+                </div>
 
-              {/* URL Input Row */}
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '14px' }}>
-                <input
-                  type="text"
-                  placeholder="Paste image URL here..."
-                  value={galleryUrl}
-                  onChange={(e) => setGalleryUrl(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddGalleryUrl();
-                    }
-                  }}
-                  className="glass-input"
-                  style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', fontSize: '0.9rem' }}
-                />
-                <button
-                  type="button"
-                  onClick={handleAddGalleryUrl}
-                  disabled={isUploadingGallery}
-                  style={{
-                    padding: '12px 20px', borderRadius: '12px', background: 'var(--accent-main)',
-                    color: 'white', border: 'none', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer',
-                    whiteSpace: 'nowrap', opacity: isUploadingGallery ? 0.7 : 1
-                  }}
-                >+ Add URL</button>
-                
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  ref={galleryFileInputRef} 
-                  style={{ display: 'none' }} 
-                  onChange={handleGalleryUpload} 
-                />
-                <button
-                  type="button"
-                  onClick={() => galleryFileInputRef.current?.click()}
-                  disabled={isUploadingGallery}
-                  style={{
-                    padding: '12px 20px', borderRadius: '12px', background: 'rgba(255,255,255,0.1)',
-                    color: 'white', border: '1px solid rgba(255,255,255,0.2)', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer',
-                    whiteSpace: 'nowrap', opacity: isUploadingGallery ? 0.7 : 1
-                  }}
+                <div>
+                  <Label text="Raw Prompt Machine Source" icon={<Zap size={14} />} />
+                  <textarea 
+                    value={formData.prompt_text}
+                    onChange={(e) => setFormData({ ...formData, prompt_text: e.target.value })}
+                    className="glass-input"
+                    style={{ width: '100%', minHeight: '180px', padding: '20px', borderRadius: '18px', fontSize: '0.95rem', fontFamily: 'monospace', lineHeight: '1.6', resize: 'vertical' }}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 4. FAQ Section */}
+            <div>
+              <SectionTitle title="4. FAQ Section (Boosts SEO)" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {formData.faqs.map((faq, index) => (
+                  <div key={index} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '20px', borderRadius: '15px', position: 'relative' }}>
+                    <button 
+                      type="button" 
+                      onClick={() => removeFaq(index)}
+                      style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', color: 'var(--accent-main)', cursor: 'pointer' }}
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                    <Label text={`Question ${index + 1}`} />
+                    <input 
+                      type="text" 
+                      value={faq.question} 
+                      onChange={(e) => updateFaq(index, 'question', e.target.value)}
+                      className="glass-input"
+                      style={{ marginBottom: '15px' }}
+                      placeholder="e.g. What AI tool works best with this prompt?"
+                    />
+                    <Label text="Answer" />
+                    <textarea 
+                      value={faq.answer} 
+                      onChange={(e) => updateFaq(index, 'answer', e.target.value)}
+                      className="glass-input"
+                      rows={2}
+                      placeholder="Answer clearly and concisely..."
+                    />
+                  </div>
+                ))}
+                <button 
+                  type="button" 
+                  onClick={addFaq}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: 600, alignSelf: 'flex-start' }}
                 >
-                  {isUploadingGallery ? 'Uploading...' : 'Upload Image'}
+                  <PlusCircle size={16} /> Add FAQ
                 </button>
               </div>
+            </div>
 
-              {/* Added URLs List */}
-              {(() => {
-                let imgs = [];
-                try { imgs = JSON.parse(formData.gallery_urls || '[]'); } catch(e) {}
-                if (!Array.isArray(imgs) || imgs.length === 0) {
-                  return <Hint text="No gallery images yet. Paste a URL above and click + Add." />;
-                }
-                return (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {imgs.map((url, idx) => (
-                      <div key={idx} style={{
-                        display: 'flex', alignItems: 'center', gap: '10px',
-                        background: 'rgba(255,255,255,0.03)', borderRadius: '10px',
-                        border: '1px solid rgba(255,255,255,0.06)', padding: '8px 12px'
-                      }}>
-                        <img src={url} alt={`img ${idx+1}`} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', flexShrink: 0, background: '#111' }} onError={e => e.target.style.display='none'} />
-                        <span style={{ flex: 1, fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{url}</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const updated = imgs.filter((_, i) => i !== idx);
-                            setFormData({ ...formData, gallery_urls: JSON.stringify(updated) });
-                          }}
-                          style={{
-                            background: 'rgba(229,9,20,0.15)', border: '1px solid rgba(229,9,20,0.3)',
-                            color: 'var(--accent-main)', width: '26px', height: '26px', borderRadius: '6px',
-                            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: '0.8rem', flexShrink: 0
-                          }}
-                        >✕</button>
-                      </div>
-                    ))}
-                    <Hint text={`${imgs.length} image${imgs.length > 1 ? 's' : ''} added to gallery.`} />
+            {/* 5. Visual Engineering */}
+            <div>
+              <SectionTitle title="5. Visual Engineering" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div className="glass-card" style={{ padding: '25px', borderRadius: '20px' }}>
+                  <Label text="Presentation Mode" />
+                  <div style={{ display: 'flex', gap: '30px', marginTop: '15px', flexWrap: 'wrap' }}>
+                    <Checkbox label="Enable Contrast Slider" checked={formData.is_image_slider} onChange={(val) => setFormData({...formData, is_image_slider: val})} />
+                    <Checkbox label="Premium Content" premium checked={formData.is_premium} onChange={(val) => setFormData({...formData, is_premium: val, password: val ? formData.password : ''})} />
+                    <Checkbox label="Hide Prompt from Users" checked={formData.hide_prompt_box} onChange={(val) => setFormData({...formData, hide_prompt_box: val})} />
+                    <Checkbox label="Feature Prompt" checked={formData.is_featured} onChange={(val) => setFormData({...formData, is_featured: val})} />
+                    <Checkbox label="Save as Draft" checked={formData.is_draft} onChange={(val) => setFormData({...formData, is_draft: val})} />
                   </div>
-                );
-              })()}
-            </div>
+                </div>
 
-            {/* Section: Security */}
-            <div style={{ gridColumn: 'span 2', marginTop: '20px' }}>
-              <SectionTitle title="Access & Monetization" />
-            </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                  <div>
+                    <Label text="Hero Image (Result)" />
+                    <ImageUpload url={formData.img_after} onUpload={(url) => setFormData({ ...formData, img_after: url })} />
+                  </div>
+                  <div>
+                    <Label text={formData.is_image_slider ? 'Comparison Image (Before)' : 'Secondary Image'} />
+                    <ImageUpload url={formData.img_before} onUpload={(url) => setFormData({ ...formData, img_before: url })} />
+                  </div>
+                </div>
 
-            {formData.is_premium && (
-              <div style={{ gridColumn: 'span 1' }}>
-                <Label text="Unlock PIN Code" />
-                <input 
-                  type="text" 
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="glass-input"
-                  placeholder="4-8 Digit PIN"
-                  style={{ width: '100%', padding: '14px', borderRadius: '14px' }}
-                />
+                <div>
+                  <Label text="Aspect Ratio Configuration" />
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '10px' }}>
+                    {['1 / 1', '16 / 9', '4 / 5', '21 / 9', '4 / 3'].map(ratio => (
+                      <RatioButton 
+                        key={ratio} ratio={ratio} 
+                        active={formData.image_ratio === ratio} 
+                        onClick={() => setFormData({ ...formData, image_ratio: ratio })} 
+                      />
+                    ))}
+                    <input 
+                      type="text" placeholder="Custom (e.g. 3 / 2)"
+                      value={formData.image_ratio}
+                      onChange={(e) => setFormData({ ...formData, image_ratio: e.target.value })}
+                      className="glass-input"
+                      style={{ width: '150px', padding: '10px 15px', borderRadius: '10px', fontSize: '0.85rem' }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label text="Gallery Images (Optional)" icon={<Image size={14} />} />
+                  <div style={{ display: 'flex', gap: '10px', marginBottom: '14px' }}>
+                    <input
+                      type="text" placeholder="Paste image URL here..."
+                      value={galleryUrl}
+                      onChange={(e) => setGalleryUrl(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddGalleryUrl(); } }}
+                      className="glass-input"
+                      style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', fontSize: '0.9rem' }}
+                    />
+                    <button type="button" onClick={handleAddGalleryUrl} disabled={isUploadingGallery}
+                      style={{ padding: '12px 20px', borderRadius: '12px', background: 'var(--accent-main)', color: 'white', border: 'none', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', whiteSpace: 'nowrap', opacity: isUploadingGallery ? 0.7 : 1 }}
+                    >+ Add URL</button>
+                    <input type="file" accept="image/*" ref={galleryFileInputRef} style={{ display: 'none' }} onChange={handleGalleryUpload} />
+                    <button type="button" onClick={() => galleryFileInputRef.current?.click()} disabled={isUploadingGallery}
+                      style={{ padding: '12px 20px', borderRadius: '12px', background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', whiteSpace: 'nowrap', opacity: isUploadingGallery ? 0.7 : 1 }}
+                    >{isUploadingGallery ? 'Uploading...' : 'Upload Image'}</button>
+                  </div>
+                  {(() => {
+                    let imgs = [];
+                    try { imgs = JSON.parse(formData.gallery_urls || '[]'); } catch(e) {}
+                    if (!Array.isArray(imgs) || imgs.length === 0) return <Hint text="No gallery images yet." />;
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {imgs.map((url, idx) => (
+                          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)', padding: '8px 12px' }}>
+                            <img src={url} alt={`img ${idx+1}`} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', flexShrink: 0, background: '#111' }} onError={e => e.target.style.display='none'} />
+                            <span style={{ flex: 1, fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{url}</span>
+                            <button type="button"
+                              onClick={() => { const updated = imgs.filter((_, i) => i !== idx); setFormData({ ...formData, gallery_urls: JSON.stringify(updated) }); }}
+                              style={{ background: 'rgba(229,9,20,0.15)', border: '1px solid rgba(229,9,20,0.3)', color: 'var(--accent-main)', width: '26px', height: '26px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', flexShrink: 0 }}
+                            >✕</button>
+                          </div>
+                        ))}
+                        <Hint text={`${imgs.length} image${imgs.length > 1 ? 's' : ''} added.`} />
+                      </div>
+                    );
+                  })()}
+                </div>
               </div>
-            )}
-
-            <div style={{ gridColumn: 'span 1' }}>
-              <Label text="Monetization URL (YT Shorts)" />
-              <input 
-                type="text" 
-                placeholder="https://youtube.com/shorts/..."
-                value={formData.ig_link}
-                onChange={(e) => setFormData({ ...formData, ig_link: e.target.value })}
-                className="glass-input"
-                style={{ width: '100%', padding: '14px', borderRadius: '14px' }}
-              />
             </div>
 
-            <div style={{ gridColumn: 'span 1' }}>
-              <Label text="Scheduled Publish Date (Optional)" />
-              <input 
-                type="datetime-local" 
-                value={formData.publish_date || ''}
-                onChange={(e) => setFormData({ ...formData, publish_date: e.target.value })}
-                className="glass-input"
-                style={{ width: '100%', padding: '14px', borderRadius: '14px', colorScheme: 'dark' }}
-              />
-              <Hint text="Leave empty to publish immediately (unless saved as draft)" />
+            {/* 6. Access & Monetization */}
+            <div>
+              <SectionTitle title="6. Access & Monetization" />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                {formData.is_premium && (
+                  <div>
+                    <Label text="Unlock PIN Code" />
+                    <input 
+                      type="text" 
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      className="glass-input"
+                      placeholder="4-8 Digit PIN"
+                      style={{ width: '100%', padding: '14px', borderRadius: '14px' }}
+                    />
+                  </div>
+                )}
+                <div>
+                  <Label text="Monetization URL (YT Shorts)" />
+                  <input 
+                    type="text" 
+                    placeholder="https://youtube.com/shorts/..."
+                    value={formData.ig_link}
+                    onChange={(e) => setFormData({ ...formData, ig_link: e.target.value })}
+                    className="glass-input"
+                    style={{ width: '100%', padding: '14px', borderRadius: '14px' }}
+                  />
+                </div>
+                <div>
+                  <Label text="Scheduled Publish Date (Optional)" />
+                  <input 
+                    type="datetime-local" 
+                    value={formData.publish_date || ''}
+                    onChange={(e) => setFormData({ ...formData, publish_date: e.target.value })}
+                    className="glass-input"
+                    style={{ width: '100%', padding: '14px', borderRadius: '14px', colorScheme: 'dark' }}
+                  />
+                  <Hint text="Leave empty to publish immediately" />
+                </div>
+              </div>
             </div>
 
+            <div className="glass-divider" />
+
+            <div style={{ display: 'flex', gap: '20px' }}>
+              <button type="button" onClick={onClose} className="glass-button-secondary"
+                style={{ flex: 1, padding: '18px', borderRadius: '18px', fontWeight: 700, fontSize: '1rem' }}
+              >Discard Changes</button>
+              <button type="submit"
+                style={{ flex: 2, padding: '18px', borderRadius: '18px', background: 'var(--accent-main)', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 900, fontSize: '1.1rem', boxShadow: '0 10px 30px rgba(229, 9, 20, 0.3)' }}
+              >Publish Prompt</button>
+            </div>
           </div>
 
-          <div className="glass-divider" style={{ margin: '40px 0' }} />
+          {/* ── RIGHT SIDEBAR ── */}
+          <div style={{ width: '340px', display: 'flex', flexDirection: 'column', gap: '30px', position: 'sticky', top: '100px' }}>
 
-          <div style={{ display: 'flex', gap: '20px' }}>
-            <button 
-              type="button" 
-              onClick={onClose}
-              className="glass-button-secondary"
-              style={{ flex: 1, padding: '18px', borderRadius: '18px', fontWeight: 700, fontSize: '1rem' }}
-            >
-              Discard Changes
-            </button>
-            <button 
-              type="submit" 
-              style={{ 
-                flex: 2, padding: '18px', borderRadius: '18px', background: 'var(--accent-main)', 
-                color: 'white', border: 'none', cursor: 'pointer', fontWeight: 900, fontSize: '1.1rem',
-                boxShadow: '0 10px 30px rgba(229, 9, 20, 0.3)'
-              }}
-            >
-              Publish Prompt
-            </button>
+            {/* Social Sharing — OG */}
+            <div style={{ background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <SectionTitle title="Social Sharing" />
+
+              <div style={{ marginBottom: '20px' }}>
+                <h4 style={{ fontSize: '0.9rem', color: 'white', marginBottom: '10px' }}>Open Graph (Facebook/LinkedIn)</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <input type="text" placeholder="OG Title (Fallback: Meta Title)" value={formData.og_title} onChange={(e) => setFormData({ ...formData, og_title: e.target.value })} className="glass-input" style={{ fontSize: '0.85rem', padding: '10px 14px' }} />
+                  <textarea placeholder="OG Description (Fallback: Meta Desc)" value={formData.og_description} onChange={(e) => setFormData({ ...formData, og_description: e.target.value })} className="glass-input" rows={2} style={{ fontSize: '0.85rem', padding: '10px 14px', resize: 'vertical' }} />
+                  <input type="text" placeholder="OG Image URL (Fallback: Hero Image)" value={formData.og_image} onChange={(e) => setFormData({ ...formData, og_image: e.target.value })} className="glass-input" style={{ fontSize: '0.85rem', padding: '10px 14px' }} />
+                </div>
+              </div>
+
+              <div>
+                <h4 style={{ fontSize: '0.9rem', color: 'white', marginBottom: '10px' }}>Twitter / X Card</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <input type="text" placeholder="Twitter Title (Fallback: OG Title)" value={formData.twitter_title} onChange={(e) => setFormData({ ...formData, twitter_title: e.target.value })} className="glass-input" style={{ fontSize: '0.85rem', padding: '10px 14px' }} />
+                  <textarea placeholder="Twitter Description" value={formData.twitter_description} onChange={(e) => setFormData({ ...formData, twitter_description: e.target.value })} className="glass-input" rows={2} style={{ fontSize: '0.85rem', padding: '10px 14px', resize: 'vertical' }} />
+                  <input type="text" placeholder="Twitter Image URL (Fallback: OG Image)" value={formData.twitter_image} onChange={(e) => setFormData({ ...formData, twitter_image: e.target.value })} className="glass-input" style={{ fontSize: '0.85rem', padding: '10px 14px' }} />
+                </div>
+              </div>
+            </div>
+
+            {/* SEO Checklist */}
+            <div style={{ background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <SectionTitle title="SEO Checklist" />
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
+                <CheckItem checked={!!formData.meta_title} text="Meta title exists" />
+                <CheckItem checked={!!formData.meta_description} text="Meta description exists" />
+                <CheckItem checked={!!formData.slug} text="Slug exists" />
+                <CheckItem checked={!!formData.focus_keyword} text="Focus keyword exists" />
+                <CheckItem checked={!!(formData.img_after || formData.img_before)} text="Hero image exists" />
+                <CheckItem checked={formData.faqs && formData.faqs.length >= 1} text="At least 1 FAQ added" />
+              </ul>
+
+              {/* Score Bar */}
+              <div style={{ marginTop: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>SEO Strength</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 700, color: getSeoScore() >= 5 ? '#4CAF50' : getSeoScore() >= 3 ? '#FF9800' : 'var(--accent-main)' }}>
+                    {getSeoScore() >= 5 ? 'Strong' : getSeoScore() >= 3 ? 'Fair' : 'Weak'}
+                  </span>
+                </div>
+                <div style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
+                  <div style={{ 
+                    height: '100%', 
+                    width: `${(getSeoScore() / 6) * 100}%`, 
+                    background: getSeoScore() >= 5 ? '#4CAF50' : getSeoScore() >= 3 ? '#FF9800' : 'var(--accent-main)',
+                    borderRadius: '10px',
+                    transition: 'width 0.4s ease'
+                  }} />
+                </div>
+              </div>
+            </div>
+
           </div>
         </form>
       </div>
@@ -499,8 +655,8 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
 
 // --- SUB-COMPONENTS ---
 const SectionTitle = ({ title }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '10px' }}>
-    <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--accent-main)', textTransform: 'uppercase', letterSpacing: '2px', whiteSpace: 'nowrap' }}>{title}</span>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
+    <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--accent-main)', textTransform: 'uppercase', letterSpacing: '1px', whiteSpace: 'nowrap' }}>{title}</span>
     <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(229,9,20,0.3), transparent)' }} />
   </div>
 );
@@ -513,6 +669,13 @@ const Label = ({ text, icon }) => (
 
 const Hint = ({ text }) => (
   <small style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.75rem', marginTop: '6px', display: 'block' }}>{text}</small>
+);
+
+const CheckItem = ({ checked, text }) => (
+  <li style={{ display: 'flex', alignItems: 'center', gap: '10px', color: checked ? '#4CAF50' : 'rgba(255,255,255,0.4)', fontWeight: checked ? 600 : 400 }}>
+    <CheckCircle size={14} color={checked ? '#4CAF50' : 'rgba(255,255,255,0.2)'} />
+    {text}
+  </li>
 );
 
 const Checkbox = ({ label, checked, onChange, premium }) => (
@@ -529,19 +692,9 @@ const Checkbox = ({ label, checked, onChange, premium }) => (
 );
 
 const RatioButton = ({ ratio, active, onClick }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    style={{
-      padding: '8px 16px', borderRadius: '10px', border: '1px solid',
-      borderColor: active ? 'var(--accent-main)' : 'rgba(255,255,255,0.1)',
-      background: active ? 'rgba(229, 9, 20, 0.15)' : 'rgba(255,255,255,0.02)',
-      color: active ? 'var(--accent-main)' : 'rgba(255,255,255,0.6)',
-      cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700, transition: '0.2s'
-    }}
-  >
-    {ratio}
-  </button>
+  <button type="button" onClick={onClick}
+    style={{ padding: '8px 16px', borderRadius: '10px', border: '1px solid', borderColor: active ? 'var(--accent-main)' : 'rgba(255,255,255,0.1)', background: active ? 'rgba(229, 9, 20, 0.15)' : 'rgba(255,255,255,0.02)', color: active ? 'var(--accent-main)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700, transition: '0.2s' }}
+  >{ratio}</button>
 );
 
 const ImageUpload = ({ url, onUpload }) => {
@@ -555,89 +708,43 @@ const ImageUpload = ({ url, onUpload }) => {
     const currentUrl = localUrl.trim();
     if (!currentUrl || currentUrl === url) return;
     if (currentUrl.includes('res.cloudinary.com') || currentUrl.startsWith('data:') || currentUrl.startsWith('/uploads/')) {
-       onUpload(currentUrl);
-       return;
+      onUpload(currentUrl); return;
     }
-    
     setIsUploading(true);
     try {
       const res = await api.post('/admin/upload_image_url', { url: currentUrl });
-      if (res.data && res.data.status === 'success') {
-         onUpload(res.data.imageUrl);
-      } else {
-         toast.error(res.data?.error || "Failed to upload from URL");
-         onUpload(currentUrl);
-      }
+      if (res.data && res.data.status === 'success') { onUpload(res.data.imageUrl); }
+      else { toast.error(res.data?.error || "Failed to upload from URL"); onUpload(currentUrl); }
     } catch (e) {
-      toast.error("Failed to upload from URL (" + e.message + ")");
-      onUpload(currentUrl);
-    } finally {
-      setIsUploading(false);
-    }
+      toast.error("Failed to upload from URL (" + e.message + ")"); onUpload(currentUrl);
+    } finally { setIsUploading(false); }
   };
 
   const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append('image', file);
-
+    const file = e.target.files[0]; if (!file) return;
+    const formData = new FormData(); formData.append('image', file);
     try {
       setIsUploading(true);
-      const res = await api.post('/admin/upload_image', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      if (res.data && res.data.status === 'success') {
-        onUpload(res.data.imageUrl);
-      } else {
-        toast.error(res.data?.error || 'Server rejected the image (file might be too large or invalid format).');
-      }
-    } catch (error) {
-      toast.error('Upload failed: ' + error.message);
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
+      const res = await api.post('/admin/upload_image', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      if (res.data && res.data.status === 'success') { onUpload(res.data.imageUrl); }
+      else { toast.error(res.data?.error || 'Server rejected the image.'); }
+    } catch (error) { toast.error('Upload failed: ' + error.message); }
+    finally { setIsUploading(false); if (fileInputRef.current) fileInputRef.current.value = ''; }
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
       <div style={{ display: 'flex', gap: '10px' }}>
-        <input 
-          type="text" 
-          placeholder="https://..."
-          value={localUrl}
-          onChange={(e) => setLocalUrl(e.target.value)}
-          onBlur={handleUrlBlur}
+        <input type="text" placeholder="https://..." value={localUrl} onChange={(e) => setLocalUrl(e.target.value)} onBlur={handleUrlBlur}
           className="glass-input"
           style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', fontSize: '0.85rem', color: 'white', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }}
         />
-        <input 
-          type="file" 
-          accept="image/*" 
-          ref={fileInputRef} 
-          style={{ display: 'none' }} 
-          onChange={handleFileChange} 
-        />
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isUploading}
-          style={{
-            padding: '0 20px', borderRadius: '12px', background: 'var(--accent-main)',
-            color: 'white', border: 'none', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
-            opacity: isUploading ? 0.7 : 1, whiteSpace: 'nowrap'
-          }}
-        >
-          {isUploading ? 'Uploading...' : 'Upload'}
-        </button>
+        <input type="file" accept="image/*" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
+        <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isUploading}
+          style={{ padding: '0 20px', borderRadius: '12px', background: 'var(--accent-main)', color: 'white', border: 'none', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', opacity: isUploading ? 0.7 : 1, whiteSpace: 'nowrap' }}
+        >{isUploading ? 'Uploading...' : 'Upload'}</button>
       </div>
-      <div style={{ 
-        height: '140px', borderRadius: '16px', border: '2px dashed rgba(255,255,255,0.1)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: 'rgba(255,255,255,0.02)', overflow: 'hidden'
-      }}>
+      <div style={{ height: '140px', borderRadius: '16px', border: '2px dashed rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.02)', overflow: 'hidden' }}>
         {url ? (
           <img src={url} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         ) : (

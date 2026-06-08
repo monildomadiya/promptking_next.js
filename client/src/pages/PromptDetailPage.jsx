@@ -332,13 +332,17 @@ const PromptDetailPage = ({ adsSettings }) => {
     return url;
   };
 
+  // Parse FAQs
+  let parsedFaqs = [];
+  try { parsedFaqs = typeof prompt.faqs === 'string' ? JSON.parse(prompt.faqs) : (prompt.faqs || []); } catch(e) {}
+
   const promptSchema = {
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',
     'name': prompt.title,
-    'description': prompt.description,
-    'image': prompt.img_after || prompt.img_before || 'https://promptking.in/favicon.png',
-    'url': `https://promptking.in/prompt/${prompt.key}`,
+    'description': prompt.meta_description || prompt.description?.replace(/<[^>]*>?/gm, '').substring(0, 200) || '',
+    'image': prompt.og_image || prompt.img_after || prompt.img_before || 'https://promptking.in/favicon.png',
+    'url': prompt.canonical_url || `https://promptking.in/prompt/${prompt.key}`,
     'keywords': `${prompt.aiType || 'AI'} prompt, ${prompt.title}, prompt engineering, PromptKing`,
     'genre': prompt.aiType || 'AI Prompt',
     'inLanguage': 'en',
@@ -356,14 +360,34 @@ const PromptDetailPage = ({ adsSettings }) => {
     }
   };
 
+  const schemas = [promptSchema];
+  if (parsedFaqs && parsedFaqs.length > 0) {
+    schemas.push({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      'mainEntity': parsedFaqs.map(faq => ({
+        '@type': 'Question',
+        'name': faq.question,
+        'acceptedAnswer': { '@type': 'Answer', 'text': faq.answer }
+      }))
+    });
+  }
+
   return (
     <div className="detail-page-wrapper" style={{ background: 'var(--surface-0)', minHeight: '100vh', color: 'white' }}>
       <SEOMetadata 
-        title={prompt.metaTitle || `${prompt.title} - ${prompt.aiType || 'AI'} Prompt | PromptKing`}
-        description={prompt.description?.slice(0, 160) || `Unlock the "${prompt.title}" AI prompt on PromptKing. Works with ${prompt.aiType || 'AI'}.`}
-        image={prompt.img_after || prompt.img_before || 'https://promptking.in/favicon.png'}
-        url={`https://promptking.in/prompt/${prompt.key}`}
-        schema={promptSchema}
+        title={prompt.metaTitle || prompt.meta_title || `${prompt.title} - ${prompt.aiType || 'AI'} Prompt | PromptKing`}
+        description={prompt.meta_description || prompt.description?.replace(/<[^>]*>?/gm, '').substring(0, 160) || `Unlock the "${prompt.title}" AI prompt on PromptKing. Works with ${prompt.aiType || 'AI'}.`}
+        image={prompt.og_image || prompt.img_after || prompt.img_before || 'https://promptking.in/favicon.png'}
+        url={prompt.canonical_url || `https://promptking.in/prompt/${prompt.key}`}
+        canonicalUrlOverride={prompt.canonical_url}
+        schema={schemas}
+        ogTitle={prompt.og_title}
+        ogDescription={prompt.og_description}
+        ogImage={prompt.og_image}
+        twitterTitle={prompt.twitter_title}
+        twitterDescription={prompt.twitter_description}
+        twitterImage={prompt.twitter_image}
         breadcrumb={[
           { name: 'Home', url: 'https://promptking.in/' },
           { name: 'Prompts', url: 'https://promptking.in/' },
@@ -921,6 +945,25 @@ const PromptDetailPage = ({ adsSettings }) => {
               </div>
             </section>
 
+            {/* FAQ Section */}
+            {parsedFaqs && parsedFaqs.length > 0 && (
+              <section style={{ marginTop: '50px', paddingTop: '40px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '30px' }}>
+                  <div style={{ width: '4px', height: '24px', background: 'var(--accent-main)', borderRadius: '2px' }} />
+                  <h2 style={{ fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0, color: 'white' }}>
+                    Frequently Asked Questions
+                  </h2>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {parsedFaqs.map((faq, i) => (
+                    <div key={i} style={{ background: 'rgba(255,255,255,0.02)', padding: '25px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <h3 style={{ fontSize: '1.1rem', marginBottom: '12px', color: 'white', fontWeight: 700 }}>{faq.question}</h3>
+                      <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, margin: 0 }}>{faq.answer}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
           </article>
 

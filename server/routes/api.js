@@ -972,12 +972,24 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
     let finalKey = newKey;
     if (originalKey) {
       finalKey = newKey || originalKey;
+      const stringifyJson = (val) => val ? JSON.stringify(val) : null;
       await db`
         UPDATE prompts SET 
           prompt_key = ${finalKey}, 
           slug = ${finalSlug}, 
           title = ${p.title}, 
           meta_title = ${p.meta_title || ''},
+          meta_description = ${p.meta_description || null},
+          focus_keyword = ${p.focus_keyword || null},
+          canonical_url = ${p.canonical_url || null},
+          og_title = ${p.og_title || null},
+          og_description = ${p.og_description || null},
+          og_image = ${p.og_image || null},
+          twitter_title = ${p.twitter_title || null},
+          twitter_description = ${p.twitter_description || null},
+          twitter_image = ${p.twitter_image || null},
+          faqs = ${stringifyJson(p.faqs)},
+          tags = ${p.tags || null},
           description = ${p.description}, 
           ai_type = ${p.ai_type}, 
           prompt_text = ${p.prompt_text}, 
@@ -997,14 +1009,20 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
       `;
     } else {
       finalKey = newKey || ('PK' + Date.now().toString().slice(-8) + Math.floor(Math.random() * 100));
+      const sJson = (val) => val ? JSON.stringify(val) : null;
       await db`
         INSERT INTO prompts (
-          prompt_key, slug, title, meta_title, description, ai_type, prompt_text, img_before, img_after, 
+          prompt_key, slug, title, meta_title, meta_description, focus_keyword, canonical_url,
+          og_title, og_description, og_image, twitter_title, twitter_description, twitter_image,
+          faqs, tags,
+          description, ai_type, prompt_text, img_before, img_after, 
           ig_link, is_image_slider, image_ratio, password, is_premium, gallery_urls, hide_prompt_box, is_featured, is_draft, publish_date
         ) VALUES (
-          ${finalKey}, ${finalSlug}, ${p.title}, ${p.meta_title || ''}, ${p.description}, ${p.ai_type}, ${p.prompt_text}, 
+          ${finalKey}, ${finalSlug}, ${p.title}, ${p.meta_title || ''}, ${p.meta_description || null}, ${p.focus_keyword || null}, ${p.canonical_url || null},
+          ${p.og_title || null}, ${p.og_description || null}, ${p.og_image || null}, ${p.twitter_title || null}, ${p.twitter_description || null}, ${p.twitter_image || null},
+          ${sJson(p.faqs)}, ${p.tags || null},
+          ${p.description}, ${p.ai_type}, ${p.prompt_text}, 
           ${p.img_before}, ${p.img_after}, ${p.ig_link}, ${p.is_image_slider ? 1 : 0}, 
-
           ${p.image_ratio}, ${p.password}, ${p.is_premium ? 1 : 0}, ${p.gallery_urls || null}, ${p.hide_prompt_box ? 1 : 0}, ${p.is_featured ? 1 : 0}, ${p.is_draft ? 1 : 0}, ${p.publish_date || null}
         )
       `;
