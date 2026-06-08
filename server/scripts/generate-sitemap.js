@@ -40,15 +40,21 @@ function formatDate(d) {
   return date.toISOString().split('T')[0];
 }
 
-function buildUrlEntry({ loc, lastmod, changefreq, priority, image }) {
+function buildUrlEntry({ loc, lastmod, changefreq, priority, images = [] }) {
+  let imagesXml = '';
+  if (images.length > 0) {
+    imagesXml = images.map(img => `
+    <image:image>
+      <image:loc>${escapeXml(img.loc)}</image:loc>
+      <image:title>${escapeXml(img.title)}</image:title>
+    </image:image>`).join('');
+  }
+
   return `  <url>
     <loc>${escapeXml(loc)}</loc>
     <lastmod>${lastmod || formatDate()}</lastmod>
     <changefreq>${changefreq}</changefreq>
-    <priority>${priority}</priority>${image ? `
-    <image:image>
-      <image:loc>${escapeXml(image)}</image:loc>
-    </image:image>` : ''}
+    <priority>${priority}</priority>${imagesXml}
   </url>`;
 }
 
@@ -94,24 +100,39 @@ async function generateSitemap() {
     // Blog articles
     for (const blog of blogs) {
       if (!blog.slug) continue;
+      
+      const images = [];
+      if (blog.featured_image) {
+        images.push({ loc: blog.featured_image.startsWith('/') ? SITE_URL + blog.featured_image : blog.featured_image, title: blog.title });
+      }
+
       urls.push(buildUrlEntry({
         loc: `${SITE_URL}/article/${blog.slug}`,
         lastmod: formatDate(blog.updated_at || blog.created_at),
         changefreq: 'weekly',
         priority: '0.8',
-        image: blog.featured_image || null
+        images
       }));
     }
 
     // Prompt detail pages
     for (const prompt of prompts) {
       if (!prompt.prompt_key) continue;
+
+      const images = [];
+      if (prompt.img_after) {
+        images.push({ loc: prompt.img_after.startsWith('/') ? SITE_URL + prompt.img_after : prompt.img_after, title: prompt.title });
+      }
+      if (prompt.img_before) {
+        images.push({ loc: prompt.img_before.startsWith('/') ? SITE_URL + prompt.img_before : prompt.img_before, title: prompt.title + ' (Before)' });
+      }
+
       urls.push(buildUrlEntry({
         loc: `${SITE_URL}/prompt/${prompt.prompt_key}`,
         lastmod: formatDate(prompt.updated_at || prompt.created_at),
         changefreq: 'weekly',
         priority: '0.7',
-        image: prompt.img_after || prompt.img_before || null
+        images
       }));
     }
 

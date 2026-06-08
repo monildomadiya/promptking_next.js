@@ -1226,8 +1226,8 @@ router.get('/sitemap.xml', async (req, res) => {
   try {
     // Attempt DB fetch if healthy
     const db = require('../db');
-    prompts = await db`SELECT prompt_key, updated_at, created_at, img_after, img_before FROM prompts WHERE prompt_key IS NOT NULL AND is_draft = 0 AND (publish_date IS NULL OR publish_date <= NOW())`;
-    blogs = await db`SELECT slug, updated_at, created_at, featured_image FROM blogs WHERE slug IS NOT NULL`;
+    prompts = await db`SELECT prompt_key, title, updated_at, created_at, img_after, img_before FROM prompts WHERE prompt_key IS NOT NULL AND is_draft = 0 AND (publish_date IS NULL OR publish_date <= NOW())`;
+    blogs = await db`SELECT slug, title, updated_at, created_at, featured_image FROM blogs WHERE slug IS NOT NULL`;
   } catch (err) {
     console.warn("Sitemap: DB failed, serving static pages only", err.message);
   }
@@ -1253,9 +1253,13 @@ router.get('/sitemap.xml', async (req, res) => {
 
     // Dynamic Prompts
     prompts.forEach(p => {
-      const img = p.img_after || p.img_before;
       xml += `  <url>\n    <loc>${baseUrl}/prompt/${escapeXml(p.prompt_key)}</loc>\n    <lastmod>${formatDate(p.updated_at || p.created_at)}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n`;
-      if (img) xml += `    <image:image>\n      <image:loc>${escapeXml(img.startsWith('/') ? baseUrl + img : img)}</image:loc>\n    </image:image>\n`;
+      if (p.img_after) {
+        xml += `    <image:image>\n      <image:loc>${escapeXml(p.img_after.startsWith('/') ? baseUrl + p.img_after : p.img_after)}</image:loc>\n      <image:title>${escapeXml(p.title)}</image:title>\n    </image:image>\n`;
+      }
+      if (p.img_before) {
+        xml += `    <image:image>\n      <image:loc>${escapeXml(p.img_before.startsWith('/') ? baseUrl + p.img_before : p.img_before)}</image:loc>\n      <image:title>${escapeXml(p.title + ' (Before)')}</image:title>\n    </image:image>\n`;
+      }
       xml += `  </url>\n`;
     });
 
@@ -1263,7 +1267,9 @@ router.get('/sitemap.xml', async (req, res) => {
     blogs.forEach(b => {
       const img = b.featured_image;
       xml += `  <url>\n    <loc>${baseUrl}/article/${escapeXml(b.slug)}</loc>\n    <lastmod>${formatDate(b.updated_at || b.created_at)}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n`;
-      if (img) xml += `    <image:image>\n      <image:loc>${escapeXml(img.startsWith('/') ? baseUrl + img : img)}</image:loc>\n    </image:image>\n`;
+      if (img) {
+        xml += `    <image:image>\n      <image:loc>${escapeXml(img.startsWith('/') ? baseUrl + img : img)}</image:loc>\n      <image:title>${escapeXml(b.title)}</image:title>\n    </image:image>\n`;
+      }
       xml += `  </url>\n`;
     });
 
