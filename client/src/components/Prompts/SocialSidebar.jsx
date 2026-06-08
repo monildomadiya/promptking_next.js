@@ -22,32 +22,33 @@ const SocialSidebar = () => {
           {
             title: settings.youtube_title || 'YouTube Channel',
             icon: <Youtube size={24} />,
-            url: settings.youtube_url || 'https://youtube.com/@yourchannel',
+            url: settings.youtube_url,
             description: 'Find secret PINs & AI tutorials',
             color: '#FF0000'
           },
           {
             title: settings.instagram_title || 'Instagram Page',
             icon: <Instagram size={24} />,
-            url: settings.instagram_url || 'https://instagram.com/yourprofile',
+            url: settings.instagram_url,
             description: 'Daily AI art & design tips',
             color: '#E4405F'
           },
           {
             title: settings.pinterest_title || 'Pinterest Page',
             icon: <PinterestIcon size={24} />,
-            url: settings.pinterest_url || 'https://pinterest.com/yourprofile',
+            url: settings.pinterest_url,
             description: 'Inspire with AI collections',
             color: '#E60023'
           },
           {
             title: settings.facebook_title || 'Facebook Page',
             icon: <Facebook size={24} />,
-            url: settings.facebook_url || 'https://facebook.com/yourpage',
+            url: settings.facebook_url,
             description: 'Join our AI community group',
             color: '#1877F2'
           }
-        ];
+        ].filter(link => link.url && link.url.trim() !== '');
+        
         setSocialLinks(links);
       } catch (error) {
         console.error("Failed to load social settings", error);
@@ -64,52 +65,56 @@ const SocialSidebar = () => {
   return (
     <aside className="social-sidebar">
       <div className="sidebar-sticky-wrapper" style={{ paddingTop: '10px' }}>
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', marginBottom: '15px', gap: '20px' }}>
-          <div style={{
-            flex: 1,
-            height: '2px',
-            background: 'linear-gradient(270deg, var(--accent-main), transparent)',
-            opacity: 0.6,
-            borderRadius: '2px'
-          }} />
-          <h3 className="sidebar-title" style={{
-            position: 'relative',
-            zIndex: 2,
-            margin: 0,
-            fontSize: '0.85rem',
-            fontWeight: 800,
-            color: 'white',
-            textTransform: 'uppercase',
-            letterSpacing: '2px',
-            whiteSpace: 'nowrap',
-            textAlign: 'right'
-          }}>Official Channels</h3>
-        </div>
+        {socialLinks.length > 0 && (
+          <>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', marginBottom: '15px', gap: '20px' }}>
+              <div style={{
+                flex: 1,
+                height: '2px',
+                background: 'linear-gradient(270deg, var(--accent-main), transparent)',
+                opacity: 0.6,
+                borderRadius: '2px'
+              }} />
+              <h3 className="sidebar-title" style={{
+                position: 'relative',
+                zIndex: 2,
+                margin: 0,
+                fontSize: '0.85rem',
+                fontWeight: 800,
+                color: 'white',
+                textTransform: 'uppercase',
+                letterSpacing: '2px',
+                whiteSpace: 'nowrap',
+                textAlign: 'right'
+              }}>Official Channels</h3>
+            </div>
 
-        <div className="social-cards-wrapper">
-          {socialLinks.map((social) => (
-            <a
-              key={social.title}
-              href={social.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="social-card-item"
-            >
-              <div className="social-card-icon-wrap" style={{ '--icon-color': social.color }}>
-                {social.icon}
-              </div>
-              <div className="social-card-content">
-                <div className="social-card-header">
-                  <span className="social-card-name">{social.title}</span>
-                </div>
-                <p className="social-card-desc">{social.description}</p>
-                <div className="social-card-action">
-                  Follow Now <ArrowRight size={14} />
-                </div>
-              </div>
-            </a>
-          ))}
-        </div>
+            <div className="social-cards-wrapper">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.title}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="social-card-item"
+                >
+                  <div className="social-card-icon-wrap" style={{ '--icon-color': social.color }}>
+                    {social.icon}
+                  </div>
+                  <div className="social-card-content">
+                    <div className="social-card-header">
+                      <span className="social-card-name">{social.title}</span>
+                    </div>
+                    <p className="social-card-desc">{social.description}</p>
+                    <div className="social-card-action">
+                      Follow Now <ArrowRight size={14} />
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </>
+        )}
 
         {/* Security / Quality Badge */}
         <div className="sidebar-badge-card">
