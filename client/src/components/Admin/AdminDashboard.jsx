@@ -1108,7 +1108,7 @@ const AdminDashboard = () => {
             boxShadow: '0 0 30px rgba(229, 9, 20, 0.15)',
             color: 'var(--accent-main)' 
           }}>
-            <Crown size={42} fill="currentColor" style={{ filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.3))' }} />
+            <img src={KingLogo} style={{ width: '50px', objectFit: 'contain' }} alt="Prompt King" />
           </div>
           <h2 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '8px', fontFamily: 'var(--font-heading)', color: 'white' }}>Admin Portal</h2>
           <p style={{ color: 'var(--text-dim)', marginBottom: '32px', fontSize: '0.9rem', fontWeight: 500 }}>Authenticated Access Only</p>
@@ -1197,16 +1197,14 @@ const AdminDashboard = () => {
             {sidebarCollapsed ? '›' : '‹'}
           </motion.button>
 
-          {/* Logo */}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '40px', width: '100%' }}>
             {sidebarCollapsed ? (
-              <div className="animated-logo" style={{ width: '40px', height: '40px', background: 'var(--accent-gradient)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.75rem', flexShrink: 0 }}>PK</div>
-            ) : settings.logo_url ? (
+              <img src={KingLogo} style={{ width: '40px', height: '40px', objectFit: 'contain' }} alt="PK" />
+            ) : settings?.logo_url ? (
               <img src={settings.logo_url} style={{ maxHeight: '90px', maxWidth: '100%', objectFit: 'contain', padding: '0 10px' }} alt="Logo" />
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', whiteSpace: 'nowrap' }}>
-                <div className="animated-logo" style={{ width: '45px', height: '45px', background: 'var(--accent-gradient)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, flexShrink: 0 }}>PK</div>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.5px', fontFamily: 'var(--font-heading)' }}>KING ADMIN</h2>
+                <img src={KingLogo} style={{ maxHeight: '45px', objectFit: 'contain' }} alt="Prompt King" />
               </div>
             )}
           </div>
