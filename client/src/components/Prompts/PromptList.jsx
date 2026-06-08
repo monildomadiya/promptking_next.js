@@ -65,9 +65,13 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
 
   const filteredPrompts = prompts.filter(p => {
     const safeKey = (p.prompt_key || '').toLowerCase();
+    const safeTitle = (p.title || '').toLowerCase();
+    const safeText = (p.prompt_text || p.promptText || '').toLowerCase();
     const safeSearch = (search || '').toLowerCase();
     
-    const matchesSearch = safeKey.includes(safeSearch);
+    const matchesSearch = safeKey.includes(safeSearch) || 
+                          safeTitle.includes(safeSearch) || 
+                          safeText.includes(safeSearch);
     
     let matchesFilter = true;
     if (filter === 'free') {
