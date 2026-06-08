@@ -1122,6 +1122,16 @@ router.post('/admin/save_blog', adminAuth, async (req, res) => {
   try {
     const stringifyJson = (val) => val ? JSON.stringify(val) : null;
     
+    // Auto-fill author details if author_id is provided
+    if (b.author_id) {
+      const authorRows = await db`SELECT * FROM authors WHERE id = ${b.author_id}`;
+      if (authorRows.length > 0) {
+        b.author_name = authorRows[0].name;
+        b.author_image = authorRows[0].image;
+        b.author_description = authorRows[0].description;
+      }
+    }
+    
     if (b.id) {
       await db`UPDATE blogs SET 
         title = ${b.title}, 
@@ -1145,9 +1155,9 @@ router.post('/admin/save_blog', adminAuth, async (req, res) => {
         twitter_image = ${b.twitter_image || null},
         faqs = ${stringifyJson(b.faqs)},
         enable_table_of_contents = ${b.enable_table_of_contents !== false},
-        author_name = ${b.author_name || null},
-        author_image = ${b.author_image || null},
-        author_description = ${b.author_description || null},
+        author_name = ${b.author_name || ''},
+        author_image = ${b.author_image || ''},
+        author_description = ${b.author_description || ''},
         author_id = ${b.author_id || null},
         status = ${b.status || 'published'},
         published_at = ${b.published_at || null},
@@ -1165,7 +1175,7 @@ router.post('/admin/save_blog', adminAuth, async (req, res) => {
         ${b.featured_image_alt || null}, ${b.featured_image_caption || null}, ${b.excerpt || null}, ${b.category || null}, ${stringifyJson(b.tags)},
         ${b.meta_title || null}, ${b.meta_description || null}, ${b.focus_keyword || null}, ${b.canonical_url || null},
         ${b.og_title || null}, ${b.og_description || null}, ${b.og_image || null}, ${b.twitter_title || null}, ${b.twitter_description || null}, ${b.twitter_image || null},
-        ${stringifyJson(b.faqs)}, ${b.enable_table_of_contents !== false}, ${b.author_name || null}, ${b.author_image || null}, ${b.author_description || null}, ${b.author_id || null}, ${b.status || 'published'}, ${b.published_at || null}, ${b.read_time || null}
+        ${stringifyJson(b.faqs)}, ${b.enable_table_of_contents !== false}, ${b.author_name || ''}, ${b.author_image || ''}, ${b.author_description || ''}, ${b.author_id || null}, ${b.status || 'published'}, ${b.published_at || null}, ${b.read_time || null}
       )`;
     }
     pingGoogleSitemap();
