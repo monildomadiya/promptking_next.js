@@ -212,12 +212,12 @@ const ArticlePage = () => {
 
           {/* Table of Contents */}
           {blog.enable_table_of_contents !== false && headings.length > 0 && (
-            <div style={{ background: 'rgba(255,255,255,0.02)', padding: '30px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '50px' }}>
-              <h3 style={{ fontSize: '1.2rem', marginBottom: '20px', color: 'white', fontWeight: 700 }}>Table of Contents</h3>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div className="blog-toc">
+              <h3>Table of Contents</h3>
+              <ul>
                 {headings.map((h, i) => (
-                  <li key={i} style={{ paddingLeft: h.tag === 'h3' ? '20px' : '0' }}>
-                    <a href={`#${h.id}`} style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.95rem', transition: '0.2s' }} onMouseOver={e => e.target.style.color='var(--accent-main)'} onMouseOut={e => e.target.style.color='var(--text-secondary)'}>
+                  <li key={i} style={{ paddingLeft: h.tag === 'h3' ? '16px' : '0' }}>
+                    <a href={`#${h.id}`}>
                       {h.text}
                     </a>
                   </li>
@@ -397,12 +397,6 @@ const ArticlePage = () => {
         @media (hover: hover) {
           .sidebar-blog-card:hover { transform: translateX(5px); color: var(--accent-main); }
         }
-        .blog-content h2, .blog-content h3 { margin-top: 40px; margin-bottom: 20px; color: white; }
-        .blog-content p { margin-bottom: 25px; }
-        .blog-content img { max-width: 100%; border-radius: 15px; margin: 30px 0; }
-        .blog-content a { color: var(--accent-main); text-decoration: none; font-weight: 600; }
-        .blog-content a:hover { text-decoration: underline; }
-        
         @media (max-width: 1100px) {
           .article-layout { grid-template-columns: 1fr; }
           .sidebar { order: 2; margin-top: 40px; }
