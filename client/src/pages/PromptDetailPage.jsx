@@ -1000,32 +1000,7 @@ const PromptDetailPage = ({ adsSettings }) => {
                 ))}
               </div>
 
-              <div style={{ 
-                marginTop: '28px', 
-                padding: '24px', 
-                background: 'linear-gradient(135deg, rgba(229, 9, 20, 0.1), rgba(229, 9, 20, 0.02))', 
-                borderRadius: '20px', 
-                border: '1px solid rgba(229, 9, 20, 0.15)',
-                textAlign: 'center'
-              }}>
-                <Crown size={28} color="var(--accent-main)" style={{ marginBottom: '12px', opacity: 0.8 }} />
-                <h5 style={{ fontSize: '0.95rem', fontWeight: 800, marginBottom: '6px' }}>King Community</h5>
-                <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.5, marginBottom: '16px' }}>
-                  Unlock exclusive masterclasses and premium prompt engineering strategies.
-                </p>
-                <button style={{ 
-                  width: '100%',
-                  background: 'var(--accent-main)', 
-                  color: 'white', 
-                  border: 'none', 
-                  padding: '10px', 
-                  borderRadius: '12px', 
-                  fontSize: '0.8rem', 
-                  fontWeight: 800, 
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 15px rgba(229, 9, 20, 0.2)'
-                }}>Coming Soon</button>
-              </div>
+
 
               {/* Sidebar Ad Placement */}
               {adsSettings?.adsense_enabled === '1' && adsSettings?.adsense_slot_sidebar && (
