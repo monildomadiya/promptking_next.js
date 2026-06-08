@@ -217,7 +217,7 @@ app.use((err, req, res, next) => {
     try {
       const checkAuthorId = await db`SHOW COLUMNS FROM blogs LIKE 'author_id'`;
       if (checkAuthorId.length === 0) {
-        await db`ALTER TABLE blogs ADD COLUMN author_id INT NULL AFTER author_name`;
+        await db`ALTER TABLE blogs ADD COLUMN author_id INT NULL`;
       }
     } catch (e) {
       console.warn("Failed to check/add author_id to blogs:", e.message);

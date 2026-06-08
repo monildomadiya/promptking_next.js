@@ -366,7 +366,11 @@ router.get('/get_data', async (req, res) => {
 
 // --- BLOGS (Public) ---
 router.get('/blogs', async (req, res) => {
-  if (!isDbHealthy()) return fetchLiveBlogs();
+  const isLiveServer = req.headers.host && (req.headers.host.includes('promptking.in') || req.headers.host.includes('onrender.com'));
+  if (!isDbHealthy()) {
+    if (isLiveServer) return res.status(500).json({ error: "Database error on live server" });
+    return fetchLiveBlogs();
+  }
   
   async function fetchLiveBlogs() {
     try {
@@ -393,6 +397,7 @@ router.get('/blogs', async (req, res) => {
   } catch (error) {
     console.warn('LOCAL DB FAILED, FETCHING LIVE BLOGS:', error.message);
     lastDbFailure = Date.now();
+    if (isLiveServer) return res.status(500).json({ error: "Database error on live server" });
     await fetchLiveBlogs();
   }
 });
@@ -1098,6 +1103,8 @@ router.get('/admin/blogs', adminAuth, async (req, res) => {
   } catch (error) {
     console.warn('ADMIN BLOGS DB FAILED, FETCHING LIVE:', error.message);
     lastDbFailure = Date.now();
+    const isLiveServer = req.headers.host && (req.headers.host.includes('promptking.in') || req.headers.host.includes('onrender.com'));
+    if (isLiveServer) return res.status(500).json({ error: "Database error on live server" });
     await fetchLiveAdminBlogs();
   }
 });
