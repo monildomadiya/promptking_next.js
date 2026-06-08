@@ -1133,6 +1133,10 @@ const AdminDashboard = () => {
       { id: 'settings-branding', label: 'Branding', icon: <Palette size={20} /> },
       { id: 'settings-social', label: 'Channels', icon: <Share2 size={20} /> },
       { id: 'settings-ads', label: 'Ads Management', icon: <Activity size={20} /> },
+    ]},
+    { title: 'ADVANCED TOOLS', items: [
+      { id: 'seo-manager', label: 'SEO Manager', icon: <Activity size={20} /> },
+      { id: 'audit-logs', label: 'Audit Logs', icon: <FileText size={20} /> },
     ]}
   ];
 
