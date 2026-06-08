@@ -1062,13 +1062,13 @@ mark {
   gap: 40px;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 20px 20px 20px;
+  padding: 40px 20px 20px 20px;
   width: 100%;
 }
 
 .layout-with-sidebar > *:last-child {
   position: sticky;
-  top: 90px;
+  top: 110px;
   height: fit-content;
 }
 
@@ -1076,7 +1076,7 @@ mark {
   .layout-with-sidebar {
     grid-template-columns: 1fr;
     gap: 30px;
-    padding: 20px;
+    padding: 30px 20px 20px 20px;
   }
 }
 @media (max-width: 1250px) {
