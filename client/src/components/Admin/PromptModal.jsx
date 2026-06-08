@@ -198,7 +198,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                 onChange={(e) => {
                   const newTitle = e.target.value;
                   const newSlug = newTitle.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-                  setFormData({ ...formData, title: newTitle, slug: formData.slug ? formData.slug : newSlug });
+                  setFormData({ ...formData, title: newTitle, slug: newSlug });
                 }}
                 className="glass-input"
                 style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
@@ -639,7 +639,7 @@ const ImageUpload = ({ url, onUpload }) => {
         background: 'rgba(255,255,255,0.02)', overflow: 'hidden'
       }}>
         {url ? (
-          <img src={url} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <img src={url} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         ) : (
           <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.2)' }}>
             <Image size={24} style={{ marginBottom: '8px' }} />

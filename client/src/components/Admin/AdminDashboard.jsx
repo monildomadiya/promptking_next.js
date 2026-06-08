@@ -905,6 +905,12 @@ const AdminDashboard = () => {
     setAdminSearch('');
   }, [view]);
 
+  useEffect(() => {
+    if (password.length === 10 && !isAdmin) {
+      handleLogin();
+    }
+  }, [password, isAdmin]);
+
   const checkAuth = async () => {
     try {
       const response = await api.get('/admin/check_auth');
@@ -917,7 +923,7 @@ const AdminDashboard = () => {
   };
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     try {
       const response = await api.post('/admin/login', { password });
       if (response.data && response.data.error) {
@@ -1192,7 +1198,6 @@ const AdminDashboard = () => {
           <p style={{ color: 'var(--text-dim)', marginBottom: '32px', fontSize: '0.9rem', fontWeight: 500 }}>Authenticated Access Only</p>
           <form onSubmit={handleLogin}>
             <AdminOtpInput value={password} onChange={setPassword} length={10} />
-            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} style={{ width: '100%', padding: '16px', background: 'var(--accent-gradient)', border: 'none', borderRadius: '12px', color: 'white', fontWeight: 800, cursor: 'pointer', boxShadow: '0 8px 24px var(--accent-glow)' }}>INITIALIZE ACCESS</motion.button>
           </form>
         </motion.div>
       </div>
