@@ -126,7 +126,7 @@ const BlogPage = () => {
               >
                 {blog.featured_image && (
                   <div className="blog-card-image-wrapper">
-                    <img src={blog.featured_image} alt={blog.title} loading="lazy" />
+                    <img src={blog.featured_image} alt={blog.featured_image_alt || blog.title} loading="lazy" />
                     <div style={{ 
                       position: 'absolute', 
                       top: '20px', 
@@ -141,19 +141,19 @@ const BlogPage = () => {
                       alignItems: 'center',
                       gap: '6px'
                     }}>
-                      <Clock size={12} /> 5 min read
+                      <Clock size={12} /> {blog.read_time || '5 min read'}
                     </div>
                   </div>
                 )}
                 <div className="blog-card-content">
                   <h2 className="blog-card-title">{blog.title}</h2>
                   <p className="blog-card-excerpt">
-                    {blog.content ? blog.content.replace(/<[^>]*>?/gm, '').substring(0, 160) + '...' : 'Dive into this insightful piece about AI and creativity...'}
+                    {blog.excerpt || (blog.content ? blog.content.replace(/<[^>]*>?/gm, '').substring(0, 160) + '...' : 'Dive into this insightful piece about AI and creativity...')}
                   </p>
                   <div className="blog-card-footer">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                       <Calendar size={14} />
-                      {new Date(blog.created_at || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {new Date(blog.published_at || blog.created_at || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </div>
                     <div className="read-more-btn">
                       Read More <ArrowRight size={16} />

@@ -12,16 +12,24 @@ const SEOMetadata = ({
   keywords = DEFAULT_KEYWORDS,
   image = DEFAULT_IMAGE,
   url = typeof window !== 'undefined' ? window.location.href : SITE_URL,
-  schema = null,
+  canonicalUrlOverride = null,
+  schema = null, // Can be object or array of objects
   noIndex = false,
   type = 'website',
   publishedDate = null,
   modifiedDate = null,
   breadcrumb = null, // Array of { name, url } objects
+  
+  // Custom Overrides
+  ogTitle,
+  ogDescription,
+  ogImage,
+  twitterTitle,
+  twitterDescription,
+  twitterImage
 }) => {
-  const canonicalUrl = url.split('?')[0]; // Strip query params for canonical
+  const canonicalUrl = canonicalUrlOverride || url.split('?')[0];
 
-  // Build BreadcrumbList schema from breadcrumb prop
   const breadcrumbSchema = breadcrumb && breadcrumb.length > 0 ? {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -33,7 +41,6 @@ const SEOMetadata = ({
     })),
   } : null;
 
-  // Organization schema – always present for brand authority
   const orgSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -46,9 +53,10 @@ const SEOMetadata = ({
     ],
   };
 
+  const schemas = Array.isArray(schema) ? schema : (schema ? [schema] : []);
+
   return (
     <Helmet>
-      {/* ── Core ─────────────────────────────────────────────── */}
       <html lang="en" />
       <title>{title}</title>
       <meta name="description" content={description} />
@@ -60,12 +68,12 @@ const SEOMetadata = ({
       {/* ── OpenGraph ────────────────────────────────────────── */}
       <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:type" content={type} />
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:image" content={image} />
+      <meta property="og:title" content={ogTitle || title} />
+      <meta property="og:description" content={ogDescription || description} />
+      <meta property="og:image" content={ogImage || image} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
-      <meta property="og:image:alt" content={title} />
+      <meta property="og:image:alt" content={ogTitle || title} />
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:locale" content="en_US" />
       {publishedDate && <meta property="article:published_time" content={publishedDate} />}
@@ -75,19 +83,18 @@ const SEOMetadata = ({
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:site" content="@promptking_in" />
       <meta name="twitter:creator" content="@promptking_in" />
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={image} />
-      <meta name="twitter:image:alt" content={title} />
+      <meta name="twitter:title" content={twitterTitle || ogTitle || title} />
+      <meta name="twitter:description" content={twitterDescription || ogDescription || description} />
+      <meta name="twitter:image" content={twitterImage || ogImage || image} />
+      <meta name="twitter:image:alt" content={twitterTitle || ogTitle || title} />
 
       {/* ── JSON-LD Schemas ───────────────────────────────────── */}
-      {/* Organization always present */}
       <script type="application/ld+json">{JSON.stringify(orgSchema)}</script>
 
-      {/* Page-level schema (WebSite, Article, etc.) */}
-      {schema && <script type="application/ld+json">{JSON.stringify(schema)}</script>}
+      {schemas.map((sch, i) => (
+        <script key={i} type="application/ld+json">{JSON.stringify(sch)}</script>
+      ))}
 
-      {/* Breadcrumb schema when provided */}
       {breadcrumbSchema && <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>}
     </Helmet>
   );

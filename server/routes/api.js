@@ -378,7 +378,16 @@ router.get('/blogs', async (req, res) => {
   }
 
   try {
-    const rows = await db`SELECT * FROM blogs ORDER BY created_at DESC`;
+    let rows;
+    try {
+      rows = await db`SELECT * FROM blogs WHERE status = 'published' OR status IS NULL ORDER BY created_at DESC`;
+    } catch (colErr) {
+      if (colErr.message.includes('Unknown column')) {
+        rows = await db`SELECT * FROM blogs ORDER BY created_at DESC`;
+      } else {
+        throw colErr;
+      }
+    }
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.json(rows);
   } catch (error) {
@@ -1104,10 +1113,50 @@ router.post('/admin/save_blog', adminAuth, async (req, res) => {
   }
   
   try {
+    const stringifyJson = (val) => val ? JSON.stringify(val) : null;
+    
     if (b.id) {
-      await db`UPDATE blogs SET title = ${b.title}, slug = ${finalSlug}, content = ${b.content}, featured_image = ${b.featured_image} WHERE id = ${b.id}`;
+      await db`UPDATE blogs SET 
+        title = ${b.title}, 
+        slug = ${finalSlug}, 
+        content = ${b.content}, 
+        featured_image = ${b.featured_image},
+        featured_image_alt = ${b.featured_image_alt || null},
+        featured_image_caption = ${b.featured_image_caption || null},
+        excerpt = ${b.excerpt || null},
+        category = ${b.category || null},
+        tags = ${stringifyJson(b.tags)},
+        meta_title = ${b.meta_title || null},
+        meta_description = ${b.meta_description || null},
+        focus_keyword = ${b.focus_keyword || null},
+        canonical_url = ${b.canonical_url || null},
+        og_title = ${b.og_title || null},
+        og_description = ${b.og_description || null},
+        og_image = ${b.og_image || null},
+        twitter_title = ${b.twitter_title || null},
+        twitter_description = ${b.twitter_description || null},
+        twitter_image = ${b.twitter_image || null},
+        faqs = ${stringifyJson(b.faqs)},
+        enable_table_of_contents = ${b.enable_table_of_contents !== false},
+        author_name = ${b.author_name || null},
+        status = ${b.status || 'published'},
+        published_at = ${b.published_at || null},
+        read_time = ${b.read_time || null}
+      WHERE id = ${b.id}`;
     } else {
-      await db`INSERT INTO blogs (title, slug, content, featured_image) VALUES (${b.title}, ${finalSlug}, ${b.content}, ${b.featured_image})`;
+      await db`INSERT INTO blogs (
+        title, slug, content, featured_image,
+        featured_image_alt, featured_image_caption, excerpt, category, tags,
+        meta_title, meta_description, focus_keyword, canonical_url,
+        og_title, og_description, og_image, twitter_title, twitter_description, twitter_image,
+        faqs, enable_table_of_contents, author_name, status, published_at, read_time
+      ) VALUES (
+        ${b.title}, ${finalSlug}, ${b.content}, ${b.featured_image},
+        ${b.featured_image_alt || null}, ${b.featured_image_caption || null}, ${b.excerpt || null}, ${b.category || null}, ${stringifyJson(b.tags)},
+        ${b.meta_title || null}, ${b.meta_description || null}, ${b.focus_keyword || null}, ${b.canonical_url || null},
+        ${b.og_title || null}, ${b.og_description || null}, ${b.og_image || null}, ${b.twitter_title || null}, ${b.twitter_description || null}, ${b.twitter_image || null},
+        ${stringifyJson(b.faqs)}, ${b.enable_table_of_contents !== false}, ${b.author_name || null}, ${b.status || 'published'}, ${b.published_at || null}, ${b.read_time || null}
+      )`;
     }
     pingGoogleSitemap();
     res.json({ status: "success" });

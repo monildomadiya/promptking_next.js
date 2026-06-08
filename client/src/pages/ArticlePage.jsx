@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../api';
 import Shimmer from '../components/Common/Shimmer';
-import { ArrowLeft, Clock, Calendar, Share2, ShieldCheck } from '../components/Common/Icons';
+import { ArrowLeft, Clock, Calendar, Share2, ShieldCheck, Tag, User } from '../components/Common/Icons';
 import SEOMetadata from '../components/SEO/SEOMetadata';
 import SocialSidebar from '../components/Prompts/SocialSidebar';
 
@@ -48,6 +48,7 @@ const ArticlePage = () => {
       </div>
     </div>
   );
+  
   if (!blog) return (
     <div style={{ padding: '100px', textAlign: 'center' }}>
       <SEOMetadata title="Article Not Found | PromptKing" />
@@ -55,17 +56,26 @@ const ArticlePage = () => {
     </div>
   );
 
+  let parsedFaqs = [];
+  try { parsedFaqs = typeof blog.faqs === 'string' ? JSON.parse(blog.faqs) : (blog.faqs || []); } catch(e) {}
+
+  let parsedTags = [];
+  try { parsedTags = typeof blog.tags === 'string' ? JSON.parse(blog.tags) : (blog.tags || []); } catch(e) {}
+
+  const plainTextContent = blog.content ? blog.content.replace(/<[^>]*>?/gm, '') : '';
+  const metaDescFallback = plainTextContent.substring(0, 160);
+
   const articleSchema = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
-    'headline': blog.title,
-    'description': blog.content ? blog.content.replace(/<[^>]*>?/gm, '').substring(0, 200) : '',
-    'image': blog.featured_image || 'https://promptking.in/favicon.png',
-    'datePublished': blog.created_at,
+    'headline': blog.meta_title || blog.title,
+    'description': blog.meta_description || blog.excerpt || metaDescFallback,
+    'image': blog.og_image || blog.featured_image || 'https://promptking.in/favicon.png',
+    'datePublished': blog.published_at || blog.created_at,
     'dateModified': blog.updated_at || blog.created_at,
     'mainEntityOfPage': {
       '@type': 'WebPage',
-      '@id': `https://promptking.in/article/${blog.slug}`
+      '@id': blog.canonical_url || `https://promptking.in/article/${blog.slug}`
     },
     'publisher': {
       '@type': 'Organization',
@@ -76,23 +86,71 @@ const ArticlePage = () => {
       }
     },
     'author': [{
-      '@type': 'Organization',
-      'name': 'PromptKing',
+      '@type': 'Person',
+      'name': blog.author_name || 'PromptKing',
       'url': 'https://promptking.in'
     }]
   };
 
+  const schemas = [articleSchema];
+
+  if (parsedFaqs && parsedFaqs.length > 0) {
+    schemas.push({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      'mainEntity': parsedFaqs.map(faq => ({
+        '@type': 'Question',
+        'name': faq.question,
+        'acceptedAnswer': {
+          '@type': 'Answer',
+          'text': faq.answer
+        }
+      }))
+    });
+  }
+
+  // Generate Table of Contents
+  const extractHeadings = () => {
+    if (!blog.content) return [];
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(blog.content, 'text/html');
+    const headings = doc.querySelectorAll('h2, h3');
+    return Array.from(headings).map(h => ({
+      tag: h.tagName.toLowerCase(),
+      text: h.textContent,
+      id: h.textContent.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    }));
+  };
+
+  const headings = extractHeadings();
+
+  // Inject IDs into content for TOC linking
+  let finalContent = blog.content;
+  if (blog.enable_table_of_contents !== false && headings.length > 0) {
+    headings.forEach(h => {
+      const regex = new RegExp(`(<${h.tag}[^>]*>)(.*?)(</${h.tag}>)`, 'i');
+      finalContent = finalContent.replace(regex, `$1<a id="${h.id}"></a>$2$3`);
+    });
+  }
+
   return (
     <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '60px 20px' }}>
       <SEOMetadata 
-        title={`${blog.title} | PromptKing Blog`}
-        description={blog.content ? blog.content.replace(/<[^>]*>?/gm, '').substring(0, 160) : `Read ${blog.title} on the PromptKing Blog.`}
+        title={blog.meta_title || `${blog.title} | PromptKing Blog`}
+        description={blog.meta_description || blog.excerpt || metaDescFallback}
         image={blog.featured_image || 'https://promptking.in/favicon.png'}
         url={`https://promptking.in/article/${blog.slug}`}
+        canonicalUrlOverride={blog.canonical_url}
         type="article"
-        publishedDate={blog.created_at}
+        publishedDate={blog.published_at || blog.created_at}
         modifiedDate={blog.updated_at || blog.created_at}
-        schema={articleSchema}
+        schema={schemas}
+        ogTitle={blog.og_title}
+        ogDescription={blog.og_description}
+        ogImage={blog.og_image}
+        twitterTitle={blog.twitter_title}
+        twitterDescription={blog.twitter_description}
+        twitterImage={blog.twitter_image}
         breadcrumb={[
           { name: 'Home', url: 'https://promptking.in/' },
           { name: 'Blog', url: 'https://promptking.in/blog' },
@@ -107,9 +165,26 @@ const ArticlePage = () => {
         {/* Main Article Content */}
         <article className="main-content">
           {blog.featured_image && (
-            <img src={blog.featured_image} alt={blog.title} style={{ width: '100%', borderRadius: '30px', marginBottom: '40px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }} />
+            <div style={{ marginBottom: '40px' }}>
+              <img 
+                src={blog.featured_image} 
+                alt={blog.featured_image_alt || blog.title} 
+                style={{ width: '100%', borderRadius: '30px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }} 
+              />
+              {blog.featured_image_caption && (
+                <p style={{ textAlign: 'center', marginTop: '12px', fontSize: '0.85rem', color: 'var(--text-dim)', fontStyle: 'italic' }}>
+                  {blog.featured_image_caption}
+                </p>
+              )}
+            </div>
           )}
           
+          {blog.category && (
+            <div style={{ display: 'inline-block', background: 'rgba(229,9,20,0.1)', color: 'var(--accent-main)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '20px' }}>
+              {blog.category}
+            </div>
+          )}
+
           <h1 style={{ 
             fontSize: window.innerWidth <= 1100 ? '2.2rem' : '3rem', 
             marginBottom: '30px', 
@@ -118,12 +193,72 @@ const ArticlePage = () => {
             color: 'white',
             textShadow: '0 10px 30px rgba(0,0,0,0.3)'
           }}>{blog.title}</h1>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'center', marginBottom: '40px', paddingBottom: '30px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            {blog.author_name && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 500 }}>
+                <User size={16} color="var(--accent-main)" /> {blog.author_name}
+              </div>
+            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 500 }}>
+              <Calendar size={16} color="var(--accent-main)" /> {new Date(blog.published_at || blog.created_at || Date.now()).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+            </div>
+            {blog.read_time && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 500 }}>
+                <Clock size={16} color="var(--accent-main)" /> {blog.read_time}
+              </div>
+            )}
+          </div>
+
+          {/* Table of Contents */}
+          {blog.enable_table_of_contents !== false && headings.length > 0 && (
+            <div style={{ background: 'rgba(255,255,255,0.02)', padding: '30px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '50px' }}>
+              <h3 style={{ fontSize: '1.2rem', marginBottom: '20px', color: 'white', fontWeight: 700 }}>Table of Contents</h3>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {headings.map((h, i) => (
+                  <li key={i} style={{ paddingLeft: h.tag === 'h3' ? '20px' : '0' }}>
+                    <a href={`#${h.id}`} style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.95rem', transition: '0.2s' }} onMouseOver={e => e.target.style.color='var(--accent-main)'} onMouseOut={e => e.target.style.color='var(--text-secondary)'}>
+                      {h.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           
           <div 
             className="blog-content" 
-            dangerouslySetInnerHTML={{ __html: blog.content }} 
-            style={{ fontSize: '1.2rem', lineHeight: 1.9, color: '#e0e0e0' }}
+            dangerouslySetInnerHTML={{ __html: finalContent }} 
+            style={{ fontSize: '1.15rem', lineHeight: 1.9, color: '#d1d1d1' }}
           />
+
+          {/* Tags */}
+          {parsedTags.length > 0 && (
+            <div style={{ marginTop: '50px', display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
+              <Tag size={18} color="var(--text-dim)" />
+              {parsedTags.map((tag, i) => (
+                <span key={i} style={{ background: 'rgba(255,255,255,0.05)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.85rem', color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* FAQs */}
+          {parsedFaqs && parsedFaqs.length > 0 && (
+            <div style={{ marginTop: '60px', paddingTop: '40px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              <h2 style={{ fontSize: '2rem', marginBottom: '30px', color: 'white', fontWeight: 800 }}>Frequently Asked Questions</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {parsedFaqs.map((faq, i) => (
+                  <div key={i} style={{ background: 'rgba(255,255,255,0.02)', padding: '25px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <h3 style={{ fontSize: '1.2rem', marginBottom: '15px', color: 'white', fontWeight: 700 }}>{faq.question}</h3>
+                    <p style={{ fontSize: '1.05rem', color: 'var(--text-secondary)', lineHeight: 1.7, margin: 0 }}>{faq.answer}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         </article>
 
         {/* Sidebar */}
@@ -180,7 +315,7 @@ const ArticlePage = () => {
                         {item.title}
                       </h4>
                       <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Calendar size={10} /> {new Date(item.created_at || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        <Calendar size={10} /> {new Date(item.published_at || item.created_at || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </div>
                     </div>
                   </Link>
@@ -222,6 +357,8 @@ const ArticlePage = () => {
         .blog-content h2, .blog-content h3 { margin-top: 40px; margin-bottom: 20px; color: white; }
         .blog-content p { margin-bottom: 25px; }
         .blog-content img { max-width: 100%; border-radius: 15px; margin: 30px 0; }
+        .blog-content a { color: var(--accent-main); text-decoration: none; font-weight: 600; }
+        .blog-content a:hover { text-decoration: underline; }
         
         @media (max-width: 1100px) {
           .article-layout { grid-template-columns: 1fr; }
