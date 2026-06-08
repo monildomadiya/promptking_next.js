@@ -268,7 +268,7 @@ const ArticlePage = () => {
             }} />
             <div style={{ flexShrink: 0 }}>
               <img 
-                src="https://github.com/monildomadiya.png" 
+                src={blog.author_image || "https://github.com/monildomadiya.png"} 
                 alt={blog.author_name || 'PromptKing Admin'} 
                 style={{ 
                   width: '90px', height: '90px', borderRadius: '50%', 
@@ -282,7 +282,7 @@ const ArticlePage = () => {
               <div style={{ fontSize: '0.8rem', color: 'var(--accent-main)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '5px' }}>About the Author</div>
               <h4 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'white', marginBottom: '10px' }}>{blog.author_name || 'PromptKing Admin'}</h4>
               <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, margin: 0 }}>
-                Passionate about AI and creative workflows. Exploring the frontiers of prompt engineering to help you unlock the true potential of tools like ChatGPT, Midjourney, and Gemini.
+                {blog.author_description || 'Passionate about AI and creative workflows. Exploring the frontiers of prompt engineering to help you unlock the true potential of tools like ChatGPT, Midjourney, and Gemini.'}
               </p>
             </div>
           </div>

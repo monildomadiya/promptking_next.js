@@ -29,6 +29,8 @@ const BlogModal = ({ blog, onClose, onSave }) => {
     enable_table_of_contents: true,
     faqs: [],
     author_name: '',
+    author_image: '',
+    author_description: '',
     status: 'published',
     read_time: ''
   });
@@ -67,6 +69,8 @@ const BlogModal = ({ blog, onClose, onSave }) => {
         enable_table_of_contents: blog.enable_table_of_contents !== false,
         faqs: parsedFaqs,
         author_name: blog.author_name || '',
+        author_image: blog.author_image || '',
+        author_description: blog.author_description || '',
         status: blog.status || 'published',
         read_time: blog.read_time || ''
       });
@@ -480,6 +484,26 @@ const BlogModal = ({ blog, onClose, onSave }) => {
                     onChange={(e) => setFormData({ ...formData, author_name: e.target.value })}
                     className="glass-input"
                     placeholder="e.g. PromptKing Admin"
+                  />
+                </div>
+                <div>
+                  <Label text="Author Image URL" />
+                  <input 
+                    type="text" 
+                    value={formData.author_image} 
+                    onChange={(e) => setFormData({ ...formData, author_image: e.target.value })}
+                    className="glass-input"
+                    placeholder="https://..."
+                  />
+                </div>
+                <div>
+                  <Label text="Author Bio" />
+                  <textarea 
+                    value={formData.author_description} 
+                    onChange={(e) => setFormData({ ...formData, author_description: e.target.value })}
+                    className="glass-input"
+                    placeholder="Short bio..."
+                    rows={3}
                   />
                 </div>
                 <div>

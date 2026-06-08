@@ -1139,6 +1139,8 @@ router.post('/admin/save_blog', adminAuth, async (req, res) => {
         faqs = ${stringifyJson(b.faqs)},
         enable_table_of_contents = ${b.enable_table_of_contents !== false},
         author_name = ${b.author_name || null},
+        author_image = ${b.author_image || null},
+        author_description = ${b.author_description || null},
         status = ${b.status || 'published'},
         published_at = ${b.published_at || null},
         read_time = ${b.read_time || null}
@@ -1149,13 +1151,13 @@ router.post('/admin/save_blog', adminAuth, async (req, res) => {
         featured_image_alt, featured_image_caption, excerpt, category, tags,
         meta_title, meta_description, focus_keyword, canonical_url,
         og_title, og_description, og_image, twitter_title, twitter_description, twitter_image,
-        faqs, enable_table_of_contents, author_name, status, published_at, read_time
+        faqs, enable_table_of_contents, author_name, author_image, author_description, status, published_at, read_time
       ) VALUES (
         ${b.title}, ${finalSlug}, ${b.content}, ${b.featured_image},
         ${b.featured_image_alt || null}, ${b.featured_image_caption || null}, ${b.excerpt || null}, ${b.category || null}, ${stringifyJson(b.tags)},
         ${b.meta_title || null}, ${b.meta_description || null}, ${b.focus_keyword || null}, ${b.canonical_url || null},
         ${b.og_title || null}, ${b.og_description || null}, ${b.og_image || null}, ${b.twitter_title || null}, ${b.twitter_description || null}, ${b.twitter_image || null},
-        ${stringifyJson(b.faqs)}, ${b.enable_table_of_contents !== false}, ${b.author_name || null}, ${b.status || 'published'}, ${b.published_at || null}, ${b.read_time || null}
+        ${stringifyJson(b.faqs)}, ${b.enable_table_of_contents !== false}, ${b.author_name || null}, ${b.author_image || null}, ${b.author_description || null}, ${b.status || 'published'}, ${b.published_at || null}, ${b.read_time || null}
       )`;
     }
     pingGoogleSitemap();
