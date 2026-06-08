@@ -404,6 +404,35 @@ router.get('/blogs', async (req, res) => {
   }
 });
 
+router.get('/blog/:slug', async (req, res) => {
+  const isLiveServer = req.headers.host && (req.headers.host.includes('promptking.in') || req.headers.host.includes('onrender.com'));
+  if (!isDbHealthy()) {
+    if (isLiveServer) return res.status(500).json({ error: "Database error on live server" });
+    return fetchLiveBlog();
+  }
+  
+  async function fetchLiveBlog() {
+    try {
+      const liveRes = await fetch(`https://api.promptking.in/api/blog/${req.params.slug}`);
+      res.json(await liveRes.json());
+    } catch (liveError) {
+      res.status(500).json({ error: "Failed to fetch blog from live API" });
+    }
+  }
+
+  try {
+    const rows = await db`SELECT b.*, a.name AS author_name, a.image AS author_image FROM blogs b LEFT JOIN authors a ON b.author_id = a.id WHERE b.slug = ${req.params.slug}`;
+    if (rows.length === 0) return res.status(404).json({ error: "Blog not found" });
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.json(rows[0]);
+  } catch (error) {
+    console.warn('LOCAL DB FAILED, FETCHING LIVE BLOG:', error.message);
+    lastDbFailure = Date.now();
+    if (isLiveServer) return res.status(500).json({ error: "Database error on live server" });
+    await fetchLiveBlog();
+  }
+});
+
 // --- FAQS (Public) ---
 router.get('/faqs', async (req, res) => {
   if (!isDbHealthy()) return fetchLiveFaqs();

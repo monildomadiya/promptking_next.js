@@ -20,11 +20,14 @@ const ArticlePage = () => {
   const fetchArticle = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/blogs'); // Public endpoint
-      const allBlogs = response.data;
-      const found = allBlogs.find(b => b.slug === slug);
-      setBlog(found);
-      setOtherBlogs(allBlogs.filter(b => b.slug !== slug).slice(0, 5));
+      // Fetch the single article with full content
+      const blogRes = await api.get(`/blog/${slug}`);
+      setBlog(blogRes.data);
+
+      // Fetch lightweight list of all blogs for the sidebar
+      const allBlogsRes = await api.get('/blogs');
+      setOtherBlogs(allBlogsRes.data.filter(b => b.slug !== slug).slice(0, 5));
+
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch article", error);
