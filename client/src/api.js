@@ -47,7 +47,7 @@ const api = {
       ...options,
       headers,
       credentials: 'include',
-      body: body instanceof FormData ? body : JSON.stringify(body)
+      body: body instanceof FormData ? body : JSON.stringify(stripUploadPaths(body))
     });
     
     const data = await res.json();
@@ -64,12 +64,18 @@ const api = {
     // Note: Don't set Content-Type for DELETE if body is empty
     if (options.body) headers['Content-Type'] = 'application/json';
     
-    const res = await fetch(`${SERVER_URL}/api${url}`, {
+    const fetchOptions = {
       method: 'DELETE',
       ...options,
       headers,
       credentials: 'include'
-    });
+    };
+    
+    if (options.body && !(options.body instanceof FormData)) {
+      fetchOptions.body = JSON.stringify(stripUploadPaths(options.body));
+    }
+    
+    const res = await fetch(`${SERVER_URL}/api${url}`, fetchOptions);
     
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || data.message || 'API Error');
@@ -77,11 +83,45 @@ const api = {
   }
 };
 
+const stripUploadPaths = (data) => {
+  if (!data) return data;
+  if (typeof data === 'string') {
+    let stripped = data;
+    if (SERVER_URL && stripped.startsWith(SERVER_URL + '/uploads/')) {
+      stripped = stripped.replace(SERVER_URL, '');
+    }
+    if (stripped.includes('localhost:5000/uploads/')) {
+      stripped = stripped.replace(/https?:\/\/localhost:5000/g, '');
+    }
+    return stripped;
+  }
+  if (Array.isArray(data)) {
+    return data.map(item => stripUploadPaths(item));
+  }
+  if (typeof data === 'object' && data !== null && !(data instanceof FormData)) {
+    const newData = {};
+    for (const key in data) {
+      newData[key] = stripUploadPaths(data[key]);
+    }
+    return newData;
+  }
+  return data;
+};
+
 const transformUploadPaths = (data) => {
   if (!data) return data;
-  if (typeof data === 'string' && data.startsWith('/uploads/')) {
-    return `${SERVER_URL}${data}`;
+  
+  if (typeof data === 'string') {
+    let transformed = data;
+    if (transformed.includes('localhost:5000/uploads/')) {
+      transformed = transformed.replace(/https?:\/\/localhost:5000/g, '');
+    }
+    if (transformed.startsWith('/uploads/')) {
+      return `${SERVER_URL}${transformed}`;
+    }
+    return transformed;
   }
+
   if (Array.isArray(data)) {
     return data.map(item => transformUploadPaths(item));
   }
