@@ -121,7 +121,7 @@ const SEOManagerPanel = () => {
                   <div key={idx} style={{ 
                     display: 'flex', alignItems: 'center', gap: '12px',
                     padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px',
-                    border: \`1px solid \${check.passed ? 'rgba(16,163,127,0.2)' : 'rgba(229,9,20,0.2)'}\`
+                    border: `1px solid ${check.passed ? 'rgba(16,163,127,0.2)' : 'rgba(229,9,20,0.2)'}`
                   }}>
                     {check.passed ? <Check color="#10a37f" /> : <X color="#e50914" />}
                     <span style={{ fontSize: '0.9rem', color: check.passed ? 'white' : 'var(--text-dim)' }}>{check.message}</span>
