@@ -1337,66 +1337,6 @@ router.post('/contact', async (req, res) => {
   }
 });
 
-// --- ADMIN AUDIT LOGS ---
-router.get('/admin/logs', adminAuth, async (req, res) => {
-  try {
-    const rows = await db`SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 100`;
-    res.json(rows);
-  } catch (error) {
-    console.warn('Failed to fetch activity logs:', error.message);
-    res.json([]);
-  }
-});
 
-// --- SEO ANALYZE ---
-router.post('/admin/seo_analyze', adminAuth, (req, res) => {
-  const { title, description, content } = req.body;
-  let score = 100;
-  let checks = [];
-
-  const addCheck = (passed, msg, deduct) => {
-    checks.push({ passed, message: msg });
-    if (!passed) score -= deduct;
-  };
-
-  // Title checks
-  if (!title) {
-    addCheck(false, "Title is missing", 20);
-  } else {
-    if (title.length < 30) addCheck(false, "Title is too short (aim for 50-60 characters)", 10);
-    else if (title.length > 60) addCheck(false, "Title is too long (keep under 60 characters)", 10);
-    else addCheck(true, "Title length is optimal", 0);
-  }
-
-  // Description checks
-  if (!description) {
-    addCheck(false, "Meta description is missing", 20);
-  } else {
-    if (description.length < 100) addCheck(false, "Description is too short (aim for 120-155 chars)", 10);
-    else if (description.length > 160) addCheck(false, "Description is too long (keep under 160 chars)", 10);
-    else addCheck(true, "Description length is optimal", 0);
-  }
-
-  // Content checks
-  if (!content) {
-    addCheck(false, "Content is empty", 20);
-  } else {
-    if (content.length < 300) addCheck(false, "Content is very thin (less than 300 characters)", 15);
-    else addCheck(true, "Content length is sufficient", 0);
-
-    if (title && content.toLowerCase().includes(title.toLowerCase().split(' ')[0])) {
-      addCheck(true, "Target keyword found in content", 0);
-    } else {
-      addCheck(false, "Main title keywords not found early in content", 10);
-    }
-  }
-
-  score = Math.max(0, score);
-  
-  res.json({
-    score,
-    checks
-  });
-});
 
 module.exports = router;

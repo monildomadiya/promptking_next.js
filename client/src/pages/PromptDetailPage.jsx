@@ -381,7 +381,7 @@ const PromptDetailPage = ({ adsSettings }) => {
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: '40px' }} className="detail-layout">
           
           {/* Main Content (Left) */}
-          <div ref={contentRef} className="detail-main-content">
+          <article ref={contentRef} className="detail-main-content">
             
             {/* Header Section: Title & Stats */}
             <div style={{ marginBottom: '35px' }}>
@@ -922,7 +922,7 @@ const PromptDetailPage = ({ adsSettings }) => {
             </section>
 
 
-          </div>
+          </article>
 
           {/* Sidebar (Right) */}
           <aside className="detail-sidebar">

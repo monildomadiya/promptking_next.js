@@ -105,7 +105,7 @@ const ArticlePage = () => {
 
       <div className="article-layout">
         {/* Main Article Content */}
-        <div className="main-content">
+        <article className="main-content">
           {blog.featured_image && (
             <img src={blog.featured_image} alt={blog.title} style={{ width: '100%', borderRadius: '30px', marginBottom: '40px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }} />
           )}
@@ -124,7 +124,7 @@ const ArticlePage = () => {
             dangerouslySetInnerHTML={{ __html: blog.content }} 
             style={{ fontSize: '1.2rem', lineHeight: 1.9, color: '#e0e0e0' }}
           />
-        </div>
+        </article>
 
         {/* Sidebar */}
         <aside className="sidebar">
