@@ -1,6 +1,10 @@
 
 
 const getBaseUrl = () => {
+  if (import.meta.env.PROD) {
+    return ''; // Always use same domain for API requests in production
+  }
+  
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
   
   if (typeof window !== 'undefined' && 
