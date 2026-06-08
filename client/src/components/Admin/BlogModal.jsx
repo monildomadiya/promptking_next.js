@@ -158,7 +158,7 @@ const BlogModal = ({ blog, onClose, onSave }) => {
       await api.post('/admin/save_blog', formData);
       onSave();
     } catch (error) {
-      toast.error("Failed to save blog");
+      toast.error(error.response?.data?.error || "Failed to save blog");
     }
   };
 

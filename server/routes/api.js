@@ -1182,7 +1182,7 @@ router.post('/admin/save_blog', adminAuth, async (req, res) => {
     res.json({ status: "success" });
   } catch (error) {
     console.error("Save blog error:", error);
-    res.status(500).json({ error: "Save failed" });
+    res.status(500).json({ error: "Save failed: " + error.message });
   }
 });
 
