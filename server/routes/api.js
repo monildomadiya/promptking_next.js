@@ -380,10 +380,10 @@ router.get('/blogs', async (req, res) => {
   try {
     let rows;
     try {
-      rows = await db`SELECT * FROM blogs WHERE status = 'published' OR status IS NULL ORDER BY created_at DESC`;
+      rows = await db`SELECT b.*, a.name AS author_name, a.image AS author_image, a.description AS author_description FROM blogs b LEFT JOIN authors a ON b.author_id = a.id WHERE b.status = 'published' OR b.status IS NULL ORDER BY b.created_at DESC`;
     } catch (colErr) {
       if (colErr.message.includes('Unknown column')) {
-        rows = await db`SELECT * FROM blogs ORDER BY created_at DESC`;
+        rows = await db`SELECT b.*, a.name AS author_name, a.image AS author_image, a.description AS author_description FROM blogs b LEFT JOIN authors a ON b.author_id = a.id ORDER BY b.created_at DESC`;
       } else {
         throw colErr;
       }
@@ -1093,7 +1093,7 @@ router.get('/admin/blogs', adminAuth, async (req, res) => {
   }
 
   try {
-    const rows = await db`SELECT * FROM blogs`;
+    const rows = await db`SELECT b.*, a.name AS author_name, a.image AS author_image, a.description AS author_description FROM blogs b LEFT JOIN authors a ON b.author_id = a.id ORDER BY b.created_at DESC`;
     res.json(rows);
   } catch (error) {
     console.warn('ADMIN BLOGS DB FAILED, FETCHING LIVE:', error.message);
@@ -1141,6 +1141,7 @@ router.post('/admin/save_blog', adminAuth, async (req, res) => {
         author_name = ${b.author_name || null},
         author_image = ${b.author_image || null},
         author_description = ${b.author_description || null},
+        author_id = ${b.author_id || null},
         status = ${b.status || 'published'},
         published_at = ${b.published_at || null},
         read_time = ${b.read_time || null}
@@ -1151,13 +1152,13 @@ router.post('/admin/save_blog', adminAuth, async (req, res) => {
         featured_image_alt, featured_image_caption, excerpt, category, tags,
         meta_title, meta_description, focus_keyword, canonical_url,
         og_title, og_description, og_image, twitter_title, twitter_description, twitter_image,
-        faqs, enable_table_of_contents, author_name, author_image, author_description, status, published_at, read_time
+        faqs, enable_table_of_contents, author_name, author_image, author_description, author_id, status, published_at, read_time
       ) VALUES (
         ${b.title}, ${finalSlug}, ${b.content}, ${b.featured_image},
         ${b.featured_image_alt || null}, ${b.featured_image_caption || null}, ${b.excerpt || null}, ${b.category || null}, ${stringifyJson(b.tags)},
         ${b.meta_title || null}, ${b.meta_description || null}, ${b.focus_keyword || null}, ${b.canonical_url || null},
         ${b.og_title || null}, ${b.og_description || null}, ${b.og_image || null}, ${b.twitter_title || null}, ${b.twitter_description || null}, ${b.twitter_image || null},
-        ${stringifyJson(b.faqs)}, ${b.enable_table_of_contents !== false}, ${b.author_name || null}, ${b.author_image || null}, ${b.author_description || null}, ${b.status || 'published'}, ${b.published_at || null}, ${b.read_time || null}
+        ${stringifyJson(b.faqs)}, ${b.enable_table_of_contents !== false}, ${b.author_name || null}, ${b.author_image || null}, ${b.author_description || null}, ${b.author_id || null}, ${b.status || 'published'}, ${b.published_at || null}, ${b.read_time || null}
       )`;
     }
     pingGoogleSitemap();
@@ -1389,5 +1390,41 @@ router.post('/contact', async (req, res) => {
 });
 
 
+
+// Admin Authors CRUD
+router.get('/admin/authors', adminAuth, async (req, res) => {
+  try {
+    const rows = await db`SELECT * FROM authors ORDER BY name ASC`;
+    res.json(rows);
+  } catch (error) {
+    console.error('ADMIN AUTHORS DB FAILED:', error.message);
+    res.status(500).json({ error: "Failed to fetch authors" });
+  }
+});
+
+router.post('/admin/save_author', adminAuth, async (req, res) => {
+  const a = req.body;
+  try {
+    if (a.id) {
+      await db`UPDATE authors SET name = ${a.name}, image = ${a.image}, description = ${a.description} WHERE id = ${a.id}`;
+    } else {
+      await db`INSERT INTO authors (name, image, description) VALUES (${a.name}, ${a.image}, ${a.description})`;
+    }
+    res.json({ status: "success" });
+  } catch (error) {
+    console.error("Save author failed", error);
+    res.status(500).json({ error: "Save failed" });
+  }
+});
+
+router.delete('/admin/delete_author/:id', adminAuth, async (req, res) => {
+  try {
+    await db`DELETE FROM authors WHERE id = ${req.params.id}`;
+    res.json({ status: "success" });
+  } catch (error) {
+    console.error("Delete author failed", error);
+    res.status(500).json({ error: "Delete failed" });
+  }
+});
 
 module.exports = router;

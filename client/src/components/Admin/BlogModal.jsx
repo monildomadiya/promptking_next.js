@@ -31,11 +31,13 @@ const BlogModal = ({ blog, onClose, onSave }) => {
     author_name: '',
     author_image: '',
     author_description: '',
+    author_id: '',
     status: 'published',
     read_time: ''
   });
 
   const [tagsInput, setTagsInput] = useState('');
+  const [authorsList, setAuthorsList] = useState([]);
 
   useEffect(() => {
     if (blog) {
@@ -71,6 +73,7 @@ const BlogModal = ({ blog, onClose, onSave }) => {
         author_name: blog.author_name || '',
         author_image: blog.author_image || '',
         author_description: blog.author_description || '',
+        author_id: blog.author_id || '',
         status: blog.status || 'published',
         read_time: blog.read_time || ''
       });
@@ -81,6 +84,9 @@ const BlogModal = ({ blog, onClose, onSave }) => {
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', handleEsc);
+    
+    api.get('/admin/authors').then(res => setAuthorsList(res.data)).catch(console.error);
+
     return () => window.removeEventListener('keydown', handleEsc);
   }, [blog, onClose]);
 
@@ -478,33 +484,18 @@ const BlogModal = ({ blog, onClose, onSave }) => {
                 </div>
                 <div>
                   <Label text="Author" />
-                  <input 
-                    type="text" 
-                    value={formData.author_name} 
-                    onChange={(e) => setFormData({ ...formData, author_name: e.target.value })}
+                  <select 
+                    value={formData.author_id} 
+                    onChange={(e) => setFormData({ ...formData, author_id: e.target.value })}
                     className="glass-input"
-                    placeholder="e.g. PromptKing Admin"
-                  />
-                </div>
-                <div>
-                  <Label text="Author Image URL" />
-                  <input 
-                    type="text" 
-                    value={formData.author_image} 
-                    onChange={(e) => setFormData({ ...formData, author_image: e.target.value })}
-                    className="glass-input"
-                    placeholder="https://..."
-                  />
-                </div>
-                <div>
-                  <Label text="Author Bio" />
-                  <textarea 
-                    value={formData.author_description} 
-                    onChange={(e) => setFormData({ ...formData, author_description: e.target.value })}
-                    className="glass-input"
-                    placeholder="Short bio..."
-                    rows={3}
-                  />
+                  >
+                    <option value="" style={{ background: '#1a1a1f' }}>Select Author...</option>
+                    {authorsList.map(a => (
+                      <option key={a.id} value={a.id} style={{ background: '#1a1a1f' }}>
+                        {a.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <Label text="Read Time (Auto)" />

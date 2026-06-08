@@ -19,6 +19,7 @@ import PromptModal from './PromptModal';
 import BlogModal from './BlogModal';
 import FAQModal from './FAQModal';
 import CategoryModal from './CategoryModal';
+import AuthorModal from './AuthorModal';
 import KingDialog from '../Modals/KingDialog';
 import toast, { Toaster } from 'react-hot-toast';
 import CommandPalette from './CommandPalette';
@@ -1055,7 +1056,7 @@ const AdminDashboard = () => {
 
     if (!window.confirm("Permanent delete? This cannot be undone.")) return;
     const id = item.prompt_key || item.id;
-    const type = view === 'prompts' ? 'prompt' : (view === 'blogs' ? 'blog' : (view === 'categories' ? 'category' : 'faq'));
+    const type = view === 'prompts' ? 'prompt' : (view === 'blogs' ? 'blog' : (view === 'categories' ? 'category' : (view === 'authors' ? 'author' : 'faq')));
     try {
       await api.delete(`/admin/delete_${type}/${id}`);
       fetchData(view);
@@ -1215,6 +1216,7 @@ const AdminDashboard = () => {
       { id: 'dashboard', label: 'Overview', icon: <Layout size={20} /> },
       { id: 'prompts', label: 'Prompts', icon: <TableProperties size={20} /> },
       { id: 'blogs', label: 'Articles', icon: <FileText size={20} /> },
+      { id: 'authors', label: 'Authors', icon: <Users size={20} /> },
       { id: 'categories', label: 'Categories', icon: <Layers size={20} /> },
       { id: 'faqs', label: 'Help Desk', icon: <Activity size={20} /> },
     ]},
@@ -1594,7 +1596,7 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {['prompts', 'blogs', 'categories', 'faqs'].includes(view) && (
+          {['prompts', 'blogs', 'authors', 'categories', 'faqs'].includes(view) && (
             <motion.div key="list" {...pageTransition} style={{ ...glassPanelStyle, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
               {isDragMode && view === 'prompts' && (
                 <div style={{ padding: '12px 24px', background: 'rgba(59,130,246,0.08)', borderBottom: '1px solid rgba(59,130,246,0.2)', display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -1649,6 +1651,15 @@ const AdminDashboard = () => {
                                   alt={item.title || 'Result'} 
                                   className="admin-thumb-hover"
                                   style={{ width: '72px', height: '72px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }} 
+                                  onError={e => e.target.style.display = 'none'} 
+                                />
+                              )}
+                              {view === 'authors' && item.image && (
+                                <img 
+                                  src={item.image} 
+                                  alt={item.name || 'Author'} 
+                                  className="admin-thumb-hover"
+                                  style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} 
                                   onError={e => e.target.style.display = 'none'} 
                                 />
                               )}
@@ -1712,6 +1723,7 @@ const AdminDashboard = () => {
 
       {isModalOpen && view === 'prompts' && <PromptModal prompt={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
       {isModalOpen && view === 'blogs' && <BlogModal blog={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
+      {isModalOpen && view === 'authors' && <AuthorModal author={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
       {isModalOpen && view === 'categories' && <CategoryModal category={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
       {isModalOpen && view === 'faqs' && <FAQModal faq={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
 
