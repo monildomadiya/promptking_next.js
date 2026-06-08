@@ -901,9 +901,15 @@ router.post('/admin/reorder_prompts', adminAuth, async (req, res) => {
 });
 
 const pingGoogleSitemap = () => {
-  fetch('http://www.google.com/ping?sitemap=https://promptking.in/api/sitemap.xml')
-    .then(r => console.log('Pinged Google Sitemap:', r.status))
-    .catch(e => console.error('Failed to ping Google:', e.message));
+  try {
+    if (typeof fetch !== 'undefined') {
+      fetch('http://www.google.com/ping?sitemap=https://promptking.in/api/sitemap.xml')
+        .then(r => console.log('Pinged Google Sitemap:', r.status))
+        .catch(e => console.error('Failed to ping Google:', e.message));
+    }
+  } catch (e) {
+    console.error('Fetch error:', e);
+  }
 };
 
 router.post('/admin/save_prompt', adminAuth, async (req, res) => {

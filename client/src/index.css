@@ -940,17 +940,18 @@ body.shorts-modal-open {
 .admin-mesh-bg {
   position: relative;
   background-color: var(--surface-0);
+  overflow: hidden;
   z-index: 1;
 }
 
 .admin-mesh-bg::before {
   content: "";
-  position: fixed;
+  position: absolute;
   top: 0; left: 0; width: 100vw; height: 100vh;
   background: 
-    radial-gradient(circle at 15% 50%, rgba(229, 9, 20, 0.04), transparent 50%),
-    radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.03), transparent 50%),
-    radial-gradient(circle at 50% 80%, rgba(139, 92, 246, 0.03), transparent 50%);
+    radial-gradient(circle at 15% 50%, rgba(229, 9, 20, 0.15), transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.1), transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(139, 92, 246, 0.1), transparent 40%);
   background-size: 200% 200%;
   animation: mesh-gradient-move 20s ease-in-out infinite;
   z-index: -1;
@@ -975,16 +976,12 @@ body.shorts-modal-open {
 
 /* Interactive Table Row Hover */
 .admin-table-row {
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border-left: 2px solid transparent;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .admin-table-row:hover {
-    background: rgba(255, 255, 255, 0.02) !important;
-    transform: translateX(6px) scale(1.005);
-    box-shadow: -4px 0 0 var(--accent-main);
-    z-index: 10;
-    position: relative;
-  }
+.admin-table-row:hover {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-left: 2px solid var(--accent-main) !important;
+  box-shadow: -4px 0 15px rgba(229, 9, 20, 0.15) !important;
 }
-
