@@ -309,7 +309,7 @@ router.get('/get_data', async (req, res) => {
       promptsRows = await db`SELECT id, prompt_key, title, ai_type, prompt_text, img_after, img_before, is_premium, is_featured, image_ratio, hide_prompt_box, password, ig_link, is_image_slider, sort_order, slug, copy_count, unlock_count, like_count, gallery_urls, meta_title, is_draft, publish_date FROM prompts WHERE is_draft = 0 AND (publish_date IS NULL OR publish_date <= NOW()) ORDER BY sort_order ASC, prompt_key ASC`;
     } catch (colErr) {
       if (colErr.message.includes('Unknown column')) {
-        promptsRows = await db`SELECT id, prompt_key, title, ai_type, prompt_text, img_after, img_before, is_premium, is_featured, image_ratio, hide_prompt_box, password, ig_link, is_image_slider, sort_order, slug, copy_count, unlock_count, like_count, gallery_urls, meta_title, is_draft, publish_date FROM prompts`;
+        promptsRows = await db`SELECT * FROM prompts ORDER BY sort_order ASC, prompt_key ASC`;
       } else {
         throw colErr;
       }
