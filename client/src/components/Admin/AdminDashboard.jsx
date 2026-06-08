@@ -1391,7 +1391,7 @@ const AdminDashboard = () => {
             </h1>
             <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem' }}>Management control panel for PK PROMPT KING systems.</p>
           </div>
-          {['prompts', 'blogs', 'categories', 'faqs'].includes(view) && (
+          {['prompts', 'blogs', 'categories', 'authors', 'faqs'].includes(view) && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
               {selectedKeys.length > 0 && view === 'prompts' && (
                 <>
@@ -1400,7 +1400,7 @@ const AdminDashboard = () => {
                   <ActionButton label={`DELETE (${selectedKeys.length})`} color="var(--accent-main)" icon={<Trash size={18} />} onClick={handleBulkDelete} />
                 </>
               )}
-              {['prompts', 'blogs', 'categories', 'faqs'].includes(view) && !isDragMode && (
+              {['prompts', 'blogs', 'categories', 'authors', 'faqs'].includes(view) && !isDragMode && (
                 <div style={{ position: 'relative', flex: 1, minWidth: isMobile ? '100%' : '200px' }}>
                   <input
                     type="text"
