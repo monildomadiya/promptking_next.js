@@ -1211,7 +1211,7 @@ const AdminDashboard = () => {
             )}
           </div>
 
-          <motion.nav variants={containerVariants} initial="hidden" animate="visible" style={{ flex: 1 }}>
+          <motion.nav variants={containerVariants} initial="hidden" animate="visible" style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }} className="hide-scrollbar">
             {menuGroups.map((group, idx) => (
               <div key={idx} style={{ marginBottom: '32px' }}>
                 {!sidebarCollapsed && (
