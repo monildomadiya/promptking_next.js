@@ -120,45 +120,89 @@ const AdminOtpInput = ({ value, onChange, length = 10 }) => {
     const focusIndex = Math.min(pasted.length, length - 1);
     inputRefs.current[focusIndex]?.focus();
   };
-
   return (
-    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '24px', flexWrap: 'wrap' }}>
-      {Array.from({ length }).map((_, i) => (
-        <input
-          key={i}
-          ref={el => inputRefs.current[i] = el}
-          type="password"
-          inputMode="numeric"
-          value={value[i] || ''}
-          onChange={e => handleChange(e, i)}
-          onKeyDown={e => handleKeyDown(e, i)}
-          onPaste={handlePaste}
-          style={{
-            width: '36px',
-            height: '46px',
-            textAlign: 'center',
-            fontSize: '1.4rem',
-            fontWeight: 'bold',
-            borderRadius: '10px',
-            border: '1px solid rgba(255,255,255,0.1)',
-            background: 'rgba(255,255,255,0.05)',
-            color: 'white',
-            outline: 'none',
-            transition: '0.2s',
-            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)'
-          }}
-          onFocus={e => {
-            e.target.style.borderColor = 'var(--accent-main)';
-            e.target.style.background = 'rgba(255,255,255,0.1)';
-            e.target.style.boxShadow = '0 0 10px rgba(229, 9, 20, 0.2)';
-          }}
-          onBlur={e => {
-            e.target.style.borderColor = 'rgba(255,255,255,0.1)';
-            e.target.style.background = 'rgba(255,255,255,0.05)';
-            e.target.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.2)';
-          }}
-        />
-      ))}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <input
+            key={i}
+            ref={el => inputRefs.current[i] = el}
+            type="password"
+            inputMode="numeric"
+            value={value[i] || ''}
+            onChange={e => handleChange(e, i)}
+            onKeyDown={e => handleKeyDown(e, i)}
+            onPaste={handlePaste}
+            style={{
+              width: '42px',
+              height: '50px',
+              textAlign: 'center',
+              fontSize: '1.5rem',
+              fontWeight: 'bold',
+              borderRadius: '10px',
+              border: '1px solid rgba(255,255,255,0.1)',
+              background: 'rgba(255,255,255,0.05)',
+              color: 'white',
+              outline: 'none',
+              transition: '0.2s',
+              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)'
+            }}
+            onFocus={e => {
+              e.target.style.borderColor = 'var(--accent-main)';
+              e.target.style.background = 'rgba(255,255,255,0.1)';
+              e.target.style.boxShadow = '0 0 10px rgba(229, 9, 20, 0.2)';
+            }}
+            onBlur={e => {
+              e.target.style.borderColor = 'rgba(255,255,255,0.1)';
+              e.target.style.background = 'rgba(255,255,255,0.05)';
+              e.target.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.2)';
+            }}
+          />
+        ))}
+      </div>
+      {length > 5 && (
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+          {Array.from({ length: length - 5 }).map((_, i) => {
+            const index = i + 5;
+            return (
+              <input
+                key={index}
+                ref={el => inputRefs.current[index] = el}
+                type="password"
+                inputMode="numeric"
+                value={value[index] || ''}
+                onChange={e => handleChange(e, index)}
+                onKeyDown={e => handleKeyDown(e, index)}
+                onPaste={handlePaste}
+                style={{
+                  width: '42px',
+                  height: '50px',
+                  textAlign: 'center',
+                  fontSize: '1.5rem',
+                  fontWeight: 'bold',
+                  borderRadius: '10px',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  background: 'rgba(255,255,255,0.05)',
+                  color: 'white',
+                  outline: 'none',
+                  transition: '0.2s',
+                  boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)'
+                }}
+                onFocus={e => {
+                  e.target.style.borderColor = 'var(--accent-main)';
+                  e.target.style.background = 'rgba(255,255,255,0.1)';
+                  e.target.style.boxShadow = '0 0 10px rgba(229, 9, 20, 0.2)';
+                }}
+                onBlur={e => {
+                  e.target.style.borderColor = 'rgba(255,255,255,0.1)';
+                  e.target.style.background = 'rgba(255,255,255,0.05)';
+                  e.target.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.2)';
+                }}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
