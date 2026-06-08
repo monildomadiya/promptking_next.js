@@ -157,6 +157,15 @@ const BlogModal = ({ blog, onClose, onSave }) => {
       position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3000,
       padding: '20px'
     }}>
+      <style>{`
+        .glass-modal .glass-input {
+          width: 100%;
+          padding: 12px 16px;
+          border-radius: 12px;
+          box-sizing: border-box;
+          font-family: inherit;
+        }
+      `}</style>
       <div className="glass-modal" style={{ 
         width: '100%', maxWidth: '1200px', maxHeight: '95vh', overflowY: 'auto', position: 'relative',
         display: 'flex', flexDirection: 'column'
