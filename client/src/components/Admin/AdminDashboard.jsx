@@ -186,6 +186,7 @@ const NavItem = ({ item, active, onClick, isMobileView, collapsed }) => (
       color: active ? 'white' : 'var(--text-dim)',
       background: active ? 'var(--accent-glow)' : 'rgba(255,255,255,0.02)',
       border: `1px solid ${active ? 'rgba(229, 9, 20, 0.3)' : 'rgba(255,255,255,0.05)'}`,
+      boxShadow: active && !isMobileView ? 'inset 0 0 20px rgba(229, 9, 20, 0.1)' : 'none',
       position: 'relative',
       whiteSpace: 'nowrap',
       flexShrink: 0,
@@ -229,13 +230,14 @@ const NavItem = ({ item, active, onClick, isMobileView, collapsed }) => (
 const StatCard = ({ label, value, icon, color }) => (
   <motion.div
     variants={itemVariants}
-    whileHover={{ y: -5, boxShadow: 'var(--shadow-md)' }}
+    whileHover={{ y: -8, scale: 1.02, boxShadow: '0 15px 35px var(--accent-glow)' }}
     style={{
       ...glassCardStyle,
       padding: '24px',
       display: 'flex',
       alignItems: 'center',
       gap: '20px',
+      transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
     }}
   >
     <div style={{
@@ -331,7 +333,7 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
   };
 
   return (
-    <tr ref={setNodeRef} style={style} onContextMenu={(e) => onContextMenu && onContextMenu(e, item)}>
+    <tr ref={setNodeRef} className="admin-table-row" style={style} onContextMenu={(e) => onContextMenu && onContextMenu(e, item)}>
       <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {isDragMode ? (
@@ -1217,11 +1219,10 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div style={{ 
+    <div className="admin-mesh-bg" style={{ 
       display: 'flex', 
       flexDirection: isMobile ? 'column' : 'row',
       minHeight: '100vh', 
-      background: 'var(--surface-0)', 
       color: 'white',
       overflowX: 'hidden'
     }}>
@@ -1372,8 +1373,9 @@ const AdminDashboard = () => {
           gap: isMobile ? '20px' : '0'
         }}>
           <div>
-            <h1 style={{ fontSize: isMobile ? '1.5rem' : '2rem', fontWeight: 900, marginBottom: '8px', fontFamily: 'var(--font-heading)' }}>
+            <h1 style={{ fontSize: isMobile ? '1.5rem' : '2rem', fontWeight: 900, marginBottom: '8px', fontFamily: 'var(--font-heading)', display: 'flex', alignItems: 'center', gap: '12px' }}>
               {view.replace('settings-', '').toUpperCase()}
+              <div className="live-pulse-dot" title="Live Connection" />
             </h1>
             <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem' }}>Management control panel for PK PROMPT KING systems.</p>
           </div>
