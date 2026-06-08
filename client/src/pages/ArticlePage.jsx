@@ -244,6 +244,49 @@ const ArticlePage = () => {
             </div>
           )}
 
+          {/* Author Box */}
+          <div className="author-box" style={{
+            marginTop: '60px',
+            padding: '40px',
+            background: 'linear-gradient(145deg, rgba(255,255,255,0.02) 0%, rgba(229,9,20,0.05) 100%)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '24px',
+            display: 'flex',
+            gap: '30px',
+            alignItems: 'center',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: '-50px', right: '-50px',
+              width: '150px', height: '150px',
+              background: 'var(--accent-main)',
+              filter: 'blur(80px)',
+              opacity: 0.15,
+              borderRadius: '50%'
+            }} />
+            <div style={{ flexShrink: 0 }}>
+              <img 
+                src="https://github.com/monildomadiya.png" 
+                alt={blog.author_name || 'PromptKing Admin'} 
+                style={{ 
+                  width: '90px', height: '90px', borderRadius: '50%', 
+                  objectFit: 'cover', border: '3px solid rgba(255,255,255,0.1)',
+                  boxShadow: '0 10px 20px rgba(0,0,0,0.3)'
+                }} 
+                onError={(e) => { e.target.src = 'https://promptking.in/favicon.png' }}
+              />
+            </div>
+            <div style={{ zIndex: 1 }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--accent-main)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '5px' }}>About the Author</div>
+              <h4 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'white', marginBottom: '10px' }}>{blog.author_name || 'PromptKing Admin'}</h4>
+              <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, margin: 0 }}>
+                Passionate about AI and creative workflows. Exploring the frontiers of prompt engineering to help you unlock the true potential of tools like ChatGPT, Midjourney, and Gemini.
+              </p>
+            </div>
+          </div>
+
           {/* FAQs */}
           {parsedFaqs && parsedFaqs.length > 0 && (
             <div style={{ marginTop: '60px', paddingTop: '40px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
