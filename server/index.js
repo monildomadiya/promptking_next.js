@@ -113,15 +113,32 @@ app.use((err, req, res, next) => {
 (async () => {
   try {
     const db = require('./db');
-    await db`
-      CREATE TABLE IF NOT EXISTS analytics_events (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        prompt_key VARCHAR(100) NOT NULL,
-        event_type ENUM('copy', 'unlock') NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        INDEX idx_created_type (created_at, event_type)
-      )
-    `;
+    try {
+      await db`
+        CREATE TABLE IF NOT EXISTS analytics_events (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          prompt_key VARCHAR(100) NOT NULL,
+          event_type ENUM('copy', 'unlock') NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          INDEX idx_created_type (created_at, event_type)
+        )
+      `;
+    } catch (e) {
+      console.warn("Failed to check/add analytics_events:", e.message);
+    }
+
+    try {
+      await db`
+        CREATE TABLE IF NOT EXISTS activity_logs (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          action VARCHAR(255) NOT NULL,
+          details TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+    } catch (e) {
+      console.warn("Failed to check/add activity_logs:", e.message);
+    }
 
     try {
       const checkSort = await db`SHOW COLUMNS FROM prompts LIKE 'sort_order'`;

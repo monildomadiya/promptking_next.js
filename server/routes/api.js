@@ -23,6 +23,15 @@ const uploadToCloudinary = (buffer, options = {}) => {
   });
 };
 
+const logAdminAction = async (action, details) => {
+  try {
+    const detailsStr = typeof details === 'string' ? details : JSON.stringify(details);
+    await db`INSERT INTO activity_logs (action, details) VALUES (${action}, ${detailsStr})`;
+  } catch (err) {
+    console.warn("Audit Log Error:", err.message);
+  }
+};
+
 // Safety Guard: Prevent infinite self-referential DDOS in production fallbacks
 const originalFetch = global.fetch;
 global.fetch = async (url, options) => {
@@ -979,6 +988,7 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
       `;
     }
     pingGoogleSitemap();
+    logAdminAction(originalKey ? "Updated Prompt" : "Created Prompt", { key: finalKey || originalKey, title: p.title });
     res.json({ status: "success" });
   } catch (error) {
     console.error(error);
@@ -1311,6 +1321,68 @@ router.post('/contact', async (req, res) => {
     }
     res.status(500).json({ error: "Failed to send message and database is unavailable" });
   }
+});
+
+// --- ADMIN AUDIT LOGS ---
+router.get('/admin/logs', adminAuth, async (req, res) => {
+  try {
+    const rows = await db`SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 100`;
+    res.json(rows);
+  } catch (error) {
+    console.warn('Failed to fetch activity logs:', error.message);
+    res.json([]);
+  }
+});
+
+// --- SEO ANALYZE ---
+router.post('/admin/seo_analyze', adminAuth, (req, res) => {
+  const { title, description, content } = req.body;
+  let score = 100;
+  let checks = [];
+
+  const addCheck = (passed, msg, deduct) => {
+    checks.push({ passed, message: msg });
+    if (!passed) score -= deduct;
+  };
+
+  // Title checks
+  if (!title) {
+    addCheck(false, "Title is missing", 20);
+  } else {
+    if (title.length < 30) addCheck(false, "Title is too short (aim for 50-60 characters)", 10);
+    else if (title.length > 60) addCheck(false, "Title is too long (keep under 60 characters)", 10);
+    else addCheck(true, "Title length is optimal", 0);
+  }
+
+  // Description checks
+  if (!description) {
+    addCheck(false, "Meta description is missing", 20);
+  } else {
+    if (description.length < 100) addCheck(false, "Description is too short (aim for 120-155 chars)", 10);
+    else if (description.length > 160) addCheck(false, "Description is too long (keep under 160 chars)", 10);
+    else addCheck(true, "Description length is optimal", 0);
+  }
+
+  // Content checks
+  if (!content) {
+    addCheck(false, "Content is empty", 20);
+  } else {
+    if (content.length < 300) addCheck(false, "Content is very thin (less than 300 characters)", 15);
+    else addCheck(true, "Content length is sufficient", 0);
+
+    if (title && content.toLowerCase().includes(title.toLowerCase().split(' ')[0])) {
+      addCheck(true, "Target keyword found in content", 0);
+    } else {
+      addCheck(false, "Main title keywords not found early in content", 10);
+    }
+  }
+
+  score = Math.max(0, score);
+  
+  res.json({
+    score,
+    checks
+  });
 });
 
 module.exports = router;

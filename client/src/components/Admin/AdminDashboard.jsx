@@ -24,6 +24,8 @@ import toast, { Toaster } from 'react-hot-toast';
 import CommandPalette from './CommandPalette';
 import ContextMenu from './ContextMenu';
 import KingLogo from '../../assets/prompt-king.webp';
+import AuditLogsPanel from './AuditLogsPanel';
+import SEOManagerPanel from './SEOManagerPanel';
 
 // --- ANIMATION VARIANTS ---
 const containerVariants = {
@@ -1456,7 +1458,8 @@ const AdminDashboard = () => {
           {view === 'settings-branding' && <BrandingPanel key="branding" onSave={() => fetchData('settings')} />}
           {view === 'settings-social' && <SocialPanel key="social" onSave={() => fetchData('settings')} />}
           {view === 'settings-ads' && <AdsPanel key="ads" onSave={() => fetchData('settings')} />}
-          {view === 'settings-security' && <SecurityPanel key="security" />}
+          {view === 'audit-logs' && <AuditLogsPanel key="audit" />}
+          {view === 'seo-manager' && <SEOManagerPanel key="seo" />}
 
           {['prompts', 'blogs', 'categories', 'faqs'].includes(view) && (
             <motion.div key="list" {...pageTransition} style={{ ...glassPanelStyle, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
