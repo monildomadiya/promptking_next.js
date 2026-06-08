@@ -24,8 +24,6 @@ import toast, { Toaster } from 'react-hot-toast';
 import CommandPalette from './CommandPalette';
 import ContextMenu from './ContextMenu';
 import KingLogo from '../../promptking-logo.svg';
-import AuditLogsPanel from './AuditLogsPanel';
-import SEOManagerPanel from './SEOManagerPanel';
 
 // --- ANIMATION VARIANTS ---
 const containerVariants = {
@@ -230,13 +228,13 @@ const NavItem = ({ item, active, onClick, isMobileView, collapsed }) => (
 const StatCard = ({ label, value, icon, color }) => (
   <motion.div
     variants={itemVariants}
-    whileHover={{ y: -8, scale: 1.02, boxShadow: '0 15px 35px var(--accent-glow)' }}
     style={{
       ...glassCardStyle,
       padding: '24px',
       display: 'flex',
       alignItems: 'center',
       gap: '20px',
+      transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
     }}
   >
     <div style={{
@@ -332,7 +330,7 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
   };
 
   return (
-    <tr ref={setNodeRef} className="admin-table-row" style={style} onContextMenu={(e) => onContextMenu && onContextMenu(e, item)}>
+    <tr ref={setNodeRef} style={style} onContextMenu={(e) => onContextMenu && onContextMenu(e, item)}>
       <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {isDragMode ? (
@@ -1215,15 +1213,11 @@ const AdminDashboard = () => {
       { id: 'settings-branding', label: 'Branding', icon: <Palette size={20} /> },
       { id: 'settings-social', label: 'Channels', icon: <Share2 size={20} /> },
       { id: 'settings-ads', label: 'Ads Management', icon: <Activity size={20} /> },
-    ]},
-    { title: 'ADVANCED TOOLS', items: [
-      { id: 'seo-manager', label: 'SEO Manager', icon: <Activity size={20} /> },
-      { id: 'audit-logs', label: 'Audit Logs', icon: <FileText size={20} /> },
     ]}
   ];
 
   return (
-    <div className="admin-mesh-bg" style={{ 
+    <div style={{ 
       display: 'flex', 
       flexDirection: isMobile ? 'column' : 'row',
       minHeight: '100vh', 
@@ -1542,8 +1536,6 @@ const AdminDashboard = () => {
           {view === 'settings-branding' && <BrandingPanel key="branding" onSave={() => fetchData('settings')} />}
           {view === 'settings-social' && <SocialPanel key="social" onSave={() => fetchData('settings')} />}
           {view === 'settings-ads' && <AdsPanel key="ads" onSave={() => fetchData('settings')} />}
-          {view === 'audit-logs' && <AuditLogsPanel key="audit" />}
-          {view === 'seo-manager' && <SEOManagerPanel key="seo" />}
 
           {['prompts', 'blogs', 'categories', 'faqs'].includes(view) && (
             <motion.div key="list" {...pageTransition} style={{ ...glassPanelStyle, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
