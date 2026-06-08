@@ -1100,15 +1100,8 @@ const AdminDashboard = () => {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--surface-0)' }}>
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} style={{ ...glassPanelStyle, padding: '48px', width: '400px', textAlign: 'center' }}>
-          <div style={{ 
-            width: '80px', height: '80px', background: 'rgba(229, 9, 20, 0.05)', 
-            borderRadius: '24px', display: 'flex', alignItems: 'center', 
-            justifyContent: 'center', margin: '0 auto 24px', 
-            border: '1px solid rgba(229, 9, 20, 0.2)',
-            boxShadow: '0 0 30px rgba(229, 9, 20, 0.15)',
-            color: 'var(--accent-main)' 
-          }}>
-            <img src={KingLogo} style={{ width: '50px', objectFit: 'contain' }} alt="Prompt King" />
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '32px', width: '100%' }}>
+            <img src={KingLogo} style={{ width: '120px', height: '120px', objectFit: 'contain' }} alt="Prompt King" />
           </div>
           <h2 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '8px', fontFamily: 'var(--font-heading)', color: 'white' }}>Admin Portal</h2>
           <p style={{ color: 'var(--text-dim)', marginBottom: '32px', fontSize: '0.9rem', fontWeight: 500 }}>Authenticated Access Only</p>
@@ -1199,12 +1192,12 @@ const AdminDashboard = () => {
 
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '40px', width: '100%' }}>
             {sidebarCollapsed ? (
-              <img src={KingLogo} style={{ width: '40px', height: '40px', objectFit: 'contain' }} alt="PK" />
+              <img src={KingLogo} style={{ width: '40px', height: '40px', objectFit: 'contain', display: 'block' }} alt="PK" />
             ) : settings?.logo_url ? (
-              <img src={settings.logo_url} style={{ maxHeight: '90px', maxWidth: '100%', objectFit: 'contain', padding: '0 10px' }} alt="Logo" />
+              <img src={settings.logo_url} style={{ maxHeight: '90px', maxWidth: '100%', objectFit: 'contain', padding: '0 10px', display: 'block' }} alt="Logo" />
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', whiteSpace: 'nowrap' }}>
-                <img src={KingLogo} style={{ maxHeight: '45px', objectFit: 'contain' }} alt="Prompt King" />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', padding: '0 10px' }}>
+                <img src={KingLogo} style={{ height: '60px', width: '100%', maxWidth: '200px', objectFit: 'contain', display: 'block' }} alt="Prompt King" />
               </div>
             )}
           </div>
