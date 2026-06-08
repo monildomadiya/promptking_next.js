@@ -272,7 +272,7 @@ const ArticlePage = () => {
             }} />
             <div style={{ flexShrink: 0 }}>
               <img 
-                src={blog.author_image || "https://github.com/monildomadiya.png"} 
+                src={blog.author_image ? optimizeImage(blog.author_image, 150) : "https://github.com/monildomadiya.png"} 
                 alt={blog.author_name || 'PromptKing Admin'} 
                 style={{ 
                   width: '90px', height: '90px', borderRadius: '50%', 
