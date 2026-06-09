@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, Activity, ChevronLeft, ChevronRight } from '../components/Common/Icons';
 import confetti from 'canvas-confetti';
 import api from '../api';
@@ -14,6 +14,16 @@ const PromptDetailPage = ({ adsSettings }) => {
   const [prompt, setPrompt] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  const handleBack = (e) => {
+    e.preventDefault();
+    if (window.history.state && window.history.state.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
   
   const [sliderValue, setSliderValue] = useState(50);
   const [pin, setPin] = useState('');
@@ -380,7 +390,7 @@ const PromptDetailPage = ({ adsSettings }) => {
     <div style={{ padding: '150px 20px', textAlign: 'center', background: 'var(--bg-color)', minHeight: '100vh' }}>
       <SEOMetadata title="Prompt Not Found | PromptKing" />
       <h2 style={{ color: 'var(--accent-main)', marginBottom: '20px' }}>{error || "Prompt not found"}</h2>
-      <Link to="/" style={{ padding: '12px 30px', background: 'white', color: 'black', borderRadius: '50px', fontWeight: 700 }}>Back to Home</Link>
+      <a href="/" onClick={handleBack} style={{ padding: '12px 30px', background: 'white', color: 'black', borderRadius: '50px', fontWeight: 700, textDecoration: 'none', display: 'inline-block' }}>Back to Home</a>
     </div>
   );
 
@@ -467,9 +477,9 @@ const PromptDetailPage = ({ adsSettings }) => {
       <div className="container" style={{ padding: '40px 20px', maxWidth: '1400px', margin: '0 auto' }}>
         
         {/* Back Button */}
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', marginBottom: '30px', fontWeight: 600, textDecoration: 'none' }} className="back-link">
-          <ArrowLeft size={18} /> Back to Explorer
-        </Link>
+        <a href="/" onClick={handleBack} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', marginBottom: '30px', fontWeight: 600, textDecoration: 'none', cursor: 'pointer' }} className="back-link">
+          <ArrowLeft size={18} /> Back
+        </a>
 
         {/* 2-Column Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: '40px' }} className="detail-layout">
