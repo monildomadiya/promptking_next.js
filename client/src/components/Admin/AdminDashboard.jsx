@@ -669,6 +669,22 @@ const SocialPanel = ({ onSave }) => {
     { key: 'pinterest', label: 'Pinterest Page', icon: <Activity size={20} color="#E60023" />, bg: 'rgba(230,0,35,0.08)', desc: 'Inspire with AI collections' },
   ];
 
+  // When editing/creating a prompt, render ONLY the modal as a full page.
+  // This removes the dashboard DOM from behind the modal so screenshot tools
+  // do not capture the fixed overlay multiple times over the scrollable dashboard.
+  if (isModalOpen && view === 'prompts') {
+    return (
+      <>
+        <Toaster position="top-right" toastOptions={{ style: { background: '#1a1a1a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } }} />
+        <PromptModal
+          prompt={editingItem}
+          onClose={() => setIsModalOpen(false)}
+          onSave={() => { setIsModalOpen(false); fetchData(view); }}
+        />
+      </>
+    );
+  }
+
   return (
     <motion.div {...pageTransition} style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
       {/* Header */}
@@ -1767,7 +1783,7 @@ const AdminDashboard = () => {
         </AnimatePresence>
       </main>
 
-      {isModalOpen && view === 'prompts' && <PromptModal prompt={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
+      {/* PromptModal is now handled by an early return at the top of this component */}
       {isModalOpen && view === 'blogs' && <BlogModal blog={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
       {isModalOpen && view === 'authors' && <AuthorModal author={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
       {isModalOpen && view === 'categories' && <CategoryModal category={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}

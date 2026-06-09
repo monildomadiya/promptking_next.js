@@ -125,24 +125,10 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
       setFormData(prev => ({ ...prev, prompt_key: uniqueId }));
     }
 
-    // Lock body scroll — prevents background from scrolling during screenshots
-    const scrollY = window.scrollY;
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
-
+    // Esc key to close
     const handleEsc = (e) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', handleEsc);
-    return () => {
-      // Restore body scroll
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      window.scrollTo(0, scrollY);
-      window.removeEventListener('keydown', handleEsc);
-    };
+    return () => window.removeEventListener('keydown', handleEsc);
   }, [prompt, onClose]);
 
   // FAQ helpers
@@ -186,9 +172,10 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
   };
 
   return (
-    <div className="glass-overlay" style={{ 
-      position: 'fixed', inset: 0, zIndex: 3000,
-      padding: '40px 20px', overflowY: 'auto'
+    <div style={{ 
+      minHeight: '100vh',
+      background: 'var(--surface-0)',
+      color: 'white'
     }}>
       <style>{`
         .prompt-modal .glass-input {
@@ -199,14 +186,15 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
           font-family: inherit;
         }
       `}</style>
-      <div className="glass-modal prompt-modal" style={{ 
-        width: '100%', maxWidth: '1200px', margin: '0 auto', position: 'relative',
+      <div className="prompt-modal" style={{ 
+        width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '0 20px 60px',
         display: 'flex', flexDirection: 'column'
       }}>
         {/* Modal Header */}
         <div style={{ 
-          padding: '30px 40px', borderBottom: '1px solid rgba(255,255,255,0.08)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+          padding: '30px 0 30px', borderBottom: '1px solid rgba(255,255,255,0.08)',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          marginBottom: '10px'
         }}>
           <div>
             <h2 style={{ fontSize: '1.8rem', fontWeight: 900, letterSpacing: '-0.5px', marginBottom: '4px' }}>
