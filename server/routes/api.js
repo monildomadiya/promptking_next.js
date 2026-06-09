@@ -349,7 +349,7 @@ router.get('/get_data', async (req, res) => {
       publish_date: row.publish_date
     }));
 
-    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
     res.json({ prompts, likes: {}, categories: categoriesRows });
   } catch (error) {
     console.error('DATABASE ERROR:', error.message);

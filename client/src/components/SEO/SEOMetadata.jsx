@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 
 const SITE_NAME = 'PromptKing';
 const SITE_URL = 'https://promptking.in';
-const DEFAULT_IMAGE = 'https://promptking.in/favicon.png';
+const DEFAULT_IMAGE = 'https://promptking.in/og-image.png';
 const DEFAULT_KEYWORDS = 'ai prompts, chatgpt prompts, midjourney prompts, gemini prompts, prompt engineering, ai art prompts, premium prompts, best chatgpt prompts, ai prompt library';
 
 const SEOMetadata = ({ 

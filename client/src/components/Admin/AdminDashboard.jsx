@@ -885,6 +885,7 @@ const AdminDashboard = () => {
   const [contextMenu, setContextMenu] = useState({ isOpen: false, x: 0, y: 0, item: null });
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterAccess, setFilterAccess] = useState('all');
+  const [isDataLoading, setIsDataLoading] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -1030,6 +1031,7 @@ const AdminDashboard = () => {
 
   const fetchData = async (currentView) => {
     if (currentView === 'settings') return;
+    setIsDataLoading(true);
     try {
       const endpoint = currentView === 'settings' ? 'settings' : currentView;
       const response = await api.get(`/admin/${endpoint}`);
@@ -1044,6 +1046,19 @@ const AdminDashboard = () => {
         });
       }
     } catch (e) { console.error(e); }
+    finally { setIsDataLoading(false); }
+  };
+
+  // Switch tab: clear stale data immediately so old tab content never flashes
+  const switchView = (id) => {
+    const dataView = id.startsWith('settings') ? 'settings' : id;
+    setView(id);
+    if (dataView !== 'settings') {
+      setData([]);          // clear immediately — no stale flash
+      setAdminSearch('');
+      setSelectedKeys([]);
+    }
+    fetchData(dataView);
   };
 
   const fetchAnalytics = async (days = analyticsDays) => {
@@ -1356,7 +1371,7 @@ const AdminDashboard = () => {
                   <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', margin: '8px 0 16px' }} />
                 )}
                 {group.items.map(item => (
-                  <NavItem key={item.id} item={item} active={view === item.id} collapsed={sidebarCollapsed} onClick={(id) => { setView(id); fetchData(id.startsWith('settings') ? 'settings' : id); }} isMobileView={false} />
+                  <NavItem key={item.id} item={item} active={view === item.id} collapsed={sidebarCollapsed} onClick={switchView} isMobileView={false} />
                 ))}
               </div>
             ))}
@@ -1406,7 +1421,7 @@ const AdminDashboard = () => {
                 key={item.id} 
                 item={item} 
                 active={view === item.id} 
-                onClick={(id) => { setView(id); fetchData(id.startsWith('settings') ? 'settings' : id); }} 
+                onClick={switchView} 
                 isMobileView={true} 
               />
             ))}
@@ -1602,13 +1617,25 @@ const AdminDashboard = () => {
 
           {['prompts', 'blogs', 'authors', 'categories', 'faqs'].includes(view) && (
             <motion.div key="list" {...pageTransition} style={{ ...glassPanelStyle, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-              {isDragMode && view === 'prompts' && (
+              {/* Loading skeleton — shown while fetching new tab data */}
+              {isDataLoading && (
+                <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="skeleton" style={{
+                      height: '64px', borderRadius: '12px',
+                      opacity: 1 - i * 0.12
+                    }} />
+                  ))}
+                </div>
+              )}
+              {/* Table content — hidden while loading to prevent stale data flash */}
+              {!isDataLoading && isDragMode && view === 'prompts' && (
                 <div style={{ padding: '12px 24px', background: 'rgba(59,130,246,0.08)', borderBottom: '1px solid rgba(59,130,246,0.2)', display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <span style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 700 }}>⠿ DRAG MODE ACTIVE</span>
                   <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)' }}>— Drag the handle icons to reorder prompts, then click SAVE ORDER</span>
                 </div>
               )}
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              {!isDataLoading && <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                 <table style={{ minWidth: isMobile ? '600px' : '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.01)' }}>
@@ -1721,7 +1748,7 @@ const AdminDashboard = () => {
                     )}
                   </tbody>
                 </table>
-              </DndContext>
+              </DndContext>}
             </motion.div>
           )}
         </AnimatePresence>

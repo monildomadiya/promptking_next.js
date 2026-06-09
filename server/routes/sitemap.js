@@ -21,7 +21,11 @@ router.get('/', async (req, res) => {
       { url: '/blog', changefreq: 'daily', priority: 0.8 },
       { url: '/faq', changefreq: 'weekly', priority: 0.7 },
       { url: '/about', changefreq: 'monthly', priority: 0.6 },
-      { url: '/contact', changefreq: 'monthly', priority: 0.6 }
+      { url: '/contact', changefreq: 'monthly', priority: 0.6 },
+      { url: '/privacy', changefreq: 'yearly', priority: 0.3 },
+      { url: '/terms', changefreq: 'yearly', priority: 0.3 },
+      { url: '/disclaimer', changefreq: 'yearly', priority: 0.3 },
+      { url: '/adsense-policy', changefreq: 'yearly', priority: 0.3 }
     ];
 
     staticRoutes.forEach(route => {

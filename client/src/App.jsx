@@ -70,12 +70,8 @@ function AppContent() {
 
   const fetchSettings = async () => {
     try {
-      // First: show cached data instantly (no flash)
-      const cached = localStorage.getItem('siteSettings');
-      if (cached) {
-        try { setSettings(JSON.parse(cached)); } catch(e) {}
-      }
-      // Then: silently revalidate in background
+      // useState already loaded from cache synchronously — skip redundant setSettings
+      // Just silently revalidate in background and update if data changed
       const response = await api.get('/settings');
       if (response.data) {
         setSettings(response.data);
@@ -100,6 +96,7 @@ function AppContent() {
     window.addEventListener('settingsUpdated', handleSettingsUpdated);
 
     return () => {
+      window.removeEventListener('resize', handleResize); // Fix: was missing — caused memory leak
       window.removeEventListener('settingsUpdated', handleSettingsUpdated);
     };
   }, []);

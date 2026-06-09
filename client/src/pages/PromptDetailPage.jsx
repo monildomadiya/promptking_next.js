@@ -287,90 +287,9 @@ const PromptDetailPage = ({ adsSettings }) => {
     }
   };
 
-  const pageStyles = (
-    <style>{`
-      .detail-page-wrapper { animation: none; }
-      @keyframes fadeIn { from { opacity: 1; transform: translateY(0); } to { opacity: 1; transform: translateY(0); } }
-      .back-link { transition: 0.3s; }
-      @media (hover: hover) {
-        .back-link:hover { color: white !important; transform: translateX(-5px); }
-        .suggested-card-item:hover { 
-          transform: translateY(-3px) translateX(4px); 
-          background: rgba(255,255,255,0.06) !important;
-          border-color: rgba(229, 9, 20, 0.2) !important;
-          box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        .suggested-card-item:hover .suggestion-img { transform: scale(1.1); }
-        .suggested-card-item:hover h4 { color: var(--accent-main) !important; }
-      }
-      .chatgpt { color: #10a37f; background: rgba(16, 163, 127, 0.08) !important; border-color: rgba(16, 163, 127, 0.3) !important; }
-      
-      @keyframes copyPulseDetail {
-        0% { transform: scale(1.01); border-color: var(--accent-main); }
-        50% { transform: scale(1.02); border-color: #27C93F; box-shadow: 0 0 60px rgba(39, 201, 63, 0.4); }
-        100% { transform: scale(1.01); border-color: #27C93F; }
-      }
-
-      .copy-success-pulse {
-        animation: copyPulseDetail 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-      }
-
-      @keyframes copyButtonPop {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.15); }
-        100% { transform: scale(1); }
-      }
-
-      @keyframes toastFloatUp {
-        0% { opacity: 0; transform: translate(-50%, 10px); }
-        20% { opacity: 1; transform: translate(-50%, 0); }
-        80% { opacity: 1; transform: translate(-50%, 0); }
-        100% { opacity: 0; transform: translate(-50%, -20px); }
-      }
-
-      .gemini { color: #4285f4; background: rgba(66, 133, 244, 0.08) !important; border-color: rgba(66, 133, 244, 0.3) !important; }
-      .midjourney { color: #a855f7; background: rgba(168, 85, 247, 0.08) !important; border-color: rgba(168, 85, 247, 0.3) !important; }
-      .blog-content img { max-width: 100%; border-radius: 15px; margin: 20px 0; }
-      .blog-content h2, .blog-content h3 { color: white; margin-top: 35px; margin-bottom: 20px; }
-      
-      @media (min-width: 1025px) {
-        .media-prompt-container {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 30px;
-          align-items: stretch;
-          margin-bottom: 40px;
-        }
-        .media-prompt-container .hero-section {
-          margin-bottom: 0 !important;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-        }
-        .media-prompt-container .hero-section > div {
-          flex: 1;
-          display: flex;
-          align-items: center;
-        }
-        .media-prompt-container .prompt-area {
-          margin-bottom: 0 !important;
-        }
-      }
-      
-      @media (max-width: 1024px) {
-        .detail-layout { grid-template-columns: 1fr !important; }
-        .detail-sidebar { display: none; }
-      }
-      @media (max-width: 768px) {
-        .detail-main { border-radius: 15px !important; padding: 15px !important; }
-        .prompt-area { border-radius: 15px !important; }
-      }
-    `}</style>
-  );
 
   if (loading) return (
     <div className="detail-page-wrapper" style={{ background: 'var(--surface-0)', minHeight: '100vh', color: 'white' }}>
-      {pageStyles}
       <SEOMetadata title="Loading Prompt... | PromptKing" />
       <div className="container" style={{ padding: '40px 20px', maxWidth: '1400px', margin: '0 auto' }}>
         {/* Back Link Shimmer */}
@@ -388,13 +307,7 @@ const PromptDetailPage = ({ adsSettings }) => {
             </div>
 
             {/* Media & Prompt Container Shimmer */}
-            <div className="media-prompt-container" style={{
-              display: 'flex',
-              flexDirection: window.innerWidth <= 1100 ? 'column' : 'row',
-              gap: '40px',
-              alignItems: window.innerWidth <= 1100 ? 'flex-start' : 'stretch',
-              marginBottom: window.innerWidth <= 1100 ? '0' : '40px'
-            }}>
+            <div className="media-prompt-container">
                {/* Hero Image Shimmer */}
                <div className="hero-section glass-panel" style={{
                  background: 'rgba(255, 255, 255, 0.02)',
@@ -404,21 +317,13 @@ const PromptDetailPage = ({ adsSettings }) => {
                  padding: '12px',
                  border: '1px solid rgba(255, 255, 255, 0.05)',
                  boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
-                 marginBottom: window.innerWidth <= 1100 ? '20px' : '0',
                  position: 'relative',
-                 overflow: 'hidden',
-                 width: window.innerWidth <= 1100 ? '100%' : 'calc(60% - 20px)',
-                 flexShrink: 0
+                 overflow: 'hidden'
                }}>
-                  <Shimmer height={window.innerWidth <= 1100 ? "250px" : "450px"} borderRadius="24px" />
+                  <Shimmer height="450px" borderRadius="24px" />
                </div>
                {/* Vault/Prompt Shimmer */}
-               <div className="prompt-vault-column" style={{ 
-                 display: 'flex', 
-                 flexDirection: 'column', 
-                 width: window.innerWidth <= 1100 ? '100%' : 'calc(40% - 20px)',
-                 gap: '20px'
-               }}>
+               <div className="prompt-vault-column" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   <div className="prompt-area" style={{ 
                     background: 'rgba(15, 15, 20, 0.4)', 
                     backdropFilter: 'blur(20px)',
@@ -540,6 +445,7 @@ const PromptDetailPage = ({ adsSettings }) => {
 
   return (
     <div className="detail-page-wrapper" style={{ background: 'var(--surface-0)', minHeight: '100vh', color: 'white' }}>
+      {/* CSS is in index.css — no inline <style> block needed */}
       <SEOMetadata 
         title={prompt.metaTitle || prompt.meta_title || `${prompt.title} - ${prompt.aiType || 'AI'} Prompt | PromptKing`}
         description={prompt.meta_description || prompt.description?.replace(/<[^>]*>?/gm, '').substring(0, 160) || `Unlock the "${prompt.title}" AI prompt on PromptKing. Works with ${prompt.aiType || 'AI'}.`}
@@ -603,13 +509,7 @@ const PromptDetailPage = ({ adsSettings }) => {
             </div>
 
             {/* Media & Prompt Split Container */}
-            <div className="media-prompt-container" style={{
-              display: 'flex',
-              flexDirection: window.innerWidth <= 1100 ? 'column' : 'row',
-              gap: '40px',
-              alignItems: window.innerWidth <= 1100 ? 'flex-start' : 'stretch',
-              marginBottom: window.innerWidth <= 1100 ? '0' : '40px'
-            }}>
+            <div className="media-prompt-container" style={{ display: 'flex', gap: '40px', alignItems: 'stretch' }}>
               {/* Hero Section: Image Display */}
             <div className="hero-section glass-panel" style={{
               background: 'rgba(255, 255, 255, 0.02)',
@@ -619,10 +519,8 @@ const PromptDetailPage = ({ adsSettings }) => {
               padding: '12px',
               border: '1px solid rgba(255, 255, 255, 0.05)',
               boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
-              marginBottom: window.innerWidth <= 1100 ? '20px' : '0',
               position: 'relative',
               overflow: 'hidden',
-              width: window.innerWidth <= 1100 ? '100%' : 'calc(60% - 20px)',
               flexShrink: 0
             }}>
               <div style={{ borderRadius: '24px', overflow: 'hidden', position: 'relative' }}>
@@ -688,12 +586,11 @@ const PromptDetailPage = ({ adsSettings }) => {
             {/* Right Column: Prompt Vault & Buttons */}
             <div className="prompt-vault-column" style={{ 
               display: 'flex', 
-              flexDirection: 'column', 
-              width: window.innerWidth <= 1100 ? '100%' : 'calc(40% - 20px)',
+              flexDirection: 'column',
               gap: '20px'
             }}>
               {/* Interactive Vault Section */}
-              <div id="box-detail" className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse' : ''} ${isRelocking ? 'vault-relock-animate' : ''}`} style={{
+              <div id="box-detail" className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse-detail' : ''} ${isRelocking ? 'vault-relock-animate' : ''}`} style={{
               background: 'rgba(15, 15, 20, 0.4)', 
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
@@ -702,7 +599,6 @@ const PromptDetailPage = ({ adsSettings }) => {
               overflow: 'hidden',
               display: 'flex', 
               flexDirection: 'column', 
-              marginBottom: window.innerWidth <= 1100 ? '20px' : '0', 
               border: isUnlocked ? (prompt.isPremium ? '2px solid #FFD700' : (isCopied ? '2px solid #27C93F' : '2px solid var(--accent-main)')) : '1px solid rgba(255,255,255,0.08)',
               boxShadow: isUnlocked ? (prompt.isPremium ? '0 15px 50px rgba(255, 215, 0, 0.15)' : (isCopied ? '0 15px 50px rgba(39, 201, 63, 0.3)' : '0 15px 50px rgba(229, 9, 20, 0.2)')) : 'none',
               transform: isUnlocked ? (isCopied && !prompt.isPremium ? 'scale(1.02)' : 'scale(1.01)') : 'scale(1)',

@@ -41,6 +41,11 @@ const BlogPage = () => {
 
   if (loading) return (
     <div className="layout-with-sidebar">
+      <SEOMetadata
+        title="PromptKing Blog - AI Prompt Tips, Guides & Updates"
+        description="Explore tutorials, tips and news about AI prompts, creative workflows, ChatGPT, Midjourney, Gemini, and the latest PromptKing updates."
+        url="https://promptking.in/blog"
+      />
       <div className="main-content-area">
         <header className="blog-hero">
           <Shimmer height="30px" width="150px" borderRadius="100px" style={{ margin: '0 auto 20px' }} />

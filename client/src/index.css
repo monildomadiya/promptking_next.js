@@ -1212,3 +1212,128 @@ body.shorts-modal-open {
   box-shadow: 0 0 8px #10a37f;
   animation: pulse-ring 2s infinite;
 }
+
+/* ── PromptCard Styles (moved from inline <style> per card) ────── */
+.badge.chatgpt  { color: #10a37f; background: rgba(16, 163, 127, 0.05) !important; border-color: rgba(16, 163, 127, 0.3) !important; }
+.badge.gemini   { color: #4285f4; background: rgba(66, 133, 244, 0.05) !important; border-color: rgba(66, 133, 244, 0.3) !important; }
+.badge.midjourney { color: #a855f7; background: rgba(168, 85, 247, 0.05) !important; border-color: rgba(168, 85, 247, 0.3) !important; }
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes copyPulse {
+  0%   { transform: scale(1.01); border-color: var(--accent-main); }
+  50%  { transform: scale(1.04); border-color: #27C93F; box-shadow: 0 0 50px rgba(39, 201, 63, 0.4); }
+  100% { transform: scale(1.01); border-color: #27C93F; box-shadow: 0 0 20px rgba(39, 201, 63, 0.2); }
+}
+
+.copy-success-pulse {
+  animation: copyPulse 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes copyButtonPop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes toastFloatUp {
+  0%   { opacity: 0; transform: translate(-50%, 10px); }
+  20%  { opacity: 1; transform: translate(-50%, 0); }
+  80%  { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .youtube-btn-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(229, 9, 20, 0.15) !important;
+    border-color: rgba(229, 9, 20, 0.3) !important;
+  }
+}
+
+/* ── PromptDetailPage Styles (moved from inline <style>) ────── */
+.detail-page-wrapper { animation: none; }
+.back-link { transition: 0.3s; }
+
+@media (hover: hover) {
+  .back-link:hover { color: white !important; transform: translateX(-5px); }
+  .suggested-card-item:hover {
+    transform: translateY(-3px) translateX(4px);
+    background: rgba(255,255,255,0.06) !important;
+    border-color: rgba(229, 9, 20, 0.2) !important;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+  .suggested-card-item:hover .suggestion-img { transform: scale(1.1); }
+  .suggested-card-item:hover h4 { color: var(--accent-main) !important; }
+}
+
+@keyframes copyPulseDetail {
+  0%   { transform: scale(1.01); border-color: var(--accent-main); }
+  50%  { transform: scale(1.02); border-color: #27C93F; box-shadow: 0 0 60px rgba(39, 201, 63, 0.4); }
+  100% { transform: scale(1.01); border-color: #27C93F; }
+}
+
+.copy-success-pulse-detail {
+  animation: copyPulseDetail 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@media (min-width: 1025px) {
+  .media-prompt-container {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 40px;
+    align-items: stretch;
+    margin-bottom: 40px;
+  }
+  .media-prompt-container .hero-section {
+    margin-bottom: 0 !important;
+    width: calc(60% - 20px);
+    flex-shrink: 0;
+  }
+  .media-prompt-container .prompt-vault-column {
+    width: calc(40% - 20px);
+    margin-bottom: 0 !important;
+  }
+  .media-prompt-container .prompt-area {
+    margin-bottom: 0 !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .detail-layout { grid-template-columns: 1fr !important; }
+  .detail-sidebar { display: none; }
+  .media-prompt-container { flex-direction: column !important; }
+  .media-prompt-container .hero-section { width: 100% !important; margin-bottom: 20px !important; }
+  .media-prompt-container .prompt-vault-column { width: 100% !important; }
+  .media-prompt-container .prompt-area { margin-bottom: 20px !important; }
+}
+
+@media (max-width: 768px) {
+  .detail-main { border-radius: 15px !important; padding: 15px !important; }
+  .prompt-area { border-radius: 15px !important; }
+}
+
+/* ── ArticlePage Styles (moved from inline <style>) ────── */
+.article-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 60px;
+}
+
+.article-page-title {
+  font-size: 3rem;
+}
+
+@media (hover: hover) {
+  .sidebar-blog-card:hover { transform: translateX(5px); color: var(--accent-main); }
+}
+
+@media (max-width: 1100px) {
+  .article-layout { grid-template-columns: 1fr; }
+  .sidebar { order: 2; margin-top: 40px; }
+  .main-content { order: 1; }
+  .article-page-title { font-size: 2.2rem; }
+}

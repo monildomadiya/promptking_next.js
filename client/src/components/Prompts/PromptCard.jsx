@@ -1,43 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Copy, Check, Eye, Lock, Unlock, Youtube, ArrowRight, Crown, Code, Instagram, Layout, Zap, Sparkles, Image, MessageSquare, Laptop, ChevronLeft, ChevronRight, Star } from '../Common/Icons';
 import api, { SERVER_URL } from '../../api';
 import YouTubeModal from '../Modals/YouTubeModal';
 import { optimizeImage } from '../../utils/imageUtils';
 
-const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searchTerm, isPriority = false }) => {
+// Defined at module level so React doesn't treat it as a new component type on every render
+const HighlightText = ({ text, highlight }) => {
+  if (!highlight || !highlight.trim()) return <span>{text}</span>;
+  const parts = String(text).split(new RegExp(`(${highlight.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')})`, 'gi'));
+  return (
+    <span>
+      {parts.map((part, i) =>
+        part.toLowerCase() === highlight.toLowerCase() ?
+          <mark key={i}>{part}</mark> : part
+      )}
+    </span>
+  );
+};
+
+const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searchTerm, isPriority = false, isMobile = false }) => {
   const [sliderValue, setSliderValue] = useState(50);
   const [pin, setPin] = useState('');
   const [showError, setShowError] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [isRelocking, setIsRelocking] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isSnapping, setIsSnapping] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-
-  React.useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  // isMobile is now a prop from parent — no per-card resize listener needed
 
   const cardPadding = isMobile ? 10 : 18;
 
   const cardRef = React.useRef(null);
-
-  const HighlightText = ({ text, highlight }) => {
-    if (!highlight || !highlight.trim()) return <span>{text}</span>;
-    const parts = String(text).split(new RegExp(`(${highlight.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')})`, 'gi'));
-    return (
-      <span>
-        {parts.map((part, i) => 
-          part.toLowerCase() === highlight.toLowerCase() ? 
-            <mark key={i}>{part}</mark> : part
-        )}
-      </span>
-    );
-  };
 
 
   React.useEffect(() => {
@@ -577,57 +572,6 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
           </div>
         )}
 
-
-
-      <style>{`
-        .chatgpt { color: #10a37f; background: rgba(16, 163, 127, 0.05) !important; border-color: rgba(16, 163, 127, 0.3) !important; }
-        .gemini { color: #4285f4; background: rgba(66, 133, 244, 0.05) !important; border-color: rgba(66, 133, 244, 0.3) !important; }
-        .midjourney { color: #a855f7; background: rgba(168, 85, 247, 0.05) !important; border-color: rgba(168, 85, 247, 0.3) !important; }
-        
-        @keyframes bounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-3px); }
-        }
-
-
-
-        @keyframes copyPulse {
-          0% { transform: scale(1.01); border-color: var(--accent-main); }
-          50% { transform: scale(1.04); border-color: #27C93F; box-shadow: 0 0 50px rgba(39, 201, 63, 0.4); }
-          100% { transform: scale(1.01); border-color: #27C93F; box-shadow: 0 0 20px rgba(39, 201, 63, 0.2); }
-        }
-
-        .copy-success-pulse {
-          animation: copyPulse 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        @keyframes copyButtonPop {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.15); }
-          100% { transform: scale(1); }
-        }
-
-        @keyframes toastFloatUp {
-          0% { opacity: 0; transform: translate(-50%, 10px); }
-          20% { opacity: 1; transform: translate(-50%, 0); }
-          80% { opacity: 1; transform: translate(-50%, 0); }
-          100% { opacity: 0; transform: translate(-50%, -20px); }
-        }
-
-        @media (hover: hover) and (pointer: fine) {
-          .pro-card-hover:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 15px 35px rgba(229, 9, 20, 0.15) !important;
-            border-color: rgba(229, 9, 20, 0.4) !important;
-          }
-          
-          .youtube-btn-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px rgba(229, 9, 20, 0.15) !important;
-            border-color: rgba(229, 9, 20, 0.3) !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };

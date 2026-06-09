@@ -58,6 +58,7 @@ const ArticlePage = () => {
 
   if (loading) return (
     <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '60px 20px' }}>
+      <SEOMetadata title="Loading Article... | PromptKing Blog" />
       <Shimmer height="20px" width="120px" style={{ marginBottom: '40px' }} />
       <div className="article-layout">
         <div className="main-content">
@@ -194,7 +195,10 @@ const ArticlePage = () => {
               <img 
                 src={optimizeImage(blog.featured_image, 1200)} 
                 alt={blog.featured_image_alt || blog.title} 
-                style={{ width: '100%', borderRadius: '30px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }} 
+                loading="lazy"
+                width="1200"
+                height="630"
+                style={{ width: '100%', height: 'auto', borderRadius: '30px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', display: 'block' }} 
               />
               {blog.featured_image_caption && (
                 <p style={{ textAlign: 'center', marginTop: '12px', fontSize: '0.85rem', color: 'var(--text-dim)', fontStyle: 'italic' }}>
@@ -210,8 +214,7 @@ const ArticlePage = () => {
             </div>
           )}
 
-          <h1 style={{ 
-            fontSize: window.innerWidth <= 1100 ? '2.2rem' : '3rem', 
+          <h1 className="article-page-title" style={{ 
             marginBottom: '30px', 
             lineHeight: 1.2, 
             fontWeight: 800, 
@@ -412,22 +415,6 @@ const ArticlePage = () => {
           </div>
         </aside>
       </div>
-      
-      <style>{`
-        .article-layout {
-          display: grid;
-          grid-template-columns: 1fr 340px;
-          gap: 60px;
-        }
-        @media (hover: hover) {
-          .sidebar-blog-card:hover { transform: translateX(5px); color: var(--accent-main); }
-        }
-        @media (max-width: 1100px) {
-          .article-layout { grid-template-columns: 1fr; }
-          .sidebar { order: 2; margin-top: 40px; }
-          .main-content { order: 1; }
-        }
-      `}</style>
     </div>
   );
 };

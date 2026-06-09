@@ -2,6 +2,8 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /admin/
+Disallow: /admin-secure/
+Disallow: /admin-secure
 
 User-agent: GPTBot
 Allow: /
@@ -18,4 +20,4 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
-Sitemap: https://promptking.in/sitemap.xml
+Sitemap: https://promptking.in/api/sitemap.xml

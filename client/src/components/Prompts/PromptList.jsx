@@ -309,6 +309,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
                       searchTerm={search}
                       isHighlighted={search && p.prompt_key && p.prompt_key.toLowerCase().includes(search.toLowerCase())}
                       isPriority={index < 2}
+                      isMobile={isMobile}
                     />
                   </div>
                 );
@@ -322,7 +323,9 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
             })()}
           </div>
 
-          {filteredPrompts.length > itemsPerPage && (
+          {filteredPrompts.length > itemsPerPage && (() => {
+            const totalPages = Math.ceil(filteredPrompts.length / itemsPerPage);
+            return (
             <div className="pagination-container" style={{ display: 'flex', justifyContent: 'center', marginTop: '30px', gap: '8px', alignItems: 'center' }}>
               <button 
                 onClick={() => {
@@ -346,9 +349,8 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
                 Prev
               </button>
               
-              {Array.from({ length: Math.ceil(filteredPrompts.length / itemsPerPage) }).map((_, idx) => {
+              {Array.from({ length: totalPages }).map((_, idx) => {
                 const pageNum = idx + 1;
-                const totalPages = Math.ceil(filteredPrompts.length / itemsPerPage);
                 
                 if (
                   pageNum === 1 || 
@@ -388,18 +390,18 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
 
               <button 
                 onClick={() => {
-                  setCurrentPage(p => Math.min(Math.ceil(filteredPrompts.length / itemsPerPage), p + 1));
+                  setCurrentPage(p => Math.min(totalPages, p + 1));
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                disabled={currentPage === Math.ceil(filteredPrompts.length / itemsPerPage)}
+                disabled={currentPage === totalPages}
                 style={{
                   background: 'rgba(255, 255, 255, 0.05)',
                   border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: currentPage === Math.ceil(filteredPrompts.length / itemsPerPage) ? 'rgba(255,255,255,0.3)' : 'white',
+                  color: currentPage === totalPages ? 'rgba(255,255,255,0.3)' : 'white',
                   padding: isMobile ? '8px 12px' : '8px 16px',
                   borderRadius: '12px',
                   fontWeight: 600,
-                  cursor: currentPage === Math.ceil(filteredPrompts.length / itemsPerPage) ? 'not-allowed' : 'pointer',
+                  cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
                   fontSize: isMobile ? '0.8rem' : '0.9rem',
                   display: 'flex',
                   alignItems: 'center'
@@ -408,7 +410,10 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
                 Next
               </button>
             </div>
-          )}
+            );
+          })()}
+
+
 
           <MagicKingIntro isMobile={isMobile} />
         </div>
