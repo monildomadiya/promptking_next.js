@@ -19,9 +19,10 @@ const BlogPage = () => {
   const fetchBlogs = async () => {
     const cacheKey = 'pk_blog_list';
     const cachedData = getCache(cacheKey);
-    if (cachedData) {
+    if (cachedData && cachedData.length > 0) {
       setBlogs(cachedData);
       setLoading(false);
+      return; // Early return to prevent redundant background request
     } else {
       setLoading(true);
     }

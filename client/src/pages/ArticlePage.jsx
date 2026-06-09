@@ -25,6 +25,7 @@ const ArticlePage = () => {
       setBlog(cachedData.blog);
       setOtherBlogs(cachedData.otherBlogs);
       setLoading(false);
+      return; // Early return to prevent redundant requests
     } else {
       setLoading(true);
     }
@@ -35,8 +36,14 @@ const ArticlePage = () => {
       const fetchedBlog = blogRes.data;
 
       // Fetch lightweight list of all blogs for the sidebar
-      const allBlogsRes = await api.get('/blogs');
-      const fetchedOtherBlogs = allBlogsRes.data.filter(b => b.slug !== slug).slice(0, 5);
+      let fetchedOtherBlogs = [];
+      const blogListCache = getCache('pk_blog_list');
+      if (blogListCache && blogListCache.length > 0) {
+        fetchedOtherBlogs = blogListCache.filter(b => b.slug !== slug).slice(0, 5);
+      } else {
+        const allBlogsRes = await api.get('/blogs');
+        fetchedOtherBlogs = allBlogsRes.data.filter(b => b.slug !== slug).slice(0, 5);
+      }
 
       setCache(cacheKey, { blog: fetchedBlog, otherBlogs: fetchedOtherBlogs });
       setBlog(fetchedBlog);
