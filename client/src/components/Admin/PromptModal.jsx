@@ -172,8 +172,8 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
 
   return (
     <div className="glass-overlay" style={{ 
-      position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3000,
-      padding: '20px'
+      position: 'fixed', inset: 0, zIndex: 3000,
+      padding: '40px 20px', overflowY: 'auto'
     }}>
       <style>{`
         .prompt-modal .glass-input {
@@ -185,7 +185,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
         }
       `}</style>
       <div className="glass-modal prompt-modal" style={{ 
-        width: '100%', maxWidth: '1200px', maxHeight: '95vh', overflowY: 'auto', position: 'relative',
+        width: '100%', maxWidth: '1200px', margin: '0 auto', position: 'relative',
         display: 'flex', flexDirection: 'column'
       }}>
         {/* Modal Header */}
