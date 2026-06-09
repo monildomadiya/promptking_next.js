@@ -125,9 +125,24 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
       setFormData(prev => ({ ...prev, prompt_key: uniqueId }));
     }
 
+    // Lock body scroll — prevents background from scrolling during screenshots
+    const scrollY = window.scrollY;
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+
     const handleEsc = (e) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
+    return () => {
+      // Restore body scroll
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, scrollY);
+      window.removeEventListener('keydown', handleEsc);
+    };
   }, [prompt, onClose]);
 
   // FAQ helpers
@@ -191,8 +206,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
         {/* Modal Header */}
         <div style={{ 
           padding: '30px 40px', borderBottom: '1px solid rgba(255,255,255,0.08)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          position: 'sticky', top: 0, background: 'rgba(10,10,12,0.8)', backdropFilter: 'blur(20px)', zIndex: 10
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
         }}>
           <div>
             <h2 style={{ fontSize: '1.8rem', fontWeight: 900, letterSpacing: '-0.5px', marginBottom: '4px' }}>
