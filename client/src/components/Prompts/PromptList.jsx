@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import PromptCard from './PromptCard';
 import MagicKingIntro from './MagicKingIntro';
 import SocialSidebar from './SocialSidebar';
@@ -8,10 +8,32 @@ import CategoryBar from './CategoryBar';
 import api from '../../api';
 import { Search, Crown, Grid, MessageSquare, Sparkles, Image, Zap, Filter, X } from '../Common/Icons';
 
+const CACHE_KEY = 'pk_prompts_cache';
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+const getCache = () => {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const { data, ts } = JSON.parse(raw);
+    if (Date.now() - ts > CACHE_TTL) return null; // stale
+    return data;
+  } catch { return null; }
+};
+
+const setCache = (data) => {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ data, ts: Date.now() }));
+  } catch {}
+};
+
 const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
-  const [prompts, setPrompts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const cached = getCache();
+  const [prompts, setPrompts] = useState(cached?.prompts || []);
+  const [categories, setCategories] = useState(cached?.categories || []);
+  const [loading, setLoading] = useState(!cached); // only show shimmer if no cache
+  const [isRevalidating, setIsRevalidating] = useState(false);
+  const [fadeIn, setFadeIn] = useState(!!cached); // animate in when data arrives
   const [activeUnlockedKey, setActiveUnlockedKey] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = isMobile ? 8 : 9;
@@ -19,6 +41,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
   const [catSearch, setCatSearch] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const hasFetched = useRef(false);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -44,58 +67,73 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
     };
   }, [isFilterOpen]);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async (silent = false) => {
+    if (silent) setIsRevalidating(true);
+    else setLoading(true);
     try {
-      setLoading(true);
       const response = await api.get('/get_data');
-      setPrompts(response.data.prompts);
-      setCategories(response.data.categories || []);
-      setLoading(false);
+      const newData = { prompts: response.data.prompts, categories: response.data.categories || [] };
+      setCache(newData);
+      setPrompts(newData.prompts);
+      setCategories(newData.categories);
+      if (!silent) {
+        setTimeout(() => setFadeIn(true), 50); // trigger fade-in
+      }
     } catch (error) {
       console.error("Failed to fetch prompts", error);
-      setLoading(false);
+    } finally {
+      if (silent) setIsRevalidating(false);
+      else setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    if (cached) {
+      // Instantly show cached data, silently revalidate in background
+      setFadeIn(true);
+      fetchData(true);
+    } else {
+      fetchData(false);
+    }
+  }, [fetchData]);
 
 
 
-  const filteredPrompts = prompts.filter(p => {
-    const safeKey = (p.prompt_key || '').toLowerCase();
-    const safeTitle = (p.title || '').toLowerCase();
-    const safeText = (p.prompt_text || p.promptText || '').toLowerCase();
-    const safeSearch = (search || '').toLowerCase();
-    
-    const matchesSearch = safeKey.includes(safeSearch) || 
-                          safeTitle.includes(safeSearch) || 
-                          safeText.includes(safeSearch);
-    
-    let matchesFilter = true;
-    if (filter === 'free') {
-      matchesFilter = !p.isPremium;
-    } else if (filter === 'premium') {
-      matchesFilter = p.isPremium;
-    } else if (filter !== 'all') {
-      matchesFilter = (p.aiType || '').toLowerCase().includes(filter);
-    }
-    
-    return matchesSearch && matchesFilter;
-  }).sort((a, b) => {
-    if (a.isFeatured && !b.isFeatured) return -1;
-    if (!a.isFeatured && b.isFeatured) return 1;
-    
-    // Sort by custom order defined in Admin Panel
-    if (a.sort_order !== b.sort_order) {
-      return (a.sort_order || 0) - (b.sort_order || 0);
-    }
-    return (a.prompt_key || '').localeCompare(b.prompt_key || '');
-  });
+  const filteredPrompts = useMemo(() => {
+    return prompts.filter(p => {
+      const safeKey = (p.prompt_key || '').toLowerCase();
+      const safeTitle = (p.title || '').toLowerCase();
+      const safeText = (p.prompt_text || p.promptText || '').toLowerCase();
+      const safeSearch = (search || '').toLowerCase();
+      
+      const matchesSearch = safeKey.includes(safeSearch) || 
+                            safeTitle.includes(safeSearch) || 
+                            safeText.includes(safeSearch);
+      
+      let matchesFilter = true;
+      if (filter === 'free') {
+        matchesFilter = !p.isPremium;
+      } else if (filter === 'premium') {
+        matchesFilter = p.isPremium;
+      } else if (filter !== 'all') {
+        matchesFilter = (p.aiType || '').toLowerCase().includes(filter);
+      }
+      
+      return matchesSearch && matchesFilter;
+    }).sort((a, b) => {
+      if (a.isFeatured && !b.isFeatured) return -1;
+      if (!a.isFeatured && b.isFeatured) return 1;
+      if (a.sort_order !== b.sort_order) {
+        return (a.sort_order || 0) - (b.sort_order || 0);
+      }
+      return (a.prompt_key || '').localeCompare(b.prompt_key || '');
+    });
+  }, [prompts, search, filter]);
 
   // Calculate counts for categories and types
-  const filterCounts = {
+  const filterCounts = useMemo(() => ({
     all: prompts.length,
     free: prompts.filter(p => !p.isPremium).length,
     premium: prompts.filter(p => p.isPremium).length,
@@ -104,7 +142,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
       acc[catName] = prompts.filter(p => (p.aiType || '').toLowerCase().includes(catName)).length;
       return acc;
     }, {})
-  };
+  }), [prompts, categories]);
 
   useEffect(() => {
     const handleOpenFilters = () => setIsSidebarOpen(true);
@@ -171,7 +209,32 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
   }
 
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: isMobile ? '10px' : '0 20px', width: '100%' }}>
+    <div style={{
+      maxWidth: '1400px', margin: '0 auto', padding: isMobile ? '10px' : '0 20px', width: '100%',
+      opacity: fadeIn ? 1 : 0,
+      transform: fadeIn ? 'translateY(0)' : 'translateY(12px)',
+      transition: 'opacity 0.4s ease, transform 0.4s ease'
+    }}>
+      {/* Background revalidation indicator */}
+      {isRevalidating && (
+        <div style={{
+          position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999,
+          background: 'rgba(20,20,20,0.85)', backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: '30px', padding: '6px 14px',
+          display: 'flex', alignItems: 'center', gap: '8px',
+          fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', fontWeight: 600,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.4)'
+        }}>
+          <div style={{
+            width: '8px', height: '8px', borderRadius: '50%',
+            background: 'var(--accent-main)',
+            animation: 'pulse-dot 1.2s ease-in-out infinite'
+          }} />
+          Refreshing…
+          <style>{`@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }`}</style>
+        </div>
+      )}
       <div className="home-layout-grid" style={{ 
         display: isMobile ? 'flex' : 'grid', 
         flexDirection: 'column' 

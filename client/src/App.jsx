@@ -46,7 +46,13 @@ function AppContent() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [isAdmin, setIsAdmin] = useState(false);
-  const [settings, setSettings] = useState({});
+  const [settings, setSettings] = useState(() => {
+    // Synchronously load cached settings to avoid header flash
+    try {
+      const cached = localStorage.getItem('siteSettings');
+      return cached ? JSON.parse(cached) : {};
+    } catch { return {}; }
+  });
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1100);
   const [headerHeight, setHeaderHeight] = useState(isMobile ? 85 : 130);
   const location = useLocation();
@@ -63,10 +69,12 @@ function AppContent() {
 
   const fetchSettings = async () => {
     try {
+      // First: show cached data instantly (no flash)
       const cached = localStorage.getItem('siteSettings');
       if (cached) {
         try { setSettings(JSON.parse(cached)); } catch(e) {}
       }
+      // Then: silently revalidate in background
       const response = await api.get('/settings');
       if (response.data) {
         setSettings(response.data);
