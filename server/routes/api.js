@@ -435,7 +435,11 @@ router.get('/blog/:slug', async (req, res) => {
 
 // --- FAQS (Public) ---
 router.get('/faqs', async (req, res) => {
-  if (!isDbHealthy()) return fetchLiveFaqs();
+  const isLiveServer = req.headers.host && (req.headers.host.includes('promptking.in') || req.headers.host.includes('onrender.com'));
+  if (!isDbHealthy()) {
+    if (isLiveServer) return res.status(500).json({ error: "Database error on live server" });
+    return fetchLiveFaqs();
+  }
 
   async function fetchLiveFaqs() {
     try {
@@ -453,13 +457,18 @@ router.get('/faqs', async (req, res) => {
   } catch (error) {
     console.warn('LOCAL DB FAILED, FETCHING LIVE FAQS:', error.message);
     lastDbFailure = Date.now();
+    if (isLiveServer) return res.status(500).json({ error: "Database error on live server" });
     await fetchLiveFaqs();
   }
 });
 
 // --- CATEGORIES (Public) ---
 router.get('/categories', async (req, res) => {
-  if (!isDbHealthy()) return fetchLiveCategories();
+  const isLiveServer = req.headers.host && (req.headers.host.includes('promptking.in') || req.headers.host.includes('onrender.com'));
+  if (!isDbHealthy()) {
+    if (isLiveServer) return res.status(500).json({ error: "Database error on live server" });
+    return fetchLiveCategories();
+  }
 
   async function fetchLiveCategories() {
     try {
@@ -477,14 +486,19 @@ router.get('/categories', async (req, res) => {
   } catch (error) {
     console.warn('LOCAL DB FAILED, FETCHING LIVE CATEGORIES:', error.message);
     lastDbFailure = Date.now();
+    if (isLiveServer) return res.status(500).json({ error: "Database error on live server" });
     await fetchLiveCategories();
   }
 });
 
 router.get('/prompt/:key', async (req, res) => {
   const { key } = req.params;
+  const isLiveServer = req.headers.host && (req.headers.host.includes('promptking.in') || req.headers.host.includes('onrender.com'));
 
-  if (!isDbHealthy()) return fetchLivePrompt();
+  if (!isDbHealthy()) {
+    if (isLiveServer) return res.status(500).json({ error: "Database error on live server" });
+    return fetchLivePrompt();
+  }
 
   async function fetchLivePrompt() {
     try {
@@ -535,6 +549,7 @@ router.get('/prompt/:key', async (req, res) => {
   } catch (error) {
     console.warn('LOCAL DB FAILED, FETCHING LIVE PROMPT:', error.message);
     lastDbFailure = Date.now();
+    if (isLiveServer) return res.status(500).json({ error: "Database error on live server" });
     await fetchLivePrompt();
   }
 });
@@ -559,7 +574,11 @@ const processSettings = (data) => {
 };
 
 router.get('/settings', async (req, res) => {
-  if (!isDbHealthy()) return fetchLiveSettings();
+  const isLiveServer = req.headers.host && (req.headers.host.includes('promptking.in') || req.headers.host.includes('onrender.com'));
+  if (!isDbHealthy()) {
+    if (isLiveServer) return res.status(500).json({ error: "Database error on live server" });
+    return fetchLiveSettings();
+  }
   try {
     const rows = await db`SELECT * FROM site_settings`;
     const settings = {};
@@ -569,6 +588,7 @@ router.get('/settings', async (req, res) => {
   } catch (error) {
     console.warn('LOCAL DB FAILED, FETCHING LIVE SETTINGS:', error.message);
     lastDbFailure = Date.now();
+    if (isLiveServer) return res.status(500).json({ error: "Database error on live server" });
     await fetchLiveSettings();
   }
 
