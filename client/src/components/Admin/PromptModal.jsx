@@ -589,7 +589,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
           </div>
 
           {/* ── RIGHT SIDEBAR ── */}
-          <div style={{ width: '340px', display: 'flex', flexDirection: 'column', gap: '30px', position: 'sticky', top: '100px' }}>
+          <div style={{ width: '340px', display: 'flex', flexDirection: 'column', gap: '30px' }}>
 
             {/* Social Sharing — OG */}
             <div style={{ background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
