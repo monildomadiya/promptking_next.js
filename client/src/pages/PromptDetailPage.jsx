@@ -112,9 +112,28 @@ const PromptDetailPage = ({ adsSettings }) => {
   const fetchSuggestions = async () => {
     const cacheKey = 'pk_suggestions_cache';
     const cachedData = getCache(cacheKey);
-    if (cachedData) {
+    if (cachedData && cachedData.length > 0) {
       // Filter out current key just in case
-      setSuggestedPrompts(cachedData.filter(p => p.key !== key));
+      setSuggestedPrompts(cachedData.filter(p => p.key !== key).slice(0, 6));
+      return; // Stop execution to save bandwidth
+    }
+
+    // Fallback: check if home page cache has prompts
+    const homeCache = getCache('pk_home_prompts');
+    if (homeCache && homeCache.prompts) {
+      const mapped = homeCache.prompts.map(p => ({
+        ...p,
+        promptText: p.prompt_text || p.promptText,
+        imgAfter: p.img_after || p.imgAfter,
+        imgBefore: p.img_before || p.imgBefore,
+        isPremium: p.is_premium || p.isPremium,
+        aiType: p.ai_type || p.aiType,
+        key: p.prompt_key || p.key
+      }));
+      const topSuggestions = mapped.slice(0, 15);
+      setCache(cacheKey, topSuggestions);
+      setSuggestedPrompts(topSuggestions.filter(p => p.key !== key).slice(0, 6));
+      return; // Stop execution
     }
 
     try {
