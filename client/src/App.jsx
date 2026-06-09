@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigationType } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
@@ -56,6 +56,7 @@ function AppContent() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1100);
   const [headerHeight, setHeaderHeight] = useState(isMobile ? 85 : 130);
   const location = useLocation();
+  const navType = useNavigationType();
   const isAdminPath = /^\/admin-secure(\/|$)/i.test(location.pathname);
 
   const fetchAdminStatus = async () => {
@@ -103,10 +104,12 @@ function AppContent() {
     };
   }, []);
 
-  // Scroll to top on page change
+  // Scroll to top on page change, UNLESS we are navigating back (POP)
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }, [location.pathname]);
+    if (navType !== 'POP') {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [location.pathname, navType]);
 
   const resetHome = () => {
     setSearch('');

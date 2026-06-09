@@ -6,6 +6,7 @@ import Shimmer from '../components/Common/Shimmer';
 import SocialSidebar from '../components/Prompts/SocialSidebar';
 import SEOMetadata from '../components/SEO/SEOMetadata';
 import { optimizeImage } from '../utils/imageUtils';
+import { getCache, setCache } from '../utils/cacheUtils';
 
 const BlogPage = () => {
   const [blogs, setBlogs] = useState([]);
@@ -13,19 +14,29 @@ const BlogPage = () => {
 
   useEffect(() => {
     fetchBlogs();
-    window.scrollTo(0, 0);
   }, []);
 
   const fetchBlogs = async () => {
+    const cacheKey = 'pk_blog_list';
+    const cachedData = getCache(cacheKey);
+    if (cachedData) {
+      setBlogs(cachedData);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+
     try {
       const response = await api.get('/blogs');
+      setCache(cacheKey, response.data);
       setBlogs(response.data);
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch blogs", error);
-      setLoading(false);
+      if (!cachedData) setLoading(false);
     }
   };
+
 
   if (loading) return (
     <div className="layout-with-sidebar">

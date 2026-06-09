@@ -35,7 +35,12 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
   const [isRevalidating, setIsRevalidating] = useState(false);
   const [fadeIn, setFadeIn] = useState(!!cached); // animate in when data arrives
   const [activeUnlockedKey, setActiveUnlockedKey] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(() => {
+    try {
+      const savedPage = sessionStorage.getItem('pk_current_page');
+      return savedPage ? parseInt(savedPage, 10) : 1;
+    } catch { return 1; }
+  });
   const itemsPerPage = isMobile ? 8 : 9;
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [catSearch, setCatSearch] = useState('');
@@ -161,6 +166,10 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
   useEffect(() => {
     setCurrentPage(1);
   }, [search, filter]);
+
+  useEffect(() => {
+    try { sessionStorage.setItem('pk_current_page', currentPage); } catch {}
+  }, [currentPage]);
 
   if (loading) {
     return (

@@ -6,6 +6,7 @@ import { ArrowLeft, Clock, Calendar, Share2, ShieldCheck, Tag, User } from '../c
 import SEOMetadata from '../components/SEO/SEOMetadata';
 import SocialSidebar from '../components/Prompts/SocialSidebar';
 import { optimizeImage } from '../utils/imageUtils';
+import { getCache, setCache } from '../utils/cacheUtils';
 
 const ArticlePage = () => {
   const { slug } = useParams();
@@ -18,20 +19,33 @@ const ArticlePage = () => {
   }, [slug]);
 
   const fetchArticle = async () => {
-    try {
+    const cacheKey = `pk_article_${slug}`;
+    const cachedData = getCache(cacheKey);
+    if (cachedData) {
+      setBlog(cachedData.blog);
+      setOtherBlogs(cachedData.otherBlogs);
+      setLoading(false);
+    } else {
       setLoading(true);
+    }
+
+    try {
       // Fetch the single article with full content
       const blogRes = await api.get(`/blog/${slug}`);
-      setBlog(blogRes.data);
+      const fetchedBlog = blogRes.data;
 
       // Fetch lightweight list of all blogs for the sidebar
       const allBlogsRes = await api.get('/blogs');
-      setOtherBlogs(allBlogsRes.data.filter(b => b.slug !== slug).slice(0, 5));
+      const fetchedOtherBlogs = allBlogsRes.data.filter(b => b.slug !== slug).slice(0, 5);
+
+      setCache(cacheKey, { blog: fetchedBlog, otherBlogs: fetchedOtherBlogs });
+      setBlog(fetchedBlog);
+      setOtherBlogs(fetchedOtherBlogs);
 
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch article", error);
-      setLoading(false);
+      if (!cachedData) setLoading(false);
     }
   };
 

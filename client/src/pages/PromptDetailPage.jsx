@@ -7,6 +7,7 @@ import Shimmer from '../components/Common/Shimmer';
 import YouTubeModal from '../components/Modals/YouTubeModal';
 import SEOMetadata from '../components/SEO/SEOMetadata';
 import AdSenseUnit from '../components/Ads/AdSenseUnit';
+import { getCache, setCache } from '../utils/cacheUtils';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const PromptDetailPage = ({ adsSettings }) => {
@@ -46,17 +47,30 @@ const PromptDetailPage = ({ adsSettings }) => {
   }, [lightboxIndex, prompt]);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Only scroll to top if not returning via back button,
+    // though App.jsx handles global scroll. This local scroll might interfere,
+    // but we can leave it or just remove it since App.jsx handles it.
+    // Let's remove window.scrollTo(0, 0) since App.jsx does it properly now.
     fetchPrompt();
     fetchSuggestions();
   }, [key]);
 
   const fetchPrompt = async () => {
-    try {
+    const cacheKey = `pk_prompt_${key}`;
+    const cachedData = getCache(cacheKey);
+    if (cachedData) {
+      setPrompt(cachedData);
+      setIsUnlocked(!(cachedData.is_premium || cachedData.isPremium));
+      setLoading(false);
+      // Still revalidate in background silently
+    } else {
       setLoading(true);
+    }
+
+    try {
       const response = await api.get(`/prompt/${key}`);
       const p = response.data;
-      setPrompt({
+      const formattedPrompt = {
         ...p,
         promptText: p.prompt_text || p.promptText,
         imgAfter: p.img_after || p.imgAfter,
@@ -69,31 +83,46 @@ const PromptDetailPage = ({ adsSettings }) => {
         metaTitle: p.meta_title || p.metaTitle,
         copyCount: p.copy_count || p.copy_count,
         key: p.prompt_key || p.key
-      });
-      if (!(p.is_premium || p.isPremium)) {
+      };
+      
+      setCache(cacheKey, formattedPrompt);
+      setPrompt(formattedPrompt);
+      
+      if (!(formattedPrompt.is_premium || formattedPrompt.isPremium)) {
         setIsUnlocked(true);
       }
       
       // Track page view once the prompt is loaded
-      try {
-        await api.post('/record_unlock', { key: p.prompt_key || p.key });
-      } catch (err) {
-        console.error("Failed to record view:", err);
+      if (!cachedData) {
+        try {
+          await api.post('/record_unlock', { key: formattedPrompt.key });
+        } catch (err) {
+          console.error("Failed to record view:", err);
+        }
       }
       
       setLoading(false);
     } catch (err) {
       console.error("Error fetching prompt:", err);
-      setError("Failed to load prompt details");
+      if (!cachedData) {
+        setError("Failed to load prompt details");
+      }
       setLoading(false);
     }
   };
 
   const fetchSuggestions = async () => {
+    const cacheKey = 'pk_suggestions_cache';
+    const cachedData = getCache(cacheKey);
+    if (cachedData) {
+      // Filter out current key just in case
+      setSuggestedPrompts(cachedData.filter(p => p.key !== key));
+    }
+
     try {
       const response = await api.get('/get_data');
       if (response.data && response.data.prompts) {
-        const mapped = response.data.prompts.filter(p => p.prompt_key !== key && p.key !== key).map(p => ({
+        const mapped = response.data.prompts.map(p => ({
           ...p,
           promptText: p.prompt_text || p.promptText,
           imgAfter: p.img_after || p.imgAfter,
@@ -102,7 +131,10 @@ const PromptDetailPage = ({ adsSettings }) => {
           aiType: p.ai_type || p.aiType,
           key: p.prompt_key || p.key
         }));
-        setSuggestedPrompts(mapped.slice(0, 6));
+        
+        const topSuggestions = mapped.slice(0, 15); // Cache top 15
+        setCache(cacheKey, topSuggestions);
+        setSuggestedPrompts(topSuggestions.filter(p => p.key !== key).slice(0, 6));
       }
     } catch (err) {
       console.error("Error fetching suggestions:", err);

@@ -5,6 +5,7 @@ import api from '../api';
 import Shimmer from '../components/Common/Shimmer';
 import SocialSidebar from '../components/Prompts/SocialSidebar';
 import SEOMetadata from '../components/SEO/SEOMetadata';
+import { getCache, setCache } from '../utils/cacheUtils';
 
 const pageVariants = {
   initial: { opacity: 1, y: 0 },
@@ -27,13 +28,23 @@ const FAQPage = () => {
   }, []);
 
   const fetchFaqs = async () => {
+    const cacheKey = 'pk_faq_list';
+    const cachedData = getCache(cacheKey);
+    if (cachedData) {
+      setFaqs(cachedData);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+
     try {
       const response = await api.get('/faqs');
+      setCache(cacheKey, response.data);
       setFaqs(response.data);
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch FAQs", error);
-      setLoading(false);
+      if (!cachedData) setLoading(false);
     }
   };
 
