@@ -20,6 +20,33 @@ export default defineConfig({
     }
   },
   build: {
-    chunkSizeWarningLimit: 1000
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // React core — smallest possible chunk loaded first
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+            return 'react-core';
+          }
+          // Router — needed on all pages
+          if (id.includes('node_modules/react-router-dom') || id.includes('node_modules/react-router/')) {
+            return 'router';
+          }
+          // Heavy admin-only libs — only loaded when admin visits /admin-secure
+          if (
+            id.includes('node_modules/recharts') ||
+            id.includes('node_modules/@dnd-kit') ||
+            id.includes('node_modules/@simplewebauthn') ||
+            id.includes('node_modules/framer-motion')
+          ) {
+            return 'admin-heavy';
+          }
+          // Other vendor libs
+          if (id.includes('node_modules/')) {
+            return 'vendor';
+          }
+        }
+      }
+    }
   }
 })
