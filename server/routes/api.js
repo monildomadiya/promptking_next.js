@@ -42,7 +42,7 @@ global.fetch = async (url, options) => {
 };
 
 let lastDbFailure = 0;
-const DB_RETRY_DELAY = 10 * 60 * 1000; // 10 minutes
+const DB_RETRY_DELAY = 10 * 1000; // 10 seconds, not 10 minutes!
 
 const isDbHealthy = () => {
   if (lastDbFailure === 0) return true;
