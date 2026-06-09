@@ -1110,7 +1110,6 @@ const PromptDetailPage = ({ adsSettings }) => {
           </aside>
         </div>
       </div>
-      {pageStyles}
     </div>
   );
 };
