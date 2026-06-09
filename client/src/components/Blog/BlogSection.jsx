@@ -37,8 +37,8 @@ const BlogSection = () => {
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}>
             <div>
-              <Shimmer height="40px" width="300px" style={{ marginBottom: '10px' }} />
-              <Shimmer height="20px" width="450px" />
+              <Shimmer height="40px" width="100%" style={{ maxWidth: '300px', marginBottom: '10px' }} />
+              <Shimmer height="20px" width="100%" style={{ maxWidth: '450px' }} />
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '30px' }}>

@@ -43,8 +43,8 @@ const BlogPage = () => {
       <div className="main-content-area">
         <header className="blog-hero">
           <Shimmer height="30px" width="150px" borderRadius="100px" style={{ margin: '0 auto 20px' }} />
-          <Shimmer height="60px" width="400px" style={{ margin: '0 auto 20px' }} />
-          <Shimmer height="20px" width="600px" style={{ margin: '0 auto' }} />
+          <Shimmer height="60px" width="100%" style={{ maxWidth: '400px', margin: '0 auto 20px' }} />
+          <Shimmer height="20px" width="100%" style={{ maxWidth: '600px', margin: '0 auto' }} />
         </header>
 
         <div className="blog-grid">

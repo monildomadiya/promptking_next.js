@@ -80,9 +80,9 @@ const FAQPage = () => {
       <div className="main-content-area">
         <header style={{ textAlign: 'center', marginBottom: '60px' }}>
           <Shimmer height="80px" width="80px" borderRadius="24px" style={{ margin: '0 auto 25px' }} />
-          <Shimmer height="60px" width="400px" style={{ margin: '0 auto 20px' }} />
-          <Shimmer height="24px" width="600px" style={{ margin: '0 auto 40px' }} />
-          <Shimmer height="60px" width="500px" borderRadius="20px" style={{ margin: '0 auto' }} />
+          <Shimmer height="60px" width="100%" style={{ maxWidth: '400px', margin: '0 auto 20px' }} />
+          <Shimmer height="24px" width="100%" style={{ maxWidth: '600px', margin: '0 auto 40px' }} />
+          <Shimmer height="60px" width="100%" borderRadius="20px" style={{ maxWidth: '500px', margin: '0 auto' }} />
         </header>
 
         <section style={{ marginBottom: '60px' }}>
