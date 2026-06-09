@@ -44,7 +44,51 @@
   <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com">
   <link rel="dns-prefetch" href="https://securetoken.googleapis.com">
 
-
+  <!-- Inline splash styles — zero flash, zero JS needed -->
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#020202;color:#fff;font-family:'Outfit',system-ui,sans-serif;min-height:100vh}
+    #app-splash{
+      position:fixed;inset:0;z-index:99999;
+      background:#020202;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;
+      transition:opacity 0.35s ease;
+    }
+    #app-splash.splash-hidden{opacity:0;pointer-events:none}
+    .splash-logo{
+      display:flex;align-items:center;gap:10px;
+    }
+    .splash-logo-crown{
+      width:38px;height:38px;
+      background:linear-gradient(135deg,#e50914,#b00711);
+      border-radius:10px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:20px;
+      box-shadow:0 0 30px rgba(229,9,20,0.4);
+      animation:splashPulse 1.8s ease-in-out infinite;
+    }
+    .splash-logo-text{
+      font-size:1.6rem;font-weight:900;letter-spacing:-0.5px;color:#fff;
+    }
+    .splash-logo-text span{color:#e50914}
+    .splash-bar{
+      width:160px;height:3px;background:rgba(255,255,255,0.06);border-radius:10px;overflow:hidden;
+    }
+    .splash-bar-fill{
+      height:100%;width:0;border-radius:10px;
+      background:linear-gradient(90deg,#e50914,#ff4d4d);
+      animation:splashBar 1.4s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+    @keyframes splashPulse{
+      0%,100%{box-shadow:0 0 20px rgba(229,9,20,0.3)}
+      50%{box-shadow:0 0 40px rgba(229,9,20,0.6)}
+    }
+    @keyframes splashBar{
+      0%{width:0}
+      60%{width:75%}
+      100%{width:100%}
+    }
+  </style>
 
   <!-- Google Analytics GA4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-1HK9T17LSR"></script>
@@ -97,8 +141,19 @@
 </head>
 
 <body>
+  <!-- Splash screen — shows instantly before JS loads, React removes it after first paint -->
+  <div id="app-splash" aria-hidden="true">
+    <div class="splash-logo">
+      <div class="splash-logo-crown">👑</div>
+      <div class="splash-logo-text">Prompt<span>King</span></div>
+    </div>
+    <div class="splash-bar">
+      <div class="splash-bar-fill"></div>
+    </div>
+  </div>
+
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 
-</html>
+</html>
