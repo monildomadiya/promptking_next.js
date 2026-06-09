@@ -960,10 +960,6 @@ const AdminDashboard = () => {
       if (response.data.isAdmin) {
         fetchData('prompts');
         fetchAnalytics();
-        if (typeof window !== 'undefined' && typeof window.clarity === 'function') {
-          window.clarity('set', 'role', 'admin');
-          window.clarity('identify', 'admin_user');
-        }
       }
     } catch (e) { console.error(e); }
   };
@@ -981,10 +977,6 @@ const AdminDashboard = () => {
         setIsAdmin(true);
         fetchData('prompts');
         fetchAnalytics();
-        if (typeof window !== 'undefined' && typeof window.clarity === 'function') {
-          window.clarity('set', 'role', 'admin');
-          window.clarity('identify', 'admin_user');
-        }
       } else {
         toast.error("Authentication failed.");
       }
@@ -1268,9 +1260,6 @@ const AdminDashboard = () => {
       { id: 'settings-branding', label: 'Branding', icon: <Palette size={20} /> },
       { id: 'settings-social', label: 'Channels', icon: <Share2 size={20} /> },
       { id: 'settings-ads', label: 'Ads Management', icon: <Activity size={20} /> },
-    ]},
-    { title: 'ANALYTICS', items: [
-      { id: 'user-tracking', label: 'User Tracking', icon: <Activity size={20} /> }
     ]}
   ];
 
@@ -1609,51 +1598,7 @@ const AdminDashboard = () => {
           {view === 'settings-branding' && <BrandingPanel key="branding" onSave={() => fetchData('settings')} />}
           {view === 'settings-social' && <SocialPanel key="social" onSave={() => fetchData('settings')} />}
           {view === 'settings-ads' && <AdsPanel key="ads" onSave={() => fetchData('settings')} />}
-          {view === 'user-tracking' && (
-            <div style={{ ...glassPanelStyle, padding: '40px', display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center', textAlign: 'center' }}>
-              <div style={{ width: '80px', height: '80px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
-                <Activity size={40} color="#3b82f6" />
-              </div>
-              <h2 style={{ fontSize: '1.8rem', fontWeight: 900 }}>Advanced User Tracking</h2>
-              <p style={{ color: 'var(--text-dim)', maxWidth: '600px', lineHeight: '1.6' }}>
-                Microsoft Clarity has been successfully integrated. It tracks advanced metrics like user heatmaps, scroll depth, rage clicks, and session recordings.
-              </p>
-              <div style={{ padding: '20px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', width: '100%', maxWidth: '600px', marginTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Project ID</div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'monospace' }}>x3oeuowknr</div>
-                </div>
-                <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Status</div>
-                  <div style={{ fontSize: '1rem', fontWeight: 700, color: '#10a37f', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div className="live-pulse-dot" style={{ width: '8px', height: '8px' }}></div> Active
-                  </div>
-                </div>
-              </div>
-              <a 
-                href="https://clarity.microsoft.com/projects/view/x3oeuowknr/dashboard" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                style={{
-                  marginTop: '20px',
-                  padding: '14px 30px',
-                  background: 'var(--accent-main)',
-                  color: 'white',
-                  borderRadius: '12px',
-                  fontWeight: 700,
-                  textDecoration: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  transition: 'transform 0.2s'
-                }}
-                onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'}
-                onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
-              >
-                Open Clarity Dashboard <ExternalLink size={18} />
-              </a>
-            </div>
-          )}
+
 
           {['prompts', 'blogs', 'authors', 'categories', 'faqs'].includes(view) && (
             <motion.div key="list" {...pageTransition} style={{ ...glassPanelStyle, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>

@@ -268,8 +268,90 @@ const PromptDetailPage = ({ adsSettings }) => {
     }
   };
 
+  const pageStyles = (
+    <style>{`
+      .detail-page-wrapper { animation: none; }
+      @keyframes fadeIn { from { opacity: 1; transform: translateY(0); } to { opacity: 1; transform: translateY(0); } }
+      .back-link { transition: 0.3s; }
+      @media (hover: hover) {
+        .back-link:hover { color: white !important; transform: translateX(-5px); }
+        .suggested-card-item:hover { 
+          transform: translateY(-3px) translateX(4px); 
+          background: rgba(255,255,255,0.06) !important;
+          border-color: rgba(229, 9, 20, 0.2) !important;
+          box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .suggested-card-item:hover .suggestion-img { transform: scale(1.1); }
+        .suggested-card-item:hover h4 { color: var(--accent-main) !important; }
+      }
+      .chatgpt { color: #10a37f; background: rgba(16, 163, 127, 0.08) !important; border-color: rgba(16, 163, 127, 0.3) !important; }
+      
+      @keyframes copyPulseDetail {
+        0% { transform: scale(1.01); border-color: var(--accent-main); }
+        50% { transform: scale(1.02); border-color: #27C93F; box-shadow: 0 0 60px rgba(39, 201, 63, 0.4); }
+        100% { transform: scale(1.01); border-color: #27C93F; }
+      }
+
+      .copy-success-pulse {
+        animation: copyPulseDetail 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      }
+
+      @keyframes copyButtonPop {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.15); }
+        100% { transform: scale(1); }
+      }
+
+      @keyframes toastFloatUp {
+        0% { opacity: 0; transform: translate(-50%, 10px); }
+        20% { opacity: 1; transform: translate(-50%, 0); }
+        80% { opacity: 1; transform: translate(-50%, 0); }
+        100% { opacity: 0; transform: translate(-50%, -20px); }
+      }
+
+      .gemini { color: #4285f4; background: rgba(66, 133, 244, 0.08) !important; border-color: rgba(66, 133, 244, 0.3) !important; }
+      .midjourney { color: #a855f7; background: rgba(168, 85, 247, 0.08) !important; border-color: rgba(168, 85, 247, 0.3) !important; }
+      .blog-content img { max-width: 100%; border-radius: 15px; margin: 20px 0; }
+      .blog-content h2, .blog-content h3 { color: white; margin-top: 35px; margin-bottom: 20px; }
+      
+      @media (min-width: 1025px) {
+        .media-prompt-container {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 30px;
+          align-items: stretch;
+          margin-bottom: 40px;
+        }
+        .media-prompt-container .hero-section {
+          margin-bottom: 0 !important;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        }
+        .media-prompt-container .hero-section > div {
+          flex: 1;
+          display: flex;
+          align-items: center;
+        }
+        .media-prompt-container .prompt-area {
+          margin-bottom: 0 !important;
+        }
+      }
+      
+      @media (max-width: 1024px) {
+        .detail-layout { grid-template-columns: 1fr !important; }
+        .detail-sidebar { display: none; }
+      }
+      @media (max-width: 768px) {
+        .detail-main { border-radius: 15px !important; padding: 15px !important; }
+        .prompt-area { border-radius: 15px !important; }
+      }
+    `}</style>
+  );
+
   if (loading) return (
     <div className="detail-page-wrapper" style={{ background: 'var(--surface-0)', minHeight: '100vh', color: 'white' }}>
+      {pageStyles}
       <SEOMetadata title="Loading Prompt... | PromptKing" />
       <div className="container" style={{ padding: '40px 20px', maxWidth: '1400px', margin: '0 auto' }}>
         {/* Back Link Shimmer */}
@@ -1119,85 +1201,7 @@ const PromptDetailPage = ({ adsSettings }) => {
           </aside>
         </div>
       </div>
-
-<style>{`
-        .detail-page-wrapper { animation: none; }
-        @keyframes fadeIn { from { opacity: 1; transform: translateY(0); } to { opacity: 1; transform: translateY(0); } }
-        .back-link { transition: 0.3s; }
-        @media (hover: hover) {
-          .back-link:hover { color: white !important; transform: translateX(-5px); }
-          .suggested-card-item:hover { 
-            transform: translateY(-3px) translateX(4px); 
-            background: rgba(255,255,255,0.06) !important;
-            border-color: rgba(229, 9, 20, 0.2) !important;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-          }
-          .suggested-card-item:hover .suggestion-img { transform: scale(1.1); }
-          .suggested-card-item:hover h4 { color: var(--accent-main) !important; }
-        }
-        .chatgpt { color: #10a37f; background: rgba(16, 163, 127, 0.08) !important; border-color: rgba(16, 163, 127, 0.3) !important; }
-        
-        @keyframes copyPulseDetail {
-          0% { transform: scale(1.01); border-color: var(--accent-main); }
-          50% { transform: scale(1.02); border-color: #27C93F; box-shadow: 0 0 60px rgba(39, 201, 63, 0.4); }
-          100% { transform: scale(1.01); border-color: #27C93F; }
-        }
-
-        .copy-success-pulse {
-          animation: copyPulseDetail 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-
-        @keyframes copyButtonPop {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.15); }
-          100% { transform: scale(1); }
-        }
-
-        @keyframes toastFloatUp {
-          0% { opacity: 0; transform: translate(-50%, 10px); }
-          20% { opacity: 1; transform: translate(-50%, 0); }
-          80% { opacity: 1; transform: translate(-50%, 0); }
-          100% { opacity: 0; transform: translate(-50%, -20px); }
-        }
-
-        .gemini { color: #4285f4; background: rgba(66, 133, 244, 0.08) !important; border-color: rgba(66, 133, 244, 0.3) !important; }
-        .midjourney { color: #a855f7; background: rgba(168, 85, 247, 0.08) !important; border-color: rgba(168, 85, 247, 0.3) !important; }
-        .blog-content img { max-width: 100%; border-radius: 15px; margin: 20px 0; }
-        .blog-content h2, .blog-content h3 { color: white; margin-top: 35px; margin-bottom: 20px; }
-        
-        @media (min-width: 1025px) {
-          .media-prompt-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            align-items: stretch;
-            margin-bottom: 40px;
-          }
-          .media-prompt-container .hero-section {
-            margin-bottom: 0 !important;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-          }
-          .media-prompt-container .hero-section > div {
-            flex: 1;
-            display: flex;
-            align-items: center;
-          }
-          .media-prompt-container .prompt-area {
-            margin-bottom: 0 !important;
-          }
-        }
-        
-        @media (max-width: 1024px) {
-          .detail-layout { grid-template-columns: 1fr !important; }
-          .detail-sidebar { display: none; }
-        }
-        @media (max-width: 768px) {
-          .detail-main { border-radius: 15px !important; padding: 15px !important; }
-          .prompt-area { border-radius: 15px !important; }
-        }
-      `}</style>
+      {pageStyles}
     </div>
   );
 };
