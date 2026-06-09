@@ -289,13 +289,26 @@ const PromptDetailPage = ({ adsSettings }) => {
             </div>
 
             {/* Media & Prompt Container Shimmer */}
-            <div className="media-prompt-container">
+            <div className="media-prompt-container" style={{
+              display: 'flex',
+              flexDirection: window.innerWidth <= 1100 ? 'column' : 'row',
+              gap: '40px',
+              alignItems: window.innerWidth <= 1100 ? 'flex-start' : 'stretch',
+              marginBottom: window.innerWidth <= 1100 ? '0' : '40px'
+            }}>
                {/* Hero Image Shimmer */}
-               <div className="hero-section" style={{ marginBottom: '40px' }}>
-                  <Shimmer height="450px" borderRadius="32px" />
+               <div className="hero-section" style={{ 
+                 marginBottom: window.innerWidth <= 1100 ? '20px' : '0',
+                 width: window.innerWidth <= 1100 ? '100%' : 'calc(60% - 20px)'
+               }}>
+                  <Shimmer height={window.innerWidth <= 1100 ? "250px" : "450px"} borderRadius="32px" />
                </div>
                {/* Vault/Prompt Shimmer */}
-               <div className="prompt-area" style={{ marginBottom: '40px', minHeight: '350px' }}>
+               <div className="prompt-area" style={{ 
+                 marginBottom: window.innerWidth <= 1100 ? '20px' : '0', 
+                 minHeight: '350px',
+                 width: window.innerWidth <= 1100 ? '100%' : 'calc(40% - 20px)'
+               }}>
                   <Shimmer height="100%" borderRadius="32px" />
                </div>
             </div>
