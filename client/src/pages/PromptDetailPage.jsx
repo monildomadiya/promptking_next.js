@@ -94,11 +94,9 @@ const PromptDetailPage = ({ adsSettings }) => {
       
       // Track page view once the prompt is loaded
       if (!cachedData) {
-        try {
-          await api.post('/record_unlock', { key: formattedPrompt.key });
-        } catch (err) {
+        api.post('/record_unlock', { key: formattedPrompt.key }).catch(err => {
           console.error("Failed to record view:", err);
-        }
+        });
       }
       
       setLoading(false);
@@ -297,19 +295,40 @@ const PromptDetailPage = ({ adsSettings }) => {
               marginBottom: window.innerWidth <= 1100 ? '0' : '40px'
             }}>
                {/* Hero Image Shimmer */}
-               <div className="hero-section" style={{ 
+               <div className="hero-section glass-panel" style={{
+                 background: 'rgba(255, 255, 255, 0.02)',
+                 backdropFilter: 'blur(30px)',
+                 WebkitBackdropFilter: 'blur(30px)',
+                 borderRadius: '32px',
+                 padding: '12px',
+                 border: '1px solid rgba(255, 255, 255, 0.05)',
+                 boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
                  marginBottom: window.innerWidth <= 1100 ? '20px' : '0',
-                 width: window.innerWidth <= 1100 ? '100%' : 'calc(60% - 20px)'
+                 position: 'relative',
+                 overflow: 'hidden',
+                 width: window.innerWidth <= 1100 ? '100%' : 'calc(60% - 20px)',
+                 flexShrink: 0
                }}>
-                  <Shimmer height={window.innerWidth <= 1100 ? "250px" : "450px"} borderRadius="32px" />
+                  <Shimmer height={window.innerWidth <= 1100 ? "250px" : "450px"} borderRadius="24px" />
                </div>
                {/* Vault/Prompt Shimmer */}
-               <div className="prompt-area" style={{ 
-                 marginBottom: window.innerWidth <= 1100 ? '20px' : '0', 
-                 minHeight: '350px',
-                 width: window.innerWidth <= 1100 ? '100%' : 'calc(40% - 20px)'
+               <div className="prompt-vault-column" style={{ 
+                 display: 'flex', 
+                 flexDirection: 'column', 
+                 width: window.innerWidth <= 1100 ? '100%' : 'calc(40% - 20px)',
+                 gap: '20px'
                }}>
-                  <Shimmer height="100%" borderRadius="32px" />
+                  <div className="prompt-area" style={{ 
+                    background: 'rgba(15, 15, 20, 0.4)', 
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    borderRadius: '32px', 
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    flex: 1,
+                    minHeight: '350px'
+                  }}>
+                    <Shimmer height="100%" borderRadius="32px" style={{ background: 'transparent' }} />
+                  </div>
                </div>
             </div>
 
