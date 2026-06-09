@@ -1338,7 +1338,11 @@ body.shorts-modal-open {
   .article-page-title { font-size: 2.2rem; }
 }
 
-/* ── Lightbox CSS Animations (replaces framer-motion) ── */
+/* ── Lightbox & Loader CSS Animations ── */
+@keyframes spin { 
+  to { transform: rotate(360deg); } 
+}
+
 @keyframes lightboxFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
