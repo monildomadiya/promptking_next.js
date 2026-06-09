@@ -106,12 +106,21 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
 
 
 
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [search]);
+
   const filteredPrompts = useMemo(() => {
     return prompts.filter(p => {
       const safeKey = (p.prompt_key || '').toLowerCase();
       const safeTitle = (p.title || '').toLowerCase();
       const safeText = (p.prompt_text || p.promptText || '').toLowerCase();
-      const safeSearch = (search || '').toLowerCase();
+      const safeSearch = (debouncedSearch || '').toLowerCase();
       
       const matchesSearch = safeKey.includes(safeSearch) || 
                             safeTitle.includes(safeSearch) || 
@@ -135,7 +144,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
       }
       return (a.prompt_key || '').localeCompare(b.prompt_key || '');
     });
-  }, [prompts, search, filter]);
+  }, [prompts, debouncedSearch, filter]);
 
   // Calculate counts for categories and types
   const filterCounts = useMemo(() => ({

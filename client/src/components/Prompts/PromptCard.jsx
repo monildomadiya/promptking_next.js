@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Copy, Check, Eye, Lock, Unlock, Youtube, ArrowRight, Crown, Code, Instagram, Layout, Zap, Sparkles, Image, MessageSquare, Laptop, ChevronLeft, ChevronRight, Star } from '../Common/Icons';
 import api, { SERVER_URL } from '../../api';
-import confetti from 'canvas-confetti';
 import YouTubeModal from '../Modals/YouTubeModal';
 import { optimizeImage } from '../../utils/imageUtils';
 
@@ -96,9 +95,10 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
 
 
 
-  const triggerConfetti = () => {
+  const triggerConfetti = async () => {
     const box = document.getElementById(`box-${prompt.key}`);
     if (box) {
+      const confetti = (await import('canvas-confetti')).default;
       const rect = box.getBoundingClientRect();
       const originX = (rect.left + (rect.width / 2)) / window.innerWidth;
       const originY = (rect.top + (rect.height / 2)) / window.innerHeight;
@@ -156,6 +156,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
         // Enhanced Celebration for Free Content
         const box = document.getElementById(`box-${prompt.key}`);
         if (box) {
+          const confetti = (await import('canvas-confetti')).default;
           const rect = box.getBoundingClientRect();
           const x = (rect.left + rect.width / 2) / window.innerWidth;
           const y = (rect.top + rect.height / 2) / window.innerHeight;
@@ -279,6 +280,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
               alt={`${prompt.title} - ${prompt.aiType || 'AI'} Prompt Result (After)`} 
               loading={isPriority ? "eager" : "lazy"} 
               fetchpriority={isPriority ? "high" : "auto"}
+              decoding="async"
               onLoad={() => setIsLoaded(true)}
               width="400" 
               height="225" 
@@ -289,6 +291,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
               alt={`${prompt.title} - Original Input Image (Before)`} 
               loading={isPriority ? "eager" : "lazy"}
               fetchpriority={isPriority ? "high" : "auto"}
+              decoding="async"
               width="400"
               height="225"
               style={{ 
@@ -344,6 +347,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
               alt={`${prompt.title} - ${prompt.aiType || 'AI'} Prompt Example`} 
               loading={isPriority ? "eager" : "lazy"} 
               fetchpriority={isPriority ? "high" : "auto"}
+              decoding="async"
               onLoad={() => setIsLoaded(true)}
               width="400" 
               height="225" 
