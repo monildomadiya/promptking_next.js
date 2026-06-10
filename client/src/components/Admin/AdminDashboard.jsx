@@ -1696,6 +1696,15 @@ const AdminDashboard = () => {
                                   onError={e => e.target.style.display = 'none'} 
                                 />
                               )}
+                              {view === 'blogs' && item.featured_image && (
+                                <img 
+                                  src={item.featured_image} 
+                                  alt={item.title || 'Blog'} 
+                                  className="admin-thumb-hover"
+                                  style={{ width: '72px', height: '54px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }} 
+                                  onError={e => e.target.style.display = 'none'} 
+                                />
+                              )}
                               <div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                   <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '4px' }}>{item.prompt_key || item.title || item.name}</div>
