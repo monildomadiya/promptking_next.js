@@ -36,6 +36,7 @@ if (compression) {
   app.use(compression());
 }
 app.use((req, res, next) => {
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   console.log(`${req.method} ${req.url}`);
   next();
 });
@@ -92,6 +93,7 @@ if (READ_ONLY) {
 // Import and use routes
 const sitemapRoute = require('./routes/sitemap');
 app.use('/sitemap.xml', sitemapRoute);
+app.use('/api/sitemap.xml', sitemapRoute);
 const apiRoutes = require('./routes/api');
 app.use('/api', apiRoutes);
 
