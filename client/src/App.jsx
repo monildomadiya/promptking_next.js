@@ -8,19 +8,38 @@ import GoogleAdSense from './components/Ads/GoogleAdSense';
 import { optimizeImage } from './utils/imageUtils';
 import './index.css';
 
-// Lazy load pages for better performance
-const HomePage = lazy(() => import('./pages/HomePage'));
-const BlogPage = lazy(() => import('./pages/BlogPage'));
-const ArticlePage = lazy(() => import('./pages/ArticlePage'));
-const PromptDetailPage = lazy(() => import('./pages/PromptDetailPage'));
-const FAQPage = lazy(() => import('./pages/FAQPage'));
-const AboutPage = lazy(() => import('./pages/AboutPage'));
-const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
-const TermsPage = lazy(() => import('./pages/TermsPage'));
-const DisclaimerPage = lazy(() => import('./pages/DisclaimerPage'));
-const AdSensePolicyPage = lazy(() => import('./pages/AdSensePolicyPage'));
-const ContactPage = lazy(() => import('./pages/ContactPage'));
-const AdminDashboard = lazy(() => import('./components/Admin/AdminDashboard'));
+// Lazy load pages for better performance and handle chunk load errors after deployments
+const lazyWithRetry = (componentImport) =>
+  lazy(async () => {
+    const pageHasAlreadyBeenForceRefreshed = JSON.parse(
+      window.sessionStorage.getItem('page-has-been-force-refreshed') || 'false'
+    );
+    try {
+      const component = await componentImport();
+      window.sessionStorage.setItem('page-has-been-force-refreshed', 'false');
+      return component;
+    } catch (error) {
+      if (!pageHasAlreadyBeenForceRefreshed) {
+        window.sessionStorage.setItem('page-has-been-force-refreshed', 'true');
+        window.location.reload();
+        return new Promise(() => {});
+      }
+      throw error;
+    }
+  });
+
+const HomePage = lazyWithRetry(() => import('./pages/HomePage'));
+const BlogPage = lazyWithRetry(() => import('./pages/BlogPage'));
+const ArticlePage = lazyWithRetry(() => import('./pages/ArticlePage'));
+const PromptDetailPage = lazyWithRetry(() => import('./pages/PromptDetailPage'));
+const FAQPage = lazyWithRetry(() => import('./pages/FAQPage'));
+const AboutPage = lazyWithRetry(() => import('./pages/AboutPage'));
+const PrivacyPage = lazyWithRetry(() => import('./pages/PrivacyPage'));
+const TermsPage = lazyWithRetry(() => import('./pages/TermsPage'));
+const DisclaimerPage = lazyWithRetry(() => import('./pages/DisclaimerPage'));
+const AdSensePolicyPage = lazyWithRetry(() => import('./pages/AdSensePolicyPage'));
+const ContactPage = lazyWithRetry(() => import('./pages/ContactPage'));
+const AdminDashboard = lazyWithRetry(() => import('./components/Admin/AdminDashboard'));
 
 // Loading Fallback Component
 const PageLoader = () => (
