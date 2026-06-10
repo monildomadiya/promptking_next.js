@@ -173,6 +173,7 @@ html {
   cursor: zoom-in;
   position: relative;
   z-index: 1;
+  transform-origin: left center;
 }
 
 @media (hover: hover) and (pointer: fine) {
