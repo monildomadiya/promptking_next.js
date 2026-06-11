@@ -25,6 +25,7 @@ const HomePage = ({ search, filter, setFilter, isMobile }) => {
     if (categorySlug) {
       const formattedCategory = categorySlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
       return `${formattedCategory} Prompts - Free AI Library | PromptKing`;
+    }
     return "PromptKing – Free AI Prompts for ChatGPT, Gemini, Midjourney & More";
   };
 
