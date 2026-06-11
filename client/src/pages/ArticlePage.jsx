@@ -12,6 +12,7 @@ const ArticlePage = () => {
   const { slug } = useParams();
   const [blog, setBlog] = useState(null);
   const [otherBlogs, setOtherBlogs] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,9 +22,13 @@ const ArticlePage = () => {
   const fetchArticle = async () => {
     const cacheKey = `pk_article_${slug}`;
     const cachedData = getCache(cacheKey);
-    if (cachedData) {
+    const catsCache = getCache('pk_categories');
+    let fetchedCategories = catsCache || [];
+
+    if (cachedData && catsCache) {
       setBlog(cachedData.blog);
       setOtherBlogs(cachedData.otherBlogs);
+      setCategories(catsCache);
       setLoading(false);
       return; // Early return to prevent redundant requests
     } else {
@@ -45,9 +50,16 @@ const ArticlePage = () => {
         fetchedOtherBlogs = allBlogsRes.data.filter(b => b.slug !== slug).slice(0, 5);
       }
 
+      if (!catsCache) {
+        const catRes = await api.get('/categories');
+        fetchedCategories = catRes.data || [];
+        setCache('pk_categories', fetchedCategories);
+      }
+
       setCache(cacheKey, { blog: fetchedBlog, otherBlogs: fetchedOtherBlogs });
       setBlog(fetchedBlog);
       setOtherBlogs(fetchedOtherBlogs);
+      setCategories(fetchedCategories);
 
       setLoading(false);
     } catch (error) {
@@ -159,6 +171,85 @@ const ArticlePage = () => {
     });
   }
 
+  // Auto-link keywords
+  const autoLinkContent = (html, cats) => {
+    if (!html || !cats || cats.length === 0) return html;
+    
+    // Sort by length to match longest phrases first (e.g. "Stable Diffusion" before "Stable")
+    const sortedCats = [...cats].sort((a, b) => (b.name || '').length - (a.name || '').length);
+    
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      const walker = document.createTreeWalker(
+        doc.body,
+        NodeFilter.SHOW_TEXT,
+        {
+          acceptNode: function(node) {
+            let parent = node.parentNode;
+            while (parent && parent !== doc.body) {
+              if (['A', 'SCRIPT', 'STYLE', 'CODE', 'PRE', 'H1', 'H2', 'H3'].includes(parent.nodeName)) {
+                return NodeFilter.FILTER_REJECT;
+              }
+              parent = parent.parentNode;
+            }
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        }
+      );
+
+      const nodesToProcess = [];
+      let currentNode;
+      while ((currentNode = walker.nextNode())) {
+        if(currentNode.nodeValue.trim().length > 0) {
+          nodesToProcess.push(currentNode);
+        }
+      }
+
+      nodesToProcess.forEach(node => {
+        let text = node.nodeValue;
+        let replaced = false;
+        
+        const escapeHTML = (str) => str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        let newHtml = escapeHTML(text);
+
+        // Track already linked parts to avoid nested linking
+        sortedCats.forEach(cat => {
+          if (!cat.name) return;
+          const keyword = cat.name;
+          const slug = cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-');
+          
+          // Regex with word boundaries. Negative lookbehind/ahead for HTML tags isn't strictly needed 
+          // because we are operating purely on text nodes, but we replaced text with HTML iteratively.
+          // So we need to ensure we don't match inside the <a> tags we just created.
+          // A safer way is a regex that ignores matches inside tags.
+          const regex = new RegExp(`(?<!<[^>]*)\\b(${keyword})\\b(?![^<]*>)`, 'gi');
+          
+          if (regex.test(newHtml)) {
+            replaced = true;
+            newHtml = newHtml.replace(regex, `<a href="/category/${slug}" class="auto-internal-link" style="color: var(--accent-main); font-weight: 600; text-decoration: underline; text-decoration-color: rgba(229,9,20,0.4); text-underline-offset: 3px; transition: 0.2s;">$1</a>`);
+          }
+        });
+
+        if (replaced) {
+          const span = doc.createElement('span');
+          span.innerHTML = newHtml;
+          while (span.firstChild) {
+            node.parentNode.insertBefore(span.firstChild, node);
+          }
+          node.parentNode.removeChild(node);
+        }
+      });
+      return doc.body.innerHTML;
+    } catch (e) {
+      console.warn("Auto-linker failed:", e);
+      return html;
+    }
+  };
+
+  finalContent = autoLinkContent(finalContent, categories);
+
   return (
     <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '60px 20px' }}>
       <SEOMetadata 
@@ -260,17 +351,42 @@ const ArticlePage = () => {
             style={{ fontSize: '1.15rem', lineHeight: 1.9, color: '#d1d1d1' }}
           />
 
-          {/* Tags */}
-          {parsedTags.length > 0 && (
-            <div style={{ marginTop: '50px', display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
-              <Tag size={18} color="var(--text-dim)" />
-              {parsedTags.map((tag, i) => (
-                <span key={i} style={{ background: 'rgba(255,255,255,0.05)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.85rem', color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
+          {/* Tags & Related Categories */}
+          <div style={{ marginTop: '50px' }}>
+            {parsedTags.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center', marginBottom: '20px' }}>
+                <Tag size={18} color="var(--text-dim)" />
+                {parsedTags.map((tag, i) => (
+                  <span key={i} style={{ background: 'rgba(255,255,255,0.05)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.85rem', color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+            
+            {/* Display matched categories from auto-linker as Related Categories */}
+            {(() => {
+              const matchedCats = categories.filter(cat => 
+                blog.content && blog.content.toLowerCase().includes(cat.name.toLowerCase())
+              );
+              if(matchedCats.length > 0) {
+                return (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center', padding: '20px', background: 'rgba(229,9,20,0.05)', border: '1px solid rgba(229,9,20,0.2)', borderRadius: '16px' }}>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'white' }}>Related Prompts:</span>
+                    {matchedCats.map(cat => {
+                       const slug = cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-');
+                       return (
+                        <Link key={cat.id} to={`/category/${slug}`} style={{ background: 'var(--accent-main)', color: 'white', padding: '6px 14px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', transition: '0.2s', boxShadow: '0 4px 10px rgba(229,9,20,0.3)' }} className="related-cat-hover">
+                          {cat.name}
+                        </Link>
+                       );
+                    })}
+                  </div>
+                );
+              }
+              return null;
+            })()}
+          </div>
 
           {/* Author Box */}
           <div className="author-box" style={{

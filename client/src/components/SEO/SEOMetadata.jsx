@@ -7,8 +7,8 @@ const DEFAULT_IMAGE = 'https://promptking.in/og-image.png';
 const DEFAULT_KEYWORDS = 'ai prompts, chatgpt prompts, midjourney prompts, gemini prompts, prompt engineering, ai art prompts, premium prompts, best chatgpt prompts, ai prompt library';
 
 const SEOMetadata = ({ 
-  title = 'PromptKing - The Ultimate AI Prompts Library', 
-  description = 'Discover the ultimate library of premium AI prompts for ChatGPT, Midjourney, Gemini, and more. Elevate your workflows, get more done, unlock world-class AI results.',
+  title = 'PromptKing – Free AI Prompts for ChatGPT, Gemini, Midjourney & More', 
+  description = 'Discover 1000+ free AI prompts for ChatGPT, Gemini, Midjourney, DALL·E & Stable Diffusion. Copy expert-crafted prompts for image creation, writing & more. Updated daily.',
   keywords = DEFAULT_KEYWORDS,
   image = DEFAULT_IMAGE,
   url = typeof window !== 'undefined' ? window.location.href : SITE_URL,
@@ -28,7 +28,11 @@ const SEOMetadata = ({
   twitterDescription,
   twitterImage
 }) => {
-  const canonicalUrl = canonicalUrlOverride || url.split('?')[0];
+  let canonicalUrl = canonicalUrlOverride || url.split('?')[0];
+  // Strip trailing slash for consistent SEO indexing, except for the root domain
+  if (canonicalUrl.endsWith('/') && canonicalUrl !== SITE_URL && canonicalUrl !== `${SITE_URL}/`) {
+    canonicalUrl = canonicalUrl.slice(0, -1);
+  }
 
   const breadcrumbSchema = breadcrumb && breadcrumb.length > 0 ? {
     '@context': 'https://schema.org',

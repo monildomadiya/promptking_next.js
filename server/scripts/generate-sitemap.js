@@ -24,6 +24,7 @@ const STATIC_PAGES = [
   { url: '/privacy',       changefreq: 'yearly',  priority: '0.3' },
   { url: '/terms',         changefreq: 'yearly',  priority: '0.3' },
   { url: '/disclaimer',    changefreq: 'yearly',  priority: '0.3' },
+  { url: '/adsense-policy',changefreq: 'yearly',  priority: '0.3' },
 ];
 
 function escapeXml(str) {
@@ -84,6 +85,12 @@ async function generateSitemap() {
     );
     console.log(`📰 Found ${blogs.length} blog articles`);
 
+    // Fetch all categories
+    const [categories] = await pool.query(
+      'SELECT id, name, slug FROM categories ORDER BY name ASC'
+    );
+    console.log(`📂 Found ${categories.length} categories`);
+
     // Build all URL entries
     const urls = [];
 
@@ -94,6 +101,17 @@ async function generateSitemap() {
         lastmod: formatDate(),
         changefreq: page.changefreq,
         priority: page.priority
+      }));
+    }
+
+    // Category pages
+    for (const cat of categories) {
+      const catSlug = cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-');
+      urls.push(buildUrlEntry({
+        loc: `${SITE_URL}/category/${catSlug}`,
+        lastmod: formatDate(),
+        changefreq: 'daily',
+        priority: '0.8'
       }));
     }
 

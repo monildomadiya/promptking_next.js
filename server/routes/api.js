@@ -1360,12 +1360,14 @@ router.get('/sitemap.xml', async (req, res) => {
   const baseUrl = 'https://promptking.in';
   let prompts = [];
   let blogs = [];
+  let categories = [];
   
   try {
     // Attempt DB fetch if healthy
     const db = require('../db');
     prompts = await db`SELECT prompt_key, title, updated_at, created_at, img_after, img_before FROM prompts WHERE prompt_key IS NOT NULL AND is_draft = 0 AND (publish_date IS NULL OR publish_date <= NOW())`;
     blogs = await db`SELECT slug, title, updated_at, created_at, featured_image FROM blogs WHERE slug IS NOT NULL`;
+    categories = await db`SELECT name, slug FROM categories ORDER BY name ASC`;
   } catch (err) {
     console.warn("Sitemap: DB failed, serving static pages only", err.message);
   }
@@ -1384,9 +1386,15 @@ router.get('/sitemap.xml', async (req, res) => {
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n`;
     
     // Static Pages
-    const staticPages = ['', '/blog', '/faq', '/about', '/privacy', '/terms', '/disclaimer', '/contact'];
+    const staticPages = ['', '/blog', '/faq', '/about', '/privacy', '/terms', '/disclaimer', '/contact', '/adsense-policy'];
     staticPages.forEach(p => {
       xml += `  <url>\n    <loc>${baseUrl}${p}</loc>\n    <changefreq>daily</changefreq>\n    <priority>${p === '' ? '1.0' : '0.8'}</priority>\n  </url>\n`;
+    });
+
+    // Dynamic Categories
+    categories.forEach(cat => {
+      const catSlug = cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-');
+      xml += `  <url>\n    <loc>${baseUrl}/category/${escapeXml(catSlug)}</loc>\n    <changefreq>daily</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
     });
 
     // Dynamic Prompts

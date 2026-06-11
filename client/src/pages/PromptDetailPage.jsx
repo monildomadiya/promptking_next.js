@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, Activity, ChevronLeft, ChevronRight } from '../components/Common/Icons';
+import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, Activity, ChevronLeft, ChevronRight, CheckCircle } from '../components/Common/Icons';
 import confetti from 'canvas-confetti';
 import api from '../api';
 import Shimmer from '../components/Common/Shimmer';
@@ -508,13 +508,27 @@ const PromptDetailPage = ({ adsSettings }) => {
               <h1 className="prompt-detail-title" style={{ 
                 fontSize: '2.4rem', 
                 fontWeight: 900, 
-                marginBottom: '10px', 
+                marginBottom: '15px', 
                 lineHeight: 1.1, 
                 letterSpacing: '-1px',
                 background: 'linear-gradient(to right, #fff, rgba(255,255,255,0.7))',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent'
               }}>{prompt.title}</h1>
+              
+              {/* E-E-A-T Badges (Expertise, Authoritativeness, Trust) */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '15px', padding: '12px 16px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <img src="https://promptking.in/favicon.png" alt="PromptKing Logo" style={{ width: '20px', height: '20px', borderRadius: '50%' }} />
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'white' }}>PromptKing Team</span>
+                  <CheckCircle size={14} color="#27C93F" />
+                  <span style={{ fontSize: '0.75rem', color: '#27C93F', fontWeight: 700, textTransform: 'uppercase' }}>Verified Expert</span>
+                </div>
+                <div style={{ width: '4px', height: '4px', background: 'rgba(255,255,255,0.2)', borderRadius: '50%' }}></div>
+                <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)' }}>
+                  Updated on {new Date(prompt.updated_at || prompt.created_at || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                </div>
+              </div>
             </div>
 
             {/* Media & Prompt Split Container */}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Layers, Search, X, Filter, Sparkles, Crown, CheckCircle } from '../Common/Icons';
 import api from '../../api';
 
@@ -56,8 +57,11 @@ const CategorySidebar = ({ filter, setFilter, counts = {} }) => {
     </div>
   );
 
-  const FilterItem = ({ label, value, icon: Icon, count, onClick }) => (
-    <button 
+  const FilterItem = ({ label, value, icon: Icon, count, onClick, to }) => {
+    const Component = to ? Link : 'button';
+    return (
+    <Component 
+      to={to}
       onClick={onClick}
       style={{
         display: 'flex',
@@ -71,7 +75,8 @@ const CategorySidebar = ({ filter, setFilter, counts = {} }) => {
         cursor: 'pointer',
         transition: 'all 0.2s ease',
         width: '100%',
-        textAlign: 'left'
+        textAlign: 'left',
+        textDecoration: 'none'
       }}
       onMouseOver={(e) => {
         if (!isActive(value)) {
@@ -116,8 +121,9 @@ const CategorySidebar = ({ filter, setFilter, counts = {} }) => {
           {count}
         </span>
       )}
-    </button>
-  );
+    </Component>
+    );
+  };
 
   return (
     <div className="category-sidebar ecommerce-filter-ui" style={{ 
@@ -139,7 +145,8 @@ const CategorySidebar = ({ filter, setFilter, counts = {} }) => {
         }}>
           <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'white', margin: 0 }}>Filter</h3>
           {filter !== 'all' && (
-            <button 
+            <Link 
+              to="/"
               onClick={() => setFilter('all')}
               aria-label="Clear all filters"
               style={{
@@ -151,13 +158,14 @@ const CategorySidebar = ({ filter, setFilter, counts = {} }) => {
                 cursor: 'pointer',
                 padding: '4px 8px',
                 borderRadius: '8px',
-                transition: 'all 0.2s'
+                transition: 'all 0.2s',
+                textDecoration: 'none'
               }}
               onMouseOver={(e) => e.currentTarget.style.background = 'rgba(229, 9, 20, 0.1)'}
               onMouseOut={(e) => e.currentTarget.style.background = 'none'}
             >
               Clear All
-            </button>
+            </Link>
           )}
         </div>
 
@@ -213,33 +221,41 @@ const CategorySidebar = ({ filter, setFilter, counts = {} }) => {
           value="all" 
           count={counts.all} 
           onClick={() => setFilter('all')} 
+          to="/"
         />
         <FilterItem 
           label="Free Access" 
           value="free" 
           count={counts.free} 
           onClick={() => setFilter('free')} 
+          to="/"
         />
         <FilterItem 
           label="Premium King" 
           value="premium" 
           count={counts.premium} 
           onClick={() => setFilter('premium')} 
+          to="/"
         />
 
       </FilterGroup>
 
       <FilterGroup title="By Category">
         {filteredCategories.length > 0 ? (
-          filteredCategories.map((cat) => (
-            <FilterItem 
-              key={cat.id}
-              label={cat.name}
-              value={cat.name.toLowerCase()}
-              count={counts.categories?.[cat.name.toLowerCase()] || 0}
-              onClick={() => setFilter(isActive(cat.name.toLowerCase()) ? 'all' : cat.name.toLowerCase())}
-            />
-          ))
+          filteredCategories.map((cat) => {
+            const catSlug = cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-');
+            const isActiveCat = isActive(cat.name.toLowerCase());
+            return (
+              <FilterItem 
+                key={cat.id}
+                label={cat.name}
+                value={cat.name.toLowerCase()}
+                count={counts.categories?.[cat.name.toLowerCase()] || 0}
+                onClick={() => setFilter(isActiveCat ? 'all' : cat.name.toLowerCase())}
+                to={isActiveCat ? '/' : `/category/${catSlug}`}
+              />
+            );
+          })
         ) : (
           <p style={{ fontSize: '0.8rem', color: 'var(--text-dim)', textAlign: 'center', padding: '10px' }}>
             No categories match.

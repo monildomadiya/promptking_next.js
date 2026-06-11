@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 Allow: /api/sitemap.xml
-Disallow: /api/
+Disallow: /api/admin/
 Disallow: /admin/
 Disallow: /admin-secure/
 Disallow: /admin-secure
