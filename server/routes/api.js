@@ -638,6 +638,41 @@ router.post('/record_unlock', async (req, res) => {
   }
 });
 
+// --- 5.1 RECORD VIEW ---
+router.post('/record_view', async (req, res) => {
+  const { key } = req.body;
+  try {
+    try {
+      // Ignore if column doesn't exist yet for backwards compatibility
+      await db`UPDATE prompts SET view_count = view_count + 1 WHERE prompt_key = ${key}`;
+    } catch(e) {}
+    try {
+      await db`INSERT INTO analytics_events (prompt_key, event_type) VALUES (${key}, 'view')`;
+    } catch(err) { console.warn('Analytics logging failed:', err.message); }
+    res.json({ status: "success" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to record view" });
+  }
+});
+
+// --- 5.2 RECORD LIKE ---
+router.post('/record_like', async (req, res) => {
+  const { key } = req.body;
+  try {
+    try {
+      await db`UPDATE prompts SET like_count = like_count + 1 WHERE prompt_key = ${key}`;
+    } catch(e) {}
+    try {
+      await db`INSERT INTO analytics_events (prompt_key, event_type) VALUES (${key}, 'like')`;
+    } catch(err) { console.warn('Analytics logging failed:', err.message); }
+    res.json({ status: "success" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to record like" });
+  }
+});
+
 // --- ADMIN ANALYTICS MOVED BELOW ADMINAUTH ---
 
 // --- 5. USER PROFILE (REMOVED) ---
@@ -690,7 +725,7 @@ router.get('/admin/analytics', adminAuth, async (req, res) => {
       } else if (typeof r.date === 'string') {
         dateStr = r.date.split('T')[0];
       }
-      if (!dataMap[dateStr]) dataMap[dateStr] = { date: dateStr, copy: 0, unlock: 0 };
+      if (!dataMap[dateStr]) dataMap[dateStr] = { date: dateStr, copy: 0, unlock: 0, view: 0, like: 0 };
       dataMap[dateStr][r.event_type] = Number(r.count);
     });
     const formattedData = Object.values(dataMap).sort((a, b) => a.date.localeCompare(b.date));
@@ -698,6 +733,42 @@ router.get('/admin/analytics', adminAuth, async (req, res) => {
   } catch (error) {
     console.error('Analytics Error:', error);
     res.status(500).json({ error: "Failed to fetch analytics" });
+  }
+});
+
+// --- ADMIN PROMPT-LEVEL ANALYTICS ---
+router.get('/admin/analytics/prompts', adminAuth, async (req, res) => {
+  try {
+    const rows = await db`
+      SELECT prompt_key, event_type, COUNT(*) as count 
+      FROM analytics_events 
+      GROUP BY prompt_key, event_type
+    `;
+    const promptStats = {};
+    rows.forEach(r => {
+      if (!promptStats[r.prompt_key]) {
+        promptStats[r.prompt_key] = { prompt_key: r.prompt_key, views: 0, copies: 0, unlocks: 0, likes: 0 };
+      }
+      if (r.event_type === 'view') promptStats[r.prompt_key].views = Number(r.count);
+      if (r.event_type === 'copy') promptStats[r.prompt_key].copies = Number(r.count);
+      if (r.event_type === 'unlock') promptStats[r.prompt_key].unlocks = Number(r.count);
+      if (r.event_type === 'like') promptStats[r.prompt_key].likes = Number(r.count);
+    });
+    
+    // Join with prompts to get titles
+    const promptsData = await db`SELECT prompt_key, title FROM prompts`;
+    const titleMap = {};
+    promptsData.forEach(p => { titleMap[p.prompt_key] = p.title; });
+    
+    const finalData = Object.values(promptStats).map(p => ({
+      ...p,
+      title: titleMap[p.prompt_key] || p.prompt_key
+    }));
+    
+    res.json(finalData);
+  } catch (err) {
+    console.error('Analytics Prompts Error:', err);
+    res.status(500).json({ error: "Failed to fetch prompt analytics" });
   }
 });
 

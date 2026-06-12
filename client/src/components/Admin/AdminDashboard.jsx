@@ -869,6 +869,7 @@ const AdminDashboard = () => {
   const [view, setView] = useState('dashboard');
   const [data, setData] = useState([]);
   const [analyticsData, setAnalyticsData] = useState([]);
+  const [promptAnalytics, setPromptAnalytics] = useState([]);
   const [stats, setStats] = useState({ prompts: 0, copies: 0, unlocks: 0, likes: 0 });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isKingDialogOpen, setIsKingDialogOpen] = useState(false);
@@ -1073,9 +1074,21 @@ const AdminDashboard = () => {
     } catch (e) { console.error(e); }
   };
 
+  const fetchPromptAnalytics = async () => {
+    try {
+      const response = await api.get('/admin/analytics/prompts');
+      if (Array.isArray(response.data)) {
+        setPromptAnalytics(response.data);
+      }
+    } catch (e) { console.error(e); }
+  };
+
   useEffect(() => {
-    if (isAdmin) fetchAnalytics(analyticsDays);
-  }, [analyticsDays]);
+    if (isAdmin) {
+      fetchAnalytics(analyticsDays);
+      fetchPromptAnalytics();
+    }
+  }, [analyticsDays, isAdmin]);
 
   const handleResetAnalytics = async () => {
     if (!window.confirm("CRITICAL WARNING: This will permanently wipe all interaction history (copies, unlocks, likes) from the system. Are you absolutely sure?")) return;
@@ -1593,6 +1606,14 @@ const AdminDashboard = () => {
                           <stop offset="5%" stopColor="#fbbf24" stopOpacity={0.8}/>
                           <stop offset="95%" stopColor="#fbbf24" stopOpacity={0}/>
                         </linearGradient>
+                        <linearGradient id="colorView" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                        </linearGradient>
+                        <linearGradient id="colorLike" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#ec4899" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#ec4899" stopOpacity={0}/>
+                        </linearGradient>
                       </defs>
                       <XAxis dataKey="date" stroke="rgba(255,255,255,0.3)" tick={{fill: 'rgba(255,255,255,0.5)', fontSize: 12}} />
                       <YAxis stroke="rgba(255,255,255,0.3)" tick={{fill: 'rgba(255,255,255,0.5)', fontSize: 12}} />
@@ -1601,10 +1622,81 @@ const AdminDashboard = () => {
                         contentStyle={{ backgroundColor: 'rgba(10, 10, 10, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
                         itemStyle={{ color: 'white', fontWeight: 700 }}
                       />
+                      <Area type="monotone" dataKey="view" name="Views" stroke="#10b981" fillOpacity={1} fill="url(#colorView)" />
                       <Area type="monotone" dataKey="copy" name="Copies" stroke="#3b82f6" fillOpacity={1} fill="url(#colorCopy)" />
                       <Area type="monotone" dataKey="unlock" name="Unlocks" stroke="#fbbf24" fillOpacity={1} fill="url(#colorUnlock)" />
+                      <Area type="monotone" dataKey="like" name="Likes" stroke="#ec4899" fillOpacity={1} fill="url(#colorLike)" />
                     </AreaChart>
                   </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* ADVANCED REPORTS */}
+              <div style={{ ...glassPanelStyle, padding: '30px', marginTop: '30px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
+                  <SectionTitle title="Advanced Reports (Per Prompt)" />
+                  <button
+                    onClick={() => {
+                      const csvContent = "data:text/csv;charset=utf-8," + 
+                        "Prompt Key,Title,Views,Copies,Unlocks,Likes\n" + 
+                        promptAnalytics.map(p => `${p.prompt_key},"${(p.title||'').replace(/"/g, '""')}",${p.views},${p.copies},${p.unlocks},${p.likes}`).join("\n");
+                      const encodedUri = encodeURI(csvContent);
+                      const link = document.createElement("a");
+                      link.setAttribute("href", encodedUri);
+                      link.setAttribute("download", "advanced_analytics.csv");
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                    style={{
+                      padding: '8px 16px',
+                      background: 'rgba(59, 130, 246, 0.1)',
+                      color: '#3b82f6',
+                      border: '1px solid rgba(59, 130, 246, 0.3)',
+                      borderRadius: '8px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      transition: '0.2s',
+                    }}
+                    onMouseOver={(e) => e.target.style.background = 'rgba(59, 130, 246, 0.2)'}
+                    onMouseOut={(e) => e.target.style.background = 'rgba(59, 130, 246, 0.1)'}
+                  >
+                    Export CSV
+                  </button>
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Prompt Title</th>
+                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Views</th>
+                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Copies</th>
+                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Unlocks</th>
+                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Likes</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...promptAnalytics]
+                        .sort((a, b) => (b.views + b.copies + b.unlocks + b.likes) - (a.views + a.copies + a.unlocks + a.likes))
+                        .slice(0, 15)
+                        .map((p) => (
+                        <tr key={p.prompt_key} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                          <td style={{ padding: '12px', fontWeight: 600, color: 'white' }}>{p.title || p.prompt_key}</td>
+                          <td style={{ padding: '12px', color: '#10b981', fontWeight: 700 }}>{p.views}</td>
+                          <td style={{ padding: '12px', color: '#3b82f6', fontWeight: 700 }}>{p.copies}</td>
+                          <td style={{ padding: '12px', color: '#fbbf24', fontWeight: 700 }}>{p.unlocks}</td>
+                          <td style={{ padding: '12px', color: '#ec4899', fontWeight: 700 }}>{p.likes}</td>
+                        </tr>
+                      ))}
+                      {promptAnalytics.length === 0 && (
+                        <tr>
+                          <td colSpan="5" style={{ padding: '24px', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>
+                            No analytics data available.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </motion.div>

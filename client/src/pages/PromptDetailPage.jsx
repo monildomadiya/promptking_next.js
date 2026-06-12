@@ -34,6 +34,22 @@ const PromptDetailPage = ({ adsSettings }) => {
   const [suggestedPrompts, setSuggestedPrompts] = useState([]);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(null);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+
+  const handleLike = async (e) => {
+    e.preventDefault();
+    if (isLiked) return;
+    setIsLiked(true);
+    setLikeCount(prev => prev + 1);
+    try {
+      await api.post('/record_like', { key });
+    } catch (err) {
+      console.error("Failed to record like:", err);
+      setIsLiked(false);
+      setLikeCount(prev => prev - 1);
+    }
+  };
 
   // Keyboard navigation for lightbox
   useEffect(() => {
@@ -96,6 +112,7 @@ const PromptDetailPage = ({ adsSettings }) => {
       
       setCache(cacheKey, formattedPrompt);
       setPrompt(formattedPrompt);
+      setLikeCount(formattedPrompt.like_count || 0);
       
       if (!(formattedPrompt.is_premium || formattedPrompt.isPremium)) {
         setIsUnlocked(true);
@@ -103,7 +120,7 @@ const PromptDetailPage = ({ adsSettings }) => {
       
       // Track page view once the prompt is loaded
       if (!cachedData) {
-        api.post('/record_unlock', { key: formattedPrompt.key }).catch(err => {
+        api.post('/record_view', { key: formattedPrompt.key }).catch(err => {
           console.error("Failed to record view:", err);
         });
       }
@@ -180,6 +197,7 @@ const PromptDetailPage = ({ adsSettings }) => {
     if (inputPass === targetPass) {
       setIsUnlocked(true);
       triggerConfetti();
+      api.post('/record_unlock', { key: prompt.key }).catch(err => console.error("Failed to record unlock:", err));
       
       // Auto-center the box so the user sees the unlocked content
       setTimeout(() => {
@@ -503,6 +521,12 @@ const PromptDetailPage = ({ adsSettings }) => {
                 <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', fontWeight: 600 }}>
                   <Activity size={14} style={{ marginRight: '5px', verticalAlign: 'middle' }} />
                   {prompt.copyCount || 0} Successful Copies
+                </span>
+                <span onClick={handleLike} style={{ color: isLiked ? '#ec4899' : 'rgba(255,255,255,0.4)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', transition: 'color 0.2s' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill={isLiked ? "#ec4899" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '5px' }}>
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                  </svg>
+                  {likeCount} Likes
                 </span>
               </div>
               <h1 className="prompt-detail-title" style={{ 
