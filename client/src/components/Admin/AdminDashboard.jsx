@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../../api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Brush, Legend } from 'recharts';
 import {
   DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragOverlay
 } from '@dnd-kit/core';
@@ -1619,13 +1619,16 @@ const AdminDashboard = () => {
                       <YAxis stroke="rgba(255,255,255,0.3)" tick={{fill: 'rgba(255,255,255,0.5)', fontSize: 12}} />
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                       <Tooltip 
-                        contentStyle={{ backgroundColor: 'rgba(10, 10, 10, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                        contentStyle={{ backgroundColor: 'rgba(10, 10, 10, 0.95)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}
                         itemStyle={{ color: 'white', fontWeight: 700 }}
+                        labelStyle={{ color: '#10b981', fontWeight: 900, marginBottom: '8px', fontSize: '1.1rem' }}
                       />
-                      <Area type="monotone" dataKey="view" name="Views" stroke="#10b981" fillOpacity={1} fill="url(#colorView)" />
-                      <Area type="monotone" dataKey="copy" name="Copies" stroke="#3b82f6" fillOpacity={1} fill="url(#colorCopy)" />
-                      <Area type="monotone" dataKey="unlock" name="Unlocks" stroke="#fbbf24" fillOpacity={1} fill="url(#colorUnlock)" />
-                      <Area type="monotone" dataKey="like" name="Likes" stroke="#ec4899" fillOpacity={1} fill="url(#colorLike)" />
+                      <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontWeight: 600, color: 'rgba(255,255,255,0.7)' }} />
+                      <Area type="monotone" dataKey="view" name="Views" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorView)" dot={{ r: 4, strokeWidth: 2, fill: '#000', stroke: '#10b981' }} activeDot={{ r: 6, strokeWidth: 0, fill: '#10b981' }} />
+                      <Area type="monotone" dataKey="copy" name="Copies" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorCopy)" dot={{ r: 4, strokeWidth: 2, fill: '#000', stroke: '#3b82f6' }} activeDot={{ r: 6, strokeWidth: 0, fill: '#3b82f6' }} />
+                      <Area type="monotone" dataKey="unlock" name="Unlocks" stroke="#fbbf24" strokeWidth={3} fillOpacity={1} fill="url(#colorUnlock)" dot={{ r: 4, strokeWidth: 2, fill: '#000', stroke: '#fbbf24' }} activeDot={{ r: 6, strokeWidth: 0, fill: '#fbbf24' }} />
+                      <Area type="monotone" dataKey="like" name="Likes" stroke="#ec4899" strokeWidth={3} fillOpacity={1} fill="url(#colorLike)" dot={{ r: 4, strokeWidth: 2, fill: '#000', stroke: '#ec4899' }} activeDot={{ r: 6, strokeWidth: 0, fill: '#ec4899' }} />
+                      <Brush dataKey="date" height={30} stroke="rgba(255,255,255,0.2)" fill="rgba(0,0,0,0.5)" tickFormatter={(tick) => tick} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
