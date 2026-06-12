@@ -871,7 +871,7 @@ const AdminDashboard = () => {
   const [analyticsData, setAnalyticsData] = useState([]);
   const [promptAnalytics, setPromptAnalytics] = useState([]);
   const [blogAnalytics, setBlogAnalytics] = useState([]);
-  const [stats, setStats] = useState({ prompts: 0, copies: 0, unlocks: 0, likes: 0 });
+  const [stats, setStats] = useState({ prompts: 0, copies: 0, unlocks: 0 });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isKingDialogOpen, setIsKingDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -1044,7 +1044,6 @@ const AdminDashboard = () => {
           prompts: response.data.length,
           copies: calculateTotal('copy_count'),
           unlocks: calculateTotal('unlock_count'),
-          likes: calculateTotal('like_count'),
           views: calculateTotal('view_count'),
         });
       }
@@ -1563,7 +1562,6 @@ const AdminDashboard = () => {
                 <StatCard label="Total Prompts" value={stats.prompts} color="#ff4d4d" icon={<TableProperties size={24} />} />
                 <StatCard label="Total Copies" value={stats.copies} color="#3b82f6" icon={<Activity size={24} />} />
                 <StatCard label="Total Opens" value={stats.unlocks} color="#fbbf24" icon={<Layers size={24} />} />
-                <StatCard label="Social Likes" value={stats.likes} color="#ec4899" icon={<Activity size={24} />} />
               </div>
               <div style={{ ...glassPanelStyle, padding: '30px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
@@ -1622,10 +1620,6 @@ const AdminDashboard = () => {
                           <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
                           <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
                         </linearGradient>
-                        <linearGradient id="colorLike" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#ec4899" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#ec4899" stopOpacity={0}/>
-                        </linearGradient>
                       </defs>
                       <XAxis dataKey="date" stroke="rgba(255,255,255,0.3)" tick={{fill: 'rgba(255,255,255,0.5)', fontSize: 12}} />
                       <YAxis stroke="rgba(255,255,255,0.3)" tick={{fill: 'rgba(255,255,255,0.5)', fontSize: 12}} />
@@ -1639,7 +1633,6 @@ const AdminDashboard = () => {
                       <Area type="monotone" dataKey="view" name="Views" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorView)" dot={{ r: 4, strokeWidth: 2, fill: '#000', stroke: '#10b981' }} activeDot={{ r: 6, strokeWidth: 0, fill: '#10b981' }} />
                       <Area type="monotone" dataKey="copy" name="Copies" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorCopy)" dot={{ r: 4, strokeWidth: 2, fill: '#000', stroke: '#3b82f6' }} activeDot={{ r: 6, strokeWidth: 0, fill: '#3b82f6' }} />
                       <Area type="monotone" dataKey="unlock" name="Unlocks" stroke="#fbbf24" strokeWidth={3} fillOpacity={1} fill="url(#colorUnlock)" dot={{ r: 4, strokeWidth: 2, fill: '#000', stroke: '#fbbf24' }} activeDot={{ r: 6, strokeWidth: 0, fill: '#fbbf24' }} />
-                      <Area type="monotone" dataKey="like" name="Likes" stroke="#ec4899" strokeWidth={3} fillOpacity={1} fill="url(#colorLike)" dot={{ r: 4, strokeWidth: 2, fill: '#000', stroke: '#ec4899' }} activeDot={{ r: 6, strokeWidth: 0, fill: '#ec4899' }} />
                       <Brush dataKey="date" height={30} stroke="rgba(255,255,255,0.2)" fill="rgba(0,0,0,0.5)" tickFormatter={(tick) => tick} />
                     </AreaChart>
                   </ResponsiveContainer>
@@ -1654,8 +1647,8 @@ const AdminDashboard = () => {
                   <button
                     onClick={() => {
                       const csvContent = "data:text/csv;charset=utf-8," + 
-                        "Prompt Key,Title,Views,Copies,Unlocks,Likes\n" + 
-                        promptAnalytics.map(p => `${p.prompt_key},"${(p.title||'').replace(/"/g, '""')}",${p.views},${p.copies},${p.unlocks},${p.likes}`).join("\n");
+                        "Prompt Key,Title,Views,Copies,Unlocks\n" + 
+                        promptAnalytics.map(p => `${p.prompt_key},"${(p.title||'').replace(/"/g, '""')}",${p.views},${p.copies},${p.unlocks}`).join("\n");
                       const encodedUri = encodeURI(csvContent);
                       const link = document.createElement("a");
                       link.setAttribute("href", encodedUri);
@@ -1688,12 +1681,11 @@ const AdminDashboard = () => {
                         <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Views</th>
                         <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Copies</th>
                         <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Unlocks</th>
-                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Likes</th>
                       </tr>
                     </thead>
                     <tbody>
                       {[...promptAnalytics]
-                        .sort((a, b) => (b.views + b.copies + b.unlocks + b.likes) - (a.views + a.copies + a.unlocks + a.likes))
+                        .sort((a, b) => (b.views + b.copies + b.unlocks) - (a.views + a.copies + a.unlocks))
                         .slice(0, 15)
                         .map((p) => (
                         <tr key={p.prompt_key} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
@@ -1701,7 +1693,6 @@ const AdminDashboard = () => {
                           <td style={{ padding: '12px', color: '#10b981', fontWeight: 700 }}>{p.views}</td>
                           <td style={{ padding: '12px', color: '#3b82f6', fontWeight: 700 }}>{p.copies}</td>
                           <td style={{ padding: '12px', color: '#fbbf24', fontWeight: 700 }}>{p.unlocks}</td>
-                          <td style={{ padding: '12px', color: '#ec4899', fontWeight: 700 }}>{p.likes}</td>
                         </tr>
                       ))}
                       {promptAnalytics.length === 0 && (

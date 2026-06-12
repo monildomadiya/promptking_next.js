@@ -729,10 +729,10 @@ router.get('/admin/analytics', adminAuth, async (req, res) => {
   try {
     let rows;
     if (daysStr === 'all') {
-      rows = await db`SELECT DATE(created_at) as date, event_type, COUNT(*) as count FROM analytics_events GROUP BY DATE(created_at), event_type ORDER BY date ASC`;
+      rows = await db`SELECT DATE(created_at) as date, event_type, COUNT(*) as count FROM analytics_events WHERE prompt_key NOT LIKE 'blog_%' GROUP BY DATE(created_at), event_type ORDER BY date ASC`;
     } else {
       const days = parseInt(daysStr, 10);
-      rows = await db`SELECT DATE(created_at) as date, event_type, COUNT(*) as count FROM analytics_events WHERE created_at >= DATE_SUB(NOW(), INTERVAL ${days} DAY) GROUP BY DATE(created_at), event_type ORDER BY date ASC`;
+      rows = await db`SELECT DATE(created_at) as date, event_type, COUNT(*) as count FROM analytics_events WHERE created_at >= DATE_SUB(NOW(), INTERVAL ${days} DAY) AND prompt_key NOT LIKE 'blog_%' GROUP BY DATE(created_at), event_type ORDER BY date ASC`;
     }
     const dataMap = {};
     rows.forEach(r => {
@@ -743,8 +743,10 @@ router.get('/admin/analytics', adminAuth, async (req, res) => {
       } else if (typeof r.date === 'string') {
         dateStr = r.date.split('T')[0];
       }
-      if (!dataMap[dateStr]) dataMap[dateStr] = { date: dateStr, copy: 0, unlock: 0, view: 0, like: 0 };
-      dataMap[dateStr][r.event_type] = Number(r.count);
+      if (!dataMap[dateStr]) dataMap[dateStr] = { date: dateStr, copy: 0, unlock: 0, view: 0 };
+      if (r.event_type !== 'like') {
+        dataMap[dateStr][r.event_type] = Number(r.count);
+      }
     });
     const formattedData = Object.values(dataMap).sort((a, b) => a.date.localeCompare(b.date));
     res.json(formattedData);
@@ -757,15 +759,14 @@ router.get('/admin/analytics', adminAuth, async (req, res) => {
 // --- ADMIN PROMPT-LEVEL ANALYTICS ---
 router.get('/admin/analytics/prompts', adminAuth, async (req, res) => {
   try {
-    const promptsData = await db`SELECT prompt_key, title, view_count, copy_count, unlock_count, like_count FROM prompts`;
+    const promptsData = await db`SELECT prompt_key, title, view_count, copy_count, unlock_count FROM prompts`;
     
     const finalData = promptsData.map(p => ({
       prompt_key: p.prompt_key,
       title: p.title || p.prompt_key,
       views: Number(p.view_count) || 0,
       copies: Number(p.copy_count) || 0,
-      unlocks: Number(p.unlock_count) || 0,
-      likes: Number(p.like_count) || 0
+      unlocks: Number(p.unlock_count) || 0
     }));
     
     res.json(finalData);
