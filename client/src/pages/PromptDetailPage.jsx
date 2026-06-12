@@ -119,11 +119,9 @@ const PromptDetailPage = ({ adsSettings }) => {
       }
       
       // Track page view once the prompt is loaded
-      if (!cachedData) {
-        api.post('/record_view', { key: formattedPrompt.key }).catch(err => {
-          console.error("Failed to record view:", err);
-        });
-      }
+      api.post('/record_view', { key: formattedPrompt.key }).catch(err => {
+        console.error("Failed to record view:", err);
+      });
       
       setLoading(false);
     } catch (err) {

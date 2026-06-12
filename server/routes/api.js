@@ -675,8 +675,68 @@ router.post('/record_like', async (req, res) => {
   }
 });
 
-// --- ADMIN ANALYTICS MOVED BELOW ADMINAUTH ---
+// --- BLOG ANALYTICS ---
+router.post('/record_blog_view', async (req, res) => {
+  const { slug } = req.body;
+  try {
+    try {
+      await db`UPDATE blogs SET view_count = view_count + 1 WHERE slug = ${slug}`;
+    } catch(e) {}
+    try {
+      await db`INSERT INTO analytics_events (prompt_key, event_type) VALUES (${'blog_' + slug}, 'view')`;
+    } catch(err) {}
+    res.json({ status: "success" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to record blog view" });
+  }
+});
 
+router.post('/record_blog_like', async (req, res) => {
+  const { slug } = req.body;
+  try {
+    try {
+      await db`UPDATE blogs SET like_count = like_count + 1 WHERE slug = ${slug}`;
+    } catch(e) {}
+    try {
+      await db`INSERT INTO analytics_events (prompt_key, event_type) VALUES (${'blog_' + slug}, 'like')`;
+    } catch(err) {}
+    res.json({ status: "success" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to record blog like" });
+  }
+});
+
+router.post('/record_blog_copy', async (req, res) => {
+  const { slug } = req.body;
+  try {
+    try {
+      await db`UPDATE blogs SET copy_count = copy_count + 1 WHERE slug = ${slug}`;
+    } catch(e) {}
+    try {
+      await db`INSERT INTO analytics_events (prompt_key, event_type) VALUES (${'blog_' + slug}, 'copy')`;
+    } catch(err) {}
+    res.json({ status: "success" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to record blog copy" });
+  }
+});
+
+router.post('/record_blog_unlock', async (req, res) => {
+  const { slug } = req.body;
+  try {
+    try {
+      await db`UPDATE blogs SET unlock_count = unlock_count + 1 WHERE slug = ${slug}`;
+    } catch(e) {}
+    try {
+      await db`INSERT INTO analytics_events (prompt_key, event_type) VALUES (${'blog_' + slug}, 'unlock')`;
+    } catch(err) {}
+    res.json({ status: "success" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to record blog unlock" });
+  }
+});
+
+// --- ADMIN ANALYTICS MOVED BELOW ADMINAUTH ---
 // --- 5. USER PROFILE (REMOVED) ---
 // User profile management was removed.
 
@@ -741,36 +801,47 @@ router.get('/admin/analytics', adminAuth, async (req, res) => {
 // --- ADMIN PROMPT-LEVEL ANALYTICS ---
 router.get('/admin/analytics/prompts', adminAuth, async (req, res) => {
   try {
-    const rows = await db`
-      SELECT prompt_key, event_type, COUNT(*) as count 
-      FROM analytics_events 
-      GROUP BY prompt_key, event_type
-    `;
-    const promptStats = {};
-    rows.forEach(r => {
-      if (!promptStats[r.prompt_key]) {
-        promptStats[r.prompt_key] = { prompt_key: r.prompt_key, views: 0, copies: 0, unlocks: 0, likes: 0 };
-      }
-      if (r.event_type === 'view') promptStats[r.prompt_key].views = Number(r.count);
-      if (r.event_type === 'copy') promptStats[r.prompt_key].copies = Number(r.count);
-      if (r.event_type === 'unlock') promptStats[r.prompt_key].unlocks = Number(r.count);
-      if (r.event_type === 'like') promptStats[r.prompt_key].likes = Number(r.count);
-    });
+    const promptsData = await db`SELECT prompt_key, title, view_count, copy_count, unlock_count, like_count FROM prompts`;
     
-    // Join with prompts to get titles
-    const promptsData = await db`SELECT prompt_key, title FROM prompts`;
-    const titleMap = {};
-    promptsData.forEach(p => { titleMap[p.prompt_key] = p.title; });
-    
-    const finalData = Object.values(promptStats).map(p => ({
-      ...p,
-      title: titleMap[p.prompt_key] || p.prompt_key
+    const finalData = promptsData.map(p => ({
+      prompt_key: p.prompt_key,
+      title: p.title || p.prompt_key,
+      views: Number(p.view_count) || 0,
+      copies: Number(p.copy_count) || 0,
+      unlocks: Number(p.unlock_count) || 0,
+      likes: Number(p.like_count) || 0
     }));
     
     res.json(finalData);
   } catch (err) {
     console.error('Analytics Prompts Error:', err);
     res.status(500).json({ error: "Failed to fetch prompt analytics" });
+  }
+});
+// --- ADMIN BLOG-LEVEL ANALYTICS ---
+router.get('/admin/analytics/blogs', adminAuth, async (req, res) => {
+  try {
+    let blogsData = [];
+    try {
+      blogsData = await db`SELECT slug, title, view_count, copy_count, unlock_count, like_count FROM blogs`;
+    } catch(e) {
+      // In case columns are not yet created
+      blogsData = await db`SELECT slug, title FROM blogs`;
+    }
+    
+    const finalData = blogsData.map(b => ({
+      slug: b.slug,
+      title: b.title || b.slug,
+      views: Number(b.view_count) || 0,
+      copies: Number(b.copy_count) || 0,
+      unlocks: Number(b.unlock_count) || 0,
+      likes: Number(b.like_count) || 0
+    }));
+    
+    res.json(finalData);
+  } catch (err) {
+    console.error('Analytics Blogs Error:', err);
+    res.status(500).json({ error: "Failed to fetch blog analytics" });
   }
 });
 
