@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../api';
 import Shimmer from '../components/Common/Shimmer';
-import { ArrowLeft, Clock, Calendar, Share2, ShieldCheck, Tag, User, Heart, Eye } from '../components/Common/Icons';
+import { ArrowLeft, Clock, Calendar, Share2, ShieldCheck, Tag, User, Eye } from '../components/Common/Icons';
 import SEOMetadata from '../components/SEO/SEOMetadata';
 import SocialSidebar from '../components/Prompts/SocialSidebar';
 import { optimizeImage } from '../utils/imageUtils';
@@ -14,22 +14,6 @@ const ArticlePage = () => {
   const [otherBlogs, setOtherBlogs] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
-
-  const handleLike = async (e) => {
-    e.preventDefault();
-    if (isLiked) return;
-    setIsLiked(true);
-    setLikeCount(prev => prev + 1);
-    try {
-      await api.post('/record_blog_like', { slug });
-    } catch (err) {
-      console.error("Failed to record blog like:", err);
-      setIsLiked(false);
-      setLikeCount(prev => prev - 1);
-    }
-  };
 
   useEffect(() => {
     fetchArticle();
@@ -74,7 +58,6 @@ const ArticlePage = () => {
 
       setCache(cacheKey, { blog: fetchedBlog, otherBlogs: fetchedOtherBlogs });
       setBlog(fetchedBlog);
-      setLikeCount(fetchedBlog.like_count || 0);
       setOtherBlogs(fetchedOtherBlogs);
       setCategories(fetchedCategories);
 
@@ -354,38 +337,6 @@ const ArticlePage = () => {
               <Eye size={16} color="var(--accent-main)" /> {blog.view_count || 0} Views
             </div>
 
-            <button 
-              onClick={handleLike}
-              style={{
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '8px', 
-                color: isLiked ? 'var(--accent-main)' : 'var(--text-secondary)', 
-                fontSize: '0.9rem', 
-                fontWeight: 500,
-                background: 'transparent',
-                border: '1px solid rgba(255,255,255,0.1)',
-                padding: '6px 14px',
-                borderRadius: '20px',
-                cursor: 'pointer',
-                transition: '0.2s',
-              }}
-              onMouseOver={(e) => {
-                if(!isLiked) {
-                  e.currentTarget.style.color = 'var(--accent-main)';
-                  e.currentTarget.style.borderColor = 'rgba(229,9,20,0.3)';
-                }
-              }}
-              onMouseOut={(e) => {
-                if(!isLiked) {
-                  e.currentTarget.style.color = 'var(--text-secondary)';
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                }
-              }}
-            >
-              <Heart size={16} color={isLiked ? 'var(--accent-main)' : 'currentColor'} /> 
-              {likeCount} {likeCount === 1 ? 'Like' : 'Likes'}
-            </button>
           </div>
 
           {/* Table of Contents */}

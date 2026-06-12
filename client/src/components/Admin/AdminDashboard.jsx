@@ -1716,74 +1716,6 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              {/* ADVANCED REPORTS - BLOGS */}
-              <div style={{ ...glassPanelStyle, padding: '30px', marginTop: '30px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
-                  <SectionTitle title="Advanced Reports (Per Blog)" />
-                  <button
-                    onClick={() => {
-                      const csvContent = "data:text/csv;charset=utf-8," + 
-                        "Blog Slug,Title,Views,Copies,Unlocks,Likes\n" + 
-                        blogAnalytics.map(b => `${b.slug},"${(b.title||'').replace(/"/g, '""')}",${b.views},${b.copies},${b.unlocks},${b.likes}`).join("\n");
-                      const encodedUri = encodeURI(csvContent);
-                      const link = document.createElement("a");
-                      link.setAttribute("href", encodedUri);
-                      link.setAttribute("download", "blog_analytics.csv");
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    }}
-                    style={{
-                      padding: '8px 16px',
-                      background: 'rgba(59, 130, 246, 0.1)',
-                      color: '#3b82f6',
-                      border: '1px solid rgba(59, 130, 246, 0.3)',
-                      borderRadius: '8px',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      transition: '0.2s',
-                    }}
-                    onMouseOver={(e) => e.target.style.background = 'rgba(59, 130, 246, 0.2)'}
-                    onMouseOut={(e) => e.target.style.background = 'rgba(59, 130, 246, 0.1)'}
-                  >
-                    Export CSV
-                  </button>
-                </div>
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Blog Title</th>
-                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Views</th>
-                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Copies</th>
-                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Unlocks</th>
-                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Likes</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[...blogAnalytics]
-                        .sort((a, b) => (b.views + b.copies + b.unlocks + b.likes) - (a.views + a.copies + a.unlocks + a.likes))
-                        .slice(0, 15)
-                        .map((b) => (
-                        <tr key={b.slug} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                          <td style={{ padding: '12px', fontWeight: 600, color: 'white' }}>{b.title || b.slug}</td>
-                          <td style={{ padding: '12px', color: '#10b981', fontWeight: 700 }}>{b.views}</td>
-                          <td style={{ padding: '12px', color: '#3b82f6', fontWeight: 700 }}>{b.copies}</td>
-                          <td style={{ padding: '12px', color: '#fbbf24', fontWeight: 700 }}>{b.unlocks}</td>
-                          <td style={{ padding: '12px', color: '#ec4899', fontWeight: 700 }}>{b.likes}</td>
-                        </tr>
-                      ))}
-                      {blogAnalytics.length === 0 && (
-                        <tr>
-                          <td colSpan="5" style={{ padding: '24px', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>
-                            No blog analytics data available.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
             </motion.div>
           )}
 
@@ -1791,6 +1723,70 @@ const AdminDashboard = () => {
           {view === 'settings-social' && <SocialPanel key="social" onSave={() => fetchData('settings')} />}
           {view === 'settings-ads' && <AdsPanel key="ads" onSave={() => fetchData('settings')} />}
 
+
+          {view === 'blogs' && (
+            <motion.div key="blog-analytics" {...pageTransition} style={{ ...glassPanelStyle, padding: '30px', marginBottom: '30px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
+                <SectionTitle title="Advanced Reports (Per Blog)" />
+                <button
+                  onClick={() => {
+                    const csvContent = "data:text/csv;charset=utf-8," + 
+                      "Blog Slug,Title,Views\n" + 
+                      blogAnalytics.map(b => `${b.slug},"${(b.title||'').replace(/"/g, '""')}",${b.views}`).join("\n");
+                    const encodedUri = encodeURI(csvContent);
+                    const link = document.createElement("a");
+                    link.setAttribute("href", encodedUri);
+                    link.setAttribute("download", "blog_analytics.csv");
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                  style={{
+                    padding: '8px 16px',
+                    background: 'rgba(59, 130, 246, 0.1)',
+                    color: '#3b82f6',
+                    border: '1px solid rgba(59, 130, 246, 0.3)',
+                    borderRadius: '8px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: '0.2s',
+                  }}
+                  onMouseOver={(e) => e.target.style.background = 'rgba(59, 130, 246, 0.2)'}
+                  onMouseOut={(e) => e.target.style.background = 'rgba(59, 130, 246, 0.1)'}
+                >
+                  Export CSV
+                </button>
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                      <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Blog Title</th>
+                      <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Views</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[...blogAnalytics]
+                      .sort((a, b) => b.views - a.views)
+                      .slice(0, 15)
+                      .map((b) => (
+                      <tr key={b.slug} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                        <td style={{ padding: '12px', fontWeight: 600, color: 'white' }}>{b.title || b.slug}</td>
+                        <td style={{ padding: '12px', color: '#10b981', fontWeight: 700 }}>{b.views}</td>
+                      </tr>
+                    ))}
+                    {blogAnalytics.length === 0 && (
+                      <tr>
+                        <td colSpan="2" style={{ padding: '24px', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>
+                          No blog analytics data available.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </motion.div>
+          )}
 
           {['prompts', 'blogs', 'authors', 'categories', 'faqs'].includes(view) && (
             <motion.div key="list" {...pageTransition} style={{ ...glassPanelStyle, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>

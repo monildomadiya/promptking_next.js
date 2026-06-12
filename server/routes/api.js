@@ -691,50 +691,6 @@ router.post('/record_blog_view', async (req, res) => {
   }
 });
 
-router.post('/record_blog_like', async (req, res) => {
-  const { slug } = req.body;
-  try {
-    try {
-      await db`UPDATE blogs SET like_count = like_count + 1 WHERE slug = ${slug}`;
-    } catch(e) {}
-    try {
-      await db`INSERT INTO analytics_events (prompt_key, event_type) VALUES (${'blog_' + slug}, 'like')`;
-    } catch(err) {}
-    res.json({ status: "success" });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to record blog like" });
-  }
-});
-
-router.post('/record_blog_copy', async (req, res) => {
-  const { slug } = req.body;
-  try {
-    try {
-      await db`UPDATE blogs SET copy_count = copy_count + 1 WHERE slug = ${slug}`;
-    } catch(e) {}
-    try {
-      await db`INSERT INTO analytics_events (prompt_key, event_type) VALUES (${'blog_' + slug}, 'copy')`;
-    } catch(err) {}
-    res.json({ status: "success" });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to record blog copy" });
-  }
-});
-
-router.post('/record_blog_unlock', async (req, res) => {
-  const { slug } = req.body;
-  try {
-    try {
-      await db`UPDATE blogs SET unlock_count = unlock_count + 1 WHERE slug = ${slug}`;
-    } catch(e) {}
-    try {
-      await db`INSERT INTO analytics_events (prompt_key, event_type) VALUES (${'blog_' + slug}, 'unlock')`;
-    } catch(err) {}
-    res.json({ status: "success" });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to record blog unlock" });
-  }
-});
 
 // --- ADMIN ANALYTICS MOVED BELOW ADMINAUTH ---
 // --- 5. USER PROFILE (REMOVED) ---
@@ -823,7 +779,7 @@ router.get('/admin/analytics/blogs', adminAuth, async (req, res) => {
   try {
     let blogsData = [];
     try {
-      blogsData = await db`SELECT slug, title, view_count, copy_count, unlock_count, like_count FROM blogs`;
+      blogsData = await db`SELECT slug, title, view_count FROM blogs`;
     } catch(e) {
       // In case columns are not yet created
       blogsData = await db`SELECT slug, title FROM blogs`;
@@ -832,10 +788,7 @@ router.get('/admin/analytics/blogs', adminAuth, async (req, res) => {
     const finalData = blogsData.map(b => ({
       slug: b.slug,
       title: b.title || b.slug,
-      views: Number(b.view_count) || 0,
-      copies: Number(b.copy_count) || 0,
-      unlocks: Number(b.unlock_count) || 0,
-      likes: Number(b.like_count) || 0
+      views: Number(b.view_count) || 0
     }));
     
     res.json(finalData);

@@ -254,9 +254,6 @@ app.use((err, req, res, next) => {
       { name: 'meta_title', def: 'VARCHAR(255) NULL DEFAULT NULL' },
       { name: 'meta_description', def: 'TEXT NULL' },
       { name: 'view_count', def: 'INT DEFAULT 0' },
-      { name: 'like_count', def: 'INT DEFAULT 0' },
-      { name: 'copy_count', def: 'INT DEFAULT 0' },
-      { name: 'unlock_count', def: 'INT DEFAULT 0' },
     ];
     for (const col of blogColumns) {
       try {
