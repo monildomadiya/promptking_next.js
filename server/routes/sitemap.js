@@ -15,6 +15,16 @@ router.get('/', async (req, res) => {
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
 
+    // Helper to format date
+    const formatDate = (dateString) => {
+      if (!dateString) return new Date().toISOString().split('T')[0];
+      try {
+        return new Date(dateString).toISOString().split('T')[0];
+      } catch (e) {
+        return new Date().toISOString().split('T')[0];
+      }
+    };
+
     // Static Routes
     const staticRoutes = [
       { url: '/', changefreq: 'daily', priority: 1.0 },
@@ -28,10 +38,13 @@ router.get('/', async (req, res) => {
       { url: '/adsense-policy', changefreq: 'yearly', priority: 0.3 }
     ];
 
+    const nowStr = formatDate(new Date());
+
     staticRoutes.forEach(route => {
       xml += `
   <url>
     <loc>${baseUrl}${route.url}</loc>
+    <lastmod>${nowStr}</lastmod>
     <changefreq>${route.changefreq}</changefreq>
     <priority>${route.priority}</priority>
   </url>`;
@@ -43,6 +56,7 @@ router.get('/', async (req, res) => {
       xml += `
   <url>
     <loc>${baseUrl}/prompt/${slug}</loc>
+    <lastmod>${formatDate(prompt.created_at)}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>`;
@@ -53,6 +67,7 @@ router.get('/', async (req, res) => {
       xml += `
   <url>
     <loc>${baseUrl}/article/${blog.slug}</loc>
+    <lastmod>${formatDate(blog.created_at)}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>`;
@@ -63,6 +78,7 @@ router.get('/', async (req, res) => {
       xml += `
   <url>
     <loc>${baseUrl}/category/${category.slug}</loc>
+    <lastmod>${formatDate(category.created_at)}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>`;
