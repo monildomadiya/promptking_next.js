@@ -1630,6 +1630,73 @@ const AdminDashboard = () => {
                   </ResponsiveContainer>
                 </div>
               </div>
+              </div>
+
+              {/* DAY-BY-DAY TABLE */}
+              <div style={{ ...glassPanelStyle, padding: '30px', marginTop: '30px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
+                  <SectionTitle title="Day-by-Day Breakdown" />
+                  <button
+                    onClick={() => {
+                      const csvContent = "data:text/csv;charset=utf-8," + 
+                        "Date,Views,Copies,Unlocks,Likes\n" + 
+                        [...analyticsData].reverse().map(d => `${d.date},${d.view || 0},${d.copy || 0},${d.unlock || 0},${d.like || 0}`).join("\n");
+                      const encodedUri = encodeURI(csvContent);
+                      const link = document.createElement("a");
+                      link.setAttribute("href", encodedUri);
+                      link.setAttribute("download", "day_by_day_analytics.csv");
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                    style={{
+                      padding: '8px 16px',
+                      background: 'rgba(16, 185, 129, 0.1)',
+                      color: '#10b981',
+                      border: '1px solid rgba(16, 185, 129, 0.3)',
+                      borderRadius: '8px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      transition: '0.2s',
+                    }}
+                    onMouseOver={(e) => e.target.style.background = 'rgba(16, 185, 129, 0.2)'}
+                    onMouseOut={(e) => e.target.style.background = 'rgba(16, 185, 129, 0.1)'}
+                  >
+                    Export Day-by-Day CSV
+                  </button>
+                </div>
+                <div style={{ overflowX: 'auto', maxHeight: '400px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                    <thead style={{ position: 'sticky', top: 0, background: '#0a0a0a', zIndex: 1 }}>
+                      <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Date</th>
+                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Views</th>
+                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Copies</th>
+                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Unlocks</th>
+                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Likes</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...analyticsData].reverse().map((d) => (
+                        <tr key={d.date} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                          <td style={{ padding: '12px', fontWeight: 600, color: 'white' }}>{d.date}</td>
+                          <td style={{ padding: '12px', color: '#10b981', fontWeight: 700 }}>{d.view || 0}</td>
+                          <td style={{ padding: '12px', color: '#3b82f6', fontWeight: 700 }}>{d.copy || 0}</td>
+                          <td style={{ padding: '12px', color: '#fbbf24', fontWeight: 700 }}>{d.unlock || 0}</td>
+                          <td style={{ padding: '12px', color: '#ec4899', fontWeight: 700 }}>{d.like || 0}</td>
+                        </tr>
+                      ))}
+                      {analyticsData.length === 0 && (
+                        <tr>
+                          <td colSpan="5" style={{ padding: '24px', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>
+                            No analytics data available for this period.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
               {/* ADVANCED REPORTS */}
               <div style={{ ...glassPanelStyle, padding: '30px', marginTop: '30px' }}>
