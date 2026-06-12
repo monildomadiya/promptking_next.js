@@ -419,7 +419,7 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.is_premium ? 'PRO' : 'FREE'}</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Opened (Views)">
-            <Eye size={12} /> {item.unlock_count || 0}
+            <Eye size={12} /> {item.view_count || 0}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(16,163,127,0.1)', color: '#10a37f', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Copied">
             <Copy size={12} /> {item.copy_count || 0}
@@ -1044,6 +1044,7 @@ const AdminDashboard = () => {
           copies: calculateTotal('copy_count'),
           unlocks: calculateTotal('unlock_count'),
           likes: calculateTotal('like_count'),
+          views: calculateTotal('view_count'),
         });
       }
     } catch (e) { console.error(e); }
@@ -1252,7 +1253,7 @@ const AdminDashboard = () => {
     return promptKey.includes(search) || title.includes(search) || aiType.includes(search);
   }).sort((a, b) => {
     if (view === 'prompts') {
-      if (sortBy === 'views_desc') return (Number(b.unlock_count) || 0) - (Number(a.unlock_count) || 0);
+      if (sortBy === 'views_desc') return (Number(b.view_count) || 0) - (Number(a.view_count) || 0);
       if (sortBy === 'copies_desc') return (Number(b.copy_count) || 0) - (Number(a.copy_count) || 0);
     }
     return 0;
@@ -1818,7 +1819,7 @@ const AdminDashboard = () => {
                               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.is_premium ? 'PRO' : 'FREE'}</span>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Opened (Views)">
-                                  <Eye size={12} /> {item.unlock_count || 0}
+                                  <Eye size={12} /> {item.view_count || 0}
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(16,163,127,0.1)', color: '#10a37f', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Copied">
                                   <Copy size={12} /> {item.copy_count || 0}

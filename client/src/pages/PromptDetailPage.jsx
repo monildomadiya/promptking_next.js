@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, Activity, ChevronLeft, ChevronRight, CheckCircle } from '../components/Common/Icons';
+import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, Activity, ChevronLeft, ChevronRight, CheckCircle, Eye } from '../components/Common/Icons';
 import confetti from 'canvas-confetti';
 import api from '../api';
 import Shimmer from '../components/Common/Shimmer';
@@ -112,7 +112,7 @@ const PromptDetailPage = ({ adsSettings }) => {
       
       setCache(cacheKey, formattedPrompt);
       setPrompt(formattedPrompt);
-      setLikeCount(formattedPrompt.like_count || 0);
+      setLikeCount(formattedPrompt.likeCount || 0);
       
       if (!(formattedPrompt.is_premium || formattedPrompt.isPremium)) {
         setIsUnlocked(true);
@@ -521,6 +521,10 @@ const PromptDetailPage = ({ adsSettings }) => {
                 <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', fontWeight: 600 }}>
                   <Activity size={14} style={{ marginRight: '5px', verticalAlign: 'middle' }} />
                   {prompt.copyCount || 0} Successful Copies
+                </span>
+                <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center' }}>
+                  <Eye size={14} style={{ marginRight: '5px' }} />
+                  {prompt.viewCount || 0} Views
                 </span>
                 <span onClick={handleLike} style={{ color: isLiked ? '#ec4899' : 'rgba(255,255,255,0.4)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', transition: 'color 0.2s' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill={isLiked ? "#ec4899" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '5px' }}>

@@ -306,7 +306,7 @@ router.get('/get_data', async (req, res) => {
   try {
     let promptsRows;
     try {
-      promptsRows = await db`SELECT id, prompt_key, title, ai_type, prompt_text, img_after, img_before, is_premium, is_featured, image_ratio, hide_prompt_box, password, ig_link, is_image_slider, sort_order, slug, copy_count, unlock_count, like_count, gallery_urls, meta_title, is_draft, publish_date FROM prompts WHERE is_draft = 0 AND (publish_date IS NULL OR publish_date <= NOW()) ORDER BY sort_order ASC, prompt_key ASC`;
+      promptsRows = await db`SELECT id, prompt_key, title, ai_type, prompt_text, img_after, img_before, is_premium, is_featured, image_ratio, hide_prompt_box, password, ig_link, is_image_slider, sort_order, slug, copy_count, unlock_count, like_count, view_count, gallery_urls, meta_title, is_draft, publish_date FROM prompts WHERE is_draft = 0 AND (publish_date IS NULL OR publish_date <= NOW()) ORDER BY sort_order ASC, prompt_key ASC`;
     } catch (colErr) {
       if (colErr.message.includes('Unknown column')) {
         promptsRows = await db`SELECT * FROM prompts ORDER BY sort_order ASC, prompt_key ASC`;
@@ -331,6 +331,7 @@ router.get('/get_data', async (req, res) => {
       copyCount: Number(row.copy_count),
       unlockCount: Number(row.unlock_count),
       likeCount: Number(row.like_count),
+      viewCount: Number(row.view_count),
       aiType: row.ai_type,
       slug: row.slug,
       key: row.prompt_key,
@@ -530,6 +531,7 @@ router.get('/prompt/:key', async (req, res) => {
       copyCount: Number(row.copy_count),
       unlockCount: Number(row.unlock_count),
       likeCount: Number(row.like_count),
+      viewCount: Number(row.view_count),
       aiType: row.ai_type,
       slug: row.slug,
       key: row.prompt_key,
@@ -970,7 +972,8 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
         ...p,
         copy_count: Number(p.copy_count || 0),
         unlock_count: Number(p.unlock_count || 0),
-        like_count: Number(p.like_count || 0),
+        like_count: Number(p.like_count || p.likeCount || 0),
+        view_count: Number(p.view_count || p.viewCount || 0),
       })));
     }
   }
@@ -991,6 +994,7 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
       copy_count: Number(r.copy_count || 0),
       unlock_count: Number(r.unlock_count || 0),
       like_count: Number(r.like_count || 0),
+      view_count: Number(r.view_count || 0),
       correct_attempts: Number(r.correct_attempts || 0),
       wrong_attempts: Number(r.wrong_attempts || 0),
       is_featured: r.is_featured == 1 || r.is_featured === true || r.is_featured === 'true',
