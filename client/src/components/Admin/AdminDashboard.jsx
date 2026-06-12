@@ -1724,69 +1724,6 @@ const AdminDashboard = () => {
           {view === 'settings-ads' && <AdsPanel key="ads" onSave={() => fetchData('settings')} />}
 
 
-          {view === 'blogs' && (
-            <motion.div key="blog-analytics" {...pageTransition} style={{ ...glassPanelStyle, padding: '30px', marginBottom: '30px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
-                <SectionTitle title="Advanced Reports (Per Blog)" />
-                <button
-                  onClick={() => {
-                    const csvContent = "data:text/csv;charset=utf-8," + 
-                      "Blog Slug,Title,Views\n" + 
-                      blogAnalytics.map(b => `${b.slug},"${(b.title||'').replace(/"/g, '""')}",${b.views}`).join("\n");
-                    const encodedUri = encodeURI(csvContent);
-                    const link = document.createElement("a");
-                    link.setAttribute("href", encodedUri);
-                    link.setAttribute("download", "blog_analytics.csv");
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                  }}
-                  style={{
-                    padding: '8px 16px',
-                    background: 'rgba(59, 130, 246, 0.1)',
-                    color: '#3b82f6',
-                    border: '1px solid rgba(59, 130, 246, 0.3)',
-                    borderRadius: '8px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    transition: '0.2s',
-                  }}
-                  onMouseOver={(e) => e.target.style.background = 'rgba(59, 130, 246, 0.2)'}
-                  onMouseOut={(e) => e.target.style.background = 'rgba(59, 130, 246, 0.1)'}
-                >
-                  Export CSV
-                </button>
-              </div>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                      <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Blog Title</th>
-                      <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Views</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[...blogAnalytics]
-                      .sort((a, b) => b.views - a.views)
-                      .slice(0, 15)
-                      .map((b) => (
-                      <tr key={b.slug} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                        <td style={{ padding: '12px', fontWeight: 600, color: 'white' }}>{b.title || b.slug}</td>
-                        <td style={{ padding: '12px', color: '#10b981', fontWeight: 700 }}>{b.views}</td>
-                      </tr>
-                    ))}
-                    {blogAnalytics.length === 0 && (
-                      <tr>
-                        <td colSpan="2" style={{ padding: '24px', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>
-                          No blog analytics data available.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </motion.div>
-          )}
 
           {['prompts', 'blogs', 'authors', 'categories', 'faqs'].includes(view) && (
             <motion.div key="list" {...pageTransition} style={{ ...glassPanelStyle, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
@@ -1820,7 +1757,7 @@ const AdminDashboard = () => {
                         </th>
                       )}
                       <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Resource Title</th>
-                      {view === 'prompts' && <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Status</th>}
+                      {(view === 'prompts' || view === 'blogs') && <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Status</th>}
                       <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'right', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Controls</th>
                     </tr>
                   </thead>
@@ -1890,16 +1827,20 @@ const AdminDashboard = () => {
                               </div>
                             </div>
                           </td>
-                          {view === 'prompts' && (
+                          {(view === 'prompts' || view === 'blogs') && (
                             <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
                               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.is_premium ? 'PRO' : 'FREE'}</span>
+                                {view === 'prompts' && (
+                                  <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.is_premium ? 'PRO' : 'FREE'}</span>
+                                )}
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Opened (Views)">
                                   <Eye size={12} /> {item.view_count || 0}
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(16,163,127,0.1)', color: '#10a37f', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Copied">
-                                  <Copy size={12} /> {item.copy_count || 0}
-                                </div>
+                                {view === 'prompts' && (
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(16,163,127,0.1)', color: '#10a37f', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Copied">
+                                    <Copy size={12} /> {item.copy_count || 0}
+                                  </div>
+                                )}
                               </div>
                             </td>
                           )}
