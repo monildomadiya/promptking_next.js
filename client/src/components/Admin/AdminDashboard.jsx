@@ -1630,7 +1630,7 @@ const AdminDashboard = () => {
                   </ResponsiveContainer>
                 </div>
               </div>
-              </div>
+
 
               {/* DAY-BY-DAY TABLE */}
               <div style={{ ...glassPanelStyle, padding: '30px', marginTop: '30px' }}>
