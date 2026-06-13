@@ -19,6 +19,7 @@ import PromptModal from './PromptModal';
 import BlogModal from './BlogModal';
 import FAQModal from './FAQModal';
 import CategoryModal from './CategoryModal';
+import WebsiteCategoryModal from './WebsiteCategoryModal';
 import AuthorModal from './AuthorModal';
 import KingDialog from '../Modals/KingDialog';
 import toast, { Toaster } from 'react-hot-toast';
@@ -920,7 +921,7 @@ const AdminDashboard = () => {
           break;
         case 'n':
         case 'N':
-          if (['prompts', 'blogs', 'categories', 'faqs'].includes(view)) {
+          if (['prompts', 'blogs', 'categories', 'website_categories', 'authors', 'faqs'].includes(view)) {
             setEditingItem(null);
             setIsModalOpen(true);
           }
@@ -1131,7 +1132,7 @@ const AdminDashboard = () => {
 
     if (!window.confirm("Permanent delete? This cannot be undone.")) return;
     const id = item.prompt_key || item.id;
-    const type = view === 'prompts' ? 'prompt' : (view === 'blogs' ? 'blog' : (view === 'categories' ? 'category' : (view === 'authors' ? 'author' : 'faq')));
+    const type = view === 'prompts' ? 'prompt' : (view === 'blogs' ? 'blog' : (view === 'categories' ? 'category' : (view === 'website_categories' ? 'website category' : (view === 'authors' ? 'author' : 'faq'))));
     try {
       await api.delete(`/admin/delete_${type}/${id}`);
       fetchData(view);
@@ -1292,7 +1293,8 @@ const AdminDashboard = () => {
       { id: 'prompts', label: 'Prompts', icon: <TableProperties size={20} /> },
       { id: 'blogs', label: 'Articles', icon: <FileText size={20} /> },
       { id: 'authors', label: 'Authors', icon: <Users size={20} /> },
-      { id: 'categories', label: 'Categories', icon: <Layers size={20} /> },
+      { id: 'categories', label: 'AI Types', icon: <Layers size={20} /> },
+      { id: 'website_categories', label: 'Website Categories', icon: <Layers size={20} /> },
       { id: 'faqs', label: 'Help Desk', icon: <Activity size={20} /> },
     ]},
     { title: 'SYSTEM CONFIG', items: [
@@ -1478,7 +1480,7 @@ const AdminDashboard = () => {
             </h1>
             <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem' }}>Management control panel for PK PROMPT KING systems.</p>
           </div>
-          {['prompts', 'blogs', 'categories', 'authors', 'faqs'].includes(view) && (
+          {['prompts', 'blogs', 'categories', 'website_categories', 'authors', 'faqs'].includes(view) && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
               {selectedKeys.length > 0 && view === 'prompts' && (
                 <>
@@ -1487,7 +1489,7 @@ const AdminDashboard = () => {
                   <ActionButton label={`DELETE (${selectedKeys.length})`} color="var(--accent-main)" icon={<Trash size={18} />} onClick={handleBulkDelete} />
                 </>
               )}
-              {['prompts', 'blogs', 'categories', 'authors', 'faqs'].includes(view) && !isDragMode && (
+              {['prompts', 'blogs', 'categories', 'website_categories', 'authors', 'faqs'].includes(view) && !isDragMode && (
                 <div style={{ position: 'relative', flex: 1, minWidth: isMobile ? '100%' : '200px' }}>
                   <input
                     type="text"
@@ -1648,7 +1650,7 @@ const AdminDashboard = () => {
 
 
 
-          {['prompts', 'blogs', 'authors', 'categories', 'faqs'].includes(view) && (
+          {['prompts', 'blogs', 'authors', 'categories', 'website_categories', 'faqs'].includes(view) && (
             <motion.div key="list" {...pageTransition} style={{ ...glassPanelStyle, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
               {/* Loading skeleton — shown while fetching new tab data */}
               {isDataLoading && (
@@ -1804,6 +1806,7 @@ const AdminDashboard = () => {
       {isModalOpen && view === 'blogs' && <BlogModal blog={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
       {isModalOpen && view === 'authors' && <AuthorModal author={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
       {isModalOpen && view === 'categories' && <CategoryModal category={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
+      {isModalOpen && view === 'website_categories' && <WebsiteCategoryModal category={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
       {isModalOpen && view === 'faqs' && <FAQModal faq={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
 
       <KingDialog 

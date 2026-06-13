@@ -9,7 +9,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     prompt_key: '',
     slug: '',
     title: '',
-    category_id: '',
+    website_category_id: '',
     sub_prompts: [],
     thumbnail_url: '',
     meta_title: '',
@@ -38,6 +38,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
   });
   const [originalKey, setOriginalKey] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [websiteCategories, setWebsiteCategories] = useState([]);
   const [galleryUrl, setGalleryUrl] = useState('');
   const [isUploadingGallery, setIsUploadingGallery] = useState(false);
   const galleryFileInputRef = useRef(null);
@@ -95,6 +96,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
 
   useEffect(() => {
     api.get('/categories').then(res => setCategories(res.data));
+    api.get('/website_categories').then(res => setWebsiteCategories(res.data));
     if (prompt) {
       let parsedFaqs = [];
       try { parsedFaqs = typeof prompt.faqs === 'string' ? JSON.parse(prompt.faqs) : (prompt.faqs || []); } catch(e) {}
@@ -328,25 +330,22 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                     className="glass-input"
                     style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', appearance: 'none', background: 'var(--surface-1)' }}
                   >
-                    <option value="ChatGPT">ChatGPT</option>
-                    <option value="Midjourney">Midjourney</option>
-                    <option value="DALL-E">DALL-E</option>
-                    <option value="Stable Diffusion">Stable Diffusion</option>
-                    <option value="Leonardo AI">Leonardo AI</option>
-                    <option value="Runway">Runway</option>
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.name}>{cat.name}</option>
+                    ))}
                   </select>
                 </div>
 
                 <div>
                   <Label text="Website Category (For Blog/Listicles)" />
                   <select 
-                    value={formData.category_id}
-                    onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
+                    value={formData.website_category_id}
+                    onChange={(e) => setFormData({ ...formData, website_category_id: e.target.value })}
                     className="glass-input"
                     style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', appearance: 'none', background: 'var(--surface-1)' }}
                   >
                     <option value="">None</option>
-                    {categories.map(cat => (
+                    {websiteCategories.map(cat => (
                       <option key={cat.id} value={cat.id}>{cat.name}</option>
                     ))}
                   </select>

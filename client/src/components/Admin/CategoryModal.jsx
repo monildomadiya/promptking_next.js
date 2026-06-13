@@ -1,7 +1,7 @@
-import toast from 'react-hot-toast';
 import React, { useState, useEffect, useRef } from 'react';
+import toast from 'react-hot-toast';
 import api from '../../api';
-import { X, Save, PlusCircle, Activity, Image } from '../Common/Icons';
+import { X, Save, Image } from '../Common/Icons';
 
 const ImageUpload = ({ url, onUpload }) => {
   const [isUploading, setIsUploading] = useState(false);
@@ -68,26 +68,15 @@ const CategoryModal = ({ category, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
-    image_url: '',
-    description: '',
-    tag: '',
-    meta_title: '',
-    meta_description: '',
-    focus_keyword: ''
+    image_url: ''
   });
-  const [activeTab, setActiveTab] = useState('general');
 
   useEffect(() => {
     if (category) {
       setFormData({
         name: category.name || '',
         slug: category.slug || '',
-        image_url: category.image_url || '',
-        description: category.description || '',
-        tag: category.tag || '',
-        meta_title: category.meta_title || '',
-        meta_description: category.meta_description || '',
-        focus_keyword: category.focus_keyword || ''
+        image_url: category.image_url || ''
       });
     }
 
@@ -101,13 +90,13 @@ const CategoryModal = ({ category, onClose, onSave }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name?.trim()) {
-      return toast.error("Category Name is required!");
+      return toast.error("Name is required!");
     }
     try {
       await api.post('/admin/save_category', { ...formData, id: category?.id });
       onSave();
     } catch (error) {
-      toast.error("Failed to save category");
+      toast.error("Failed to save AI Type");
     }
   };
 
@@ -117,8 +106,8 @@ const CategoryModal = ({ category, onClose, onSave }) => {
       padding: '20px'
     }}>
       <div className="glass-modal" style={{ 
-        width: '100%', maxWidth: '700px', maxHeight: '90vh', position: 'relative',
-        display: 'flex', flexDirection: 'column', overflow: 'hidden'
+        width: '100%', maxWidth: '500px', position: 'relative',
+        display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--surface-1)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.08)'
       }}>
         {/* Modal Header */}
         <div style={{ 
@@ -126,159 +115,63 @@ const CategoryModal = ({ category, onClose, onSave }) => {
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           background: 'rgba(10,10,12,0.5)', backdropFilter: 'blur(10px)'
         }}>
-          <div>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 900, letterSpacing: '-0.3px' }}>
-              {category ? 'Edit Category' : 'New Category'}
-            </h2>
-          </div>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 900, letterSpacing: '-0.3px', margin: 0, color: 'white' }}>
+            {category ? 'Edit AI Type' : 'Create AI Type'}
+          </h2>
           <button 
             onClick={onClose}
-            className="glass-button-secondary"
-            style={{ width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            style={{ 
+              background: 'rgba(255,255,255,0.05)', border: 'none', color: 'rgba(255,255,255,0.6)', 
+              width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', transition: 'all 0.3s ease'
+            }}
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
 
-        {/* Tabs */}
-        <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
-          {['general', 'seo'].map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              style={{
-                flex: 1, padding: '15px', background: 'none', border: 'none',
-                color: activeTab === tab ? 'white' : 'rgba(255,255,255,0.5)',
-                fontWeight: activeTab === tab ? 800 : 600,
-                borderBottom: activeTab === tab ? '2px solid var(--accent-main)' : '2px solid transparent',
-                cursor: 'pointer', textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '1px'
-              }}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-        
-        <div style={{ overflowY: 'auto', flex: 1, padding: '35px' }}>
-          <form id="categoryForm" onSubmit={handleSubmit}>
-            
-            {activeTab === 'general' && (
-              <>
-                <div style={{ display: 'flex', gap: '20px', marginBottom: '25px' }}>
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                      Category Name
-                    </label>
-                    <input 
-                      type="text" 
-                      value={formData.name} 
-                      onChange={(e) => {
-                        const name = e.target.value;
-                        const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-                        setFormData({ ...formData, name, slug: formData.slug === '' || formData.slug === category?.slug ? slug : formData.slug });
-                      }}
-                      placeholder="e.g. Midjourney Excellence"
-                      className="glass-input"
-                      style={{ width: '100%', padding: '14px 18px', borderRadius: '15px', fontSize: '0.95rem' }}
-                      required 
-                    />
-                  </div>
+        <div style={{ padding: '35px' }}>
+          <form id="aiTypeForm" onSubmit={handleSubmit}>
+            <div style={{ marginBottom: '25px' }}>
+              <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                AI Name
+              </label>
+              <input 
+                type="text" 
+                value={formData.name} 
+                onChange={(e) => {
+                  const name = e.target.value;
+                  const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+                  setFormData({ ...formData, name, slug: formData.slug === '' || formData.slug === category?.slug ? slug : formData.slug });
+                }}
+                placeholder="e.g. Midjourney"
+                className="glass-input"
+                style={{ width: '100%', padding: '14px 18px', borderRadius: '15px', fontSize: '0.95rem' }}
+                required 
+              />
+            </div>
 
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                      URL Identity (Slug)
-                    </label>
-                    <input 
-                      type="text" 
-                      value={formData.slug} 
-                      onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') })}
-                      placeholder="midjourney-excellence"
-                      className="glass-input"
-                      style={{ width: '100%', padding: '14px 18px', borderRadius: '15px', fontSize: '0.95rem' }}
-                      required 
-                    />
-                  </div>
-                </div>
+            <div style={{ marginBottom: '25px' }}>
+              <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                URL Slug
+              </label>
+              <input 
+                type="text" 
+                value={formData.slug} 
+                onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') })}
+                placeholder="midjourney"
+                className="glass-input"
+                style={{ width: '100%', padding: '14px 18px', borderRadius: '15px', fontSize: '0.95rem' }}
+                required 
+              />
+            </div>
 
-                <div style={{ marginBottom: '25px' }}>
-                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                    Category Tag (e.g. "Trending Prompt")
-                  </label>
-                  <input 
-                    type="text" 
-                    value={formData.tag} 
-                    onChange={(e) => setFormData({ ...formData, tag: e.target.value })}
-                    placeholder="Trending Prompt"
-                    className="glass-input"
-                    style={{ width: '100%', padding: '14px 18px', borderRadius: '15px', fontSize: '0.95rem' }}
-                  />
-                </div>
-
-                <div style={{ marginBottom: '25px' }}>
-                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                    Description
-                  </label>
-                  <textarea 
-                    value={formData.description} 
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Generate stylish trending images for social media..."
-                    className="glass-input"
-                    style={{ width: '100%', padding: '14px 18px', borderRadius: '15px', fontSize: '0.95rem', minHeight: '80px', resize: 'vertical' }}
-                  />
-                </div>
-
-                <div style={{ marginBottom: '25px' }}>
-                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                    Category Thumbnail (Vertical Image Recommended)
-                  </label>
-                  <ImageUpload url={formData.image_url} onUpload={(url) => setFormData({ ...formData, image_url: url })} />
-                </div>
-              </>
-            )}
-
-            {activeTab === 'seo' && (
-              <>
-                <div style={{ marginBottom: '25px' }}>
-                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                    Meta Title (SEO)
-                  </label>
-                  <input 
-                    type="text" 
-                    value={formData.meta_title} 
-                    onChange={(e) => setFormData({ ...formData, meta_title: e.target.value })}
-                    placeholder="Best Couple Photo Prompts for Midjourney"
-                    className="glass-input"
-                    style={{ width: '100%', padding: '14px 18px', borderRadius: '15px', fontSize: '0.95rem' }}
-                  />
-                </div>
-                <div style={{ marginBottom: '25px' }}>
-                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                    Focus Keyword (SEO)
-                  </label>
-                  <input 
-                    type="text" 
-                    value={formData.focus_keyword} 
-                    onChange={(e) => setFormData({ ...formData, focus_keyword: e.target.value })}
-                    placeholder="couple photo prompt, midjourney wedding"
-                    className="glass-input"
-                    style={{ width: '100%', padding: '14px 18px', borderRadius: '15px', fontSize: '0.95rem' }}
-                  />
-                </div>
-                <div style={{ marginBottom: '25px' }}>
-                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                    Meta Description (SEO)
-                  </label>
-                  <textarea 
-                    value={formData.meta_description} 
-                    onChange={(e) => setFormData({ ...formData, meta_description: e.target.value })}
-                    placeholder="Discover the best couple photo prompts to generate cinematic AI images..."
-                    className="glass-input"
-                    style={{ width: '100%', padding: '14px 18px', borderRadius: '15px', fontSize: '0.95rem', minHeight: '100px', resize: 'vertical' }}
-                  />
-                </div>
-              </>
-            )}
-
+            <div style={{ marginBottom: '25px' }}>
+              <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Icon / Image
+              </label>
+              <ImageUpload url={formData.image_url} onUpload={(url) => setFormData({ ...formData, image_url: url })} />
+            </div>
           </form>
         </div>
 
@@ -293,14 +186,14 @@ const CategoryModal = ({ category, onClose, onSave }) => {
           </button>
           <button 
             type="submit" 
-            form="categoryForm"
+            form="aiTypeForm"
             style={{ 
               flex: 2, padding: '16px', borderRadius: '16px', background: 'var(--accent-main)', 
               color: 'white', border: 'none', cursor: 'pointer', fontWeight: 900, fontSize: '1rem',
               boxShadow: '0 8px 25px rgba(229, 9, 20, 0.25)'
             }}
           >
-            Save Architecture
+            Save AI Type
           </button>
         </div>
       </div>

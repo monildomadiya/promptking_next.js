@@ -9,7 +9,7 @@ const CategorySlider = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await api.get('/categories');
+        const res = await api.get('/website_categories');
         setCategories(res.data);
       } catch (err) {
         console.error("Failed to fetch categories", err);

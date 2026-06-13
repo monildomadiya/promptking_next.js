@@ -492,24 +492,36 @@ router.get('/categories', async (req, res) => {
   }
 });
 
+// --- WEBSITE CATEGORIES (Public) ---
+router.get('/website_categories', async (req, res) => {
+  try {
+    const rows = await db`SELECT * FROM website_categories ORDER BY created_at DESC`;
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.json(rows);
+  } catch (error) {
+    console.error('Fetch website categories error:', error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // --- SINGLE CATEGORY & PROMPTS (Public) ---
 router.get('/category/:slug', async (req, res) => {
   try {
-    const categories = await db`SELECT * FROM categories WHERE slug = ${req.params.slug}`;
+    const categories = await db`SELECT * FROM website_categories WHERE slug = ${req.params.slug}`;
     if (categories.length === 0) return res.status(404).json({ error: "Category not found" });
     const category = categories[0];
 
     // Increment view count
-    await db`UPDATE categories SET view_count = view_count + 1 WHERE id = ${category.id}`;
+    await db`UPDATE website_categories SET view_count = view_count + 1 WHERE id = ${category.id}`;
 
     // Fetch prompts for this category
     const prompts = await db`
       SELECT 
-        prompt_key, slug, title, category_id, sub_prompts, thumbnail_url,
+        prompt_key, slug, title, website_category_id, sub_prompts, thumbnail_url,
         description, ai_type, prompt_text, img_before, img_after, ig_link, is_image_slider, image_ratio,
         is_premium, gallery_urls, is_featured, is_draft, publish_date, view_count, copy_count, unlock_count, like_count
       FROM prompts 
-      WHERE category_id = ${category.id} AND is_draft = 0 AND (publish_date IS NULL OR publish_date <= NOW())
+      WHERE website_category_id = ${category.id} AND is_draft = 0 AND (publish_date IS NULL OR publish_date <= NOW())
       ORDER BY is_featured DESC, view_count DESC, created_at DESC
     `;
 
@@ -1191,7 +1203,7 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
           prompt_key = ${finalKey}, 
           slug = ${finalSlug}, 
           title = ${p.title}, 
-          category_id = ${p.category_id || null},
+          website_category_id = ${p.website_category_id || null},
           sub_prompts = ${stringifyJson(p.sub_prompts)},
           thumbnail_url = ${p.thumbnail_url || null},
           meta_title = ${p.meta_title || ''},
@@ -1228,13 +1240,13 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
       const sJson = (val) => val ? JSON.stringify(val) : null;
       await db`
         INSERT INTO prompts (
-          prompt_key, slug, title, category_id, sub_prompts, thumbnail_url, meta_title, meta_description, focus_keyword, canonical_url,
+          prompt_key, slug, title, website_category_id, sub_prompts, thumbnail_url, meta_title, meta_description, focus_keyword, canonical_url,
           og_title, og_description, og_image, twitter_title, twitter_description, twitter_image,
           faqs, tags,
           description, ai_type, prompt_text, img_before, img_after, 
           ig_link, is_image_slider, image_ratio, password, is_premium, gallery_urls, hide_prompt_box, is_featured, is_draft, publish_date
         ) VALUES (
-          ${finalKey}, ${finalSlug}, ${p.title}, ${p.category_id || null}, ${sJson(p.sub_prompts)}, ${p.thumbnail_url || null}, ${p.meta_title || ''}, ${p.meta_description || null}, ${p.focus_keyword || null}, ${p.canonical_url || null},
+          ${finalKey}, ${finalSlug}, ${p.title}, ${p.website_category_id || null}, ${sJson(p.sub_prompts)}, ${p.thumbnail_url || null}, ${p.meta_title || ''}, ${p.meta_description || null}, ${p.focus_keyword || null}, ${p.canonical_url || null},
           ${p.og_title || null}, ${p.og_description || null}, ${p.og_image || null}, ${p.twitter_title || null}, ${p.twitter_description || null}, ${p.twitter_image || null},
           ${sJson(p.faqs)}, ${p.tags || null},
           ${p.description}, ${p.ai_type}, ${p.prompt_text}, 
@@ -1496,23 +1508,50 @@ router.get('/admin/categories', adminAuth, async (req, res) => {
   }
 });
 
+router.get('/admin/website_categories', adminAuth, async (req, res) => {
+  try {
+    const rows = await db`SELECT * FROM website_categories ORDER BY name ASC`;
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch website categories" });
+  }
+});
+
 router.post('/admin/save_category', adminAuth, async (req, res) => {
   const c = req.body;
   const slug = c.slug || c.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
   try {
     if (c.id) {
       await db`UPDATE categories SET 
+        name = ${c.name}, slug = ${slug}, image_url = ${c.image_url || null}
+        WHERE id = ${c.id}`;
+    } else {
+      await db`INSERT INTO categories (name, slug, image_url) 
+        VALUES (${c.name}, ${slug}, ${c.image_url || null})`;
+    }
+    res.json({ status: "success" });
+  } catch (error) {
+    res.status(500).json({ error: "Save failed" });
+  }
+});
+
+router.post('/admin/save_website_category', adminAuth, async (req, res) => {
+  const c = req.body;
+  const slug = c.slug || c.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+  try {
+    if (c.id) {
+      await db`UPDATE website_categories SET 
         name = ${c.name}, slug = ${slug}, image_url = ${c.image_url || null}, description = ${c.description || null}, 
         tag = ${c.tag || null}, meta_title = ${c.meta_title || null}, meta_description = ${c.meta_description || null}, 
         focus_keyword = ${c.focus_keyword || null} 
         WHERE id = ${c.id}`;
     } else {
-      await db`INSERT INTO categories (name, slug, image_url, description, tag, meta_title, meta_description, focus_keyword) 
+      await db`INSERT INTO website_categories (name, slug, image_url, description, tag, meta_title, meta_description, focus_keyword) 
         VALUES (${c.name}, ${slug}, ${c.image_url || null}, ${c.description || null}, ${c.tag || null}, ${c.meta_title || null}, ${c.meta_description || null}, ${c.focus_keyword || null})`;
     }
     res.json({ status: "success" });
   } catch (error) {
-    res.status(500).json({ error: "Save failed" });
+    res.status(500).json({ error: "Save website category failed" });
   }
 });
 
@@ -1522,6 +1561,15 @@ router.delete('/admin/delete_category/:id', adminAuth, async (req, res) => {
     res.json({ status: "success" });
   } catch (error) {
     res.status(500).json({ error: "Delete failed" });
+  }
+});
+
+router.delete('/admin/delete_website_category/:id', adminAuth, async (req, res) => {
+  try {
+    await db`DELETE FROM website_categories WHERE id = ${req.params.id}`;
+    res.json({ status: "success" });
+  } catch (error) {
+    res.status(500).json({ error: "Delete website category failed" });
   }
 });
 
@@ -1537,7 +1585,7 @@ router.get('/sitemap.xml', async (req, res) => {
     const db = require('../db');
     prompts = await db`SELECT prompt_key, title, updated_at, created_at, img_after, img_before FROM prompts WHERE prompt_key IS NOT NULL AND is_draft = 0 AND (publish_date IS NULL OR publish_date <= NOW())`;
     blogs = await db`SELECT slug, title, updated_at, created_at, featured_image FROM blogs WHERE slug IS NOT NULL`;
-    categories = await db`SELECT name, slug FROM categories ORDER BY name ASC`;
+    categories = await db`SELECT name, slug FROM website_categories ORDER BY name ASC`;
   } catch (err) {
     console.warn("Sitemap: DB failed, serving static pages only", err.message);
   }

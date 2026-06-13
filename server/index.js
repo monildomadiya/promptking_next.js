@@ -268,38 +268,29 @@ app.use((err, req, res, next) => {
       console.warn("Failed to check/add categories table:", e.message);
     }
     
-    // Add potentially missing columns to categories table
-    const categoryColumns = [
-      { name: 'image_url', def: 'VARCHAR(500) NULL DEFAULT NULL' },
-      { name: 'description', def: 'TEXT NULL' },
-      { name: 'tag', def: 'VARCHAR(100) NULL DEFAULT NULL' },
-      { name: 'meta_title', def: 'VARCHAR(255) NULL DEFAULT NULL' },
-      { name: 'meta_description', def: 'TEXT NULL' },
-      { name: 'focus_keyword', def: 'VARCHAR(255) NULL DEFAULT NULL' },
-      { name: 'view_count', def: 'INT DEFAULT 0' },
-    ];
-    for (const col of categoryColumns) {
-      try {
-        const exists = await db`SHOW COLUMNS FROM categories LIKE ${col.name}`;
-        if (exists.length === 0) {
-          const mysql = require('mysql2/promise');
-          const pool = mysql.createPool({
-            host: process.env.DB_HOST, user: process.env.DB_USER,
-            password: process.env.DB_PASS, database: process.env.DB_NAME,
-            port: 3306, ssl: { rejectUnauthorized: false }
-          });
-          await pool.query(`ALTER TABLE categories ADD COLUMN \`${col.name}\` ${col.def}`);
-          await pool.end();
-          console.log(`Added column: categories.${col.name}`);
-        }
-      } catch (e) {
-        console.warn(`Could not add column ${col.name} to categories:`, e.message);
-      }
+    try {
+      await db`
+        CREATE TABLE IF NOT EXISTS website_categories (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          name VARCHAR(255) NOT NULL,
+          slug VARCHAR(255) NOT NULL,
+          image_url VARCHAR(500) NULL DEFAULT NULL,
+          description TEXT NULL,
+          tag VARCHAR(100) NULL DEFAULT NULL,
+          meta_title VARCHAR(255) NULL DEFAULT NULL,
+          meta_description TEXT NULL,
+          focus_keyword VARCHAR(255) NULL DEFAULT NULL,
+          view_count INT DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+    } catch (e) {
+      console.warn("Failed to check/add website_categories:", e.message);
     }
 
     // Add all potentially missing columns to prompts table
     const promptColumns = [
-      { name: 'category_id', def: 'INT NULL' },
+      { name: 'website_category_id', def: 'INT NULL' },
       { name: 'sub_prompts', def: 'JSON NULL' },
       { name: 'thumbnail_url', def: 'VARCHAR(500) NULL DEFAULT NULL' },
       { name: 'meta_description', def: 'TEXT NULL' },
