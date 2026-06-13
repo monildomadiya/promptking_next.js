@@ -803,7 +803,7 @@ router.get('/admin/analytics/blogs', adminAuth, async (req, res) => {
 router.post('/admin/analytics/reset', adminAuth, async (req, res) => {
   try {
     // Only clear the overview events graph, do not reset lifetime counts on prompts/blogs
-    await db`TRUNCATE TABLE analytics_events`;
+    await db`DELETE FROM analytics_events`;
     res.json({ status: "success" });
   } catch (error) {
     console.error('Analytics Reset Error:', error);
