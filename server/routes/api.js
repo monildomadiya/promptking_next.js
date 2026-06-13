@@ -802,7 +802,8 @@ router.get('/admin/analytics/blogs', adminAuth, async (req, res) => {
 // --- ADMIN ANALYTICS RESET ---
 router.post('/admin/analytics/reset', adminAuth, async (req, res) => {
   try {
-    await db`UPDATE prompts SET copy_count = 0, unlock_count = 0, like_count = 0`;
+    await db`UPDATE prompts SET copy_count = 0, unlock_count = 0, like_count = 0, view_count = 0`;
+    try { await db`UPDATE blogs SET view_count = 0`; } catch(e) {}
     await db`TRUNCATE TABLE analytics_events`;
     res.json({ status: "success" });
   } catch (error) {
