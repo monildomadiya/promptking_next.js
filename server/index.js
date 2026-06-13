@@ -261,12 +261,25 @@ app.use((err, req, res, next) => {
       { name: 'faqs', def: 'LONGTEXT NULL' },
       { name: 'tags', def: 'TEXT NULL' },
       { name: 'description', def: 'TEXT NULL' },
+      { name: 'gallery_urls', def: 'JSON NULL' },
+      { name: 'hide_prompt_box', def: 'TINYINT(1) NOT NULL DEFAULT 0' },
+      { name: 'is_featured', def: 'TINYINT(1) NOT NULL DEFAULT 0' },
+      { name: 'is_draft', def: 'TINYINT(1) NOT NULL DEFAULT 0' },
+      { name: 'publish_date', def: 'DATETIME NULL' },
     ];
     for (const col of promptColumns) {
       try {
         const exists = await db`SHOW COLUMNS FROM prompts LIKE ${col.name}`;
         if (exists.length === 0) {
-          await db`ALTER TABLE prompts ADD COLUMN ${db(col.name)} ${db(col.def)}`;
+          const mysql = require('mysql2/promise');
+          const pool = mysql.createPool({
+            host: process.env.DB_HOST, user: process.env.DB_USER,
+            password: process.env.DB_PASS, database: process.env.DB_NAME,
+            port: 3306, ssl: { rejectUnauthorized: false }
+          });
+          await pool.query(`ALTER TABLE prompts ADD COLUMN \`${col.name}\` ${col.def}`);
+          await pool.end();
+          console.log(`Added column: prompts.${col.name}`);
         }
       } catch (e) {
         console.warn(`Failed to check/add ${col.name} to prompts:`, e.message);
