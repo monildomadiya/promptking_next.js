@@ -121,11 +121,13 @@ app.use((err, req, res, next) => {
         CREATE TABLE IF NOT EXISTS analytics_events (
           id INT AUTO_INCREMENT PRIMARY KEY,
           prompt_key VARCHAR(100) NOT NULL,
-          event_type ENUM('copy', 'unlock') NOT NULL,
+          event_type ENUM('copy', 'unlock', 'view', 'like') NOT NULL,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           INDEX idx_created_type (created_at, event_type)
         )
       `;
+      // Attempt to modify the column to support 'view' and 'like' in case it already exists
+      await db`ALTER TABLE analytics_events MODIFY COLUMN event_type ENUM('copy', 'unlock', 'view', 'like') NOT NULL`;
     } catch (e) {
       console.warn("Failed to check/add analytics_events:", e.message);
     }
