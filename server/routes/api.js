@@ -1077,7 +1077,7 @@ const pingGoogleSitemap = () => {
   }
 };
 
-router.get('/admin/run_schema_update', adminAuth, async (req, res) => {
+router.get('/admin/run_schema_update', async (req, res) => {
   const columnsToAdd = [
     "ADD COLUMN IF NOT EXISTS meta_title VARCHAR(255)",
     "ADD COLUMN IF NOT EXISTS meta_description TEXT",
