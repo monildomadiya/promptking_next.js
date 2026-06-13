@@ -1558,10 +1558,11 @@ const AdminDashboard = () => {
         <AnimatePresence mode="wait">
           {view === 'dashboard' && (
             <motion.div key="dashboard" {...pageTransition}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px', marginBottom: '48px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', marginBottom: '48px' }}>
                 <StatCard label="Total Prompts" value={stats.prompts} color="#ff4d4d" icon={<TableProperties size={24} />} />
+                <StatCard label="Total Views" value={stats.views} color="#10b981" icon={<Layers size={24} />} />
                 <StatCard label="Total Copies" value={stats.copies} color="#3b82f6" icon={<Activity size={24} />} />
-                <StatCard label="Total Opens" value={stats.unlocks} color="#fbbf24" icon={<Layers size={24} />} />
+                <StatCard label="Total Unlocks" value={stats.unlocks} color="#fbbf24" icon={<Crown size={24} />} />
               </div>
               <div style={{ ...glassPanelStyle, padding: '30px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
@@ -1638,75 +1639,6 @@ const AdminDashboard = () => {
                   </ResponsiveContainer>
                 </div>
               </div>
-
-
-              {/* ADVANCED REPORTS */}
-              <div style={{ ...glassPanelStyle, padding: '30px', marginTop: '30px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
-                  <SectionTitle title="Advanced Reports (Per Prompt)" />
-                  <button
-                    onClick={() => {
-                      const csvContent = "data:text/csv;charset=utf-8," + 
-                        "Prompt Key,Title,Views,Copies,Unlocks\n" + 
-                        promptAnalytics.map(p => `${p.prompt_key},"${(p.title||'').replace(/"/g, '""')}",${p.views},${p.copies},${p.unlocks}`).join("\n");
-                      const encodedUri = encodeURI(csvContent);
-                      const link = document.createElement("a");
-                      link.setAttribute("href", encodedUri);
-                      link.setAttribute("download", "advanced_analytics.csv");
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    }}
-                    style={{
-                      padding: '8px 16px',
-                      background: 'rgba(59, 130, 246, 0.1)',
-                      color: '#3b82f6',
-                      border: '1px solid rgba(59, 130, 246, 0.3)',
-                      borderRadius: '8px',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      transition: '0.2s',
-                    }}
-                    onMouseOver={(e) => e.target.style.background = 'rgba(59, 130, 246, 0.2)'}
-                    onMouseOut={(e) => e.target.style.background = 'rgba(59, 130, 246, 0.1)'}
-                  >
-                    Export CSV
-                  </button>
-                </div>
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Prompt Title</th>
-                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Views</th>
-                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Copies</th>
-                        <th style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Unlocks</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[...promptAnalytics]
-                        .sort((a, b) => (b.views + b.copies + b.unlocks) - (a.views + a.copies + a.unlocks))
-                        .slice(0, 15)
-                        .map((p) => (
-                        <tr key={p.prompt_key} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                          <td style={{ padding: '12px', fontWeight: 600, color: 'white' }}>{p.title || p.prompt_key}</td>
-                          <td style={{ padding: '12px', color: '#10b981', fontWeight: 700 }}>{p.views}</td>
-                          <td style={{ padding: '12px', color: '#3b82f6', fontWeight: 700 }}>{p.copies}</td>
-                          <td style={{ padding: '12px', color: '#fbbf24', fontWeight: 700 }}>{p.unlocks}</td>
-                        </tr>
-                      ))}
-                      {promptAnalytics.length === 0 && (
-                        <tr>
-                          <td colSpan="5" style={{ padding: '24px', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>
-                            No analytics data available.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
             </motion.div>
           )}
 
