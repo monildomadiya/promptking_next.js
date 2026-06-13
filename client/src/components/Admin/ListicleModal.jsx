@@ -405,51 +405,9 @@ const ListicleModal = ({ prompt, onClose, onSave }) => {
               </div>
             </div>
 
-            {/* 4. FAQ Section */}
+            {/* 4. Sub-Prompts (Listicle Builder) */}
             <div>
-              <SectionTitle title="4. FAQ Section (Boosts SEO)" />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                {formData.faqs.map((faq, index) => (
-                  <div key={index} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '20px', borderRadius: '15px', position: 'relative' }}>
-                    <button 
-                      type="button" 
-                      onClick={() => removeFaq(index)}
-                      style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', color: 'var(--accent-main)', cursor: 'pointer' }}
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                    <Label text={`Question ${index + 1}`} />
-                    <input 
-                      type="text" 
-                      value={faq.question} 
-                      onChange={(e) => updateFaq(index, 'question', e.target.value)}
-                      className="glass-input"
-                      style={{ marginBottom: '15px' }}
-                      placeholder="e.g. What AI tool works best with this prompt?"
-                    />
-                    <Label text="Answer" />
-                    <textarea 
-                      value={faq.answer} 
-                      onChange={(e) => updateFaq(index, 'answer', e.target.value)}
-                      className="glass-input"
-                      rows={2}
-                      placeholder="Answer clearly and concisely..."
-                    />
-                  </div>
-                ))}
-                <button 
-                  type="button" 
-                  onClick={addFaq}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: 600, alignSelf: 'flex-start' }}
-                >
-                  <PlusCircle size={16} /> Add FAQ
-                </button>
-              </div>
-            </div>
-
-            {/* 4.5. Sub-Prompts (Listicle Builder) */}
-            <div>
-              <SectionTitle title="4.5. Sub-Prompts (Listicle/Blog Builder)" />
+              <SectionTitle title="4. Sub-Prompts (Listicle/Blog Builder)" />
               <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
                 {(formData.sub_prompts || []).map((sp, index) => (
                   <div key={index} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '25px', borderRadius: '15px', position: 'relative' }}>
@@ -507,6 +465,48 @@ const ListicleModal = ({ prompt, onClose, onSave }) => {
                   value={formData.description}
                   onChange={(content) => setFormData({ ...formData, description: content })}
                 />
+              </div>
+            </div>
+
+            {/* 6. FAQ Section */}
+            <div>
+              <SectionTitle title="6. FAQ Section (Boosts SEO)" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {formData.faqs.map((faq, index) => (
+                  <div key={index} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '20px', borderRadius: '15px', position: 'relative' }}>
+                    <button 
+                      type="button" 
+                      onClick={() => removeFaq(index)}
+                      style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', color: 'var(--accent-main)', cursor: 'pointer' }}
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                    <Label text={`Question ${index + 1}`} />
+                    <input 
+                      type="text" 
+                      value={faq.question} 
+                      onChange={(e) => updateFaq(index, 'question', e.target.value)}
+                      className="glass-input"
+                      style={{ marginBottom: '15px' }}
+                      placeholder="e.g. What AI tool works best with this prompt?"
+                    />
+                    <Label text="Answer" />
+                    <textarea 
+                      value={faq.answer} 
+                      onChange={(e) => updateFaq(index, 'answer', e.target.value)}
+                      className="glass-input"
+                      rows={2}
+                      placeholder="Answer clearly and concisely..."
+                    />
+                  </div>
+                ))}
+                <button 
+                  type="button" 
+                  onClick={addFaq}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: 600, alignSelf: 'flex-start' }}
+                >
+                  <PlusCircle size={16} /> Add FAQ
+                </button>
               </div>
             </div>
 
