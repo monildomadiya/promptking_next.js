@@ -2,14 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api';
 
+let cachedCategories = null;
+
 const CategorySlider = () => {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState(cachedCategories || []);
+  const [loading, setLoading] = useState(!cachedCategories);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await api.get('/website_categories');
+        cachedCategories = res.data;
         setCategories(res.data);
       } catch (err) {
         console.error("Failed to fetch categories", err);
@@ -20,7 +23,7 @@ const CategorySlider = () => {
     fetchCategories();
   }, []);
 
-  if (loading || categories.length === 0) return null;
+  if (!loading && categories.length === 0) return null;
 
   return (
     <div style={{ padding: '0 20px', maxWidth: '1400px', margin: '40px auto 20px' }}>
@@ -28,7 +31,19 @@ const CategorySlider = () => {
         Browse by Category
       </h2>
       <div className="hide-scrollbar category-slider-container">
-        {categories.map((cat, i) => (
+        {loading && categories.length === 0 ? (
+          [1, 2, 3, 4, 5, 6].map((skel) => (
+            <div 
+              key={skel} 
+              className="category-slider-item shimmer-bg"
+              style={{
+                borderRadius: '24px',
+                border: '1px solid rgba(255,255,255,0.05)',
+              }}
+            />
+          ))
+        ) : (
+          categories.map((cat, i) => (
           <Link 
             key={cat.id} 
             to={`/category/${cat.slug}`}
