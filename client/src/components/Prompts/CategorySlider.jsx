@@ -27,25 +27,14 @@ const CategorySlider = () => {
       <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '20px', letterSpacing: '-0.5px', color: 'white' }}>
         Browse by Category
       </h2>
-      <div 
-        className="hide-scrollbar"
-        style={{ 
-          display: 'flex', 
-          gap: '20px', 
-          overflowX: 'auto', 
-          paddingBottom: '10px',
-          scrollSnapType: 'x mandatory'
-        }}
-      >
+      <div className="hide-scrollbar category-slider-container">
         {categories.map((cat, i) => (
           <Link 
             key={cat.id} 
             to={`/category/${cat.slug}`}
+            className="category-slider-item"
             style={{
               textDecoration: 'none',
-              flex: '0 0 auto',
-              width: '240px',
-              height: '320px',
               borderRadius: '24px',
               position: 'relative',
               overflow: 'hidden',
@@ -79,9 +68,9 @@ const CategorySlider = () => {
               background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 60%)' 
             }} />
 
-            <div style={{ position: 'absolute', bottom: '25px', left: '20px', right: '20px', zIndex: 2 }}>
+            <div className="category-slider-content">
               {cat.tag && (
-                <span style={{ 
+                <span className="category-slider-tag" style={{ 
                   background: 'var(--accent-main)', 
                   color: 'white', 
                   fontSize: '0.65rem', 
@@ -96,7 +85,7 @@ const CategorySlider = () => {
                   {cat.tag}
                 </span>
               )}
-              <h3 style={{ 
+              <h3 className="category-slider-title" style={{ 
                 color: 'white', 
                 fontSize: '1.25rem', 
                 fontWeight: 800, 
