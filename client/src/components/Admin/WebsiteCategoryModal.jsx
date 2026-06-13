@@ -65,6 +65,7 @@ const ImageUpload = ({ url, onUpload }) => {
 };
 
 const WebsiteCategoryModal = ({ category, onClose, onSave }) => {
+  const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -100,14 +101,18 @@ const WebsiteCategoryModal = ({ category, onClose, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSaving) return;
     if (!formData.name?.trim()) {
       return toast.error("Category Name is required!");
     }
+    setIsSaving(true);
     try {
       await api.post('/admin/save_website_category', { ...formData, id: category?.id });
       onSave();
     } catch (error) {
       toast.error("Failed to save category");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -294,13 +299,15 @@ const WebsiteCategoryModal = ({ category, onClose, onSave }) => {
           <button 
             type="submit" 
             form="categoryForm"
+            disabled={isSaving}
             style={{ 
               flex: 2, padding: '16px', borderRadius: '16px', background: 'var(--accent-main)', 
-              color: 'white', border: 'none', cursor: 'pointer', fontWeight: 900, fontSize: '1rem',
-              boxShadow: '0 8px 25px rgba(229, 9, 20, 0.25)'
+              color: 'white', border: 'none', cursor: isSaving ? 'not-allowed' : 'pointer', fontWeight: 900, fontSize: '1rem',
+              boxShadow: '0 8px 25px rgba(229, 9, 20, 0.25)',
+              opacity: isSaving ? 0.7 : 1
             }}
           >
-            Save Architecture
+            {isSaving ? 'Saving...' : 'Save Architecture'}
           </button>
         </div>
       </div>
