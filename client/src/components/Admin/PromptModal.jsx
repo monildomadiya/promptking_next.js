@@ -174,6 +174,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     if (formData.meta_description) score++;
     if (formData.slug) score++;
     if (formData.focus_keyword) score++;
+    if (formData.img_after || formData.img_before) score++;
     if (formData.faqs && formData.faqs.length >= 1) score++;
     return score;
   };
@@ -184,7 +185,17 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     if (!formData.title?.trim()) {
       return toast.error("Title is required!");
     }
+    if (!formData.prompt_text?.trim()) {
+      return toast.error("Prompt Content is required!");
+    }
+    if (!formData.ai_type?.trim()) {
+      return toast.error("AI Model/Type is required!");
+    }
 
+    if (formData.is_premium && (!formData.password || formData.password.trim() === '')) {
+      toast.error("⚠️ SECURITY REQUIRED: Premium content must have an unlock PIN/Password.");
+      return;
+    }
     try {
       await api.post('/admin/save_prompt', { ...formData, originalKey });
       onSave();
@@ -233,8 +244,8 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
               background: 'rgba(255,255,255,0.05)', padding: '8px 16px', borderRadius: '20px',
               border: '1px solid rgba(255,255,255,0.1)'
             }}>
-              <CheckCircle size={16} color={getSeoScore() >= 4 ? '#4CAF50' : '#FF9800'} />
-              <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>SEO Score: {getSeoScore()}/5</span>
+              <CheckCircle size={16} color={getSeoScore() >= 5 ? '#4CAF50' : '#FF9800'} />
+              <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>SEO Score: {getSeoScore()}/6</span>
             </div>
             <button 
               onClick={onClose}
@@ -310,6 +321,24 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                   </div>
                   {formData.slug && <small style={{ color: 'var(--text-dim)', display: 'block', marginTop: '5px' }}>Preview: /prompt/{formData.prompt_key}</small>}
                 </div>
+
+                <div>
+                  <Label text="AI Type" />
+                  <select 
+                    value={formData.ai_type}
+                    onChange={(e) => setFormData({ ...formData, ai_type: e.target.value })}
+                    className="glass-input"
+                    style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', appearance: 'none', background: 'var(--surface-1)' }}
+                  >
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.name}>{cat.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+
+
+
 
                 <div style={{ gridColumn: 'span 2' }}>
                   <Label text="Tags (comma separated)" />
@@ -387,55 +416,30 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
               </div>
             </div>
 
-            {/* 3. Sub-Prompts */}
+            {/* 3. Experience Content */}
             <div>
-              <SectionTitle title="3. Sub-Prompts" />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
-                {(formData.sub_prompts || []).map((sp, index) => (
-                  <div key={index} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '25px', borderRadius: '15px', position: 'relative' }}>
-                    <button 
-                      type="button" 
-                      onClick={() => removeSubPrompt(index)}
-                      style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', color: 'var(--accent-main)', cursor: 'pointer' }}
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                    <Label text={`Sub-Prompt ${index + 1} Title`} />
-                    <input 
-                      type="text" 
-                      value={sp.title} 
-                      onChange={(e) => updateSubPrompt(index, 'title', e.target.value)}
-                      className="glass-input"
-                      style={{ marginBottom: '15px', width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
-                      placeholder="e.g. 1. The Classic Cinematic Shot"
+              <SectionTitle title="3. Experience Content" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div>
+                  <Label text="Detailed Description" />
+                  <div style={{ borderRadius: '18px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <CustomEditor
+                      value={formData.description}
+                      onChange={(content) => setFormData({ ...formData, description: content })}
                     />
-                    <Label text="Sub-Prompt Text" />
-                    <textarea 
-                      value={sp.prompt_text} 
-                      onChange={(e) => updateSubPrompt(index, 'prompt_text', e.target.value)}
-                      className="glass-input"
-                      style={{ marginBottom: '15px', width: '100%', minHeight: '100px', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', fontFamily: 'monospace' }}
-                      placeholder="Enter the prompt here..."
-                    />
-                    <div style={{ display: 'flex', gap: '20px' }}>
-                      <div style={{ flex: 1 }}>
-                        <Label text="Before Image (Optional)" />
-                        <ImageUpload url={sp.imgBefore} onUpload={(url) => updateSubPrompt(index, 'imgBefore', url)} />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <Label text="After/Result Image" />
-                        <ImageUpload url={sp.imgAfter} onUpload={(url) => updateSubPrompt(index, 'imgAfter', url)} />
-                      </div>
-                    </div>
                   </div>
-                ))}
-                <button 
-                  type="button" 
-                  onClick={addSubPrompt}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '14px 24px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: 600, alignSelf: 'flex-start' }}
-                >
-                  <PlusCircle size={16} /> Add Sub-Prompt
-                </button>
+                </div>
+
+                <div>
+                  <Label text="Raw Prompt Machine Source" icon={<Zap size={14} />} />
+                  <textarea 
+                    value={formData.prompt_text}
+                    onChange={(e) => setFormData({ ...formData, prompt_text: e.target.value })}
+                    className="glass-input"
+                    style={{ width: '100%', minHeight: '180px', padding: '20px', borderRadius: '18px', fontSize: '0.95rem', fontFamily: 'monospace', lineHeight: '1.6', resize: 'vertical' }}
+                    required
+                  />
+                </div>
               </div>
             </div>
 
@@ -481,14 +485,134 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
               </div>
               </div>
 
-            {/* 5. Detailed Description */}
+            {/* 5. Visual Engineering */}
             <div>
-              <SectionTitle title="5. Detailed Description" />
-              <div style={{ borderRadius: '18px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
-                <CustomEditor
-                  value={formData.description}
-                  onChange={(content) => setFormData({ ...formData, description: content })}
-                />
+              <SectionTitle title="5. Visual Engineering" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div className="glass-card" style={{ padding: '25px', borderRadius: '20px' }}>
+                  <Label text="Presentation Mode" />
+                  <div style={{ display: 'flex', gap: '30px', marginTop: '15px', flexWrap: 'wrap' }}>
+                    <Checkbox label="Enable Contrast Slider" checked={formData.is_image_slider} onChange={(val) => setFormData({...formData, is_image_slider: val})} />
+                    <Checkbox label="Premium Content" premium checked={formData.is_premium} onChange={(val) => setFormData({...formData, is_premium: val, password: val ? formData.password : ''})} />
+                    <Checkbox label="Hide Prompt from Users" checked={formData.hide_prompt_box} onChange={(val) => setFormData({...formData, hide_prompt_box: val})} />
+                    <Checkbox label="Feature Prompt" checked={formData.is_featured} onChange={(val) => setFormData({...formData, is_featured: val})} />
+                    <Checkbox label="Save as Draft" checked={formData.is_draft} onChange={(val) => setFormData({...formData, is_draft: val})} />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                  <div>
+                    <Label text="Hero Image (Result)" />
+                    <ImageUpload url={formData.img_after} onUpload={(url) => setFormData({ ...formData, img_after: url })} />
+                  </div>
+                  <div>
+                    <Label text={formData.is_image_slider ? 'Comparison Image (Before)' : 'Secondary Image'} />
+                    <ImageUpload url={formData.img_before} onUpload={(url) => setFormData({ ...formData, img_before: url })} />
+                  </div>
+                </div>
+
+                <div>
+                  <Label text="Aspect Ratio Configuration" />
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '10px' }}>
+                    {['1 / 1', '16 / 9', '4 / 5', '21 / 9', '4 / 3'].map(ratio => (
+                      <RatioButton 
+                        key={ratio} ratio={ratio} 
+                        active={formData.image_ratio === ratio} 
+                        onClick={() => setFormData({ ...formData, image_ratio: ratio })} 
+                      />
+                    ))}
+                    <input 
+                      type="text" placeholder="Custom (e.g. 3 / 2)"
+                      value={formData.image_ratio}
+                      onChange={(e) => setFormData({ ...formData, image_ratio: e.target.value })}
+                      className="glass-input"
+                      style={{ width: '150px', padding: '10px 15px', borderRadius: '10px', fontSize: '0.85rem' }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label text="Gallery Images (Optional)" icon={<Image size={14} />} />
+                  <div style={{ display: 'flex', gap: '10px', marginBottom: '14px' }}>
+                    <input
+                      type="text" placeholder="Paste image URL here..."
+                      value={galleryUrl}
+                      onChange={(e) => setGalleryUrl(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddGalleryUrl(); } }}
+                      className="glass-input"
+                      style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', fontSize: '0.9rem' }}
+                    />
+                    <button type="button" onClick={handleAddGalleryUrl} disabled={isUploadingGallery}
+                      style={{ padding: '12px 20px', borderRadius: '12px', background: 'var(--accent-main)', color: 'white', border: 'none', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', whiteSpace: 'nowrap', opacity: isUploadingGallery ? 0.7 : 1 }}
+                    >+ Add URL</button>
+                    <input type="file" accept="image/*" ref={galleryFileInputRef} style={{ display: 'none' }} onChange={handleGalleryUpload} />
+                    <button type="button" onClick={() => galleryFileInputRef.current?.click()} disabled={isUploadingGallery}
+                      style={{ padding: '12px 20px', borderRadius: '12px', background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', whiteSpace: 'nowrap', opacity: isUploadingGallery ? 0.7 : 1 }}
+                    >{isUploadingGallery ? 'Uploading...' : 'Upload Image'}</button>
+                  </div>
+                  {(() => {
+                    let imgs = [];
+                    try { imgs = JSON.parse(formData.gallery_urls || '[]'); } catch(e) {}
+                    if (!Array.isArray(imgs) || imgs.length === 0) return <Hint text="No gallery images yet." />;
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {imgs.map((url, idx) => (
+                          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)', padding: '8px 12px' }}>
+                            <img src={url} alt={`img ${idx+1}`} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', flexShrink: 0, background: '#111' }} onError={e => e.target.style.display='none'} />
+                            <span style={{ flex: 1, fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{url}</span>
+                            <button type="button"
+                              onClick={() => { const updated = imgs.filter((_, i) => i !== idx); setFormData({ ...formData, gallery_urls: JSON.stringify(updated) }); }}
+                              style={{ background: 'rgba(229,9,20,0.15)', border: '1px solid rgba(229,9,20,0.3)', color: 'var(--accent-main)', width: '26px', height: '26px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', flexShrink: 0 }}
+                            >✕</button>
+                          </div>
+                        ))}
+                        <Hint text={`${imgs.length} image${imgs.length > 1 ? 's' : ''} added.`} />
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            </div>
+
+            {/* 6. Access & Monetization */}
+            <div>
+              <SectionTitle title="6. Access & Monetization" />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                {formData.is_premium && (
+                  <div>
+                    <Label text="Unlock PIN Code" />
+                    <input 
+                      type="text" 
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      className="glass-input"
+                      placeholder="4-8 Digit PIN"
+                      style={{ width: '100%', padding: '14px', borderRadius: '14px' }}
+                    />
+                  </div>
+                )}
+                <div>
+                  <Label text="Monetization URL (YT Shorts)" />
+                  <input 
+                    type="text" 
+                    placeholder="https://youtube.com/shorts/..."
+                    value={formData.ig_link}
+                    onChange={(e) => setFormData({ ...formData, ig_link: e.target.value })}
+                    className="glass-input"
+                    style={{ width: '100%', padding: '14px', borderRadius: '14px' }}
+                  />
+                </div>
+                <div>
+                  <Label text="Scheduled Publish Date (Optional)" />
+                  <input 
+                    type="datetime-local" 
+                    value={formData.publish_date || ''}
+                    onChange={(e) => setFormData({ ...formData, publish_date: e.target.value })}
+                    className="glass-input"
+                    style={{ width: '100%', padding: '14px', borderRadius: '14px', colorScheme: 'dark' }}
+                  />
+                  <Hint text="Leave empty to publish immediately" />
+                </div>
               </div>
             </div>
 
@@ -538,6 +662,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                 <CheckItem checked={!!formData.meta_description} text="Meta description exists" />
                 <CheckItem checked={!!formData.slug} text="Slug exists" />
                 <CheckItem checked={!!formData.focus_keyword} text="Focus keyword exists" />
+                <CheckItem checked={!!(formData.img_after || formData.img_before)} text="Hero image exists" />
                 <CheckItem checked={formData.faqs && formData.faqs.length >= 1} text="At least 1 FAQ added" />
               </ul>
 
@@ -545,15 +670,15 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
               <div style={{ marginTop: '20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>SEO Strength</span>
-                  <span style={{ fontSize: '0.8rem', fontWeight: 700, color: getSeoScore() >= 4 ? '#4CAF50' : getSeoScore() >= 2 ? '#FF9800' : 'var(--accent-main)' }}>
-                    {getSeoScore() >= 4 ? 'Strong' : getSeoScore() >= 2 ? 'Fair' : 'Weak'}
+                  <span style={{ fontSize: '0.8rem', fontWeight: 700, color: getSeoScore() >= 5 ? '#4CAF50' : getSeoScore() >= 3 ? '#FF9800' : 'var(--accent-main)' }}>
+                    {getSeoScore() >= 5 ? 'Strong' : getSeoScore() >= 3 ? 'Fair' : 'Weak'}
                   </span>
                 </div>
                 <div style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
                   <div style={{ 
                     height: '100%', 
-                    width: `${(getSeoScore() / 5) * 100}%`, 
-                    background: getSeoScore() >= 4 ? '#4CAF50' : getSeoScore() >= 2 ? '#FF9800' : 'var(--accent-main)',
+                    width: `${(getSeoScore() / 6) * 100}%`, 
+                    background: getSeoScore() >= 5 ? '#4CAF50' : getSeoScore() >= 3 ? '#FF9800' : 'var(--accent-main)',
                     borderRadius: '10px',
                     transition: 'width 0.4s ease'
                   }} />
