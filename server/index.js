@@ -243,7 +243,34 @@ app.use((err, req, res, next) => {
         await db`ALTER TABLE blogs ADD COLUMN author_id INT NULL`;
       }
     } catch (e) {
+
       console.warn("Failed to check/add author_id to blogs:", e.message);
+    }
+
+    // Add all potentially missing columns to prompts table
+    const promptColumns = [
+      { name: 'meta_description', def: 'TEXT NULL' },
+      { name: 'focus_keyword', def: 'VARCHAR(255) NULL DEFAULT NULL' },
+      { name: 'canonical_url', def: 'VARCHAR(500) NULL DEFAULT NULL' },
+      { name: 'og_title', def: 'VARCHAR(255) NULL DEFAULT NULL' },
+      { name: 'og_description', def: 'TEXT NULL' },
+      { name: 'og_image', def: 'VARCHAR(500) NULL DEFAULT NULL' },
+      { name: 'twitter_title', def: 'VARCHAR(255) NULL DEFAULT NULL' },
+      { name: 'twitter_description', def: 'TEXT NULL' },
+      { name: 'twitter_image', def: 'VARCHAR(500) NULL DEFAULT NULL' },
+      { name: 'faqs', def: 'LONGTEXT NULL' },
+      { name: 'tags', def: 'TEXT NULL' },
+      { name: 'description', def: 'TEXT NULL' },
+    ];
+    for (const col of promptColumns) {
+      try {
+        const exists = await db`SHOW COLUMNS FROM prompts LIKE ${col.name}`;
+        if (exists.length === 0) {
+          await db`ALTER TABLE prompts ADD COLUMN ${db(col.name)} ${db(col.def)}`;
+        }
+      } catch (e) {
+        console.warn(`Failed to check/add ${col.name} to prompts:`, e.message);
+      }
     }
 
     // Add all potentially missing columns to blogs table
