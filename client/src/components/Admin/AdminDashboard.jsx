@@ -1134,7 +1134,7 @@ const AdminDashboard = () => {
 
     if (!window.confirm("Permanent delete? This cannot be undone.")) return;
     const id = item.prompt_key || item.id;
-    const type = view === 'prompts' ? 'prompt' : (view === 'listicles' ? 'listicle' : (view === 'blogs' ? 'blog' : (view === 'categories' ? 'category' : (view === 'website_categories' ? 'website category' : (view === 'authors' ? 'author' : 'faq')))));
+    const type = view === 'prompts' ? 'prompt' : (view === 'listicles' ? 'listicle' : (view === 'blogs' ? 'blog' : (view === 'categories' ? 'category' : (view === 'website_categories' ? 'website_category' : (view === 'authors' ? 'author' : 'faq')))));
     try {
       await api.delete(`/admin/delete_${type}/${id}`);
       fetchData(view);
