@@ -26,6 +26,9 @@ const CategoryModal = ({ category, onClose, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.name?.trim()) {
+      return toast.error("Category Name is required!");
+    }
     try {
       await api.post('/admin/save_category', { ...formData, id: category?.id });
       onSave();

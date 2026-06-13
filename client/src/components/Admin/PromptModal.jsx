@@ -158,6 +158,17 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!formData.title?.trim()) {
+      return toast.error("Title is required!");
+    }
+    if (!formData.prompt_text?.trim()) {
+      return toast.error("Prompt Content is required!");
+    }
+    if (!formData.ai_type?.trim()) {
+      return toast.error("AI Model/Type is required!");
+    }
+
     if (formData.is_premium && (!formData.password || formData.password.trim() === '')) {
       toast.error("⚠️ SECURITY REQUIRED: Premium content must have an unlock PIN/Password.");
       return;

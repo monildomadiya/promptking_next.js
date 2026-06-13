@@ -28,6 +28,9 @@ const AuthorModal = ({ author, onClose, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.name?.trim()) {
+      return toast.error("Author Name is required!");
+    }
     try {
       await api.post('/admin/save_author', { ...formData, id: author?.id });
       onSave();

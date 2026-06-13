@@ -28,6 +28,12 @@ const FAQModal = ({ faq, onClose, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.question?.trim()) {
+      return toast.error("Question is required!");
+    }
+    if (!formData.answer?.trim()) {
+      return toast.error("Answer is required!");
+    }
     try {
       await api.post('/admin/save_faq', {
         ...formData,
