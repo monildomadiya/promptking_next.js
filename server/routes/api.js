@@ -1077,6 +1077,40 @@ const pingGoogleSitemap = () => {
   }
 };
 
+router.get('/admin/run_schema_update', adminAuth, async (req, res) => {
+  const columnsToAdd = [
+    "ADD COLUMN IF NOT EXISTS meta_title VARCHAR(255)",
+    "ADD COLUMN IF NOT EXISTS meta_description TEXT",
+    "ADD COLUMN IF NOT EXISTS focus_keyword VARCHAR(255)",
+    "ADD COLUMN IF NOT EXISTS canonical_url VARCHAR(255)",
+    "ADD COLUMN IF NOT EXISTS og_title VARCHAR(255)",
+    "ADD COLUMN IF NOT EXISTS og_description TEXT",
+    "ADD COLUMN IF NOT EXISTS og_image VARCHAR(255)",
+    "ADD COLUMN IF NOT EXISTS twitter_title VARCHAR(255)",
+    "ADD COLUMN IF NOT EXISTS twitter_description TEXT",
+    "ADD COLUMN IF NOT EXISTS twitter_image VARCHAR(255)",
+    "ADD COLUMN IF NOT EXISTS faqs JSON",
+    "ADD COLUMN IF NOT EXISTS tags TEXT",
+    "ADD COLUMN IF NOT EXISTS gallery_urls JSON",
+    "ADD COLUMN IF NOT EXISTS hide_prompt_box BOOLEAN DEFAULT FALSE",
+    "ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE",
+    "ADD COLUMN IF NOT EXISTS is_draft BOOLEAN DEFAULT FALSE",
+    "ADD COLUMN IF NOT EXISTS publish_date DATETIME"
+  ];
+
+  let results = [];
+  for (const col of columnsToAdd) {
+    try {
+      await db([`ALTER TABLE prompts ${col}`]);
+      results.push(`Executed: ${col}`);
+    } catch (err) {
+      results.push(`Note on ${col}: ${err.message}`);
+    }
+  }
+  
+  res.json({ status: "success", logs: results });
+});
+
 router.post('/admin/save_prompt', adminAuth, async (req, res) => {
   const p = req.body;
   const originalKey = p.originalKey;
