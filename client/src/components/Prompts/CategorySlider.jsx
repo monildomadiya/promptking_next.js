@@ -111,7 +111,7 @@ const CategorySlider = () => {
               </h3>
             </div>
           </Link>
-        ))}
+        )))}
       </div>
     </div>
   );
