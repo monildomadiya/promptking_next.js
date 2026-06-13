@@ -1019,6 +1019,122 @@ const PromptDetailPage = ({ adsSettings }) => {
               />
             </div>
 
+            {/* NEW: Multi-Prompt / Listicle Section */}
+            {(() => {
+              let parsedSubPrompts = [];
+              try {
+                parsedSubPrompts = typeof prompt.sub_prompts === 'string' 
+                  ? JSON.parse(prompt.sub_prompts) 
+                  : (prompt.sub_prompts || []);
+              } catch(e) {}
+
+              if (!parsedSubPrompts || parsedSubPrompts.length === 0) return null;
+
+              return (
+                <div style={{ padding: '30px 0', borderTop: '1px solid rgba(255,255,255,0.05)', marginTop: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
+                    <div style={{ width: '4px', height: '24px', background: 'var(--accent-main)', borderRadius: '2px' }} />
+                    <h2 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0, color: 'white' }}>
+                      Additional Prompts & Variations
+                    </h2>
+                  </div>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
+                    {parsedSubPrompts.map((sp, idx) => (
+                      <div key={idx} style={{ 
+                        background: 'var(--surface-1)', 
+                        border: '1px solid rgba(255,255,255,0.05)', 
+                        borderRadius: '24px', 
+                        overflow: 'hidden' 
+                      }}>
+                        {/* Sub-Prompt Images */}
+                        {(sp.imgBefore || sp.imgAfter) && (
+                          <div style={{ 
+                            display: 'flex', 
+                            flexDirection: 'column',
+                            borderBottom: '1px solid rgba(255,255,255,0.05)'
+                          }}>
+                            {sp.imgBefore && sp.imgAfter ? (
+                              <div style={{ display: 'flex' }}>
+                                <div style={{ flex: 1, borderRight: '1px solid rgba(255,255,255,0.05)' }}>
+                                  <div style={{ padding: '8px 12px', background: 'rgba(255,255,255,0.02)', fontSize: '0.75rem', fontWeight: 800, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px' }}>Before</div>
+                                  <img src={sp.imgBefore} alt="Before" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                  <div style={{ padding: '8px 12px', background: 'rgba(255,255,255,0.02)', fontSize: '0.75rem', fontWeight: 800, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px' }}>After</div>
+                                  <img src={sp.imgAfter} alt="After" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                                </div>
+                              </div>
+                            ) : (
+                              <img src={sp.imgAfter || sp.imgBefore} alt="Variation Result" style={{ width: '100%', maxHeight: '400px', objectFit: 'cover', display: 'block' }} />
+                            )}
+                          </div>
+                        )}
+                        
+                        {/* Sub-Prompt Content */}
+                        <div style={{ padding: '25px' }}>
+                          {sp.title && (
+                            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '15px', color: 'white' }}>
+                              {sp.title}
+                            </h3>
+                          )}
+                          <div style={{ position: 'relative' }}>
+                            <div style={{ 
+                              padding: '20px', 
+                              background: 'rgba(0,0,0,0.3)', 
+                              borderRadius: '12px', 
+                              fontFamily: '"JetBrains Mono", monospace', 
+                              fontSize: '0.9rem', 
+                              color: 'rgba(255,255,255,0.8)',
+                              lineHeight: 1.6,
+                              filter: (isUnlocked && !isRelocking) ? 'none' : 'blur(12px)',
+                              userSelect: (isUnlocked && !isRelocking) ? 'text' : 'none',
+                              transition: 'filter 0.5s ease-out'
+                            }}>
+                              {sp.prompt_text}
+                            </div>
+                            
+                            {isUnlocked && (
+                              <button 
+                                onClick={(e) => {
+                                  const text = sp.prompt_text + '\n\n- Copied from PromptKing.in';
+                                  navigator.clipboard.writeText(text);
+                                  const btn = e.currentTarget;
+                                  btn.innerHTML = '<span style="display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!</span>';
+                                  btn.style.background = 'var(--accent-main)';
+                                  setTimeout(() => {
+                                    btn.innerHTML = '<span style="display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy</span>';
+                                    btn.style.background = 'rgba(255,255,255,0.1)';
+                                  }, 2000);
+                                }}
+                                style={{
+                                  position: 'absolute',
+                                  bottom: '15px',
+                                  right: '15px',
+                                  background: 'rgba(255,255,255,0.1)',
+                                  border: '1px solid rgba(255,255,255,0.2)',
+                                  color: 'white',
+                                  padding: '6px 12px',
+                                  borderRadius: '8px',
+                                  fontSize: '0.8rem',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  backdropFilter: 'blur(5px)',
+                                  transition: 'all 0.3s ease'
+                                }}
+                              >
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Copy size={14} /> Copy</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* NEW: How to Use Prompt Section */}
             <section className="how-to-use-section" style={{ padding: '30px 0', borderTop: '1px solid rgba(255,255,255,0.05)', marginTop: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>

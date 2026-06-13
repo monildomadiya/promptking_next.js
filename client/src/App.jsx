@@ -41,6 +41,7 @@ const AdSensePolicyPage = lazyWithRetry(() => import('./pages/AdSensePolicyPage'
 const ContactPage = lazyWithRetry(() => import('./pages/ContactPage'));
 const AdminDashboard = lazyWithRetry(() => import('./components/Admin/AdminDashboard'));
 const NotFoundPage = lazyWithRetry(() => import('./pages/NotFoundPage'));
+const CategoryPage = lazyWithRetry(() => import('./pages/CategoryPage'));
 
 // Loading Fallback Component
 const PageLoader = () => (
@@ -160,7 +161,7 @@ function AppContent() {
         <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<HomePage search={search} filter={filter} setFilter={setFilter} isMobile={isMobile} />} />
-          <Route path="/category/:categorySlug" element={<HomePage search={search} filter={filter} setFilter={setFilter} isMobile={isMobile} />} />
+          <Route path="/category/:slug" element={<CategoryPage />} />
           <Route path="/admin-secure" element={<AdminDashboard />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/article/:slug" element={<ArticlePage />} />

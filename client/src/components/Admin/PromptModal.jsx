@@ -9,6 +9,9 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     prompt_key: '',
     slug: '',
     title: '',
+    category_id: '',
+    sub_prompts: [],
+    thumbnail_url: '',
     meta_title: '',
     meta_description: '',
     focus_keyword: '',
@@ -96,8 +99,13 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
       let parsedFaqs = [];
       try { parsedFaqs = typeof prompt.faqs === 'string' ? JSON.parse(prompt.faqs) : (prompt.faqs || []); } catch(e) {}
 
+      let parsedSubPrompts = [];
+      try { parsedSubPrompts = typeof prompt.sub_prompts === 'string' ? JSON.parse(prompt.sub_prompts) : (prompt.sub_prompts || []); } catch(e) {}
+
       setFormData({
         ...prompt,
+        faqs: parsedFaqs,
+        sub_prompts: parsedSubPrompts,
         is_image_slider: Boolean(prompt.is_image_slider),
         is_premium: prompt.is_premium == 1 || prompt.is_premium === true || prompt.is_premium === 'true' || prompt.isPremium == 1 || prompt.isPremium === true || prompt.isPremium === 'true',
         hide_prompt_box: prompt.hide_prompt_box == 1 || prompt.hide_prompt_box === true || prompt.hide_prompt_box === 'true' || prompt.hidePromptBox == 1 || prompt.hidePromptBox === true || prompt.hidePromptBox === 'true',
@@ -142,6 +150,19 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     const newFaqs = [...formData.faqs];
     newFaqs.splice(index, 1);
     setFormData(prev => ({ ...prev, faqs: newFaqs }));
+  };
+
+  // Sub-Prompt helpers
+  const addSubPrompt = () => setFormData(prev => ({ ...prev, sub_prompts: [...(prev.sub_prompts || []), { title: '', prompt_text: '', imgBefore: '', imgAfter: '' }] }));
+  const updateSubPrompt = (index, field, value) => {
+    const newSubPrompts = [...(formData.sub_prompts || [])];
+    newSubPrompts[index][field] = value;
+    setFormData(prev => ({ ...prev, sub_prompts: newSubPrompts }));
+  };
+  const removeSubPrompt = (index) => {
+    const newSubPrompts = [...(formData.sub_prompts || [])];
+    newSubPrompts.splice(index, 1);
+    setFormData(prev => ({ ...prev, sub_prompts: newSubPrompts }));
   };
 
   // SEO Score
@@ -300,17 +321,40 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                 </div>
 
                 <div>
-                  <Label text="AI Category" />
+                  <Label text="AI Type" />
                   <select 
                     value={formData.ai_type}
                     onChange={(e) => setFormData({ ...formData, ai_type: e.target.value })}
                     className="glass-input"
-                    style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', appearance: 'none' }}
+                    style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', appearance: 'none', background: 'var(--surface-1)' }}
                   >
+                    <option value="ChatGPT">ChatGPT</option>
+                    <option value="Midjourney">Midjourney</option>
+                    <option value="DALL-E">DALL-E</option>
+                    <option value="Stable Diffusion">Stable Diffusion</option>
+                    <option value="Leonardo AI">Leonardo AI</option>
+                    <option value="Runway">Runway</option>
+                  </select>
+                </div>
+
+                <div>
+                  <Label text="Website Category (For Blog/Listicles)" />
+                  <select 
+                    value={formData.category_id}
+                    onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
+                    className="glass-input"
+                    style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', appearance: 'none', background: 'var(--surface-1)' }}
+                  >
+                    <option value="">None</option>
                     {categories.map(cat => (
-                      <option key={cat.id} value={cat.name}>{cat.name}</option>
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
                     ))}
                   </select>
+                </div>
+
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <Label text="Listicle / Blog Thumbnail (Overrides Image After)" />
+                  <ImageUpload url={formData.thumbnail_url} onUpload={(url) => setFormData({ ...formData, thumbnail_url: url })} />
                 </div>
 
                 <div style={{ gridColumn: 'span 2' }}>
@@ -454,6 +498,58 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                   style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: 600, alignSelf: 'flex-start' }}
                 >
                   <PlusCircle size={16} /> Add FAQ
+                </button>
+              </div>
+            </div>
+
+            {/* 4.5. Sub-Prompts (Listicle Builder) */}
+            <div>
+              <SectionTitle title="4.5. Sub-Prompts (Listicle/Blog Builder)" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+                {(formData.sub_prompts || []).map((sp, index) => (
+                  <div key={index} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '25px', borderRadius: '15px', position: 'relative' }}>
+                    <button 
+                      type="button" 
+                      onClick={() => removeSubPrompt(index)}
+                      style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', color: 'var(--accent-main)', cursor: 'pointer' }}
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                    <Label text={`Sub-Prompt ${index + 1} Title`} />
+                    <input 
+                      type="text" 
+                      value={sp.title} 
+                      onChange={(e) => updateSubPrompt(index, 'title', e.target.value)}
+                      className="glass-input"
+                      style={{ marginBottom: '15px', width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
+                      placeholder="e.g. 1. The Classic Cinematic Shot"
+                    />
+                    <Label text="Sub-Prompt Text" />
+                    <textarea 
+                      value={sp.prompt_text} 
+                      onChange={(e) => updateSubPrompt(index, 'prompt_text', e.target.value)}
+                      className="glass-input"
+                      style={{ marginBottom: '15px', width: '100%', minHeight: '100px', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', fontFamily: 'monospace' }}
+                      placeholder="Enter the prompt here..."
+                    />
+                    <div style={{ display: 'flex', gap: '20px' }}>
+                      <div style={{ flex: 1 }}>
+                        <Label text="Before Image (Optional)" />
+                        <ImageUpload url={sp.imgBefore} onUpload={(url) => updateSubPrompt(index, 'imgBefore', url)} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <Label text="After/Result Image" />
+                        <ImageUpload url={sp.imgAfter} onUpload={(url) => updateSubPrompt(index, 'imgAfter', url)} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <button 
+                  type="button" 
+                  onClick={addSubPrompt}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '14px 24px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: 600, alignSelf: 'flex-start' }}
+                >
+                  <PlusCircle size={16} /> Add Sub-Prompt
                 </button>
               </div>
             </div>

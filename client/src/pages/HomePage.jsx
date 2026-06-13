@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import PromptList from '../components/Prompts/PromptList';
+import CategorySlider from '../components/Prompts/CategorySlider';
 import SEOMetadata from '../components/SEO/SEOMetadata';
 
 const HomePage = ({ search, filter, setFilter, isMobile }) => {
@@ -70,6 +71,7 @@ const HomePage = ({ search, filter, setFilter, isMobile }) => {
       }}>
         {categorySlug ? `${categorySlug.split('-').join(' ')} AI Prompts Library` : 'PromptKing - Premium AI Prompts Library for ChatGPT, Midjourney & Gemini'}
       </h1>
+      <CategorySlider />
       <PromptList 
         search={search} 
         filter={filter} 
