@@ -1183,7 +1183,7 @@ router.post('/admin/save_prompt', adminAuth, async (req, res) => {
     res.json({ status: "success" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Save failed" });
+    res.status(500).json({ error: error.message || "Save failed" });
   }
 });
 

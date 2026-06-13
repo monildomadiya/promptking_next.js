@@ -177,8 +177,8 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
       await api.post('/admin/save_prompt', { ...formData, originalKey });
       onSave();
     } catch (error) {
-      const msg = error.response?.data?.error || "Failed to save prompt";
-      toast.error(msg);
+      const msg = error.response?.data?.error || error.message || "Unknown error";
+      toast.error(`Failed to save prompt: ${msg}`);
     }
   };
 
