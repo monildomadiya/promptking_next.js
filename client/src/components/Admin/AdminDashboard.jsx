@@ -16,6 +16,7 @@ import {
   Eye, Copy, ExternalLink
 } from '../Common/Icons';
 import PromptModal from './PromptModal';
+import ListicleModal from './ListicleModal';
 import BlogModal from './BlogModal';
 import FAQModal from './FAQModal';
 import CategoryModal from './CategoryModal';
@@ -921,7 +922,7 @@ const AdminDashboard = () => {
           break;
         case 'n':
         case 'N':
-          if (['prompts', 'blogs', 'categories', 'website_categories', 'authors', 'faqs'].includes(view)) {
+          if (['prompts', 'listicles', 'blogs', 'categories', 'website_categories', 'authors', 'faqs'].includes(view)) {
             setEditingItem(null);
             setIsModalOpen(true);
           }
@@ -1015,7 +1016,8 @@ const AdminDashboard = () => {
       case 'RESET_ANALYTICS': handleResetAnalytics(); break;
       case 'LOGOUT': handleLogout(); break;
       case 'EDIT_ITEM': 
-        if (item.prompt_key) setView('prompts');
+        if (item.website_category_id) setView('listicles');
+        else if (item.prompt_key) setView('prompts');
         else if (item.slug && item.content) setView('blogs');
         else if (item.answer) setView('faqs');
         setEditingItem(item); 
@@ -1039,7 +1041,7 @@ const AdminDashboard = () => {
       const endpoint = currentView === 'settings' ? 'settings' : currentView;
       const response = await api.get(`/admin/${endpoint}`);
       setData(response.data);
-      if (currentView === 'prompts') {
+      if (currentView === 'prompts' || currentView === 'listicles') {
         const calculateTotal = (key) => response.data.reduce((acc, curr) => acc + (Number(curr[key]) || 0), 0);
         setStats({
           prompts: response.data.length,
@@ -1132,7 +1134,7 @@ const AdminDashboard = () => {
 
     if (!window.confirm("Permanent delete? This cannot be undone.")) return;
     const id = item.prompt_key || item.id;
-    const type = view === 'prompts' ? 'prompt' : (view === 'blogs' ? 'blog' : (view === 'categories' ? 'category' : (view === 'website_categories' ? 'website category' : (view === 'authors' ? 'author' : 'faq'))));
+    const type = view === 'prompts' ? 'prompt' : (view === 'listicles' ? 'listicle' : (view === 'blogs' ? 'blog' : (view === 'categories' ? 'category' : (view === 'website_categories' ? 'website category' : (view === 'authors' ? 'author' : 'faq')))));
     try {
       await api.delete(`/admin/delete_${type}/${id}`);
       fetchData(view);
@@ -1291,6 +1293,7 @@ const AdminDashboard = () => {
     { title: 'CORE CONTENT', items: [
       { id: 'dashboard', label: 'Overview', icon: <Layout size={20} /> },
       { id: 'prompts', label: 'Prompts', icon: <TableProperties size={20} /> },
+      { id: 'listicles', label: 'Listicles', icon: <FileText size={20} /> },
       { id: 'blogs', label: 'Articles', icon: <FileText size={20} /> },
       { id: 'authors', label: 'Authors', icon: <Users size={20} /> },
       { id: 'categories', label: 'AI Types', icon: <Layers size={20} /> },
@@ -1304,13 +1307,26 @@ const AdminDashboard = () => {
     ]}
   ];
 
-  // When PromptModal is open, render ONLY the modal as a full page
+  // When PromptModal/ListicleModal is open, render ONLY the modal as a full page
   // (no dashboard content behind it) so screenshot tools don't repeat it.
   if (isModalOpen && view === 'prompts') {
     return (
       <>
         <Toaster position="top-right" toastOptions={{ style: { background: '#1a1a1a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } }} />
         <PromptModal
+          prompt={editingItem}
+          onClose={() => setIsModalOpen(false)}
+          onSave={() => { setIsModalOpen(false); fetchData(view); }}
+        />
+      </>
+    );
+  }
+  
+  if (isModalOpen && view === 'listicles') {
+    return (
+      <>
+        <Toaster position="top-right" toastOptions={{ style: { background: '#1a1a1a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } }} />
+        <ListicleModal
           prompt={editingItem}
           onClose={() => setIsModalOpen(false)}
           onSave={() => { setIsModalOpen(false); fetchData(view); }}
@@ -1480,16 +1496,16 @@ const AdminDashboard = () => {
             </h1>
             <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem' }}>Management control panel for PK PROMPT KING systems.</p>
           </div>
-          {['prompts', 'blogs', 'categories', 'website_categories', 'authors', 'faqs'].includes(view) && (
+          {['prompts', 'listicles', 'blogs', 'categories', 'website_categories', 'authors', 'faqs'].includes(view) && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-              {selectedKeys.length > 0 && view === 'prompts' && (
+              {selectedKeys.length > 0 && (view === 'prompts' || view === 'listicles') && (
                 <>
                   <ActionButton label={`HIDE (${selectedKeys.length})`} color="#fbbf24" icon={<Layers size={18} />} onClick={() => handleBulkVisibility(true)} />
                   <ActionButton label={`SHOW (${selectedKeys.length})`} color="#10a37f" icon={<Layers size={18} />} onClick={() => handleBulkVisibility(false)} />
                   <ActionButton label={`DELETE (${selectedKeys.length})`} color="var(--accent-main)" icon={<Trash size={18} />} onClick={handleBulkDelete} />
                 </>
               )}
-              {['prompts', 'blogs', 'categories', 'website_categories', 'authors', 'faqs'].includes(view) && !isDragMode && (
+              {['prompts', 'listicles', 'blogs', 'categories', 'website_categories', 'authors', 'faqs'].includes(view) && !isDragMode && (
                 <div style={{ position: 'relative', flex: 1, minWidth: isMobile ? '100%' : '200px' }}>
                   <input
                     type="text"
@@ -1650,7 +1666,7 @@ const AdminDashboard = () => {
 
 
 
-          {['prompts', 'blogs', 'authors', 'categories', 'website_categories', 'faqs'].includes(view) && (
+          {['prompts', 'listicles', 'blogs', 'authors', 'categories', 'website_categories', 'faqs'].includes(view) && (
             <motion.div key="list" {...pageTransition} style={{ ...glassPanelStyle, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
               {/* Loading skeleton — shown while fetching new tab data */}
               {isDataLoading && (

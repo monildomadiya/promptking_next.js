@@ -1046,7 +1046,7 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
   try {
     let rows;
     try {
-      rows = await db`SELECT * FROM prompts ORDER BY sort_order ASC, prompt_key ASC`;
+      rows = await db`SELECT * FROM prompts WHERE website_category_id IS NULL OR website_category_id = '' ORDER BY sort_order ASC, prompt_key ASC`;
     } catch (colErr) {
       if (colErr.message.includes('Unknown column')) {
         rows = await db`SELECT * FROM prompts`;
@@ -1084,6 +1084,29 @@ router.get('/admin/prompts', adminAuth, async (req, res) => {
         like_count: Number(p.like_count || 0),
       })));
     }
+  }
+});
+
+router.get('/admin/listicles', adminAuth, async (req, res) => {
+  try {
+    const rows = await db`SELECT * FROM prompts WHERE website_category_id IS NOT NULL AND website_category_id != '' ORDER BY sort_order ASC, prompt_key ASC`;
+    const formatted = rows.map(r => ({
+      ...r,
+      copy_count: Number(r.copy_count || 0),
+      unlock_count: Number(r.unlock_count || 0),
+      like_count: Number(r.like_count || 0),
+      view_count: Number(r.view_count || 0),
+      is_featured: r.is_featured == 1 || r.is_featured === true || r.is_featured === 'true',
+      is_premium: r.is_premium == 1 || r.is_premium === true || r.is_premium === 'true',
+      hide_prompt_box: r.hide_prompt_box == 1 || r.hide_prompt_box === true || r.hide_prompt_box === 'true',
+      is_draft: r.is_draft == 1 || r.is_draft === true || r.is_draft === 'true',
+      publish_date: r.publish_date,
+      metaTitle: r.meta_title
+    }));
+    res.json(formatted);
+  } catch (error) {
+    console.error('ADMIN LISTICLES DB ERROR:', error.message);
+    res.json([]);
   }
 });
 
@@ -1268,6 +1291,18 @@ router.delete('/admin/delete_prompt/:key', adminAuth, async (req, res) => {
   const { key } = req.params;
   try {
     console.log(`[Admin] Single delete request for prompt: ${key}`);
+    await db`DELETE FROM prompts WHERE prompt_key = ${key}`;
+    res.json({ status: "success" });
+  } catch (error) {
+    console.error(`[Admin] Single delete FAILED for ${key}:`, error);
+    res.status(500).json({ error: "Delete failed" });
+  }
+});
+
+router.delete('/admin/delete_listicle/:key', adminAuth, async (req, res) => {
+  const { key } = req.params;
+  try {
+    console.log(`[Admin] Single delete request for listicle: ${key}`);
     await db`DELETE FROM prompts WHERE prompt_key = ${key}`;
     res.json({ status: "success" });
   } catch (error) {
