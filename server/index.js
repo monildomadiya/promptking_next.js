@@ -182,6 +182,24 @@ app.use((err, req, res, next) => {
     }
 
     try {
+      const checkViewCount = await db`SHOW COLUMNS FROM prompts LIKE 'view_count'`;
+      if (checkViewCount.length === 0) {
+        await db`ALTER TABLE prompts ADD COLUMN view_count INT DEFAULT 0`;
+      }
+    } catch (e) {
+      console.warn("Failed to check/add view_count:", e.message);
+    }
+
+    try {
+      const checkLikeCount = await db`SHOW COLUMNS FROM prompts LIKE 'like_count'`;
+      if (checkLikeCount.length === 0) {
+        await db`ALTER TABLE prompts ADD COLUMN like_count INT DEFAULT 0`;
+      }
+    } catch (e) {
+      console.warn("Failed to check/add like_count:", e.message);
+    }
+
+    try {
       const checkPublishDate = await db`SHOW COLUMNS FROM prompts LIKE 'publish_date'`;
       if (checkPublishDate.length === 0) {
         await db`ALTER TABLE prompts ADD COLUMN publish_date DATETIME DEFAULT NULL`;
