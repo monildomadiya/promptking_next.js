@@ -125,7 +125,6 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
         twitter_title: prompt.twitter_title || '',
         twitter_description: prompt.twitter_description || '',
         twitter_image: prompt.twitter_image || '',
-        faqs: parsedFaqs,
         tags: typeof prompt.tags === 'string' ? prompt.tags : '',
         gallery_urls: prompt.gallery_urls || prompt.galleryUrls || '[]'
       });
