@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import PromptCard from './PromptCard';
 import MagicKingIntro from './MagicKingIntro';
 import SocialSidebar from './SocialSidebar';
@@ -448,7 +449,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
           </aside>
         )}
 
-        {isMobile && isSidebarOpen && (
+        {isMobile && isSidebarOpen && typeof window !== 'undefined' && createPortal(
           <div style={{
             position: 'fixed',
             inset: 0,
@@ -546,7 +547,8 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
                 APPLY SETTINGS
               </button>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     </div>
