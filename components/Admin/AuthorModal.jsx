@@ -1,8 +1,8 @@
 "use client";
 import toast from 'react-hot-toast';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '@/lib/api';
-import { X } from '../Common/Icons';
+import { X, Camera } from '../Common/Icons';
 
 const AuthorModal = ({ author, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -10,6 +10,29 @@ const AuthorModal = ({ author, onClose, onSave }) => {
     image: '',
     description: ''
   });
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const form = new FormData();
+    form.append('file', file);
+    try {
+      setIsUploading(true);
+      const res = await api.post('/admin/upload_image', form, { headers: { 'Content-Type': 'multipart/form-data' } });
+      if (res.data?.url) {
+        setFormData({ ...formData, image: res.data.url });
+        toast.success("Image uploaded successfully!");
+      } else {
+        toast.error("Upload failed.");
+      }
+    } catch (error) {
+      toast.error("Failed to upload image.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   useEffect(() => {
     if (author) {
@@ -89,14 +112,52 @@ const AuthorModal = ({ author, onClose, onSave }) => {
             <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
               Image URL
             </label>
-            <input 
-              type="text" 
-              value={formData.image} 
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              placeholder="https://..."
-              className="glass-input"
-              style={{ width: '100%', padding: '14px 18px', borderRadius: '15px', fontSize: '0.95rem' }}
-            />
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <input 
+                type="text" 
+                value={formData.image} 
+                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                placeholder="https://..."
+                className="glass-input"
+                style={{ flex: 1, padding: '14px 18px', borderRadius: '15px', fontSize: '0.95rem' }}
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="glass-button-secondary"
+                style={{
+                  padding: '0 20px',
+                  borderRadius: '15px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontWeight: 600,
+                  cursor: isUploading ? 'not-allowed' : 'pointer',
+                  opacity: isUploading ? 0.7 : 1
+                }}
+              >
+                <Camera size={18} />
+                {isUploading ? 'Uploading...' : 'Upload'}
+              </button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleUpload}
+                accept="image/*"
+                style={{ display: 'none' }}
+              />
+            </div>
+            {formData.image && (
+              <div style={{ marginTop: '15px', display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <img 
+                  src={formData.image} 
+                  alt="Preview" 
+                  style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)' }}
+                  onError={(e) => e.target.style.display = 'none'}
+                />
+              </div>
+            )}
           </div>
 
           <div style={{ marginBottom: '35px' }}>
