@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import Image from 'next/image';
 import { Sparkles, Crown, Zap } from '../Common/Icons';
 import KingImage from '../../assets/prompt-king.webp';
 
@@ -35,9 +36,9 @@ const MagicKingIntro = ({ isMobile }) => {
           alignItems: 'center',
           position: 'relative'
         }}>
-          <img 
+          <Image 
             src={KingImage} 
-            alt="Prompt King" 
+            alt="Prompt King"
             style={{
               maxHeight: '100%',
               maxWidth: '100%',

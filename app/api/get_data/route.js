@@ -47,6 +47,7 @@ export async function GET(req) {
     return response;
   } catch (error) {
     console.error('DATABASE ERROR:', error.message);
-    return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
+    // Return empty data so the client degrades gracefully without throwing
+    return NextResponse.json({ prompts: [], categories: [] });
   }
 }

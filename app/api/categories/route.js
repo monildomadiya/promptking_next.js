@@ -6,7 +6,7 @@ export async function GET(req) {
     const rows = await db`SELECT * FROM categories ORDER BY name ASC`;
     return NextResponse.json(rows);
   } catch (error) {
-    console.error('Fetch categories error:', error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Fetch categories error:', error.message);
+    return NextResponse.json([]);
   }
 }

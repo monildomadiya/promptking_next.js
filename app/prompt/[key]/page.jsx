@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { useRouter , useParams } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, Activity, ChevronLeft, ChevronRight, CheckCircle, Eye } from '@/components/Common/Icons';
 import confetti from 'canvas-confetti';
 import api from '@/lib/api';
@@ -16,17 +16,13 @@ const PromptDetailPage = ({ adsSettings }) => {
   const [prompt, setPrompt] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useRouter();
+  const router = useRouter();
 
   const handleBack = (e) => {
     e.preventDefault();
-    if (window.history.state && window.history.state.idx > 0) {
-      navigate(-1);
-    } else {
-      navigate('/');
-    }
+    router.back();
   };
-  
+
   const [sliderValue, setSliderValue] = useState(50);
   const [pin, setPin] = useState('');
   const [isUnlocked, setIsUnlocked] = useState(false);
@@ -409,7 +405,7 @@ const PromptDetailPage = ({ adsSettings }) => {
     <div style={{ padding: '150px 20px', textAlign: 'center', background: 'var(--bg-color)', minHeight: '100vh' }}>
       <SEOMetadata title="Prompt Not Found | PromptKing" />
       <h2 style={{ color: 'var(--accent-main)', marginBottom: '20px' }}>{error || "Prompt not found"}</h2>
-      <a href="/" onClick={handleBack} style={{ padding: '12px 30px', background: 'white', color: 'black', borderRadius: '50px', fontWeight: 700, textDecoration: 'none', display: 'inline-block' }}>Back to Home</a>
+      <button onClick={handleBack} style={{ padding: '12px 30px', background: 'white', color: 'black', borderRadius: '50px', fontWeight: 700, textDecoration: 'none', display: 'inline-block', border: 'none', cursor: 'pointer' }}>Back to Home</button>
     </div>
   );
 
@@ -498,9 +494,9 @@ const PromptDetailPage = ({ adsSettings }) => {
       <div className="container" style={{ padding: '40px 20px', maxWidth: '1400px', margin: '0 auto' }}>
         
         {/* Back Button */}
-        <a href="/" onClick={handleBack} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', marginBottom: '30px', fontWeight: 600, textDecoration: 'none', cursor: 'pointer' }} className="back-link">
+        <button onClick={handleBack} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', marginBottom: '30px', fontWeight: 600, textDecoration: 'none', cursor: 'pointer', background: 'none', border: 'none', padding: 0 }} className="back-link">
           <ArrowLeft size={18} /> Back
-        </a>
+        </button>
 
         {/* Grid or Column Layout depending on Listicle */}
         <div style={{ display: isListicle ? 'flex' : 'grid', flexDirection: isListicle ? 'column' : 'row', gridTemplateColumns: isListicle ? 'none' : 'minmax(0, 1fr) 350px', gap: '40px', maxWidth: isListicle ? '900px' : 'none', margin: isListicle ? '0 auto' : '0' }} className="detail-layout">

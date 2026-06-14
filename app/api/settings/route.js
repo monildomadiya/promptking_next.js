@@ -8,7 +8,8 @@ export async function GET(req) {
     rows.forEach(r => { settings[r.setting_key] = r.setting_value; });
     return NextResponse.json(settings);
   } catch (error) {
-    console.error('Fetch settings error:', error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Fetch settings error:', error.message);
+    // Return empty settings so client components degrade gracefully
+    return NextResponse.json({});
   }
 }

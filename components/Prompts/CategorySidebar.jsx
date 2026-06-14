@@ -60,9 +60,10 @@ const CategorySidebar = ({ filter, setFilter, counts = {} }) => {
 
   const FilterItem = ({ label, value, icon: Icon, count, onClick, to }) => {
     const Component = to ? Link : 'button';
+    const linkProps = to ? { href: to } : {};
     return (
     <Component 
-      to={to}
+      {...linkProps}
       onClick={onClick}
       style={{
         display: 'flex',

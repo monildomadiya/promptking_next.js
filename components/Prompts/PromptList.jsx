@@ -29,25 +29,29 @@ const setCache = (data) => {
 };
 
 const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
-  const cached = getCache();
-  const [prompts, setPrompts] = useState(cached?.prompts || []);
-  const [categories, setCategories] = useState(cached?.categories || []);
-  const [loading, setLoading] = useState(!cached); // only show shimmer if no cache
+  // Always start with loading=true to match server-rendered HTML (avoids hydration mismatch).
+  // Cache is read client-side only in useEffect.
+  const [prompts, setPrompts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isRevalidating, setIsRevalidating] = useState(false);
-  const [fadeIn, setFadeIn] = useState(!!cached); // animate in when data arrives
+  const [fadeIn, setFadeIn] = useState(false);
   const [activeUnlockedKey, setActiveUnlockedKey] = useState(null);
-  const [currentPage, setCurrentPage] = useState(() => {
-    try {
-      const savedPage = sessionStorage.getItem('pk_current_page');
-      return savedPage ? parseInt(savedPage, 10) : 1;
-    } catch { return 1; }
-  });
+  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = isMobile ? 8 : 9;
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [catSearch, setCatSearch] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const dropdownRef = useRef(null);
   const hasFetched = useRef(false);
+
+  // Restore page + cache client-side only (localStorage/sessionStorage not available on server)
+  useEffect(() => {
+    try {
+      const savedPage = sessionStorage.getItem('pk_current_page');
+      if (savedPage) setCurrentPage(parseInt(savedPage, 10));
+    } catch {}
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -96,8 +100,13 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;
+    // Read cache here (client-only) to avoid server/client mismatch
+    const cached = getCache();
     if (cached) {
       // Instantly show cached data, silently revalidate in background
+      setPrompts(cached.prompts || []);
+      setCategories(cached.categories || []);
+      setLoading(false);
       setFadeIn(true);
       fetchData(true);
     } else {
