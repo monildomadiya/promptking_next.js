@@ -37,7 +37,15 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
   const [isRevalidating, setIsRevalidating] = useState(false);
   const [fadeIn, setFadeIn] = useState(false);
   const [activeUnlockedKey, setActiveUnlockedKey] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const savedPage = sessionStorage.getItem('pk_current_page');
+        return savedPage ? parseInt(savedPage, 10) : 1;
+      } catch {}
+    }
+    return 1;
+  });
   const itemsPerPage = isMobile ? 8 : 9;
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [catSearch, setCatSearch] = useState('');
@@ -45,13 +53,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
   const dropdownRef = useRef(null);
   const hasFetched = useRef(false);
 
-  // Restore page + cache client-side only (localStorage/sessionStorage not available on server)
-  useEffect(() => {
-    try {
-      const savedPage = sessionStorage.getItem('pk_current_page');
-      if (savedPage) setCurrentPage(parseInt(savedPage, 10));
-    } catch {}
-  }, []);
+  // Removed the useEffect that read from sessionStorage since it's now handled in useState
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -182,13 +184,15 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
     };
   }, []);
 
-  const isFirstMount = useRef(true);
+  const prevSearch = useRef(search);
+  const prevFilter = useRef(filter);
+  
   useEffect(() => {
-    if (isFirstMount.current) {
-      isFirstMount.current = false;
-      return;
+    if (search !== prevSearch.current || filter !== prevFilter.current) {
+      setCurrentPage(1);
+      prevSearch.current = search;
+      prevFilter.current = filter;
     }
-    setCurrentPage(1);
   }, [search, filter]);
 
   useEffect(() => {
