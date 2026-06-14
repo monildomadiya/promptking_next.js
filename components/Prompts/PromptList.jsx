@@ -182,7 +182,12 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
     };
   }, []);
 
+  const isFirstMount = useRef(true);
   useEffect(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
     setCurrentPage(1);
   }, [search, filter]);
 
