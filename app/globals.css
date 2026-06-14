@@ -275,6 +275,10 @@ button:active {
   .home-layout-grid {
     gap: 20px !important;
   }
+  
+  #skeletonContainer > div:nth-child(3) {
+    display: none !important;
+  }
 }
 
 @media (max-width: 500px) {
