@@ -16,8 +16,22 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
-            # 1. તમારા સર્વરમાં જ્યાં વેબસાઈટ પડી છે તે ફોલ્ડરમાં જવાનો કમાન્ડ 
-            cd /var/www/your-website-folder
-            
-            # 2. ગિટહબમાંથી નવો કોડ લેવાનો કમાન્ડ
+            cd /var/www/promptking.in
+
+            # Pull latest code
             git pull origin main
+
+            # Install dependencies (skip dev deps in production)
+            npm install --omit=dev
+
+            # Build the Next.js app
+            npm run build
+
+            # Restart the app with PM2 (creates it if it doesn't exist)
+            pm2 describe promptking.in > /dev/null 2>&1
+            if [ $? -eq 0 ]; then
+              pm2 restart promptking.in --update-env
+            else
+              pm2 start npm --name "promptking.in" -- start
+            fi
+            pm2 save

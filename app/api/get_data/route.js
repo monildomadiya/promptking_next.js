@@ -4,16 +4,8 @@ import db from '@/lib/db';
 
 export async function GET(req) {
   try {
-    let promptsRows;
-    try {
-      promptsRows = await db`SELECT id, prompt_key, title, ai_type, prompt_text, img_after, img_before, is_premium, is_featured, image_ratio, hide_prompt_box, password, ig_link, is_image_slider, sort_order, slug, copy_count, unlock_count, like_count, view_count, gallery_urls, meta_title, is_draft, publish_date FROM prompts WHERE is_draft = 0 AND (publish_date IS NULL OR publish_date <= NOW()) ORDER BY sort_order ASC, prompt_key ASC`;
-    } catch (colErr) {
-      if (colErr.message.includes('Unknown column')) {
-        promptsRows = await db`SELECT * FROM prompts ORDER BY sort_order ASC, prompt_key ASC`;
-      } else {
-        throw colErr;
-      }
-    }
+    // Use SELECT * to be resilient against schema differences (e.g. missing 'id' column)
+    const promptsRows = await db`SELECT * FROM prompts WHERE is_draft = 0 AND (publish_date IS NULL OR publish_date <= NOW()) ORDER BY sort_order ASC, prompt_key ASC`;
     const categoriesRows = await db`SELECT * FROM categories ORDER BY name ASC`;
 
     const parseDbBool = (val) => {
@@ -23,15 +15,15 @@ export async function GET(req) {
     };
 
     const prompts = promptsRows.map(row => ({
-      id: row.id,
+      id: row.id ?? row.prompt_key,  // fallback to prompt_key if no id column
       title: row.title,
       sort_order: row.sort_order,
       isImageSlider: parseDbBool(row.is_image_slider),
       hidePromptBox: parseDbBool(row.hide_prompt_box),
-      copyCount: Number(row.copy_count),
-      unlockCount: Number(row.unlock_count),
-      likeCount: Number(row.like_count),
-      viewCount: Number(row.view_count),
+      copyCount: Number(row.copy_count || 0),
+      unlockCount: Number(row.unlock_count || 0),
+      likeCount: Number(row.like_count || 0),
+      viewCount: Number(row.view_count || 0),
       aiType: row.ai_type,
       slug: row.slug,
       key: row.prompt_key,
