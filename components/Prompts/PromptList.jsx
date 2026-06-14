@@ -280,7 +280,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
           {isMobile && (
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '15px' }}>
               <button 
-                onClick={() => window.dispatchEvent(new CustomEvent('openFilters'))}
+                onClick={() => setIsSidebarOpen(true)}
                 aria-label="Open filter menu"
                 className="glass-button-secondary"
                 style={{
