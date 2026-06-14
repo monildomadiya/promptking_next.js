@@ -24,7 +24,7 @@ const CategorySlider = () => {
     fetchCategories();
   }, []);
 
-  if (!loading && categories.length === 0) return null;
+  if (categories.length === 0) return null;
 
   return (
     <div style={{ padding: '0 20px', maxWidth: '1400px', margin: '40px auto 20px' }}>
@@ -32,19 +32,7 @@ const CategorySlider = () => {
         Browse by Category
       </h2>
       <div className="hide-scrollbar category-slider-container">
-        {loading && categories.length === 0 ? (
-          [1, 2, 3, 4, 5, 6].map((skel) => (
-            <div 
-              key={skel} 
-              className="category-slider-item shimmer-bg"
-              style={{
-                borderRadius: '24px',
-                border: '1px solid rgba(255,255,255,0.05)',
-              }}
-            />
-          ))
-        ) : (
-          categories.map((cat, i) => (
+        {categories.map((cat, i) => (
           <Link 
             key={cat.id} 
             href={`/category/${cat.slug}`}
@@ -112,7 +100,7 @@ const CategorySlider = () => {
               </h3>
             </div>
           </Link>
-        )))}
+        ))}
       </div>
     </div>
   );
