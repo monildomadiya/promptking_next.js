@@ -8,7 +8,7 @@ import AdSenseUnit from '../Ads/AdSenseUnit';
 
 const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilters, onLogoClick, settings, isAdmin, onHeightChange }) => {
   const [logoError, setLogoError] = useState(false);
-  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth <= 1100 : false);
+  const [isMobile, setIsMobile] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -28,7 +28,8 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
   };
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(typeof window !== 'undefined' ? window.innerWidth <= 1100 : false);
+    setIsMobile(window.innerWidth <= 1100);
+    const handleResize = () => setIsMobile(window.innerWidth <= 1100);
     window.addEventListener('resize', handleResize);
     
     const handleScroll = () => {
@@ -74,84 +75,26 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
 
   return (
     <>
-      <header ref={headerRef} style={{
-        position: 'fixed',
-        top: isMobile ? '10px' : '20px',
-        left: 0,
-        right: 0,
-        margin: '0 auto',
-        width: isMobile ? 'calc(100% - 20px)' : 'calc(100% - 40px)',
-        maxWidth: '1400px',
-        zIndex: 2000,
-        background: 'rgba(10, 10, 15, 0.7)',
-        backdropFilter: 'blur(25px)',
-        WebkitBackdropFilter: 'blur(25px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        borderRadius: '24px',
-        padding: isMobile ? '10px 15px' : '12px 20px',
+      <header ref={headerRef} className="responsive-header" style={{
         boxShadow: isScrolled ? '0 20px 40px rgba(0, 0, 0, 0.4)' : 'none',
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         transform: isVisible ? 'translateY(0)' : 'translateY(-120%)',
-        opacity: isVisible ? 1 : 0,
-        minHeight: isMobile ? '65px' : 'auto',
-        height: 'auto'
+        opacity: isVisible ? 1 : 0
       }}>
-        <div style={{ 
-          margin: '0 auto', 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          position: 'relative',
-          gap: isMobile ? '8px' : '40px'
-        }}>
-          <div style={{ 
-            display: (isMobile && isSearchExpanded) ? 'none' : 'flex', 
-            alignItems: 'center', 
-            flex: '0 0 auto', 
-            zIndex: 20,
-            minWidth: isMobile ? '130px' : 'fit-content',
-            flexShrink: 0,
-            overflow: 'visible'
+        <div className="header-inner-flex">
+          <div className="header-logo-container" style={{ 
+            display: (isMobile && isSearchExpanded) ? 'none' : 'flex'
           }}>
             <Link 
               href="/" 
               onClick={onLogoClick}
-              style={{ 
-                display: 'flex', 
-                alignItems: 'center',
-                minHeight: isMobile ? '32px' : '50px',
-                minWidth: isMobile ? '100px' : 'fit-content'
-              }}
+              className="header-logo-link"
             >
-              {settings.logo_url && 
-               settings.logo_url !== 'null' && 
-               settings.logo_url !== 'undefined' && 
-               settings.logo_url !== '' && 
-               !logoError ? (
-                <img 
-                  src={optimizeImage(settings.logo_url, 400)} 
-                  alt="PromptKing" 
-                  onError={() => {
-                    console.warn("Logo failed to load, switching to text fallback");
-                    setLogoError(true);
-                  }}
-                  style={{ 
-                    height: isMobile 
-                      ? (settings.logo_height_mobile || '32px') 
-                      : (settings.logo_height_desktop || '50px'),
-                    maxHeight: isMobile ? '75px' : '100%',
-                    width: isMobile 
-                      ? (settings.logo_width_mobile || 'auto')
-                      : (settings.logo_width_desktop || 'auto'),
-                    objectFit: 'contain',
-                    display: 'block',
-                    transition: 'all 0.3s ease'
-                  }} 
-                  className="site-logo"
-                />
-              ) : (
-                <span className="header-logo-text" style={{ fontSize: isMobile ? '1.25rem' : '1.5rem', fontWeight: 900, color: 'white', letterSpacing: '-0.5px' }}>PromptKing</span>
-              )}
+              <img 
+                src="/promptking-logo.svg"
+                alt="PromptKing Logo" 
+                className="site-logo header-logo-img"
+              />
             </Link>
           </div>
 
@@ -253,8 +196,8 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                     value={search}
                     onChange={(e) => {
                       setSearch(e.target.value);
-                      if (window.location !== '/') {
-                        navigate('/');
+                      if (!isHomePage) {
+                        navigate.push('/');
                       }
                     }}
                     onBlur={() => {
@@ -324,7 +267,7 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                   href="https://ko-fi.com/M5H720SAJV"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="coffee-btn-hover"
+                  className="coffee-btn-hover desktop-coffee-btn"
                   style={{ 
                     display: 'flex', alignItems: 'center', gap: '8px',
                     height: '42px', borderRadius: '21px', 
@@ -335,13 +278,11 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                     color: '#FFC107',
                     transition: '0.3s',
                     backdropFilter: 'blur(10px)',
-                    textDecoration: 'none',
-                    fontWeight: 600,
-                    fontSize: '14px'
+                    textDecoration: 'none'
                   }}
                 >
-                  <Coffee size={18} />
-                  <span>Buy me a coffee</span>
+                  <Coffee size={20} style={{ display: 'block' }} />
+                  <span className="hide-on-mobile" style={{ fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.5px' }}>Support Us</span>
                 </a>
               </div>
             )}

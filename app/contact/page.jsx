@@ -4,7 +4,10 @@ import { Mail, MessageCircle, Send, CheckCircle, Sparkles, Instagram, Youtube, T
 import SocialSidebar from '@/components/Prompts/SocialSidebar';
 import SEOMetadata from '@/components/SEO/SEOMetadata';
 import api from '@/lib/api';
+import { useAppContext } from '@/components/AppContext';
+
 const ContactPage = () => {
+  const { isMobile } = useAppContext();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -55,7 +58,7 @@ const ContactPage = () => {
 
         <div style={{ 
           display: 'grid',
-          gridTemplateColumns: typeof window !== 'undefined' && window.innerWidth > 1024 ? '1fr 1.5fr' : '1fr',
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1.5fr',
           gap: '40px',
           maxWidth: '1200px',
           margin: '0 auto'

@@ -5,7 +5,7 @@ import { ArrowRight, ChevronDown, ChevronUp } from '../Common/Icons';
 import api from '@/lib/api';
 
 const Footer = ({ onLogoClick }) => {
-  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
+  const [isMobile, setIsMobile] = useState(false);
   const [settings, setSettings] = useState({ logo_url: '', logo_width_desktop: '150', logo_width_mobile: '120' });
   const [openSections, setOpenSections] = useState({
     platform: false,
@@ -26,6 +26,7 @@ const Footer = ({ onLogoClick }) => {
 
   useEffect(() => {
     fetchSettings();
+    setIsMobile(window.innerWidth <= 768);
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -85,21 +86,19 @@ const Footer = ({ onLogoClick }) => {
               alignItems: 'flex-start', 
               gap: '8px'
             }}>
-              {settings.logo_url && (
-                <img 
-                  src={optimizeImage(settings.logo_url, 400)} 
-                  alt="Logo Icon" 
-                  width="180"
-                  height="55"
-                  style={{ 
-                    height: isMobile ? '45px' : '55px',
-                    width: 'auto', 
-                    objectFit: 'contain',
-                    filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.1))',
-                    marginBottom: '4px'
-                  }} 
-                />
-              )}
+              <img 
+                src="/promptking-logo.svg"
+                alt="PromptKing Logo" 
+                width="180"
+                height="55"
+                style={{ 
+                  height: isMobile ? '45px' : '55px',
+                  width: 'auto', 
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.1))',
+                  marginBottom: '4px'
+                }} 
+              />
               <span style={{ 
                 fontSize: '1.8rem', 
                 fontWeight: 900, 
@@ -214,68 +213,6 @@ const Footer = ({ onLogoClick }) => {
             &copy; {currentYear} PromptKing. All rights reserved.
           </p>
 
-          {/* Featured Badges Container */}
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            flexWrap: 'wrap', 
-            gap: '15px' 
-          }}>
-            {/* Findly.tools Badge */}
-            <a
-              href="https://findly.tools/promptking?utm_source=promptking"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
-              onMouseEnter={e => e.currentTarget.style.opacity = 1}
-              onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
-            >
-              <img
-                src="https://findly.tools/badges/findly-tools-badge-dark.svg"
-                alt="Featured on Findly.tools"
-                width="175"
-                height="55"
-                style={{ display: 'block' }}
-              />
-            </a>
-
-            {/* Startup Fame Badge */}
-            <a
-              href="https://startupfa.me/s/promptking?utm_source=promptking.in"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
-              onMouseEnter={e => e.currentTarget.style.opacity = 1}
-              onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
-            >
-              <img
-                src="https://startupfa.me/badges/featured/dark.webp"
-                alt="PromptKing - Featured on Startup Fame"
-                width="171"
-                height="54"
-                style={{ display: 'block' }}
-              />
-            </a>
-
-            {/* Turbo0 Badge */}
-            <a 
-              href="https://turbo0.com/item/promptking" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ display: 'inline-flex', alignItems: 'center', opacity: 0.85, transition: 'opacity 0.2s' }}
-              onMouseEnter={e => e.currentTarget.style.opacity = 1}
-              onMouseLeave={e => e.currentTarget.style.opacity = 0.85}
-            >
-              <img 
-                src="https://img.turbo0.com/badge-listed-dark.svg" 
-                alt="Listed on Turbo0" 
-                style={{ display: 'block', height: '54px', width: 'auto' }} 
-              />
-            </a>
-
-
-          </div>
 
           {!isMobile && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>

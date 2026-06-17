@@ -3,7 +3,7 @@ import db from '@/lib/db';
 
 export async function GET(req, { params }) {
   const resolvedParams = await Promise.resolve(params);
-  const key = resolvedParams.key;
+  const key = decodeURIComponent(resolvedParams.key);
 
   try {
     const rows = await db`

@@ -498,7 +498,7 @@ const BrandingPanel = ({ onSave }) => {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: typeof window !== 'undefined' && window.innerWidth > 1024 ? '350px 1fr' : '1fr', gap: '25px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: !isMobile ? '350px 1fr' : '1fr', gap: '25px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
           {/* Logo Preview Card */}
           <div style={{ ...glassPanelStyle, padding: '30px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -895,9 +895,10 @@ const AdminDashboard = () => {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
-  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 1100 : false);
-
+  const [isMobile, setIsMobile] = useState(false);
+  
   useEffect(() => {
+    setIsMobile(window.innerWidth < 1100);
     const handleResize = () => setIsMobile(window.innerWidth < 1100);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -1395,8 +1396,6 @@ const AdminDashboard = () => {
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '40px', width: '100%' }}>
             {sidebarCollapsed ? (
               <img src={KingLogo} style={{ width: '40px', height: '40px', objectFit: 'contain', display: 'block' }} alt="PK" />
-            ) : settings?.logo_url ? (
-              <img src={settings.logo_url} style={{ maxHeight: '90px', maxWidth: '100%', objectFit: 'contain', padding: '0 10px', display: 'block' }} alt="Logo" />
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', padding: '0 10px' }}>
                 <img src={KingLogo} style={{ height: '60px', width: '100%', maxWidth: '200px', objectFit: 'contain', display: 'block' }} alt="Prompt King" />
@@ -1739,14 +1738,23 @@ const AdminDashboard = () => {
                                   onError={e => e.target.style.display = 'none'} 
                                 />
                               )}
-                              {view === 'authors' && item.image && (
-                                <img 
-                                  src={item.image} 
-                                  alt={item.name || 'Author'} 
-                                  className="admin-thumb-hover"
-                                  style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} 
-                                  onError={e => e.target.style.display = 'none'} 
-                                />
+                              {view === 'authors' && (
+                                (item.image && item.image !== 'null' && item.image !== 'undefined') ? (
+                                  <img 
+                                    src={item.image} 
+                                    alt={item.name || 'Author'} 
+                                    className="admin-thumb-hover"
+                                    style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, backgroundColor: 'var(--accent-main)' }} 
+                                    onError={(e) => {
+                                      e.target.onerror = null;
+                                      e.target.src = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50'><rect width='50' height='50' fill='%23E50914'/><text x='50%' y='50%' dominant-baseline='central' text-anchor='middle' font-family='sans-serif' font-size='24' font-weight='bold' fill='white'>${(item.name || 'A').charAt(0).toUpperCase()}</text></svg>`;
+                                    }} 
+                                  />
+                                ) : (
+                                  <div style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'var(--accent-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 'bold', flexShrink: 0, color: 'white' }}>
+                                    {(item.name || 'A').charAt(0).toUpperCase()}
+                                  </div>
+                                )
                               )}
                               {view === 'blogs' && item.featured_image && (
                                 <img 

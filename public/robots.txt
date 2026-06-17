@@ -21,4 +21,4 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
-Sitemap: https://promptking.in/api/sitemap.xml
+Sitemap: https://promptking.in/sitemap.xml

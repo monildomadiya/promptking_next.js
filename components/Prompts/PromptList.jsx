@@ -29,24 +29,27 @@ const setCache = (data) => {
   } catch {}
 };
 
-const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
+const PromptList = ({ search, filter, setFilter, showFilters, isMobile, initialPrompts = [], initialCategories = [] }) => {
   // Always start with loading=true to match server-rendered HTML (avoids hydration mismatch).
   // Cache is read client-side only in useEffect.
-  const [prompts, setPrompts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [prompts, setPrompts] = useState(initialPrompts);
+  const [categories, setCategories] = useState(initialCategories);
+  const [loading, setLoading] = useState(initialPrompts.length === 0);
   const [isRevalidating, setIsRevalidating] = useState(false);
-  const [fadeIn, setFadeIn] = useState(false);
+  const [fadeIn, setFadeIn] = useState(true);
   const [activeUnlockedKey, setActiveUnlockedKey] = useState(null);
-  const [currentPage, setCurrentPage] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const savedPage = sessionStorage.getItem('pk_current_page');
-        return savedPage ? parseInt(savedPage, 10) : 1;
-      } catch {}
-    }
-    return 1;
-  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    try {
+      const savedPage = sessionStorage.getItem('pk_current_page');
+      if (savedPage) {
+        setCurrentPage(parseInt(savedPage, 10));
+      }
+    } catch {}
+    setIsHydrated(true);
+  }, []);
   const itemsPerPage = isMobile ? 8 : 9;
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [catSearch, setCatSearch] = useState('');
@@ -103,6 +106,13 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;
+    
+    if (initialPrompts.length > 0) {
+      // We already have server-rendered data, so just silently revalidate
+      fetchData(true);
+      return;
+    }
+
     // Read cache here (client-only) to avoid server/client mismatch
     const cached = getCache();
     if (cached) {
@@ -115,7 +125,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile }) => {
     } else {
       fetchData(false);
     }
-  }, [fetchData]);
+  }, [fetchData, initialPrompts.length]);
 
 
 

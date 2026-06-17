@@ -13,11 +13,8 @@ const BlogPage = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchBlogs();
-  }, []);
 
-  const fetchBlogs = async () => {
+  async function fetchBlogs() {
     const cacheKey = 'pk_blog_list';
     const cachedData = getCache(cacheKey);
     if (cachedData && cachedData.length > 0) {
@@ -38,6 +35,10 @@ const BlogPage = () => {
       if (!cachedData) setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchBlogs();
+  }, []);
 
 
   if (loading) return (
@@ -172,7 +173,7 @@ const BlogPage = () => {
                   <div className="blog-card-footer">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                       <Calendar size={14} />
-                      {new Date(blog.published_at || blog.created_at || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {new Date(blog.published_at || blog.created_at || '2024-01-01').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </div>
                     <div className="read-more-btn">
                       Read More <ArrowRight size={16} />

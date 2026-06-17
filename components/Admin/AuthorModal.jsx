@@ -17,12 +17,12 @@ const AuthorModal = ({ author, onClose, onSave }) => {
     const file = e.target.files[0];
     if (!file) return;
     const form = new FormData();
-    form.append('file', file);
+    form.append('image', file);
     try {
       setIsUploading(true);
       const res = await api.post('/admin/upload_image', form, { headers: { 'Content-Type': 'multipart/form-data' } });
-      if (res.data?.url) {
-        setFormData({ ...formData, image: res.data.url });
+      if (res.data?.status === 'success' && res.data?.imageUrl) {
+        setFormData({ ...formData, image: res.data.imageUrl });
         toast.success("Image uploaded successfully!");
       } else {
         toast.error("Upload failed.");

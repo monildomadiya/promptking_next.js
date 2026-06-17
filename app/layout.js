@@ -17,15 +17,56 @@ import { AppProvider } from "@/components/AppContext";
 import ClientLayout from "./ClientLayout";
 
 export const metadata = {
-  title: "PromptKing - Free AI Prompts",
-  description: "Discover 1000+ free AI prompts for ChatGPT, Midjourney, and more.",
+  metadataBase: new URL('https://promptking.in'),
+  title: "PromptKing - Premium AI Prompts Library",
+  description: "Discover 1000+ free and premium AI prompts for ChatGPT, Midjourney, Claude, and more. Elevate your AI engineering skills.",
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://promptking.in',
+    title: 'PromptKing - Premium AI Prompts Library',
+    description: 'Discover 1000+ free and premium AI prompts for ChatGPT, Midjourney, Claude, and more.',
+    siteName: 'PromptKing',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'PromptKing - Premium AI Prompts',
+    description: 'Discover high-quality AI prompts for ChatGPT, Midjourney, and more.',
+  },
 };
 
 const GA_ID = "G-1HK9T17LSR";
 
 export default function RootLayout({ children }) {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'PromptKing',
+    url: 'https://promptking.in',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: 'https://promptking.in/?q={search_term_string}',
+      'query-input': 'required name=search_term_string'
+    }
+  };
+
+  const orgJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'PromptKing',
+    url: 'https://promptking.in',
+    logo: 'https://promptking.in/promptking-logo.svg',
+    sameAs: [
+      // Add social links here if needed
+    ]
+  };
+
   return (
     <html lang="en">
+      <head>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
+      </head>
       <body>
         {/* Google Analytics */}
         <Script

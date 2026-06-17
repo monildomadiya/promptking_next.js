@@ -16,11 +16,6 @@ const BlogSection = () => {
     }
     return url;
   };
-
-  useEffect(() => {
-    fetchBlogs();
-  }, []);
-
   const fetchBlogs = async () => {
     try {
       const response = await api.get('/blogs');
@@ -31,6 +26,10 @@ const BlogSection = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchBlogs();
+  }, []);
 
   if (loading) {
     return (

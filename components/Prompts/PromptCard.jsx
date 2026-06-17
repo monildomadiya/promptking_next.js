@@ -48,7 +48,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
         }
       }, 400); // Wait for open/unlock animation
     }
-  }, [isUnlocked]);
+  }, [isUnlocked, prompt.isPremium, prompt.key]);
 
   const ratio = (prompt.image_ratio || prompt.imageRatio || '16/9').toString().replace(/\s+/g, '').trim();
   const aiType = prompt.aiType || '';

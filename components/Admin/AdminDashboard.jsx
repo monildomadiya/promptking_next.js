@@ -27,7 +27,7 @@ import KingDialog from '../Modals/KingDialog';
 import toast, { Toaster } from 'react-hot-toast';
 import CommandPalette from './CommandPalette';
 import ContextMenu from './ContextMenu';
-import KingLogo from '../../promptking-logo.svg';
+
 
 // --- ANIMATION VARIANTS ---
 const containerVariants = {
@@ -453,419 +453,6 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
   );
 };
 
-const BrandingPanel = ({ onSave }) => {
-  const [settings, setSettings] = useState({});
-  const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    api.get('/admin/settings').then(res => setSettings(res.data));
-  }, []);
-
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      await api.post('/admin/save_settings', settings);
-      onSave();
-      window.dispatchEvent(new CustomEvent('settingsUpdated'));
-      toast.success("Branding settings applied!");
-    } catch(e) { console.error(e); }
-    finally { setIsSaving(false); }
-  };
-
-  return (
-    <motion.div {...pageTransition} style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-      {/* Header */}
-      <div style={{ ...glassPanelStyle, padding: '24px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <div style={{ width: '45px', height: '45px', borderRadius: '12px', background: 'rgba(229,9,20,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Palette size={22} color="var(--accent-main)" />
-          </div>
-          <div>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '2px' }}>Branding & Identity</h3>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Customize your site's visual presence.</p>
-          </div>
-        </div>
-        <button 
-          onClick={handleSave}
-          disabled={isSaving}
-          className="glass-button-secondary"
-          style={{ 
-            padding: '12px 24px', borderRadius: '12px', background: 'var(--accent-main)', 
-            color: 'white', border: 'none', fontWeight: 700, opacity: isSaving ? 0.5 : 1
-          }}
-        >
-          {isSaving ? "Saving..." : "Apply Changes"}
-        </button>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth > 1024 ? '350px 1fr' : '1fr', gap: '25px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-          {/* Logo Preview Card */}
-          <div style={{ ...glassPanelStyle, padding: '30px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <SectionTitle title="Logo Preview" />
-            <div style={{ 
-              aspectRatio: '1', borderRadius: '20px', background: 'rgba(0,0,0,0.4)', 
-              border: '2px dashed rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', 
-              justifyContent: 'center', padding: '20px', position: 'relative', overflow: 'hidden'
-            }}>
-              {settings.logo_url ? (
-                 <img src={settings.logo_url} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} alt="Logo" />
-              ) : (
-                 <Palette size={48} style={{ opacity: 0.1 }} />
-              )}
-            </div>
-            <div style={{ position: 'relative' }}>
-               <input 
-                 type="file" 
-                 id="logo-upload"
-                 accept="image/*"
-                 style={{ display: 'none' }}
-                 onChange={async (e) => {
-                   if (e.target.files && e.target.files[0]) {
-                     const formData = new FormData();
-                     formData.append('logo', e.target.files[0]);
-                     try {
-                       const res = await api.post('/admin/upload_logo', formData);
-                       if (res.data.status === 'success') {
-                         setSettings({ ...settings, logo_url: res.data.logoUrl });
-                         toast.success("Logo uploaded successfully!");
-                       }
-                     } catch (err) {
-                       console.error(err);
-                       toast.error("Failed to upload logo.");
-                     }
-                   }
-                 }}
-               />
-               <button 
-                 onClick={() => document.getElementById('logo-upload').click()}
-                 className="glass-button-secondary"
-                 style={{ 
-                   width: '100%', 
-                   padding: '14px', 
-                   borderRadius: '12px', 
-                   fontWeight: 800, 
-                   fontSize: '0.9rem', 
-                   color: 'var(--accent-main)',
-                   background: 'rgba(229, 9, 20, 0.05)',
-                   border: '1px solid rgba(229, 9, 20, 0.2)',
-                   cursor: 'pointer'
-                 }}
-               >
-                 Choose Logo File
-               </button>
-            </div>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>SVG, PNG or WEBP recommended.</p>
-          </div>
-
-          {/* Favicon Card - Now Static */}
-          <div style={{ ...glassPanelStyle, padding: '30px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <SectionTitle title="Favicon" />
-            <div style={{ 
-              aspectRatio: '1', borderRadius: '20px', background: 'rgba(0,0,0,0.4)', 
-              border: '2px solid rgba(229,9,20,0.2)', display: 'flex', alignItems: 'center', 
-              justifyContent: 'center', padding: '20px', position: 'relative', overflow: 'hidden'
-            }}>
-              <img src="/favicon.png" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '12px' }} alt="Favicon" />
-            </div>
-            <div style={{ 
-              padding: '14px 18px', 
-              background: 'rgba(229, 9, 20, 0.05)', 
-              border: '1px solid rgba(229, 9, 20, 0.2)',
-              borderRadius: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px'
-            }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10a37f', flexShrink: 0 }} />
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                Favicon is permanently set to the PromptKing logo. Loads instantly from static files — no server requests needed.
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Dimension Settings Card */}
-        <div style={{ ...glassPanelStyle, padding: '30px', display: 'flex', flexDirection: 'column', gap: '25px' }}>
-          <SectionTitle title="Dimension Tuning" />
-          
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-            <div>
-              <Label text="Desktop Height" icon={<Layout size={14} />} />
-              <input 
-                style={inputStyle} 
-                value={settings.logo_height_desktop || ''} 
-                onChange={e => setSettings({...settings, logo_height_desktop: e.target.value})} 
-                placeholder="e.g. 50px" 
-              />
-              <Hint text="Affects header logo on PCs" />
-            </div>
-            <div>
-              <Label text="Desktop Width" icon={<Layout size={14} />} />
-              <input 
-                style={inputStyle} 
-                value={settings.logo_width_desktop || ''} 
-                onChange={e => setSettings({...settings, logo_width_desktop: e.target.value})} 
-                placeholder="e.g. auto" 
-              />
-              <Hint text="Affects header logo width on PCs" />
-            </div>
-            <div>
-              <Label text="Mobile Height" icon={<Activity size={14} />} />
-              <input 
-                style={inputStyle} 
-                value={settings.logo_height_mobile || ''} 
-                onChange={e => setSettings({...settings, logo_height_mobile: e.target.value})} 
-                placeholder="e.g. 32px" 
-              />
-              <Hint text="Affects header logo on phones" />
-            </div>
-            <div>
-              <Label text="Mobile Width" icon={<Activity size={14} />} />
-              <input 
-                style={inputStyle} 
-                value={settings.logo_width_mobile || ''} 
-                onChange={e => setSettings({...settings, logo_width_mobile: e.target.value})} 
-                placeholder="e.g. auto" 
-              />
-              <Hint text="Affects header logo width on phones" />
-            </div>
-          </div>
-
-          <div className="glass-divider" />
-
-          <div>
-             <SectionTitle title="Health Check" />
-             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
-                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10a37f', boxShadow: '0 0 10px #10a37f' }} />
-                <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Branding Assets Synchronized</span>
-             </div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-const SocialPanel = ({ onSave }) => {
-  const [settings, setSettings] = useState({});
-  const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    api.get('/admin/settings').then(res => setSettings(res.data));
-  }, []);
-
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      await api.post('/admin/save_settings', settings);
-      onSave();
-      toast.success("Social links updated!");
-    } catch(e) { console.error(e); }
-    finally { setIsSaving(false); }
-  };
-
-  const socialGroups = [
-    { key: 'youtube', label: 'YouTube Channel', icon: <Activity size={20} color="#ff0000" />, bg: 'rgba(255,0,0,0.08)', desc: 'Promote your video content' },
-    { key: 'instagram', label: 'Instagram Profile', icon: <Activity size={20} color="#e1306c" />, bg: 'rgba(225,48,108,0.08)', desc: 'Share your visual feed' },
-    { key: 'facebook', label: 'Facebook Page', icon: <Activity size={20} color="#1877f2" />, bg: 'rgba(24,119,242,0.08)', desc: 'Connect with community' },
-    { key: 'pinterest', label: 'Pinterest Page', icon: <Activity size={20} color="#E60023" />, bg: 'rgba(230,0,35,0.08)', desc: 'Inspire with AI collections' },
-  ];
-
-  return (
-    <motion.div {...pageTransition} style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-      {/* Header */}
-      <div style={{ ...glassPanelStyle, padding: '24px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <div style={{ width: '45px', height: '45px', borderRadius: '12px', background: 'rgba(59,130,246,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Share2 size={22} color="#3b82f6" />
-          </div>
-          <div>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '2px' }}>Social Synergy</h3>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Manage your official channel integrations.</p>
-          </div>
-        </div>
-        <button 
-          onClick={handleSave}
-          disabled={isSaving}
-          className="glass-button-secondary"
-          style={{ 
-            padding: '12px 24px', borderRadius: '12px', background: '#3b82f6', 
-            color: 'white', border: 'none', fontWeight: 700, opacity: isSaving ? 0.5 : 1
-          }}
-        >
-          {isSaving ? "Saving..." : "Update Channels"}
-        </button>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '25px' }}>
-        {socialGroups.map(group => (
-          <div key={group.key} style={{ ...glassPanelStyle, padding: '25px', position: 'relative', overflow: 'hidden' }}>
-            {/* Background Glow */}
-            <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: '100px', height: '100px', background: group.bg, filter: 'blur(40px)', zIndex: 0 }} />
-            
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
-                  {group.icon}
-                </div>
-                <div>
-                  <h4 style={{ fontSize: '1rem', fontWeight: 700 }}>{group.label}</h4>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>{group.desc}</p>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                <div>
-                  <Label text="Display Title" />
-                  <input 
-                    style={inputStyle} 
-                    placeholder="e.g. Subscribe on YouTube" 
-                    value={settings[`${group.key}_title`] || ''} 
-                    onChange={e => setSettings({...settings, [`${group.key}_title`]: e.target.value})} 
-                  />
-                </div>
-                <div>
-                  <Label text={group.label + " URL"} />
-                  <input 
-                    style={inputStyle} 
-                    placeholder="https://..." 
-                    value={settings[`${group.key}_url`] || ''} 
-                    onChange={e => setSettings({...settings, [`${group.key}_url`]: e.target.value})} 
-                  />
-                  <Hint text="Must be a valid absolute URL" />
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </motion.div>
-  );
-};
-
-
-
-const AdsPanel = ({ onSave }) => {
-  const [settings, setSettings] = useState({});
-  const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    api.get('/admin/settings').then(res => setSettings(res.data));
-  }, []);
-
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      await api.post('/admin/save_settings', settings);
-      onSave();
-      toast.success("Ads configuration updated! Changes may take a moment to propagate.");
-    } catch(e) { console.error(e); }
-    finally { setIsSaving(false); }
-  };
-
-  return (
-    <motion.div {...pageTransition} style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-      <div style={{ ...glassPanelStyle, padding: '24px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <div style={{ width: '45px', height: '45px', borderRadius: '12px', background: 'rgba(251,191,36,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Activity size={22} color="#fbbf24" />
-          </div>
-          <div>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '2px' }}>Revenue & Ads</h3>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Manage Google AdSense placements and policy compliance.</p>
-          </div>
-        </div>
-        <button 
-          onClick={handleSave}
-          disabled={isSaving}
-          className="glass-button-secondary"
-          style={{ 
-            padding: '12px 24px', borderRadius: '12px', background: '#fbbf24', 
-            color: 'black', border: 'none', fontWeight: 800, opacity: isSaving ? 0.5 : 1
-          }}
-        >
-          {isSaving ? "Saving..." : "Apply Ad Settings"}
-        </button>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '25px' }}>
-        {/* Global Config */}
-        <div style={{ ...glassPanelStyle, padding: '30px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <SectionTitle title="Global Configuration" />
-          <div>
-            <Label text="AdSense Client ID" />
-            <input 
-              style={inputStyle} 
-              placeholder="ca-pub-XXXXXXXXXXXXXXXX" 
-              value={settings.adsense_client_id || ''} 
-              onChange={e => setSettings({...settings, adsense_client_id: e.target.value})} 
-            />
-            <Hint text="Your unique Google AdSense publisher ID." />
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>Enable All Ads</div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>Global toggle for ad visibility</div>
-            </div>
-            <input 
-              type="checkbox" 
-              checked={settings.adsense_enabled === '1'} 
-              onChange={e => setSettings({...settings, adsense_enabled: e.target.checked ? '1' : '0'})}
-              style={{ width: '20px', height: '20px', accentColor: '#fbbf24' }}
-            />
-          </div>
-        </div>
-
-        {/* Slot IDs */}
-        <div style={{ ...glassPanelStyle, padding: '30px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <SectionTitle title="Ad Placement Slots" />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-            <div>
-              <Label text="Header Slot" />
-              <input 
-                style={inputStyle} 
-                placeholder="Slot ID" 
-                value={settings.adsense_slot_header || ''} 
-                onChange={e => setSettings({...settings, adsense_slot_header: e.target.value})} 
-              />
-            </div>
-            <div>
-              <Label text="Sidebar Slot" />
-              <input 
-                style={inputStyle} 
-                placeholder="Slot ID" 
-                value={settings.adsense_slot_sidebar || ''} 
-                onChange={e => setSettings({...settings, adsense_slot_sidebar: e.target.value})} 
-              />
-            </div>
-            <div>
-              <Label text="Detail Slot" />
-              <input 
-                style={inputStyle} 
-                placeholder="Slot ID" 
-                value={settings.adsense_slot_detail || ''} 
-                onChange={e => setSettings({...settings, adsense_slot_detail: e.target.value})} 
-              />
-            </div>
-            <div>
-              <Label text="Footer Slot" />
-              <input 
-                style={inputStyle} 
-                placeholder="Slot ID" 
-                value={settings.adsense_slot_footer || ''} 
-                onChange={e => setSettings({...settings, adsense_slot_footer: e.target.value})} 
-              />
-            </div>
-          </div>
-          <Hint text="Leave blank to disable specific placements." />
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-
 const AdminDashboard = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [password, setPassword] = useState('');
@@ -959,7 +546,7 @@ const AdminDashboard = () => {
     }
   }, [password, isAdmin]);
 
-  const checkAuth = async () => {
+  async function checkAuth() {
     try {
       const response = await api.get('/admin/check_auth');
       setIsAdmin(response.data.isAdmin);
@@ -970,7 +557,7 @@ const AdminDashboard = () => {
     } catch (e) { console.error(e); }
   };
 
-  const handleLogin = async (e) => {
+  async function handleLogin(e) {
     if (e) e.preventDefault();
     try {
       const response = await api.post('/admin/login', { password });
@@ -1035,7 +622,7 @@ const AdminDashboard = () => {
     setPassword('');
   };
 
-  const fetchData = async (currentView) => {
+  async function fetchData(currentView) {
     if (currentView === 'settings') return;
     setIsDataLoading(true);
     try {
@@ -1278,7 +865,7 @@ const AdminDashboard = () => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--surface-0)' }}>
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} style={{ ...glassPanelStyle, padding: '48px', width: '400px', textAlign: 'center' }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '32px', width: '100%' }}>
-            <img src={KingLogo} style={{ width: '120px', height: '120px', objectFit: 'contain' }} alt="Prompt King" />
+            <img src="/promptking-logo.svg" style={{ width: '120px', height: '120px', objectFit: 'contain' }} alt="Prompt King" />
           </div>
           <h2 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '8px', fontFamily: 'var(--font-heading)', color: 'white' }}>Admin Portal</h2>
           <p style={{ color: 'var(--text-dim)', marginBottom: '32px', fontSize: '0.9rem', fontWeight: 500 }}>Authenticated Access Only</p>
@@ -1300,11 +887,6 @@ const AdminDashboard = () => {
       { id: 'categories', label: 'AI Types', icon: <Layers size={20} /> },
       { id: 'website_categories', label: 'Website Categories', icon: <Layers size={20} /> },
       { id: 'faqs', label: 'Help Desk', icon: <Activity size={20} /> },
-    ]},
-    { title: 'SYSTEM CONFIG', items: [
-      { id: 'settings-branding', label: 'Branding', icon: <Palette size={20} /> },
-      { id: 'settings-social', label: 'Channels', icon: <Share2 size={20} /> },
-      { id: 'settings-ads', label: 'Ads Management', icon: <Activity size={20} /> },
     ]}
   ];
 
@@ -1394,12 +976,10 @@ const AdminDashboard = () => {
 
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '40px', width: '100%' }}>
             {sidebarCollapsed ? (
-              <img src={KingLogo} style={{ width: '40px', height: '40px', objectFit: 'contain', display: 'block' }} alt="PK" />
-            ) : settings?.logo_url ? (
-              <img src={settings.logo_url} style={{ maxHeight: '90px', maxWidth: '100%', objectFit: 'contain', padding: '0 10px', display: 'block' }} alt="Logo" />
+              <img src="/promptking-logo.svg" style={{ width: '40px', height: '40px', objectFit: 'contain', display: 'block' }} alt="PK" />
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', padding: '0 10px' }}>
-                <img src={KingLogo} style={{ height: '60px', width: '100%', maxWidth: '200px', objectFit: 'contain', display: 'block' }} alt="Prompt King" />
+                <img src="/promptking-logo.svg" style={{ height: '60px', width: '100%', maxWidth: '200px', objectFit: 'contain', display: 'block' }} alt="Prompt King" />
               </div>
             )}
           </div>
@@ -1661,12 +1241,6 @@ const AdminDashboard = () => {
             </motion.div>
           )}
 
-          {view === 'settings-branding' && <BrandingPanel key="branding" onSave={() => fetchData('settings')} />}
-          {view === 'settings-social' && <SocialPanel key="social" onSave={() => fetchData('settings')} />}
-          {view === 'settings-ads' && <AdsPanel key="ads" onSave={() => fetchData('settings')} />}
-
-
-
           {['prompts', 'listicles', 'blogs', 'authors', 'categories', 'website_categories', 'faqs'].includes(view) && (
             <motion.div key="list" {...pageTransition} style={{ ...glassPanelStyle, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
               {/* Loading skeleton — shown while fetching new tab data */}
@@ -1739,14 +1313,20 @@ const AdminDashboard = () => {
                                   onError={e => e.target.style.display = 'none'} 
                                 />
                               )}
-                              {view === 'authors' && item.image && (
-                                <img 
-                                  src={item.image} 
-                                  alt={item.name || 'Author'} 
-                                  className="admin-thumb-hover"
-                                  style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} 
-                                  onError={e => e.target.style.display = 'none'} 
-                                />
+                              {view === 'authors' && (
+                                item.image ? (
+                                  <img 
+                                    src={item.image} 
+                                    alt={item.name || 'Author'} 
+                                    className="admin-thumb-hover"
+                                    style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} 
+                                    onError={e => e.target.style.display = 'none'} 
+                                  />
+                                ) : (
+                                  <div style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'var(--accent-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 'bold', flexShrink: 0, color: 'white' }}>
+                                    {(item.name || 'A').charAt(0).toUpperCase()}
+                                  </div>
+                                )
                               )}
                               {view === 'blogs' && item.featured_image && (
                                 <img 

@@ -130,7 +130,6 @@ const CustomEditor = ({ value, onChange }) => {
     exec('formatBlock', 'blockquote');
   };
 
-  const Divider = () => <div style={{ width: '1px', height: '22px', background: 'rgba(255,255,255,0.1)', margin: '0 4px' }} />;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100%', borderRadius: '18px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
@@ -370,5 +369,8 @@ const ModalBtn = ({ children, onClick, secondary }) => (
     style={{ padding: '10px 22px', borderRadius: '10px', border: secondary ? '1px solid rgba(255,255,255,0.1)' : 'none', background: secondary ? 'rgba(255,255,255,0.05)' : 'var(--accent-main)', color: 'white', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', transition: '0.2s' }}
   >{children}</button>
 );
+
+// Divider
+const Divider = () => <div style={{ width: '1px', height: '22px', background: 'rgba(255,255,255,0.1)', margin: '0 4px' }} />;
 
 export default CustomEditor;
