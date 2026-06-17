@@ -45,7 +45,7 @@ export default async function PromptPage({ params }) {
           SELECT * FROM prompts 
           WHERE category_id = ${p.category_id} AND id != ${p.id} 
           ORDER BY id DESC LIMIT 20
-        \`;
+        `;
         
         // Shuffle the 20 recent prompts in JavaScript to avoid the slow ORDER BY RAND() SQL query
         initialSuggestedPrompts = suggestRows.sort(() => 0.5 - Math.random()).slice(0, 4);
