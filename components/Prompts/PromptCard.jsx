@@ -266,10 +266,10 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
       }}>
         {/* Image Section */}
         {prompt.isImageSlider ? (
-          <div className="slider-container" style={{ 
+          <div className="slider-container prompt-image-container" style={{ 
             aspectRatio: ratio, width: '100%', margin: `0 0 15px 0`,
             position: 'relative', overflow: 'hidden', borderBottom: '1px solid var(--border-color)',
-            minHeight: isMobile ? '140px' : '180px', background: '#111'
+            background: '#111'
           }}>
             <img 
               src={optimizeImage(prompt.imgAfter, isMobile ? 450 : 600)} 
@@ -337,7 +337,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
 
           </div>
         ) : (prompt.imgAfter || prompt.imgBefore) && (
-          <div style={{ width: '100%', margin: `0 0 15px 0`, aspectRatio: ratio, background: '#111', overflow: 'hidden', minHeight: isMobile ? '140px' : '180px', position: 'relative' }}>
+          <div className="prompt-image-container" style={{ width: '100%', margin: `0 0 15px 0`, aspectRatio: ratio, background: '#111', overflow: 'hidden', position: 'relative' }}>
             <img 
               src={optimizeImage(prompt.imgAfter || prompt.imgBefore, isMobile ? 450 : 600)} 
               alt={`${prompt.title} - ${prompt.aiType || 'AI'} Prompt Example`} 
