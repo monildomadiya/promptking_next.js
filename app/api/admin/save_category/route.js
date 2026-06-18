@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
+import { cacheInvalidate } from '@/lib/cache';
 
 export async function POST(req) {
   try {
@@ -11,6 +12,10 @@ export async function POST(req) {
     } else {
       await db`INSERT INTO categories (name, slug, description, image, icon) VALUES (${name}, ${slug}, ${description}, ${image}, ${icon})`;
     }
+
+    // Invalidate caches so live site reflects changes immediately
+    cacheInvalidate('api_categories');
+    cacheInvalidate('all_prompts_listing');
     
     return NextResponse.json({ success: true });
   } catch (error) {

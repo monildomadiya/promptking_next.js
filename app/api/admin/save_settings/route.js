@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
+import { cacheInvalidate } from '@/lib/cache';
 
 export async function POST(req) {
   try {
@@ -11,6 +12,10 @@ export async function POST(req) {
         ON DUPLICATE KEY UPDATE setting_value = ${value}
       `;
     }
+
+    // Invalidate settings cache so live site reflects changes immediately
+    cacheInvalidate('api_settings');
+
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

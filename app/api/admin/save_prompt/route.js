@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getSession } from '@/lib/session';
+import { cacheInvalidate } from '@/lib/cache';
 
 const generateUniqueSlug = async (title, currentId = null, table = 'prompts', idColumn = 'prompt_key') => {
   if (!title) title = table === 'prompts' ? 'prompt' : 'article';
@@ -134,6 +135,9 @@ export async function POST(req) {
         )
       `;
     }
+
+    // Invalidate the server-side cache so the live site reflects changes immediately
+    cacheInvalidate('all_prompts_listing');
 
     return NextResponse.json({ status: "success" });
   } catch (error) {
