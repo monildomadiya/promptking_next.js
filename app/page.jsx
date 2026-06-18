@@ -3,7 +3,7 @@ import { fetchAllData } from '@/lib/data';
 
 // Note: Next.js will cache this route if possible.
 // Use 'force-dynamic' if prompts update frequently and you want fresh data on each request.
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export default async function Page() {
   const { prompts, categories } = await fetchAllData();

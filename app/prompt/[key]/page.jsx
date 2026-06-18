@@ -2,7 +2,7 @@ import db from '@/lib/db';
 import ClientPromptDetail from './ClientPromptDetail';
 import { notFound } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export default async function PromptPage({ params }) {
   const resolvedParams = await Promise.resolve(params);
