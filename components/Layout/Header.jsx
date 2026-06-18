@@ -1,23 +1,21 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import api from '@/lib/api';
-import { Search, Layout, Menu, X, Filter, Crown, Layers, ChevronDown, Camera, Activity, Coffee } from '../Common/Icons';
+import { Search, X, Crown, Coffee } from '../Common/Icons';
 import AdSenseUnit from '../Ads/AdSenseUnit';
 
 const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilters, onLogoClick, settings, isAdmin, onHeightChange }) => {
-  const [logoError, setLogoError] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
-  const [categories, setCategories] = useState([]);
+  // Use ref for lastScrollY — avoids re-registering scroll listener on every scroll event
+  const lastScrollY = useRef(0);
   const navigate = useRouter();
   const location = usePathname();
   const isHomePage = location === '/';
-  const headerRef = React.useRef(null);
+  const headerRef = useRef(null);
 
   const optimizeImage = (url, width = 600) => {
     if (!url) return url;
@@ -37,7 +35,7 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
       
       // Control header visibility based on scroll direction
       if (currentScrollY > 150) {
-        if (currentScrollY > lastScrollY && !isSearchExpanded) {
+        if (currentScrollY > lastScrollY.current && !isSearchExpanded) {
           setIsVisible(false);
         } else {
           setIsVisible(true);
@@ -47,17 +45,14 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
       }
       
       setIsScrolled(currentScrollY > 20);
-      setLastScrollY(currentScrollY);
+      lastScrollY.current = currentScrollY; // update ref, no re-render
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    
-    // Fetch categories
-    api.get('/categories').then(res => setCategories(res.data));
 
     const resizeObserver = new ResizeObserver((entries) => {
       for (let entry of entries) {
         if (onHeightChange) {
-          onHeightChange(entry.target.offsetHeight + (isMobile ? 10 : 20)); // Add the 'top' margin/buffer
+          onHeightChange(entry.target.offsetHeight + (isMobile ? 10 : 20));
         }
       }
     });
@@ -71,7 +66,8 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
       window.removeEventListener('scroll', handleScroll);
       resizeObserver.disconnect();
     };
-  }, [lastScrollY, onHeightChange, isMobile]);
+    // Only re-run if onHeightChange or isMobile reference changes — NOT on every scroll
+  }, [onHeightChange, isMobile, isSearchExpanded]);
 
   return (
     <>

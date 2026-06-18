@@ -1,8 +1,7 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Layers, Search, X, Filter, Sparkles, Crown, CheckCircle } from '../Common/Icons';
-import api from '@/lib/api';
 
 const HighlightText = ({ text, highlight }) => {
   if (!highlight || !highlight.trim()) return <span>{text}</span>;
@@ -113,13 +112,9 @@ const FilterItem = ({ label, value, icon: Icon, count, onClick, to, isActive, se
   );
 };
 
-const CategorySidebar = ({ filter, setFilter, counts = {} }) => {
-  const [categories, setCategories] = useState([]);
+// categories prop is passed from PromptList (already fetched server-side)
+const CategorySidebar = ({ filter, setFilter, counts = {}, categories = [] }) => {
   const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    api.get('/categories').then(res => setCategories(res.data));
-  }, []);
 
   const filteredCategories = categories.filter(cat => 
     cat.name.toLowerCase().includes(searchTerm.toLowerCase())

@@ -108,9 +108,10 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile, initialP
     hasFetched.current = true;
     
     if (initialPrompts.length > 0) {
-      // We already have server-rendered data, so just silently revalidate
-      fetchData(true);
-      return;
+      // We have fresh SSR data — skip the immediate revalidation.
+      // Schedule a background revalidation after 60 seconds (matches server revalidate = 60).
+      const timer = setTimeout(() => fetchData(true), 60 * 1000);
+      return () => clearTimeout(timer);
     }
 
     // Read cache here (client-only) to avoid server/client mismatch
@@ -413,6 +414,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile, initialP
               filter={filter} 
               setFilter={setFilter} 
               counts={filterCounts}
+              categories={categories}
             />
             <SocialSidebar />
           </aside>
@@ -492,10 +494,9 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile, initialP
                 filter={filter} 
                 setFilter={(f) => {
                   setFilter(f);
-                  // Optional: Close on selection for better UX
-                  // setIsSidebarOpen(false); 
                 }} 
                 counts={filterCounts}
+                categories={categories}
               />
 
               <button 

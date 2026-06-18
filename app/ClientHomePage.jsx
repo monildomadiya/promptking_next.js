@@ -8,7 +8,7 @@ import SEOMetadata from '@/components/SEO/SEOMetadata';
 
 import { useAppContext } from '@/components/AppContext';
 
-const HomePage = ({ initialPrompts = [], initialCategories = [] }) => {
+const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteCategories = [] }) => {
   const { search, filter, setFilter, isMobile } = useAppContext();
   const { categorySlug } = useParams();
 
@@ -17,10 +17,6 @@ const HomePage = ({ initialPrompts = [], initialCategories = [] }) => {
     if (categorySlug) {
       setFilter(categorySlug.toLowerCase());
     } else if (!categorySlug && filter !== 'premium' && filter !== 'free' && filter !== 'all' && !search) {
-       // if we navigate to / from a category, reset filter (unless they just searched or used quick filters)
-       // This is a bit tricky, but safe enough is just setting it to 'all' if categorySlug is absent 
-       // but we only want to do that if they actually navigated from a category page.
-       // The PromptList already handles filter state. We just need to ensure the route change triggers it.
        if(filter !== 'all') {
          setFilter('all');
        }
@@ -76,7 +72,8 @@ const HomePage = ({ initialPrompts = [], initialCategories = [] }) => {
       }}>
         {categorySlug ? `${categorySlug.split('-').join(' ')} AI Prompts Library` : 'PromptKing - Premium AI Prompts Library for ChatGPT, Midjourney & Gemini'}
       </h1>
-      <CategorySlider />
+      {/* Pass server-fetched website categories so CategorySlider skips its own network request */}
+      <CategorySlider initialCategories={initialWebsiteCategories} />
       <PromptList 
         search={search} 
         filter={filter} 
