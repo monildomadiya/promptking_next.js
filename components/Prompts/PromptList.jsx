@@ -217,36 +217,16 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile, initialP
           display: isMobile ? 'flex' : 'grid', 
           flexDirection: 'column' 
         }}>
-          <div className="masonry-grid-react" id="skeletonContainer" style={{ 
-            display: 'flex', 
-            gap: isMobile ? '12px' : '20px', 
-            alignItems: 'flex-start',
-            flexWrap: 'nowrap',
-            flexDirection: 'row'
-          }}>
-            {(() => {
-              const items = [1, 2, 3, 4, 5, 6];
-              const cols = isMobile ? 2 : 3;
-              const columns = Array.from({ length: cols }, () => []);
-              
-              items.forEach((item, index) => {
-                columns[index % cols].push(
-                  <div key={item} className="masonry-grid-item" style={{ 
-                    background: 'rgba(255, 255, 255, 0.03)', borderRadius: '24px', padding: '18px', border: '1px solid rgba(255, 255, 255, 0.1)'
-                  }}>
-                    <Shimmer height={isMobile ? '140px' : '180px'} borderRadius="20px 20px 0 0" style={{ margin: '-18px -18px 15px -18px', width: 'calc(100% + 36px)' }} />
-                    <Shimmer height="20px" width="60%" style={{ marginBottom: '10px' }} />
-                    <Shimmer height="140px" width="100%" borderRadius="20px" />
-                  </div>
-                );
-              });
-
-              return columns.map((colItems, i) => (
-                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: isMobile ? '12px' : '25px', minWidth: 0 }}>
-                  {colItems}
-                </div>
-              ));
-            })()}
+          <div className="css-masonry-grid" id="skeletonContainer">
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+              <div key={item} style={{ 
+                background: 'rgba(255, 255, 255, 0.03)', borderRadius: '24px', padding: '18px', border: '1px solid rgba(255, 255, 255, 0.1)'
+              }}>
+                <Shimmer height={isMobile ? '140px' : '180px'} borderRadius="20px 20px 0 0" style={{ margin: '-18px -18px 15px -18px', width: 'calc(100% + 36px)' }} />
+                <Shimmer height="20px" width="60%" style={{ marginBottom: '10px' }} />
+                <Shimmer height="140px" width="100%" borderRadius="20px" />
+              </div>
+            ))}
           </div>
           <div className="social-sidebar" style={{ width: '280px' }}>
              <Shimmer height="500px" borderRadius="32px" />
@@ -315,42 +295,21 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile, initialP
           )}
           
           
-          <div className="masonry-grid-react" style={{ 
-            display: 'flex', 
-            gap: isMobile ? '12px' : '20px', 
-            alignItems: 'flex-start',
-            marginTop: search ? '20px' : '0',
-            flexWrap: 'nowrap',
-            flexDirection: 'row'
-          }}>
-            {(() => {
-              const items = filteredPrompts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-              const cols = isMobile ? 2 : 3;
-              const columns = Array.from({ length: cols }, () => []);
-              
-              items.forEach((p, index) => {
-                columns[index % cols].push(
-                  <div key={p.prompt_key || p.id} style={{ width: '100%' }}>
-                    <PromptCard 
-                      prompt={p} 
-                      isUnlocked={!p.isPremium || activeUnlockedKey === (p.prompt_key || p.id)}
-                      onUnlock={() => setActiveUnlockedKey(p.prompt_key || p.id)}
-                      onLock={() => setActiveUnlockedKey(null)}
-                      searchTerm={search}
-                      isHighlighted={search && p.prompt_key && p.prompt_key.toLowerCase().includes(search.toLowerCase())}
-                      isPriority={index < 2}
-                      isMobile={isMobile}
-                    />
-                  </div>
-                );
-              });
-
-              return columns.map((colItems, i) => (
-                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: isMobile ? '12px' : '25px', minWidth: 0 }}>
-                  {colItems}
-                </div>
-              ));
-            })()}
+          <div className="css-masonry-grid" style={{ marginTop: search ? '20px' : '0' }}>
+            {filteredPrompts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((p, index) => (
+              <div key={p.prompt_key || p.id} style={{ width: '100%' }}>
+                <PromptCard 
+                  prompt={p} 
+                  isUnlocked={!p.isPremium || activeUnlockedKey === (p.prompt_key || p.id)}
+                  onUnlock={() => setActiveUnlockedKey(p.prompt_key || p.id)}
+                  onLock={() => setActiveUnlockedKey(null)}
+                  searchTerm={search}
+                  isHighlighted={search && p.prompt_key && p.prompt_key.toLowerCase().includes(search.toLowerCase())}
+                  isPriority={index < 2}
+                  isMobile={isMobile}
+                />
+              </div>
+            ))}
           </div>
 
           {filteredPrompts.length > itemsPerPage && (() => {
