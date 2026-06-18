@@ -6,7 +6,7 @@ import { authenticate } from "../shopify.server";
 export const loader = async ({ request }) => {
   await authenticate.admin(request);
 
-  // eslint-disable-next-line no-undef
+// Remove eslint-disable as it is unused
   return { apiKey: process.env.SHOPIFY_API_KEY || "" };
 };
 

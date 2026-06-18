@@ -453,7 +453,7 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
   );
 };
 
-const BrandingPanel = ({ onSave }) => {
+const BrandingPanel = ({ onSave, isMobile }) => {
   const [settings, setSettings] = useState({});
   const [isSaving, setIsSaving] = useState(false);
 
@@ -1660,7 +1660,7 @@ const AdminDashboard = () => {
             </motion.div>
           )}
 
-          {view === 'settings-branding' && <BrandingPanel key="branding" onSave={() => fetchData('settings')} />}
+          {view === 'settings-branding' && <BrandingPanel key="branding" onSave={() => fetchData('settings')} isMobile={isMobile} />}
           {view === 'settings-social' && <SocialPanel key="social" onSave={() => fetchData('settings')} />}
           {view === 'settings-ads' && <AdsPanel key="ads" onSave={() => fetchData('settings')} />}
 
