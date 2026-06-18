@@ -7,6 +7,11 @@ export async function POST(req) {
     if (!key) return NextResponse.json({ error: 'Key is required' }, { status: 400 });
     try {
       await db`UPDATE prompts SET copy_count = COALESCE(copy_count, 0) + 1 WHERE prompt_key = ${key} OR slug = ${key}`;
+      try {
+        await db`INSERT INTO analytics_events (event_type, item_key) VALUES ('copy', ${key})`;
+      } catch (e) {
+        // Fallback
+      }
     } catch (colErr) {
       if (colErr.code !== 'ER_NO_SUCH_TABLE') throw colErr;
     }
