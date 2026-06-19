@@ -1,203 +1,114 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { createPortal } from 'react-dom';
 import PromptCard from './PromptCard';
 import MagicKingIntro from './MagicKingIntro';
 import Shimmer from '../Common/Shimmer';
 import api from '@/lib/api';
-import { Search, Crown, Grid, MessageSquare, Sparkles, Image, Zap, Filter, X } from '../Common/Icons';
 
-const CACHE_KEY = 'pk_prompts_cache';
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+// ─── Module-level memory cache ────────────────────────────────────────────────
+// Persists for the entire browser session (survives component unmount/remount).
+// This is the key fix: back navigation reuses this data instantly, no blink.
+let _cachedPrompts = null;
+let _cachedCategories = null;
+let _cacheTimestamp = 0;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-const getCache = () => {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
-    const { data, ts } = JSON.parse(raw);
-    if (Date.now() - ts > CACHE_TTL) return null; // stale
-    return data;
-  } catch { return null; }
+const isCacheFresh = () => Date.now() - _cacheTimestamp < CACHE_TTL_MS;
+
+const readCache = () => {
+  if (_cachedPrompts && isCacheFresh()) return { prompts: _cachedPrompts, categories: _cachedCategories || [] };
+  return null;
 };
 
-const setCache = (data) => {
-  try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ data, ts: Date.now() }));
-  } catch {}
+const writeCache = (prompts, categories) => {
+  _cachedPrompts = prompts;
+  _cachedCategories = categories;
+  _cacheTimestamp = Date.now();
 };
 
-const PromptList = ({ search, filter, setFilter, showFilters, isMobile, initialPrompts = [], initialCategories = [] }) => {
-  // Always start with loading=true to match server-rendered HTML (avoids hydration mismatch).
-  // Cache is read client-side only in useEffect.
-  const [prompts, setPrompts] = useState(initialPrompts);
-  const [categories, setCategories] = useState(initialCategories);
-  const [loading, setLoading] = useState(initialPrompts.length === 0);
+// Saved page persists across navigation without triggering a re-render on read
+let _savedPage = 1;
+
+// ─── Component ─────────────────────────────────────────────────────────────────
+const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], initialCategories = [] }) => {
+  // Seed from SSR data OR module cache immediately — never start empty if we have data
+  const getInitialPrompts = () => {
+    if (initialPrompts.length > 0) return initialPrompts;
+    const mem = readCache();
+    return mem ? mem.prompts : [];
+  };
+
+  const getInitialCategories = () => {
+    if (initialCategories.length > 0) return initialCategories;
+    const mem = readCache();
+    return mem ? mem.categories : [];
+  };
+
+  const [prompts, setPrompts] = useState(getInitialPrompts);
+  const [categories, setCategories] = useState(getInitialCategories);
+
+  // Only show loading skeleton if we truly have no data at all
+  const hasInitialData = initialPrompts.length > 0 || readCache() !== null;
+  const [loading, setLoading] = useState(!hasInitialData);
   const [isRevalidating, setIsRevalidating] = useState(false);
-  const [fadeIn, setFadeIn] = useState(true);
+
   const [activeUnlockedKey, setActiveUnlockedKey] = useState(null);
-  const [currentPage, setCurrentPage] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const savedPage = sessionStorage.getItem('pk_current_page');
-        if (savedPage) return parseInt(savedPage, 10);
-      } catch {}
-    }
-    return 1;
-  });
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [currentPage, setCurrentPage] = useState(() => _savedPage);
 
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
-  const itemsPerPage = isMobile ? 8 : 12;
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [catSearch, setCatSearch] = useState('');
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const dropdownRef = useRef(null);
   const hasFetched = useRef(false);
+  const prevSearch = useRef(search);
+  const prevFilter = useRef(filter);
 
-  // Removed the useEffect that read from sessionStorage since it's now handled in useState
+  const itemsPerPage = isMobile ? 8 : 12;
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsFilterOpen(false);
-      }
-    };
-
-    const handleEscKey = (event) => {
-      if (event.key === 'Escape') {
-        setIsFilterOpen(false);
-      }
-    };
-
-    if (isFilterOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('keydown', handleEscKey);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscKey);
-    };
-  }, [isFilterOpen]);
-
+  // ── Fetch data from API ──────────────────────────────────────────────────────
   const fetchData = useCallback(async (silent = false) => {
-    if (silent) setIsRevalidating(true);
-    else setLoading(true);
+    if (!silent) setLoading(true);
+    else setIsRevalidating(true);
+
     try {
       const response = await api.get('/get_data');
-      const newData = { prompts: response.data.prompts, categories: response.data.categories || [] };
-      setCache(newData);
-      setPrompts(newData.prompts);
-      setCategories(newData.categories);
-      if (!silent) {
-        setTimeout(() => setFadeIn(true), 50); // trigger fade-in
-      }
+      const newPrompts = response.data.prompts || [];
+      const newCategories = response.data.categories || [];
+      writeCache(newPrompts, newCategories);
+      setPrompts(newPrompts);
+      setCategories(newCategories);
     } catch (error) {
-      console.error("Failed to fetch prompts", error);
+      console.error('Failed to fetch prompts:', error);
     } finally {
-      if (silent) setIsRevalidating(false);
-      else setLoading(false);
+      if (!silent) setLoading(false);
+      else setIsRevalidating(false);
     }
   }, []);
 
+  // ── Bootstrap data on mount ──────────────────────────────────────────────────
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;
-    
+
     if (initialPrompts.length > 0) {
-      // We have fresh SSR data — skip the immediate revalidation.
-      // Schedule a background revalidation after 60 seconds (matches server revalidate = 60).
-      const timer = setTimeout(() => fetchData(true), 60 * 1000);
+      // Fresh SSR data — write to module cache, revalidate silently after 60s
+      writeCache(initialPrompts, initialCategories);
+      const timer = setTimeout(() => fetchData(true), 60_000);
       return () => clearTimeout(timer);
     }
 
-    // Read cache here (client-only) to avoid server/client mismatch
-    const cached = getCache();
-    if (cached) {
-      // Instantly show cached data, silently revalidate in background
-      setPrompts(cached.prompts || []);
-      setCategories(cached.categories || []);
-      setLoading(false);
-      setFadeIn(true);
+    const mem = readCache();
+    if (mem) {
+      // Module cache hit — already seeded in useState, just revalidate silently
       fetchData(true);
     } else {
+      // Cold start — fetch and show skeleton
       fetchData(false);
     }
-  }, [fetchData, initialPrompts.length]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-
-
-  const [debouncedSearch, setDebouncedSearch] = useState(search);
-
+  // ── Persist current page to module-level var (no state update on read) ───────
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 300);
-    return () => clearTimeout(handler);
-  }, [search]);
+    _savedPage = currentPage;
+  }, [currentPage]);
 
-  const filteredPrompts = useMemo(() => {
-    return prompts.filter(p => {
-      const safeKey = (p.prompt_key || '').toLowerCase();
-      const safeTitle = (p.title || '').toLowerCase();
-      const safeText = (p.prompt_text || p.promptText || '').toLowerCase();
-      const safeSearch = (debouncedSearch || '').toLowerCase();
-      
-      const matchesSearch = safeKey.includes(safeSearch) || 
-                            safeTitle.includes(safeSearch) || 
-                            safeText.includes(safeSearch);
-      
-      let matchesFilter = true;
-      if (filter === 'free') {
-        matchesFilter = !p.isPremium;
-      } else if (filter === 'premium') {
-        matchesFilter = p.isPremium;
-      } else if (filter !== 'all') {
-        matchesFilter = (p.aiType || '').toLowerCase().includes(filter);
-      }
-      
-      return matchesSearch && matchesFilter;
-    }).sort((a, b) => {
-      if (a.isFeatured && !b.isFeatured) return -1;
-      if (!a.isFeatured && b.isFeatured) return 1;
-      if (a.sort_order !== b.sort_order) {
-        return (a.sort_order || 0) - (b.sort_order || 0);
-      }
-      return (a.prompt_key || '').localeCompare(b.prompt_key || '');
-    });
-  }, [prompts, debouncedSearch, filter]);
-
-  // Calculate counts for categories and types
-  const filterCounts = useMemo(() => ({
-    all: prompts.length,
-    free: prompts.filter(p => !p.isPremium).length,
-    premium: prompts.filter(p => p.isPremium).length,
-    categories: categories.reduce((acc, cat) => {
-      const catName = (cat.name || '').toLowerCase();
-      acc[catName] = prompts.filter(p => (p.aiType || '').toLowerCase().includes(catName)).length;
-      return acc;
-    }, {})
-  }), [prompts, categories]);
-
-  useEffect(() => {
-    const handleOpenFilters = () => setIsSidebarOpen(true);
-    const handleReset = () => {
-      setCurrentPage(1);
-      setActiveUnlockedKey(null);
-    };
-    window.addEventListener('openFilters', handleOpenFilters);
-    window.addEventListener('resetPagination', handleReset);
-    return () => {
-      window.removeEventListener('openFilters', handleOpenFilters);
-      window.removeEventListener('resetPagination', handleReset);
-    };
-  }, []);
-
-  const prevSearch = useRef(search);
-  const prevFilter = useRef(filter);
-  
+  // ── Reset page when search/filter changes ────────────────────────────────────
   useEffect(() => {
     if (search !== prevSearch.current || filter !== prevFilter.current) {
       setCurrentPage(1);
@@ -206,45 +117,77 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile, initialP
     }
   }, [search, filter]);
 
+  // ── Filtered + sorted prompts ────────────────────────────────────────────────
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
   useEffect(() => {
-    try { sessionStorage.setItem('pk_current_page', currentPage); } catch {}
-  }, [currentPage]);
+    const t = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(t);
+  }, [search]);
 
+  const filteredPrompts = useMemo(() => {
+    const safeSearch = (debouncedSearch || '').toLowerCase();
+    return prompts
+      .filter(p => {
+        const matchesSearch =
+          !safeSearch ||
+          (p.prompt_key || '').toLowerCase().includes(safeSearch) ||
+          (p.title || '').toLowerCase().includes(safeSearch) ||
+          (p.prompt_text || p.promptText || '').toLowerCase().includes(safeSearch);
+
+        let matchesFilter = true;
+        if (filter === 'free') matchesFilter = !p.isPremium;
+        else if (filter === 'premium') matchesFilter = p.isPremium;
+        else if (filter !== 'all') matchesFilter = (p.aiType || '').toLowerCase().includes(filter);
+
+        return matchesSearch && matchesFilter;
+      })
+      .sort((a, b) => {
+        if (a.isFeatured && !b.isFeatured) return -1;
+        if (!a.isFeatured && b.isFeatured) return 1;
+        return (a.sort_order || 0) - (b.sort_order || 0) || (a.prompt_key || '').localeCompare(b.prompt_key || '');
+      });
+  }, [prompts, debouncedSearch, filter]);
+
+  const totalPages = Math.ceil(filteredPrompts.length / itemsPerPage);
+  const pagedPrompts = filteredPrompts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const goToPage = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // ── Skeleton loader (only when truly no data) ────────────────────────────────
   if (loading) {
+    const skeletonCount = isMobile ? 4 : 12;
     return (
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px', width: '100%' }}>
-        <div style={{ 
-          display: 'block', 
-          marginTop: '40px' 
-        }}>
-          <div className="css-masonry-grid" id="skeletonContainer">
-            {[1, 2, 3, 4, 5, 6].map((item) => (
-              <div key={item} style={{ 
-                background: 'rgba(255, 255, 255, 0.03)', borderRadius: '24px', padding: '18px', border: '1px solid rgba(255, 255, 255, 0.1)'
-              }}>
-                <Shimmer height={isMobile ? '140px' : '180px'} borderRadius="20px 20px 0 0" style={{ margin: '-18px -18px 15px -18px', width: 'calc(100% + 36px)' }} />
-                <Shimmer height="20px" width="60%" style={{ marginBottom: '10px' }} />
-                <Shimmer height="140px" width="100%" borderRadius="20px" />
-              </div>
-            ))}
-          </div>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px', width: '100%', marginTop: '40px' }}>
+        <div className="css-masonry-grid">
+          {Array.from({ length: skeletonCount }).map((_, i) => (
+            <div key={i} style={{
+              background: 'rgba(255,255,255,0.03)',
+              borderRadius: '24px',
+              padding: '18px',
+              border: '1px solid rgba(255,255,255,0.08)'
+            }}>
+              <Shimmer height={isMobile ? '140px' : '180px'} borderRadius="16px 16px 0 0" style={{ margin: '-18px -18px 15px -18px', width: 'calc(100% + 36px)' }} />
+              <Shimmer height="18px" width="65%" style={{ marginBottom: '10px' }} />
+              <Shimmer height="120px" width="100%" borderRadius="16px" />
+            </div>
+          ))}
         </div>
       </div>
     );
   }
 
+  // ── Main render ──────────────────────────────────────────────────────────────
   return (
-    <div style={{
-      maxWidth: '1400px', margin: '0 auto', padding: isMobile ? '10px' : '0 20px', width: '100%',
-      opacity: fadeIn ? 1 : 0,
-      transform: fadeIn ? 'translateY(0)' : 'translateY(12px)',
-      transition: 'opacity 0.4s ease, transform 0.4s ease'
-    }}>
-      {/* Background revalidation indicator */}
+    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: isMobile ? '10px' : '0 20px', width: '100%', marginTop: '40px' }}>
+
+      {/* Silent background revalidation indicator */}
       {isRevalidating && (
         <div style={{
           position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999,
-          background: 'rgba(20,20,20,0.85)', backdropFilter: 'blur(10px)',
+          background: 'rgba(15,15,15,0.9)', backdropFilter: 'blur(12px)',
           border: '1px solid rgba(255,255,255,0.08)',
           borderRadius: '30px', padding: '6px 14px',
           display: 'flex', alignItems: 'center', gap: '8px',
@@ -252,132 +195,95 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile, initialP
           boxShadow: '0 4px 20px rgba(0,0,0,0.4)'
         }}>
           <div style={{
-            width: '8px', height: '8px', borderRadius: '50%',
+            width: '7px', height: '7px', borderRadius: '50%',
             background: 'var(--accent-main)',
-            animation: 'pulse-dot 1.2s ease-in-out infinite'
+            animation: 'pulse-revalidate 1.4s ease-in-out infinite'
           }} />
-          Refreshing…
-          <style>{`@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }`}</style>
+          Updating…
+          <style>{`@keyframes pulse-revalidate{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.3;transform:scale(0.65)}}`}</style>
         </div>
       )}
-      <div style={{ 
-        display: 'block', 
-        marginTop: '40px' 
-      }}>
-        <div className="grid-main-area" style={{ width: '100%' }}>
-          
-          <div className="css-masonry-grid" style={{ marginTop: search ? '20px' : '0' }}>
-            {filteredPrompts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((p, index) => (
-              <div key={p.prompt_key || p.id} style={{ width: '100%' }}>
-                <PromptCard 
-                  prompt={p} 
-                  isUnlocked={!p.isPremium || activeUnlockedKey === (p.prompt_key || p.id)}
-                  onUnlock={() => setActiveUnlockedKey(p.prompt_key || p.id)}
-                  onLock={() => setActiveUnlockedKey(null)}
-                  searchTerm={search}
-                  isHighlighted={search && p.prompt_key && p.prompt_key.toLowerCase().includes(search.toLowerCase())}
-                  isPriority={isMobile ? index < 4 : index < 6}
-                  isMobile={isMobile}
-                />
-              </div>
-            ))}
+
+      {/* Prompt Grid */}
+      <div className="css-masonry-grid">
+        {pagedPrompts.map((p, index) => (
+          <div key={p.prompt_key || p.id}>
+            <PromptCard
+              prompt={p}
+              isUnlocked={!p.isPremium || activeUnlockedKey === (p.prompt_key || p.id)}
+              onUnlock={() => setActiveUnlockedKey(p.prompt_key || p.id)}
+              onLock={() => setActiveUnlockedKey(null)}
+              searchTerm={search}
+              isHighlighted={!!search && (p.prompt_key || '').toLowerCase().includes(search.toLowerCase())}
+              isPriority={index < (isMobile ? 4 : 8)}
+              isMobile={isMobile}
+            />
           </div>
-
-          {filteredPrompts.length > itemsPerPage && (() => {
-            const totalPages = Math.ceil(filteredPrompts.length / itemsPerPage);
-            return (
-            <div className="pagination-container" style={{ display: 'flex', justifyContent: 'center', marginTop: '30px', gap: '8px', alignItems: 'center' }}>
-              <button 
-                onClick={() => {
-                  setCurrentPage(p => Math.max(1, p - 1));
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                disabled={currentPage === 1}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: currentPage === 1 ? 'rgba(255,255,255,0.3)' : 'white',
-                  padding: isMobile ? '8px 12px' : '8px 16px',
-                  borderRadius: '12px',
-                  fontWeight: 600,
-                  cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                  fontSize: isMobile ? '0.8rem' : '0.9rem',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                Prev
-              </button>
-              
-              {Array.from({ length: totalPages }).map((_, idx) => {
-                const pageNum = idx + 1;
-                
-                if (
-                  pageNum === 1 || 
-                  pageNum === totalPages || 
-                  (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
-                ) {
-                  return (
-                    <button 
-                      key={pageNum}
-                      onClick={() => {
-                        setCurrentPage(pageNum);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      style={{
-                        background: currentPage === pageNum ? 'var(--accent-main)' : 'rgba(255, 255, 255, 0.05)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        color: 'white',
-                        padding: isMobile ? '8px 12px' : '8px 14px',
-                        borderRadius: '8px',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        boxShadow: currentPage === pageNum ? '0 0 15px rgba(229, 9, 20, 0.4)' : 'none',
-                        fontSize: isMobile ? '0.85rem' : '1rem'
-                      }}
-                    >
-                      {pageNum}
-                    </button>
-                  );
-                } else if (
-                  pageNum === currentPage - 2 || 
-                  pageNum === currentPage + 2
-                ) {
-                  return <span key={pageNum} style={{ color: 'rgba(255,255,255,0.5)', padding: '0 4px', fontSize: '0.9rem' }}>...</span>;
-                }
-                return null;
-              })}
-
-              <button 
-                onClick={() => {
-                  setCurrentPage(p => Math.min(totalPages, p + 1));
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                disabled={currentPage === totalPages}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: currentPage === totalPages ? 'rgba(255,255,255,0.3)' : 'white',
-                  padding: isMobile ? '8px 12px' : '8px 16px',
-                  borderRadius: '12px',
-                  fontWeight: 600,
-                  cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-                  fontSize: isMobile ? '0.8rem' : '0.9rem',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                Next
-              </button>
-            </div>
-            );
-          })()}
-
-
-
-          <MagicKingIntro isMobile={isMobile} />
-        </div>
+        ))}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '40px', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => goToPage(Math.max(1, currentPage - 1))}
+            disabled={currentPage === 1}
+            style={{
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: currentPage === 1 ? 'rgba(255,255,255,0.3)' : 'white',
+              padding: '8px 18px', borderRadius: '12px', fontWeight: 600,
+              cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+              fontSize: isMobile ? '0.8rem' : '0.9rem',
+            }}
+          >← Prev</button>
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter(n => n === 1 || n === totalPages || Math.abs(n - currentPage) <= 1)
+            .reduce((acc, n, i, arr) => {
+              if (i > 0 && n - arr[i - 1] > 1) acc.push('…');
+              acc.push(n);
+              return acc;
+            }, [])
+            .map((item, i) =>
+              item === '…' ? (
+                <span key={`dots-${i}`} style={{ color: 'rgba(255,255,255,0.4)', padding: '0 4px' }}>…</span>
+              ) : (
+                <button
+                  key={item}
+                  onClick={() => goToPage(item)}
+                  style={{
+                    background: currentPage === item ? 'var(--accent-main)' : 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: 'white',
+                    padding: '8px 14px', borderRadius: '10px', fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: currentPage === item ? '0 0 14px rgba(229,9,20,0.4)' : 'none',
+                    fontSize: isMobile ? '0.85rem' : '0.95rem',
+                    transition: 'all 0.2s ease',
+                  }}
+                >{item}</button>
+              )
+            )
+          }
+
+          <button
+            onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
+            disabled={currentPage === totalPages}
+            style={{
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: currentPage === totalPages ? 'rgba(255,255,255,0.3)' : 'white',
+              padding: '8px 18px', borderRadius: '12px', fontWeight: 600,
+              cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+              fontSize: isMobile ? '0.8rem' : '0.9rem',
+            }}
+          >Next →</button>
+        </div>
+      )}
+
+      {/* The Magic Ruler section */}
+      <MagicKingIntro isMobile={isMobile} />
     </div>
   );
 };
