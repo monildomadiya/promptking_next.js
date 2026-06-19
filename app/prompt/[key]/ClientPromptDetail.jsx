@@ -991,21 +991,23 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
             )}
 
             {/* Content Section: Description */}
-            <div className="detail-description-section" style={{
-              padding: '20px 0'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
-                <div style={{ width: '4px', height: '24px', background: 'var(--accent-main)', borderRadius: '2px' }} />
-                <h3 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0 }}>
-                  Logic & Instructions
-                </h3>
+            {prompt.description && prompt.description.replace(/<[^>]*>?/gm, '').trim() !== '' && (
+              <div className="detail-description-section" style={{
+                padding: '20px 0'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
+                  <div style={{ width: '4px', height: '24px', background: 'var(--accent-main)', borderRadius: '2px' }} />
+                  <h3 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0 }}>
+                    Logic & Instructions
+                  </h3>
+                </div>
+                <div 
+                  className="blog-content" 
+                  style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.9, fontSize: '1.1rem' }}
+                  dangerouslySetInnerHTML={{ __html: prompt.description }}
+                />
               </div>
-              <div 
-                className="blog-content" 
-                style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.9, fontSize: '1.1rem' }}
-                dangerouslySetInnerHTML={{ __html: prompt.description || '' }}
-              />
-            </div>
+            )}
 
             {/* NEW: Multi-Prompt / Listicle Section */}
             {(() => {
