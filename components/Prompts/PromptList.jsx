@@ -3,10 +3,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom';
 import PromptCard from './PromptCard';
 import MagicKingIntro from './MagicKingIntro';
-import SocialSidebar from './SocialSidebar';
-import CategorySidebar from './CategorySidebar';
 import Shimmer from '../Common/Shimmer';
-import CategoryBar from './CategoryBar';
 import api from '@/lib/api';
 import { Search, Crown, Grid, MessageSquare, Sparkles, Image, Zap, Filter, X } from '../Common/Icons';
 
@@ -231,9 +228,6 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile, initialP
               </div>
             ))}
           </div>
-          <div className="social-sidebar" style={{ width: '280px' }}>
-             <Shimmer height="500px" borderRadius="32px" />
-          </div>
         </div>
       </div>
     );
@@ -271,32 +265,6 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile, initialP
         flexDirection: 'column' 
       }}>
         <div className="grid-main-area" style={{ width: '100%' }}>
-          {isMobile && (
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '15px' }}>
-              <button 
-                onClick={() => setIsSidebarOpen(true)}
-                aria-label="Open filter menu"
-                className="glass-button-secondary"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  padding: '8px 16px',
-                  borderRadius: '20px',
-                  color: 'white',
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  backdropFilter: 'blur(10px)'
-                }}
-              >
-                <Filter size={16} /> 
-                <span style={{ fontWeight: 600 }}>Filter</span>
-              </button>
-            </div>
-          )}
-          
           
           <div className="css-masonry-grid" style={{ marginTop: search ? '20px' : '0' }}>
             {filteredPrompts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((p, index) => (
@@ -409,119 +377,6 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile, initialP
 
           <MagicKingIntro isMobile={isMobile} />
         </div>
-
-        {!isMobile && (
-          <aside className="sidebar-area" style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '30px', width: '300px', position: 'sticky', top: '100px', height: 'fit-content' }}>
-            <CategorySidebar 
-              filter={filter} 
-              setFilter={setFilter} 
-              counts={filterCounts}
-              categories={categories}
-            />
-            <SocialSidebar />
-          </aside>
-        )}
-
-        {isMobile && isSidebarOpen && typeof window !== 'undefined' && createPortal(
-          <div style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 10001,
-            background: 'rgba(0,0,0,0.6)',
-            backdropFilter: 'blur(8px)',
-            display: 'flex',
-            alignItems: 'flex-end',
-            animation: 'fadeIn 0.3s ease-out'
-          }} onClick={() => setIsSidebarOpen(false)}>
-            <div style={{
-              width: '100%',
-              maxHeight: '85vh',
-              overflowY: 'auto',
-              background: 'var(--surface-0)',
-              borderRadius: '32px 32px 0 0',
-              padding: '20px 24px 40px',
-              borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-              boxShadow: '0 -20px 60px rgba(0,0,0,0.9)',
-              animation: 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-              position: 'relative'
-            }} onClick={e => e.stopPropagation()}>
-              
-              {/* Close Button */}
-              <button 
-                onClick={() => setIsSidebarOpen(false)}
-                aria-label="Close categories"
-                style={{
-                  position: 'absolute',
-                  top: '20px',
-                  right: '24px',
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  zIndex: 100,
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-                }}
-              >
-                <X size={20} />
-              </button>
-              
-              {/* Drag Handle */}
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                marginBottom: '25px',
-                sticky: 'top',
-                paddingTop: '5px'
-              }}>
-                <div style={{ 
-                  width: '45px', 
-                  height: '5px', 
-                  background: 'rgba(255, 255, 255, 0.15)', 
-                  borderRadius: '10px' 
-                }} />
-              </div>
-
-              <div style={{ marginBottom: '10px' }}>
-                <h3 style={{ fontSize: '1.4rem', fontWeight: 900, color: 'white', marginBottom: '5px' }}>Controls</h3>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-dim)', marginBottom: '20px' }}>Configure your browsing experience.</p>
-              </div>
-
-              <CategorySidebar 
-                filter={filter} 
-                setFilter={(f) => {
-                  setFilter(f);
-                }} 
-                counts={filterCounts}
-                categories={categories}
-              />
-
-              <button 
-                onClick={() => setIsSidebarOpen(false)}
-                style={{
-                  width: '100%',
-                  padding: '18px',
-                  borderRadius: '16px',
-                  background: 'var(--accent-main)',
-                  border: 'none',
-                  color: 'white',
-                  fontWeight: 800,
-                  marginTop: '30px',
-                  fontSize: '1rem',
-                  boxShadow: '0 8px 25px var(--accent-glow)'
-                }}
-              >
-                APPLY SETTINGS
-              </button>
-            </div>
-          </div>,
-          document.body
-        )}
       </div>
     </div>
   );

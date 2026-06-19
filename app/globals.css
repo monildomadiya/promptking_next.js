@@ -1727,6 +1727,6 @@ body.shorts-modal-open {
   }
 }
   
-.css-masonry-grid { column-count: 3; column-gap: 20px; width: 100%; }  
+.css-masonry-grid { column-count: 4; column-gap: 20px; width: 100%; }  
 .css-masonry-grid > div { break-inside: avoid; margin-bottom: 25px; }  
-@media (max-width: 1100px) { .css-masonry-grid { column-count: 2; column-gap: 12px; } .css-masonry-grid > div { margin-bottom: 12px; } } 
+@media (max-width: 1100px) { .css-masonry-grid { column-count: 2; column-gap: 12px; } .css-masonry-grid > div { margin-bottom: 12px; } }
