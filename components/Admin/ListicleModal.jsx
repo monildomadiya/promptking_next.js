@@ -35,6 +35,7 @@ const ListicleModal = ({ prompt, onClose, onSave }) => {
     is_featured: false,
     publish_date: ''
   });
+  const [errors, setErrors] = useState({});
   const [originalKey, setOriginalKey] = useState(null);
   const [categories, setCategories] = useState([]);
   const [websiteCategories, setWebsiteCategories] = useState([]);
