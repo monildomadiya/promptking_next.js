@@ -15,6 +15,11 @@ export async function POST(req) {
       UPDATE prompts SET is_featured = ${is_featured ? 1 : 0} WHERE prompt_key = ${key}
     `;
 
+    try {
+      const { revalidatePath } = require('next/cache');
+      revalidatePath('/', 'layout');
+    } catch (e) {}
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('toggle_featured error:', error);

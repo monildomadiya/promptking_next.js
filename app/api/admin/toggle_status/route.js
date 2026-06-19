@@ -4,6 +4,8 @@ import db from '@/lib/db';
 import { getSession } from '@/lib/session';
 import { cacheInvalidate } from '@/lib/cache';
 
+import { revalidatePath } from 'next/cache';
+
 export async function POST(req) {
   const session = await getSession();
   if (!session?.isAdmin) return NextResponse.json({ error: 'Admin access required' }, { status: 401 });
@@ -29,6 +31,9 @@ export async function POST(req) {
     }
 
     cacheInvalidate('all_prompts_listing');
+    try {
+      revalidatePath('/', 'layout');
+    } catch (e) {}
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('toggle_status error:', error);

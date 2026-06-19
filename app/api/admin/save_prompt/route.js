@@ -138,6 +138,10 @@ export async function POST(req) {
 
     // Invalidate the server-side cache so the live site reflects changes immediately
     cacheInvalidate('all_prompts_listing');
+    try {
+      const { revalidatePath } = require('next/cache');
+      revalidatePath('/', 'layout');
+    } catch (e) {}
 
     return NextResponse.json({ status: "success" });
   } catch (error) {

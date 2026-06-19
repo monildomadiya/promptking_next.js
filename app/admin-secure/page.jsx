@@ -1821,7 +1821,7 @@ const AdminDashboard = () => {
                               <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
                                 {view === 'prompts' && (
                                   <span
-                                    onClick={() => handleToggleStatus(item, 'is_premium')}
+                                    onClick={(e) => { e.stopPropagation(); handleToggleStatus(item, 'is_premium'); }}
                                     title="Click to toggle PRO / FREE"
                                     style={{
                                       padding: '4px 8px',
@@ -1835,7 +1835,7 @@ const AdminDashboard = () => {
                                 )}
                                 {view === 'prompts' && (
                                   <span
-                                    onClick={() => handleToggleStatus(item, 'is_draft')}
+                                    onClick={(e) => { e.stopPropagation(); handleToggleStatus(item, 'is_draft'); }}
                                     title="Click to toggle Draft / Published"
                                     style={{
                                       padding: '4px 8px',
@@ -1849,7 +1849,7 @@ const AdminDashboard = () => {
                                 )}
                                 {view === 'prompts' && (
                                   <span
-                                    onClick={() => handleToggleStatus(item, 'hide_prompt_box')}
+                                    onClick={(e) => { e.stopPropagation(); handleToggleStatus(item, 'hide_prompt_box'); }}
                                     title="Click to toggle Hidden / Visible"
                                     style={{
                                       padding: '4px 8px',
