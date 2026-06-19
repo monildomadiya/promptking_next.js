@@ -6,11 +6,11 @@ export async function POST(req) {
     const { key } = await req.json();
     if (!key) return NextResponse.json({ error: 'Key is required' }, { status: 400 });
 
-    // Update prompt view counter
+    // Update prompt view counter (match by prompt_key OR slug)
     const result = await db`
       UPDATE prompts 
       SET view_count = COALESCE(view_count, 0) + 1 
-      WHERE prompt_key = ${key}
+      WHERE prompt_key = ${key} OR slug = ${key}
     `;
 
     // Try to insert into analytics_events (non-critical)

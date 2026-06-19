@@ -49,7 +49,7 @@ export async function GET(req) {
 
     // If analytics_events has no data OR table doesn't exist, fall back to prompts table totals
     if (!usedEventsTable || rows.length === 0) {
-      // Generate a single synthetic "today" summary from prompts table totals
+      // Get all-time totals from prompts
       const [totals] = await db`
         SELECT 
           COALESCE(SUM(view_count), 0)   AS total_views,
@@ -58,24 +58,32 @@ export async function GET(req) {
         FROM prompts
       `;
 
-      // Build a rolling 7-day or 30-day synthetic chart using created_at from prompts
-      const days = daysParam === 'all' ? 365 : (Math.max(1, parseInt(daysParam) || 30));
+      // Build a synthetic daily chart from prompts table aggregates (no date filter so we always get data)
       const dailyRows = await db`
         SELECT 
           DATE(created_at) as date,
-          COUNT(*) as new_prompts,
           COALESCE(SUM(view_count), 0)   as view,
           COALESCE(SUM(copy_count), 0)   as copy,
           COALESCE(SUM(unlock_count), 0) as unlock
         FROM prompts
-        WHERE created_at >= SUBDATE(CURDATE(), ${days})
         GROUP BY DATE(created_at)
         ORDER BY DATE(created_at) ASC
       `;
 
       if (dailyRows.length > 0) {
-        const formattedFallback = dailyRows.map(row => ({
-          date: new Date(row.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        // Apply day filter client-side to avoid parameterized INTERVAL issues
+        const days = daysParam === 'all' ? Infinity : (Math.max(1, parseInt(daysParam) || 30));
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - days);
+
+        const filtered = daysParam === 'all'
+          ? dailyRows
+          : dailyRows.filter(row => new Date(row.date) >= cutoff);
+
+        const source = filtered.length > 0 ? filtered : dailyRows.slice(-7);
+
+        const formattedFallback = source.map(row => ({
+          date:   new Date(row.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
           view:   Number(row.view)   || 0,
           copy:   Number(row.copy)   || 0,
           unlock: Number(row.unlock) || 0,

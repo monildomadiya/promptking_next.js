@@ -1112,11 +1112,12 @@ const AdminDashboard = () => {
   }, [analyticsDays, isAdmin]);
 
   const handleResetAnalytics = async () => {
-    if (!window.confirm("CRITICAL WARNING: This will permanently wipe all interaction history (copies, unlocks, likes) from the system. Are you absolutely sure?")) return;
+    if (!window.confirm("CRITICAL WARNING: This will permanently reset all interaction counts (views, copies, unlocks) to zero. Are you absolutely sure?")) return;
     try {
       await api.post('/admin/analytics/reset');
       fetchData('prompts');
       fetchAnalytics(analyticsDays);
+      fetchDashboardStats();
       toast.success("Analytics data has been completely reset.");
     } catch (error) {
       console.error(error);
