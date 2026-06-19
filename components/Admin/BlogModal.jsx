@@ -37,6 +37,7 @@ const BlogModal = ({ blog, onClose, onSave }) => {
     read_time: ''
   });
 
+  const [errors, setErrors] = useState({});
   const [tagsInput, setTagsInput] = useState('');
   const [authorsList, setAuthorsList] = useState([]);
 
