@@ -379,8 +379,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
       </div>
 
       {/* Prompt Area */}
-      {!(prompt.hidePromptBox || prompt.hide_prompt_box) && (
-        <div style={{ transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }}>
+      <div style={{ transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }}>
           <div id={`box-${prompt.key}`} className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isSnapping ? 'thanos-snap' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse' : ''} ${isRelocking ? 'vault-relock-animate' : ''}`} style={{
               background: 'rgba(15, 15, 20, 0.4)', 
               backdropFilter: 'blur(20px)',
@@ -551,164 +550,19 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
                         onMouseOver={(e) => { if (!isMobile) e.currentTarget.style.color = 'white'; }}
                         onMouseOut={(e) => { if (!isMobile) e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
                       >
-              </div>
-              
-              {/* Overlay for Locked State */}
-              {!isUnlocked && (
-                <div style={{
-                  position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  background: 'linear-gradient(to bottom, rgba(15,15,20,0.1), rgba(15,15,20,0.95))',
-                  zIndex: 2, padding: '20px'
-                }}>
-                  <motion.button 
-                    whileHover={{ scale: 1.05, boxShadow: '0 10px 25px rgba(229, 9, 20, 0.4)' }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={prompt.isPremium ? () => setIsPinModalOpen(true) : handleCopy}
-                    className="premium-unlock-btn"
-                    style={{
-                      background: prompt.isPremium ? 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)' : 'var(--accent-gradient)',
-                      border: 'none', borderRadius: '30px', padding: '12px 28px', color: prompt.isPremium ? '#000' : 'white',
-                      fontWeight: 800, fontSize: '0.9rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
-                      boxShadow: prompt.isPremium ? '0 8px 20px rgba(255, 215, 0, 0.3)' : '0 8px 20px rgba(229, 9, 20, 0.3)',
-                      textTransform: 'uppercase', letterSpacing: '1px'
-                    }}
-                  >
-                    {prompt.isPremium ? (
-                      <><Lock size={16} strokeWidth={2.5} /> Unlock Premium</>
-                    ) : (
-                      <><Unlock size={16} strokeWidth={2.5} /> Reveal & Copy</>
+                        {prompt.igLink.includes('instagram') ? (
+                          <Instagram size={16} color="currentColor" />
+                        ) : (
+                          <Youtube size={16} color="currentColor" />
+                        )}
+                        Get PIN from {prompt.igLink.includes('instagram') ? 'Reel' : 'Short'}
+                      </button>
                     )}
-                  </motion.button>
-                  {prompt.isPremium && (
-                    <div style={{ marginTop: '12px', fontSize: '0.75rem', color: 'var(--text-dim)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Lock size={12} /> Requires PIN
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Interaction Bar for Unlocked Free Prompt */}
-              {isUnlocked && !prompt.isPremium && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: '12px 18px', background: isCopied ? 'rgba(39, 201, 63, 0.1)' : 'rgba(255,255,255,0.02)',
-                    borderTop: '1px solid rgba(255,255,255,0.04)'
-                  }}
-                >
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Info size={14} /> Ready to use
-                  </div>
-                  <motion.button 
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleCopy} 
-                    style={{
-                      background: isCopied ? '#27C93F' : 'rgba(255,255,255,0.1)',
-                      color: isCopied ? '#000' : 'white', border: 'none', borderRadius: '8px', padding: '8px 16px',
-                      fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
-                      transition: 'all 0.3s ease'
-                    }}
-                  >
-                    {isCopied ? <Check size={14} strokeWidth={3} /> : <Copy size={14} />}
-                    {isCopied ? 'COPIED!' : 'COPY AGAIN'}
-                  </motion.button>
-                </motion.div>
-              )}
-            </div>
-        </div>
-
-        {/* Premium Unlocked Features */}
-        <AnimatePresence>
-          {isUnlocked && prompt.isPremium && (
-            <motion.div
-              initial={{ opacity: 0, y: -20, height: 0 }}
-              animate={{ opacity: 1, y: 0, height: 'auto' }}
-              exit={{ opacity: 0, y: -20, height: 0 }}
-              transition={{ duration: 0.5, cubicBezier: [0.4, 0, 0.2, 1] }}
-              style={{ overflow: 'hidden' }}
-            >
-              <div style={{ 
-                background: 'rgba(255, 215, 0, 0.03)', 
-                border: '1px solid rgba(255, 215, 0, 0.1)',
-                borderTop: 'none',
-                borderRadius: '0 0 20px 20px', 
-                padding: '20px',
-                marginTop: '-10px',
-                position: 'relative',
-                zIndex: 1
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Shield size={16} color="#FFD700" />
-                    <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#FFD700', letterSpacing: '0.5px' }}>VAULT UNLOCKED</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <motion.button 
-                      whileHover={{ scale: 1.05, background: 'rgba(255,255,255,0.15)' }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={handleCopy} 
-                      style={{
-                        background: isCopied ? '#27C93F' : 'rgba(255,255,255,0.1)',
-                        color: isCopied ? '#000' : 'white', border: 'none', borderRadius: '10px', padding: '10px 16px',
-                        fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
-                        transition: 'all 0.3s ease'
-                      }}
-                    >
-                      {isCopied ? <Check size={16} strokeWidth={3} /> : <Copy size={16} />}
-                      {isCopied ? 'COPIED!' : 'COPY'}
-                    </motion.button>
-                    <motion.button 
-                      whileHover={{ scale: 1.05, background: 'rgba(229, 9, 20, 0.15)' }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={handleRelock} 
-                      title="Relock Prompt"
-                      style={{
-                        background: 'rgba(229, 9, 20, 0.1)', color: 'var(--accent-main)', border: '1px solid rgba(229, 9, 20, 0.2)', 
-                        borderRadius: '10px', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                        cursor: 'pointer', transition: 'all 0.3s ease'
-                      }}
-                    >
-                      <Lock size={16} />
-                    </motion.button>
-                  </div>
-                </div>
-
-                {prompt.subPrompts && prompt.subPrompts.length > 0 && (
-                  <div>
-                    <h4 style={{ fontSize: '0.8rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>Bonus Variations</h4>
-                    <div style={{ display: 'grid', gap: '10px' }}>
-                      {prompt.subPrompts.map((sub, idx) => (
-                        <div key={idx} style={{ 
-                          background: 'rgba(0,0,0,0.3)', borderRadius: '12px', padding: '12px 15px',
-                          border: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-                        }}>
-                          <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{sub.title || `Variation ${idx + 1}`}</div>
-                          <button 
-                            onClick={(e) => {
-                              e.preventDefault();
-                              navigator.clipboard.writeText(sub.prompt_text);
-                              toast.success(`Copied ${sub.title || `Variation ${idx + 1}`}`);
-                            }}
-                            className="glass-button-secondary"
-                            style={{ padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', display: 'flex', gap: '4px', alignItems: 'center' }}
-                          >
-                            <Copy size={12} /> COPY
-                          </button>
-                        </div>
-                      ))}
-                    </div>
                   </div>
                 )}
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+              
+            </div>
             
             <YouTubeModal 
               isOpen={showVideoModal} 
@@ -716,7 +570,6 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
               videoUrl={prompt.igLink} 
             />
           </div>
-        )}
 
     </div>
   );
