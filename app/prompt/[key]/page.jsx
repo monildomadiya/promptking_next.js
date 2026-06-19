@@ -36,7 +36,6 @@ export default async function PromptPage({ params }) {
         igLink: p.ig_link || p.igLink,
         metaTitle: p.meta_title || p.metaTitle,
         copyCount: p.copy_count || p.copy_count,
-        likeCount: p.like_count || p.like_count,
         viewCount: p.view_count || p.view_count
       };
 

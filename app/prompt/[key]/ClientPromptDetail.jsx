@@ -34,22 +34,6 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
   const [suggestedPrompts, setSuggestedPrompts] = useState(initialSuggestedPrompts || []);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(null);
-  const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
-
-  const handleLike = async (e) => {
-    e.preventDefault();
-    if (isLiked) return;
-    setIsLiked(true);
-    setLikeCount(prev => prev + 1);
-    try {
-      await api.post('/record_like', { key });
-    } catch (err) {
-      console.error("Failed to record like:", err);
-      setIsLiked(false);
-      setLikeCount(prev => prev - 1);
-    }
-  };
 
   // Keyboard navigation for lightbox
   useEffect(() => {
@@ -114,7 +98,6 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
       
       setCache(cacheKey, formattedPrompt);
       setPrompt(formattedPrompt);
-      setLikeCount(formattedPrompt.likeCount || 0);
       
       if (!(formattedPrompt.is_premium || formattedPrompt.isPremium)) {
         setIsUnlocked(true);
@@ -528,12 +511,6 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                 <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center' }}>
                   <Eye size={14} style={{ marginRight: '5px' }} />
                   {prompt.viewCount || 0} Views
-                </span>
-                <span onClick={handleLike} style={{ color: isLiked ? '#ec4899' : 'rgba(255,255,255,0.4)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', transition: 'color 0.2s' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill={isLiked ? "#ec4899" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '5px' }}>
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                  </svg>
-                  {likeCount} Likes
                 </span>
               </div>
               <h1 className="prompt-detail-title" style={{ 

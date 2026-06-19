@@ -1,38 +1,26 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 
-// Ensure the analytics_events table exists before writing
-async function ensureAnalyticsTable() {
-  try {
-    await db`
-      CREATE TABLE IF NOT EXISTS analytics_events (
-        id          BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        event_type  VARCHAR(20)  NOT NULL,
-        item_key    VARCHAR(255) NOT NULL,
-        created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        INDEX idx_event_type (event_type),
-        INDEX idx_created_at (created_at)
-      )
-    `;
-  } catch (e) {
-    // Ignore — table may already exist or DB may not support DDL
-  }
-}
-
 export async function POST(req) {
   try {
     const { key } = await req.json();
     if (!key) return NextResponse.json({ error: 'Key is required' }, { status: 400 });
 
-    // Update prompt counter
-    await db`UPDATE prompts SET view_count = COALESCE(view_count, 0) + 1 WHERE prompt_key = ${key}`;
+    // Update prompt view counter
+    const result = await db`
+      UPDATE prompts 
+      SET view_count = COALESCE(view_count, 0) + 1 
+      WHERE prompt_key = ${key}
+    `;
 
-    // Insert analytics event (create table first if needed)
+    // Try to insert into analytics_events (non-critical)
     try {
-      await ensureAnalyticsTable();
-      await db`INSERT INTO analytics_events (event_type, item_key) VALUES ('view', ${key})`;
+      await db`
+        INSERT INTO analytics_events (event_type, item_key, created_at) 
+        VALUES ('view', ${key}, NOW())
+      `;
     } catch (e) {
-      // Non-critical — counter update above is the source of truth
+      // analytics_events table may not exist — that's ok, view_count is the source of truth
     }
 
     return NextResponse.json({ success: true });
