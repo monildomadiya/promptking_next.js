@@ -22,6 +22,13 @@ export default async function PromptPage({ params }) {
       notFound();
     }
 
+    // Block public access to draft prompts
+    const isDraft = promptRows[0]?.is_draft;
+    const draftValue = Buffer.isBuffer(isDraft) ? isDraft[0] === 1 : isDraft == 1;
+    if (draftValue) {
+      notFound();
+    }
+
     if (promptRows.length > 0) {
       const p = promptRows[0];
       initialPrompt = {

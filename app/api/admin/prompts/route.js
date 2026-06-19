@@ -4,6 +4,13 @@ import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getSession } from '@/lib/session';
 
+// Handles MariaDB tinyint(1) which can come back as Buffer, number, boolean, or string
+const parseDbBool = (val) => {
+  if (val === null || val === undefined) return false;
+  if (Buffer.isBuffer(val)) return val[0] === 1;
+  return val == 1 || val === true || val === 'true';
+};
+
 export async function GET(req) {
   const session = await getSession();
   if (!session?.isAdmin) return NextResponse.json({ error: "Admin access required" }, { status: 401 });
@@ -21,18 +28,19 @@ export async function GET(req) {
     }
     const formatted = rows.map(r => ({
       ...r,
-      copy_count: Number(r.copy_count || 0),
-      unlock_count: Number(r.unlock_count || 0),
-      like_count: Number(r.like_count || 0),
-      view_count: Number(r.view_count || 0),
+      copy_count:       Number(r.copy_count || 0),
+      unlock_count:     Number(r.unlock_count || 0),
+      like_count:       Number(r.like_count || 0),
+      view_count:       Number(r.view_count || 0),
       correct_attempts: Number(r.correct_attempts || 0),
-      wrong_attempts: Number(r.wrong_attempts || 0),
-      is_featured: r.is_featured == 1 || r.is_featured === true || r.is_featured === 'true',
-      is_premium: r.is_premium == 1 || r.is_premium === true || r.is_premium === 'true',
-      hide_prompt_box: r.hide_prompt_box == 1 || r.hide_prompt_box === true || r.hide_prompt_box === 'true',
-      is_draft: r.is_draft == 1 || r.is_draft === true || r.is_draft === 'true',
-      publish_date: r.publish_date,
-      metaTitle: r.meta_title
+      wrong_attempts:   Number(r.wrong_attempts || 0),
+      // Use parseDbBool to correctly handle MariaDB Buffer tinyint(1) values
+      is_featured:      parseDbBool(r.is_featured),
+      is_premium:       parseDbBool(r.is_premium),
+      hide_prompt_box:  parseDbBool(r.hide_prompt_box),
+      is_draft:         parseDbBool(r.is_draft),
+      publish_date:     r.publish_date,
+      metaTitle:        r.meta_title
     }));
     return NextResponse.json(formatted);
   } catch (error) {
