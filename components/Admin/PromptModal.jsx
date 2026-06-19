@@ -32,9 +32,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     image_ratio: '4 / 5',
     is_image_slider: false,
     gallery_urls: '[]',
-    hide_prompt_box: false,
     is_featured: false,
-    is_draft: false,
     publish_date: ''
   });
   const [originalKey, setOriginalKey] = useState(null);
@@ -111,9 +109,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
         sub_prompts: parsedSubPrompts,
         is_image_slider: Boolean(prompt.is_image_slider),
         is_premium: prompt.is_premium == 1 || prompt.is_premium === true || prompt.is_premium === 'true' || prompt.isPremium == 1 || prompt.isPremium === true || prompt.isPremium === 'true',
-        hide_prompt_box: prompt.hide_prompt_box == 1 || prompt.hide_prompt_box === true || prompt.hide_prompt_box === 'true' || prompt.hidePromptBox == 1 || prompt.hidePromptBox === true || prompt.hidePromptBox === 'true',
         is_featured: prompt.is_featured == 1 || prompt.is_featured === true || prompt.is_featured === 'true' || prompt.isFeatured == 1 || prompt.isFeatured === true || prompt.isFeatured === 'true',
-        is_draft: prompt.is_draft == 1 || prompt.is_draft === true || prompt.is_draft === 'true',
         publish_date: prompt.publish_date ? new Date(new Date(prompt.publish_date).getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0,16) : '',
         description: prompt.description || '',
         meta_title: prompt.meta_title || prompt.metaTitle || '',
@@ -494,9 +490,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                   <div style={{ display: 'flex', gap: '30px', marginTop: '15px', flexWrap: 'wrap' }}>
                     <Checkbox label="Enable Contrast Slider" checked={formData.is_image_slider} onChange={(val) => setFormData({...formData, is_image_slider: val})} />
                     <Checkbox label="Premium Content" premium checked={formData.is_premium} onChange={(val) => setFormData({...formData, is_premium: val, password: val ? formData.password : ''})} />
-                    <Checkbox label="Hide Prompt from Users" checked={formData.hide_prompt_box} onChange={(val) => setFormData({...formData, hide_prompt_box: val})} />
                     <Checkbox label="Feature Prompt" checked={formData.is_featured} onChange={(val) => setFormData({...formData, is_featured: val})} />
-                    <Checkbox label="Save as Draft" checked={formData.is_draft} onChange={(val) => setFormData({...formData, is_draft: val})} />
                   </div>
                 </div>
 

@@ -15,19 +15,15 @@ export async function POST(req) {
     if (!key || !field) return NextResponse.json({ error: 'Key and field are required' }, { status: 400 });
 
     // Only allow safe fields to be toggled
-    const allowedFields = ['is_premium', 'is_draft', 'is_featured', 'hide_prompt_box'];
+    const allowedFields = ['is_premium', 'is_featured'];
     if (!allowedFields.includes(field)) {
       return NextResponse.json({ error: 'Field not allowed' }, { status: 400 });
     }
 
     if (field === 'is_premium') {
       await db`UPDATE prompts SET is_premium = ${value ? 1 : 0} WHERE prompt_key = ${key}`;
-    } else if (field === 'is_draft') {
-      await db`UPDATE prompts SET is_draft = ${value ? 1 : 0} WHERE prompt_key = ${key}`;
     } else if (field === 'is_featured') {
       await db`UPDATE prompts SET is_featured = ${value ? 1 : 0} WHERE prompt_key = ${key}`;
-    } else if (field === 'hide_prompt_box') {
-      await db`UPDATE prompts SET hide_prompt_box = ${value ? 1 : 0} WHERE prompt_key = ${key}`;
     }
 
     cacheInvalidate('all_prompts_listing');

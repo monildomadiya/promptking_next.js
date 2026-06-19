@@ -409,8 +409,6 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '4px' }}>{item.prompt_key}</div>
-              {item.hide_prompt_box && <span style={{ fontSize: '0.65rem', color: '#fbbf24', border: '1px solid #fbbf24', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px' }}>HIDDEN</span>}
-              {item.is_draft && <span style={{ fontSize: '0.65rem', color: '#9ca3af', border: '1px solid #9ca3af', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px', marginLeft: '4px' }}>DRAFT</span>}
               {item.publish_date && new Date(item.publish_date) > new Date() && <span style={{ fontSize: '0.65rem', color: '#3b82f6', border: '1px solid #3b82f6', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px', marginLeft: '4px' }}>SCHEDULED</span>}
               {item.is_featured && <span style={{ fontSize: '0.65rem', color: '#fff', background: 'rgba(229, 9, 20, 0.8)', border: '1px solid rgba(229, 9, 20, 1)', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px', fontWeight: 'bold' }}>FEATURED</span>}
             </div>
@@ -1268,10 +1266,7 @@ const AdminDashboard = () => {
   const filteredData = Array.isArray(data) ? data.filter(item => {
     let match = true;
     if (view === 'prompts') {
-      if (filterStatus === 'published') match = !item.is_draft && !(item.publish_date && new Date(item.publish_date) > new Date()) && !item.hide_prompt_box;
-      else if (filterStatus === 'draft') match = !!item.is_draft;
-      else if (filterStatus === 'scheduled') match = item.publish_date && new Date(item.publish_date) > new Date();
-      else if (filterStatus === 'hidden') match = !!item.hide_prompt_box;
+      if (filterStatus === 'published') match = !(item.publish_date && new Date(item.publish_date) > new Date());
 
       if (match && filterAccess !== 'all') {
         if (filterAccess === 'pro') match = !!item.is_premium;
@@ -1520,8 +1515,6 @@ const AdminDashboard = () => {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
               {selectedKeys.length > 0 && (view === 'prompts' || view === 'listicles') && (
                 <>
-                  <ActionButton label={`HIDE (${selectedKeys.length})`} color="#fbbf24" icon={<Layers size={18} />} onClick={() => handleBulkVisibility(true)} />
-                  <ActionButton label={`SHOW (${selectedKeys.length})`} color="#10a37f" icon={<Layers size={18} />} onClick={() => handleBulkVisibility(false)} />
                   <ActionButton label={`DELETE (${selectedKeys.length})`} color="var(--accent-main)" icon={<Trash size={18} />} onClick={handleBulkDelete} />
                 </>
               )}
@@ -1807,8 +1800,6 @@ const AdminDashboard = () => {
                               <div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                   <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '4px' }}>{item.prompt_key || item.title || item.name}</div>
-                                  {item.hide_prompt_box && <span style={{ fontSize: '0.65rem', color: '#fbbf24', border: '1px solid #fbbf24', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px' }}>HIDDEN</span>}
-              {item.is_draft && <span style={{ fontSize: '0.65rem', color: '#9ca3af', border: '1px solid #9ca3af', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px', marginLeft: '4px' }}>DRAFT</span>}
               {item.publish_date && new Date(item.publish_date) > new Date() && <span style={{ fontSize: '0.65rem', color: '#3b82f6', border: '1px solid #3b82f6', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px', marginLeft: '4px' }}>SCHEDULED</span>}
                                   {view === 'prompts' && item.is_featured && <span style={{ fontSize: '0.65rem', color: '#fff', background: 'rgba(229, 9, 20, 0.8)', border: '1px solid rgba(229, 9, 20, 1)', padding: '2px 6px', borderRadius: '4px', marginBottom: '4px', fontWeight: 'bold' }}>FEATURED</span>}
                                 </div>
@@ -1832,34 +1823,6 @@ const AdminDashboard = () => {
                                       cursor: 'pointer', userSelect: 'none', transition: 'all 0.2s'
                                     }}
                                   >{item.is_premium ? 'PRO' : 'FREE'}</span>
-                                )}
-                                {view === 'prompts' && (
-                                  <span
-                                    onClick={(e) => { e.stopPropagation(); handleToggleStatus(item, 'is_draft'); }}
-                                    title="Click to toggle Draft / Published"
-                                    style={{
-                                      padding: '4px 8px',
-                                      background: item.is_draft ? 'rgba(156,163,175,0.15)' : 'rgba(16,185,129,0.12)',
-                                      color: item.is_draft ? '#9ca3af' : '#10b981',
-                                      border: item.is_draft ? '1px solid rgba(156,163,175,0.3)' : '1px solid rgba(16,185,129,0.3)',
-                                      borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700,
-                                      cursor: 'pointer', userSelect: 'none', transition: 'all 0.2s'
-                                    }}
-                                  >{item.is_draft ? 'DRAFT' : 'PUB'}</span>
-                                )}
-                                {view === 'prompts' && (
-                                  <span
-                                    onClick={(e) => { e.stopPropagation(); handleToggleStatus(item, 'hide_prompt_box'); }}
-                                    title="Click to toggle Hidden / Visible"
-                                    style={{
-                                      padding: '4px 8px',
-                                      background: item.hide_prompt_box ? 'rgba(251,191,36,0.12)' : 'rgba(255,255,255,0.03)',
-                                      color: item.hide_prompt_box ? '#fbbf24' : 'rgba(255,255,255,0.2)',
-                                      border: item.hide_prompt_box ? '1px solid rgba(251,191,36,0.3)' : '1px solid rgba(255,255,255,0.06)',
-                                      borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700,
-                                      cursor: 'pointer', userSelect: 'none', transition: 'all 0.2s'
-                                    }}
-                                  >{item.hide_prompt_box ? 'HIDDEN' : 'SHOWN'}</span>
                                 )}
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Opened (Views)">
                                   <Eye size={12} /> {item.view_count || 0}

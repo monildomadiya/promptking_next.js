@@ -13,25 +13,18 @@ export async function GET(req, { params }) {
     if (rows.length === 0) return NextResponse.json({ error: "Prompt not found" }, { status: 404 });
 
     const row = rows[0];
+    
     const parseDbBool = (val) => {
       if (val === null || val === undefined) return false;
       if (Buffer.isBuffer(val)) return val[0] === 1;
       return val == 1 || val === true || val === 'true';
     };
 
-    const isDraft = parseDbBool(row.is_draft);
-    if (isDraft) {
-      const { getSession } = require('@/lib/session');
-      const session = await getSession();
-      if (!session?.isAdmin) {
-        return NextResponse.json({ error: "Prompt not found" }, { status: 404 });
-      }
-    }
+
 
     const prompt = {
       ...row,
       isImageSlider: parseDbBool(row.is_image_slider),
-      hidePromptBox: parseDbBool(row.hide_prompt_box),
       copyCount: Number(row.copy_count),
       unlockCount: Number(row.unlock_count),
       likeCount: Number(row.like_count),

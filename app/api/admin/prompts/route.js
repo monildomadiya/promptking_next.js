@@ -37,8 +37,6 @@ export async function GET(req) {
       // Use parseDbBool to correctly handle MariaDB Buffer tinyint(1) values
       is_featured:      parseDbBool(r.is_featured),
       is_premium:       parseDbBool(r.is_premium),
-      hide_prompt_box:  parseDbBool(r.hide_prompt_box),
-      is_draft:         parseDbBool(r.is_draft),
       publish_date:     r.publish_date,
       metaTitle:        r.meta_title
     }));
