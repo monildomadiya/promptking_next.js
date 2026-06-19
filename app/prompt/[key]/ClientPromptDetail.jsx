@@ -66,6 +66,17 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
     }
   }, [key, initialPrompt, initialSuggestedPrompts]);
 
+  // Always record a view on mount — even when initialPrompt is provided via SSR.
+  // Previously this was only called inside fetchPrompt(), which was skipped for SSR pages.
+  useEffect(() => {
+    const promptKey = initialPrompt?.prompt_key || initialPrompt?.key || key;
+    if (promptKey) {
+      api.post('/record_view', { key: promptKey }).catch(err => {
+        console.error('Failed to record view:', err);
+      });
+    }
+  }, [key]);
+
   const fetchPrompt = async () => {
     const cacheKey = `pk_prompt_${key}`;
     const cachedData = getCache(cacheKey);
@@ -102,11 +113,6 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
       if (!(formattedPrompt.is_premium || formattedPrompt.isPremium)) {
         setIsUnlocked(true);
       }
-      
-      // Track page view once the prompt is loaded
-      api.post('/record_view', { key: formattedPrompt.key }).catch(err => {
-        console.error("Failed to record view:", err);
-      });
       
       setLoading(false);
     } catch (err) {
