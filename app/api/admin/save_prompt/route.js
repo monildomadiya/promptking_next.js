@@ -21,9 +21,9 @@ const generateUniqueSlug = async (title, currentId = null, table = 'prompts', id
 
   while (exists) {
     const rows = await db`
-      SELECT ${db.db ? db.db(idColumn) : db(idColumn)} 
-      FROM ${db.db ? db.db(table) : db(table)} 
-      WHERE slug = ${uniqueSlug} AND ${db.db ? db.db(idColumn) : db(idColumn)} != ${currentId || (idColumn === 'id' ? 0 : '')}
+      SELECT ${db(idColumn)} 
+      FROM ${db(table)} 
+      WHERE slug = ${uniqueSlug} AND ${db(idColumn)} != ${currentId || (idColumn === 'id' ? 0 : '')}
     `;
     if (rows.length === 0) {
       exists = false;
