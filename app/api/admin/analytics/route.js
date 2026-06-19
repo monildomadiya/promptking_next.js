@@ -12,6 +12,7 @@ export async function GET(req) {
     const daysParam = url.searchParams.get('days') || '30';
 
     // Try analytics_events table first (event-level granular data)
+    // Note: 'view', 'copy', 'unlock' are reserved in MariaDB — backtick-quote them
     let rows = [];
     let usedEventsTable = false;
 
@@ -19,10 +20,10 @@ export async function GET(req) {
       if (daysParam === 'all') {
         rows = await db`
           SELECT 
-            DATE(created_at) as date,
-            SUM(CASE WHEN event_type = 'view'   THEN 1 ELSE 0 END) as view,
-            SUM(CASE WHEN event_type = 'copy'   THEN 1 ELSE 0 END) as copy,
-            SUM(CASE WHEN event_type = 'unlock' THEN 1 ELSE 0 END) as unlock
+            DATE(created_at) AS \`date\`,
+            SUM(CASE WHEN event_type = 'view'   THEN 1 ELSE 0 END) AS \`view\`,
+            SUM(CASE WHEN event_type = 'copy'   THEN 1 ELSE 0 END) AS \`copy\`,
+            SUM(CASE WHEN event_type = 'unlock' THEN 1 ELSE 0 END) AS \`unlock\`
           FROM analytics_events
           GROUP BY DATE(created_at)
           ORDER BY DATE(created_at) ASC
@@ -31,10 +32,10 @@ export async function GET(req) {
         const days = Math.max(1, parseInt(daysParam) || 30);
         rows = await db`
           SELECT 
-            DATE(created_at) as date,
-            SUM(CASE WHEN event_type = 'view'   THEN 1 ELSE 0 END) as view,
-            SUM(CASE WHEN event_type = 'copy'   THEN 1 ELSE 0 END) as copy,
-            SUM(CASE WHEN event_type = 'unlock' THEN 1 ELSE 0 END) as unlock
+            DATE(created_at) AS \`date\`,
+            SUM(CASE WHEN event_type = 'view'   THEN 1 ELSE 0 END) AS \`view\`,
+            SUM(CASE WHEN event_type = 'copy'   THEN 1 ELSE 0 END) AS \`copy\`,
+            SUM(CASE WHEN event_type = 'unlock' THEN 1 ELSE 0 END) AS \`unlock\`
           FROM analytics_events
           WHERE created_at >= SUBDATE(CURDATE(), ${days})
           GROUP BY DATE(created_at)
@@ -47,7 +48,7 @@ export async function GET(req) {
       console.warn('analytics_events table not available, using prompts table fallback:', e.message);
     }
 
-    // If analytics_events has no data OR table doesn't exist, fall back to prompts table totals
+    // If analytics_events has no data OR table doesn't exist, fall back to prompts table
     if (!usedEventsTable || rows.length === 0) {
       // Get all-time totals from prompts
       const [totals] = await db`
@@ -58,21 +59,22 @@ export async function GET(req) {
         FROM prompts
       `;
 
-      // Build a synthetic daily chart from prompts table aggregates (no date filter so we always get data)
+      // Build synthetic daily chart — no date filter, always returns data
+      // Backtick-quote reserved-word aliases for MariaDB compatibility
       const dailyRows = await db`
         SELECT 
-          DATE(created_at) as date,
-          COALESCE(SUM(view_count), 0)   as view,
-          COALESCE(SUM(copy_count), 0)   as copy,
-          COALESCE(SUM(unlock_count), 0) as unlock
+          DATE(created_at)                AS \`date\`,
+          COALESCE(SUM(view_count),   0)  AS \`view\`,
+          COALESCE(SUM(copy_count),   0)  AS \`copy\`,
+          COALESCE(SUM(unlock_count), 0)  AS \`unlock\`
         FROM prompts
         GROUP BY DATE(created_at)
         ORDER BY DATE(created_at) ASC
       `;
 
       if (dailyRows.length > 0) {
-        // Apply day filter client-side to avoid parameterized INTERVAL issues
-        const days = daysParam === 'all' ? Infinity : (Math.max(1, parseInt(daysParam) || 30));
+        // Apply day filter in JS (avoids parameterized INTERVAL syntax issues)
+        const days = daysParam === 'all' ? Infinity : Math.max(1, parseInt(daysParam) || 30);
         const cutoff = new Date();
         cutoff.setDate(cutoff.getDate() - days);
 
@@ -80,15 +82,15 @@ export async function GET(req) {
           ? dailyRows
           : dailyRows.filter(row => new Date(row.date) >= cutoff);
 
-        const source = filtered.length > 0 ? filtered : dailyRows.slice(-7);
+        // If nothing falls in the range, show all data so chart is never empty
+        const source = filtered.length > 0 ? filtered : dailyRows;
 
-        const formattedFallback = source.map(row => ({
+        return NextResponse.json(source.map(row => ({
           date:   new Date(row.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
           view:   Number(row.view)   || 0,
           copy:   Number(row.copy)   || 0,
           unlock: Number(row.unlock) || 0,
-        }));
-        return NextResponse.json(formattedFallback);
+        })));
       }
 
       // Last resort: single bar with lifetime totals under today's date
@@ -101,14 +103,13 @@ export async function GET(req) {
       }]);
     }
 
-    const formattedData = rows.map(row => ({
+    return NextResponse.json(rows.map(row => ({
       date:   new Date(row.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       view:   Number(row.view)   || 0,
       copy:   Number(row.copy)   || 0,
       unlock: Number(row.unlock) || 0,
-    }));
+    })));
 
-    return NextResponse.json(formattedData);
   } catch (error) {
     console.error('Analytics fetch error:', error);
     return NextResponse.json({ error: 'Failed to fetch analytics' }, { status: 500 });
