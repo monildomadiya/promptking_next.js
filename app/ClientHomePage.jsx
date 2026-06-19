@@ -12,16 +12,11 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
   const { search, filter, setFilter, isMobile } = useAppContext();
   const { categorySlug } = useParams();
 
-  // Sync URL parameter with filter state on mount or when URL changes
   useEffect(() => {
     if (categorySlug) {
       setFilter(categorySlug.toLowerCase());
-    } else if (!categorySlug && filter !== 'premium' && filter !== 'free' && filter !== 'all' && !search) {
-       if(filter !== 'all') {
-         setFilter('all');
-       }
     }
-  }, [categorySlug, setFilter]); // removed 'filter' to avoid infinite loops when clicking quick filters
+  }, [categorySlug, setFilter]);
 
   const getPageTitle = () => {
     if (categorySlug) {

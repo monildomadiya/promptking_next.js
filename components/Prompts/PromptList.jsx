@@ -38,16 +38,18 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile, initialP
   const [isRevalidating, setIsRevalidating] = useState(false);
   const [fadeIn, setFadeIn] = useState(true);
   const [activeUnlockedKey, setActiveUnlockedKey] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const savedPage = sessionStorage.getItem('pk_current_page');
+        if (savedPage) return parseInt(savedPage, 10);
+      } catch {}
+    }
+    return 1;
+  });
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    try {
-      const savedPage = sessionStorage.getItem('pk_current_page');
-      if (savedPage) {
-        setCurrentPage(parseInt(savedPage, 10));
-      }
-    } catch {}
     setIsHydrated(true);
   }, []);
   const itemsPerPage = isMobile ? 8 : 9;
@@ -306,7 +308,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile, initialP
                   onLock={() => setActiveUnlockedKey(null)}
                   searchTerm={search}
                   isHighlighted={search && p.prompt_key && p.prompt_key.toLowerCase().includes(search.toLowerCase())}
-                  isPriority={index < 2}
+                  isPriority={isMobile ? index < 4 : index < 6}
                   isMobile={isMobile}
                 />
               </div>
