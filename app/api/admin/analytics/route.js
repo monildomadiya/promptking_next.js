@@ -36,7 +36,7 @@ export async function GET(req) {
             SUM(CASE WHEN event_type = 'copy'   THEN 1 ELSE 0 END) as copy,
             SUM(CASE WHEN event_type = 'unlock' THEN 1 ELSE 0 END) as unlock
           FROM analytics_events
-          WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL ${days} DAY)
+          WHERE created_at >= SUBDATE(CURDATE(), ${days})
           GROUP BY DATE(created_at)
           ORDER BY DATE(created_at) ASC
         `;
@@ -68,7 +68,7 @@ export async function GET(req) {
           COALESCE(SUM(copy_count), 0)   as copy,
           COALESCE(SUM(unlock_count), 0) as unlock
         FROM prompts
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL ${days} DAY)
+        WHERE created_at >= SUBDATE(CURDATE(), ${days})
         GROUP BY DATE(created_at)
         ORDER BY DATE(created_at) ASC
       `;

@@ -1586,7 +1586,6 @@ const AdminDashboard = () => {
                 <StatCard label="Total Views" value={stats.views} color="#10b981" icon={<Layers size={24} />} />
                 <StatCard label="Total Copies" value={stats.copies} color="#3b82f6" icon={<Activity size={24} />} />
                 <StatCard label="Total Unlocks" value={stats.unlocks} color="#fbbf24" icon={<Crown size={24} />} />
-                <StatCard label="Total Likes" value={stats.likes} color="#f472b6" icon={<Crown size={24} />} />
                 <StatCard label="Total Blogs" value={stats.blogs} color="#a78bfa" icon={<Layout size={24} />} />
               </div>
               <div style={{ ...glassPanelStyle, padding: '30px' }}>
