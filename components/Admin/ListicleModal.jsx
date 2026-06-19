@@ -177,9 +177,21 @@ const ListicleModal = ({ prompt, onClose, onSave }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.title?.trim()) {
-      return toast.error("Title is required!");
+    const newErrors = {};
+    if (!formData.title?.trim()) newErrors.title = true;
+    if (!formData.slug?.trim()) newErrors.slug = true;
+    if (!formData.sub_prompts || formData.sub_prompts.length === 0) newErrors.sub_prompts = true;
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error("Please fill in all required fields marked in red.");
+      setTimeout(() => {
+        const errorElement = document.querySelector('.has-error');
+        if (errorElement) errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+      return;
     }
+
     try {
       await api.post('/admin/save_prompt', { ...formData, originalKey });
       onSave();
@@ -403,7 +415,7 @@ const ListicleModal = ({ prompt, onClose, onSave }) => {
             </div>
 
             {/* 4. Sub-Prompts (Listicle Builder) */}
-            <div>
+            <div className={errors.sub_prompts ? 'has-error' : ''} style={{ border: errors.sub_prompts ? '1px solid #ff4444' : undefined, borderRadius: '14px', padding: errors.sub_prompts ? '20px' : '0' }}>
               <SectionTitle title="4. Sub-Prompts (Listicle/Blog Builder)" />
               <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
                 {(formData.sub_prompts || []).map((sp, index) => (

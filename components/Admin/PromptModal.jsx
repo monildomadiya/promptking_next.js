@@ -35,6 +35,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     is_featured: false,
     publish_date: ''
   });
+  const [errors, setErrors] = useState({});
   const [originalKey, setOriginalKey] = useState(null);
   const [categories, setCategories] = useState([]);
   const [websiteCategories, setWebsiteCategories] = useState([]);
@@ -178,20 +179,31 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.title?.trim()) {
-      return toast.error("Title is required!");
-    }
-    if (!formData.prompt_text?.trim()) {
-      return toast.error("Prompt Content is required!");
-    }
-    if (!formData.ai_type?.trim()) {
-      return toast.error("AI Model/Type is required!");
+    const newErrors = {};
+    if (!formData.title?.trim()) newErrors.title = true;
+    if (!formData.prompt_text?.trim()) newErrors.prompt_text = true;
+    if (!formData.ai_type?.trim()) newErrors.ai_type = true;
+    if (!formData.slug?.trim()) newErrors.slug = true;
+    
+    if (formData.is_premium && (!formData.password || formData.password.trim() === '')) {
+      newErrors.password = true;
+      toast.error("⚠️ SECURITY REQUIRED: Premium content must have an unlock PIN/Password.");
     }
 
-    if (formData.is_premium && (!formData.password || formData.password.trim() === '')) {
-      toast.error("⚠️ SECURITY REQUIRED: Premium content must have an unlock PIN/Password.");
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error("Please fill in all required fields marked in red.");
+      
+      // Attempt to scroll to the first error element
+      setTimeout(() => {
+        const errorElement = document.querySelector('.has-error');
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
       return;
     }
+
     try {
       await api.post('/admin/save_prompt', { ...formData, originalKey });
       onSave();
@@ -281,7 +293,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                 </div>
 
                 <div>
-                  <Label text="Display Title" />
+                  <Label text="Display Title" required />
                   <input 
                     type="text" 
                     value={formData.title} 
@@ -289,22 +301,26 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                       const newTitle = e.target.value;
                       const newSlug = newTitle.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
                       setFormData({ ...formData, title: newTitle, slug: newSlug });
+                      if (errors.title) setErrors(prev => ({ ...prev, title: false }));
+                      if (errors.slug) setErrors(prev => ({ ...prev, slug: false }));
                     }}
-                    className="glass-input"
-                    style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
-                    required 
+                    className={`glass-input ${errors.title ? 'has-error' : ''}`}
+                    style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', border: errors.title ? '1px solid #ff4444' : undefined }}
                   />
                 </div>
 
                 <div>
-                  <Label text="SEO Slug" />
+                  <Label text="SEO Slug" required />
                   <div style={{ display: 'flex', gap: '12px' }}>
                     <input 
                       type="text" 
                       value={formData.slug} 
-                      onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') })}
-                      className="glass-input"
-                      style={{ flex: 1, padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
+                      onChange={(e) => {
+                        setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') });
+                        if (errors.slug) setErrors(prev => ({ ...prev, slug: false }));
+                      }}
+                      className={`glass-input ${errors.slug ? 'has-error' : ''}`}
+                      style={{ flex: 1, padding: '14px', borderRadius: '14px', fontSize: '0.95rem', border: errors.slug ? '1px solid #ff4444' : undefined }}
                     />
                     <button 
                       type="button"
@@ -319,12 +335,15 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                 </div>
 
                 <div>
-                  <Label text="AI Type" />
+                  <Label text="AI Type" required />
                   <select 
                     value={formData.ai_type}
-                    onChange={(e) => setFormData({ ...formData, ai_type: e.target.value })}
-                    className="glass-input"
-                    style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', appearance: 'none', background: 'var(--surface-1)' }}
+                    onChange={(e) => {
+                      setFormData({ ...formData, ai_type: e.target.value });
+                      if (errors.ai_type) setErrors(prev => ({ ...prev, ai_type: false }));
+                    }}
+                    className={`glass-input ${errors.ai_type ? 'has-error' : ''}`}
+                    style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', appearance: 'none', background: 'var(--surface-1)', border: errors.ai_type ? '1px solid #ff4444' : undefined }}
                   >
                     {categories.map(cat => (
                       <option key={cat.id} value={cat.name}>{cat.name}</option>
@@ -427,12 +446,15 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                 </div>
 
                 <div>
-                  <Label text="Raw Prompt Machine Source" icon={<Zap size={14} />} />
+                  <Label text="Prompt Content" icon={<FileText size={14} />} required />
                   <textarea 
                     value={formData.prompt_text}
-                    onChange={(e) => setFormData({ ...formData, prompt_text: e.target.value })}
-                    className="glass-input"
-                    style={{ width: '100%', minHeight: '180px', padding: '20px', borderRadius: '18px', fontSize: '0.95rem', fontFamily: 'monospace', lineHeight: '1.6', resize: 'vertical' }}
+                    onChange={(e) => {
+                      setFormData({ ...formData, prompt_text: e.target.value });
+                      if (errors.prompt_text) setErrors(prev => ({ ...prev, prompt_text: false }));
+                    }}
+                    className={`glass-input ${errors.prompt_text ? 'has-error' : ''}`}
+                    style={{ width: '100%', minHeight: '180px', padding: '20px', borderRadius: '18px', fontSize: '0.95rem', fontFamily: 'monospace', lineHeight: '1.6', resize: 'vertical', border: errors.prompt_text ? '1px solid #ff4444' : undefined }}
                     required
                   />
                 </div>
@@ -695,9 +717,9 @@ const SectionTitle = ({ title }) => (
   </div>
 );
 
-const Label = ({ text, icon }) => (
+const Label = ({ text, icon, required }) => (
   <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontSize: '0.85rem', fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>
-    {icon} {text}
+    {icon} {text} {required ? <span style={{ color: '#ff4444', marginLeft: '4px' }}>*</span> : <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.7rem', marginLeft: '4px', textTransform: 'none' }}>(Optional)</span>}
   </label>
 );
 

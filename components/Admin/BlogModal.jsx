@@ -390,10 +390,16 @@ const BlogModal = ({ blog, onClose, onSave }) => {
                 />
                 <label htmlFor="enableTOC" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Enable Table of Contents (Auto-generated from H2/H3)</label>
               </div>
-              <div style={{ borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ marginBottom: '15px' }}>
+                <Label text="Article Content" required />
+              </div>
+              <div className={`glass-input ${errors.content ? 'has-error' : ''}`} style={{ borderRadius: '20px', overflow: 'hidden', border: errors.content ? '1px solid #ff4444' : '1px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column' }}>
                 <CustomEditor
                   value={formData.content}
-                  onChange={(content) => setFormData({ ...formData, content })}
+                  onChange={(content) => {
+                    setFormData({ ...formData, content });
+                    if (errors.content) setErrors(prev => ({ ...prev, content: false }));
+                  }}
                 />
               </div>
             </div>
