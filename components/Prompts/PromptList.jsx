@@ -213,9 +213,9 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile, initialP
   if (loading) {
     return (
       <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px', width: '100%' }}>
-        <div className="home-layout-grid" style={{ 
-          display: isMobile ? 'flex' : 'grid', 
-          flexDirection: 'column' 
+        <div style={{ 
+          display: 'block', 
+          marginTop: '40px' 
         }}>
           <div className="css-masonry-grid" id="skeletonContainer">
             {[1, 2, 3, 4, 5, 6].map((item) => (
@@ -260,9 +260,9 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile, initialP
           <style>{`@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }`}</style>
         </div>
       )}
-      <div className="home-layout-grid" style={{ 
-        display: isMobile ? 'flex' : 'grid', 
-        flexDirection: 'column' 
+      <div style={{ 
+        display: 'block', 
+        marginTop: '40px' 
       }}>
         <div className="grid-main-area" style={{ width: '100%' }}>
           
