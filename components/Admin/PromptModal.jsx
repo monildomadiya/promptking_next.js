@@ -596,14 +596,17 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                 {formData.is_premium && (
                   <div>
-                    <Label text="Unlock PIN Code" />
+                    <Label text="Unlock PIN Code" required />
                     <input 
                       type="text" 
                       value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="glass-input"
+                      onChange={(e) => {
+                        setFormData({ ...formData, password: e.target.value });
+                        if (errors.password) setErrors(prev => ({ ...prev, password: false }));
+                      }}
+                      className={`glass-input ${errors.password ? 'has-error' : ''}`}
                       placeholder="4-8 Digit PIN"
-                      style={{ width: '100%', padding: '14px', borderRadius: '14px' }}
+                      style={{ width: '100%', padding: '14px', borderRadius: '14px', border: errors.password ? '1px solid #ff4444' : undefined }}
                     />
                   </div>
                 )}
