@@ -49,7 +49,7 @@ const PromptList = ({ search, filter, setFilter, showFilters, isMobile, initialP
   useEffect(() => {
     setIsHydrated(true);
   }, []);
-  const itemsPerPage = isMobile ? 8 : 9;
+  const itemsPerPage = isMobile ? 8 : 12;
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [catSearch, setCatSearch] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
