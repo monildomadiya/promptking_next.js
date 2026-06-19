@@ -282,7 +282,7 @@ const ListicleModal = ({ prompt, onClose, onSave }) => {
                 </div>
 
                 <div>
-                  <Label text="Display Title" />
+                  <Label text="Display Title" required />
                   <input 
                     type="text" 
                     value={formData.title} 
@@ -290,26 +290,34 @@ const ListicleModal = ({ prompt, onClose, onSave }) => {
                       const newTitle = e.target.value;
                       const newSlug = newTitle.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
                       setFormData({ ...formData, title: newTitle, slug: newSlug });
+                      if (errors.title) setErrors(prev => ({ ...prev, title: false }));
+                      if (errors.slug) setErrors(prev => ({ ...prev, slug: false }));
                     }}
-                    className="glass-input"
-                    style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
+                    className={`glass-input ${errors.title ? 'has-error' : ''}`}
+                    style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', border: errors.title ? '1px solid #ff4444' : undefined }}
                     required 
                   />
                 </div>
 
                 <div>
-                  <Label text="SEO Slug" />
+                  <Label text="SEO Slug" required />
                   <div style={{ display: 'flex', gap: '12px' }}>
                     <input 
                       type="text" 
                       value={formData.slug} 
-                      onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') })}
-                      className="glass-input"
-                      style={{ flex: 1, padding: '14px', borderRadius: '14px', fontSize: '0.95rem' }}
+                      onChange={(e) => {
+                        setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') });
+                        if (errors.slug) setErrors(prev => ({ ...prev, slug: false }));
+                      }}
+                      className={`glass-input ${errors.slug ? 'has-error' : ''}`}
+                      style={{ flex: 1, padding: '14px', borderRadius: '14px', fontSize: '0.95rem', border: errors.slug ? '1px solid #ff4444' : undefined }}
                     />
                     <button 
                       type="button"
-                      onClick={() => setFormData({ ...formData, slug: formData.title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') })}
+                      onClick={() => {
+                        setFormData({ ...formData, slug: formData.title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') });
+                        if (errors.slug) setErrors(prev => ({ ...prev, slug: false }));
+                      }}
                       className="glass-button-secondary"
                       style={{ padding: '0 20px', borderRadius: '14px', fontWeight: 700, fontSize: '0.8rem' }}
                     >
@@ -604,9 +612,9 @@ const SectionTitle = ({ title }) => (
   </div>
 );
 
-const Label = ({ text, icon }) => (
+const Label = ({ text, icon, required }) => (
   <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontSize: '0.85rem', fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>
-    {icon} {text}
+    {icon} {text} {required ? <span style={{ color: '#ff4444', marginLeft: '4px' }}>*</span> : <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.7rem', marginLeft: '4px', textTransform: 'none' }}>(Optional)</span>}
   </label>
 );
 

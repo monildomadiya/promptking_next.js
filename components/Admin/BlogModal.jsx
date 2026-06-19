@@ -149,11 +149,21 @@ const BlogModal = ({ blog, onClose, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.title) return toast.error("Headline is required");
-    if (!formData.slug) return toast.error("Slug is required");
-    if (!formData.content) return toast.error("Content is required");
-    if (formData.featured_image && !formData.featured_image_alt) {
-      return toast.error("Featured Image Alt Text is required if image exists");
+    
+    const newErrors = {};
+    if (!formData.title?.trim()) newErrors.title = true;
+    if (!formData.slug?.trim()) newErrors.slug = true;
+    if (!formData.content?.trim()) newErrors.content = true;
+    if (formData.featured_image && (!formData.featured_image_alt || !formData.featured_image_alt.trim())) newErrors.featured_image_alt = true;
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error("Please fill in all required fields marked in red.");
+      setTimeout(() => {
+        const errorElement = document.querySelector('.has-error');
+        if (errorElement) errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+      return;
     }
 
     try {
@@ -224,25 +234,32 @@ const BlogModal = ({ blog, onClose, onSave }) => {
               <SectionTitle title="1. Core Publication Details" />
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                 <div style={{ gridColumn: 'span 2' }}>
-                  <Label text="Article Headline *" />
+                  <Label text="Article Headline" required />
                   <input 
                     type="text" 
                     value={formData.title} 
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="glass-input"
-                    style={{ width: '100%', padding: '16px', borderRadius: '15px', fontSize: '1.1rem', fontWeight: 600 }}
+                    onChange={(e) => {
+                      setFormData({ ...formData, title: e.target.value });
+                      if (errors.title) setErrors(prev => ({ ...prev, title: false }));
+                    }}
+                    className={`glass-input ${errors.title ? 'has-error' : ''}`}
+                    style={{ width: '100%', padding: '16px', borderRadius: '15px', fontSize: '1.1rem', fontWeight: 600, border: errors.title ? '1px solid #ff4444' : undefined }}
                     placeholder="Enter a captivating title..."
                     required 
                   />
                 </div>
                 <div>
-                  <Label text="URL Slug *" />
+                  <Label text="URL Slug" required />
                   <input 
                     type="text" 
                     value={formData.slug} 
-                    onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-                    className="glass-input"
+                    onChange={(e) => {
+                      setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') });
+                      if (errors.slug) setErrors(prev => ({ ...prev, slug: false }));
+                    }}
+                    className={`glass-input ${errors.slug ? 'has-error' : ''}`}
                     placeholder="best-ai-image-generator-2026"
+                    style={{ border: errors.slug ? '1px solid #ff4444' : undefined }}
                     required 
                   />
                   {formData.slug && <small style={{ color: 'var(--text-dim)', display: 'block', marginTop: '5px' }}>Preview: /article/{formData.slug}</small>}
@@ -355,13 +372,16 @@ const BlogModal = ({ blog, onClose, onSave }) => {
                 />
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                   <div>
-                    <Label text={`Featured Image Alt Text ${formData.featured_image ? '*' : ''}`} />
+                    <Label text="Featured Image Alt Text" required={!!formData.featured_image} />
                     <input 
                       type="text" 
                       value={formData.featured_image_alt} 
-                      onChange={(e) => setFormData({ ...formData, featured_image_alt: e.target.value })}
-                      className="glass-input"
-                      placeholder="Describe the image for SEO..."
+                      onChange={(e) => {
+                        setFormData({ ...formData, featured_image_alt: e.target.value });
+                        if (errors.featured_image_alt) setErrors(prev => ({ ...prev, featured_image_alt: false }));
+                      }}
+                      className={`glass-input ${errors.featured_image_alt ? 'has-error' : ''}`}
+                      style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', border: errors.featured_image_alt ? '1px solid #ff4444' : undefined }}
                     />
                   </div>
                   <div>
@@ -571,9 +591,9 @@ const SectionTitle = ({ title }) => (
   </div>
 );
 
-const Label = ({ text, icon }) => (
+const Label = ({ text, icon, required }) => (
   <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', fontSize: '0.85rem', fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>
-    {icon} {text}
+    {icon} {text} {required ? <span style={{ color: '#ff4444', marginLeft: '4px' }}>*</span> : <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.7rem', marginLeft: '4px', textTransform: 'none' }}>(Optional)</span>}
   </label>
 );
 
