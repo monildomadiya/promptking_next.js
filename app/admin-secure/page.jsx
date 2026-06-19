@@ -874,7 +874,7 @@ const AdminDashboard = () => {
   const [analyticsData, setAnalyticsData] = useState([]);
   const [promptAnalytics, setPromptAnalytics] = useState([]);
   const [blogAnalytics, setBlogAnalytics] = useState([]);
-  const [stats, setStats] = useState({ prompts: 0, copies: 0, unlocks: 0 });
+  const [stats, setStats] = useState({ prompts: 0, copies: 0, unlocks: 0, views: 0, likes: 0, blogs: 0 });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isKingDialogOpen, setIsKingDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -967,8 +967,18 @@ const AdminDashboard = () => {
       if (response.data.isAdmin) {
         fetchData('prompts');
         fetchAnalytics();
+        fetchDashboardStats();
       }
     } catch (e) { console.error(e); }
+  };
+
+  const fetchDashboardStats = async () => {
+    try {
+      const res = await api.get('/admin/dashboard');
+      if (res.data && !res.data.error) {
+        setStats(res.data);
+      }
+    } catch (e) { console.error('Dashboard stats error:', e); }
   };
 
   const handleLogin = async (e) => {
@@ -984,6 +994,7 @@ const AdminDashboard = () => {
         setIsAdmin(true);
         fetchData('prompts');
         fetchAnalytics();
+        fetchDashboardStats();
       } else {
         toast.error("Authentication failed.");
       }
@@ -1044,13 +1055,7 @@ const AdminDashboard = () => {
       const response = await api.get(`/admin/${endpoint}`);
       setData(response.data);
       if (currentView === 'prompts' || currentView === 'listicles') {
-        const calculateTotal = (key) => response.data.reduce((acc, curr) => acc + (Number(curr[key]) || 0), 0);
-        setStats({
-          prompts: response.data.length,
-          copies: calculateTotal('copy_count'),
-          unlocks: calculateTotal('unlock_count'),
-          views: calculateTotal('view_count'),
-        });
+        fetchDashboardStats();
       }
     } catch (e) { console.error(e); }
     finally { setIsDataLoading(false); }
@@ -1578,9 +1583,11 @@ const AdminDashboard = () => {
             <motion.div key="dashboard" {...pageTransition}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', marginBottom: '48px' }}>
                 <StatCard label="Total Prompts" value={stats.prompts} color="#ff4d4d" icon={<TableProperties size={24} />} />
-                <StatCard label="Total Views" value={analyticsData.reduce((acc, curr) => acc + (curr.view || 0), 0)} color="#10b981" icon={<Layers size={24} />} />
-                <StatCard label="Total Copies" value={analyticsData.reduce((acc, curr) => acc + (curr.copy || 0), 0)} color="#3b82f6" icon={<Activity size={24} />} />
-                <StatCard label="Total Unlocks" value={analyticsData.reduce((acc, curr) => acc + (curr.unlock || 0), 0)} color="#fbbf24" icon={<Crown size={24} />} />
+                <StatCard label="Total Views" value={stats.views} color="#10b981" icon={<Layers size={24} />} />
+                <StatCard label="Total Copies" value={stats.copies} color="#3b82f6" icon={<Activity size={24} />} />
+                <StatCard label="Total Unlocks" value={stats.unlocks} color="#fbbf24" icon={<Crown size={24} />} />
+                <StatCard label="Total Likes" value={stats.likes} color="#f472b6" icon={<Crown size={24} />} />
+                <StatCard label="Total Blogs" value={stats.blogs} color="#a78bfa" icon={<Layout size={24} />} />
               </div>
               <div style={{ ...glassPanelStyle, padding: '30px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
