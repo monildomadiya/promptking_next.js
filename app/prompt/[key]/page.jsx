@@ -1,6 +1,7 @@
 import db from '@/lib/db';
 import ClientPromptDetail from './ClientPromptDetail';
 import { notFound } from 'next/navigation';
+import { getSession } from '@/lib/session';
 
 export const revalidate = 60;
 
@@ -22,10 +23,18 @@ export default async function PromptPage({ params }) {
       notFound();
     }
 
+    // Check session to allow admins to preview drafts
+    let session = null;
+    try {
+      session = await getSession();
+    } catch (err) {
+      // ignore
+    }
+
     // Block public access to draft prompts
     const isDraft = promptRows[0]?.is_draft;
     const draftValue = Buffer.isBuffer(isDraft) ? isDraft[0] === 1 : isDraft == 1;
-    if (draftValue) {
+    if (draftValue && !session?.isAdmin) {
       notFound();
     }
 

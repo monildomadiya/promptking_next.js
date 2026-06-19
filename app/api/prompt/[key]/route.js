@@ -18,6 +18,16 @@ export async function GET(req, { params }) {
       if (Buffer.isBuffer(val)) return val[0] === 1;
       return val == 1 || val === true || val === 'true';
     };
+
+    const isDraft = parseDbBool(row.is_draft);
+    if (isDraft) {
+      const { getSession } = require('@/lib/session');
+      const session = await getSession();
+      if (!session?.isAdmin) {
+        return NextResponse.json({ error: "Prompt not found" }, { status: 404 });
+      }
+    }
+
     const prompt = {
       ...row,
       isImageSlider: parseDbBool(row.is_image_slider),
