@@ -1235,6 +1235,20 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleToggleStatus = async (item, field) => {
+    const newValue = !item[field];
+    // Optimistic UI update
+    setData(prev => prev.map(p => p.prompt_key === item.prompt_key ? { ...p, [field]: newValue } : p));
+    try {
+      await api.post('/admin/toggle_status', { key: item.prompt_key, field, value: newValue });
+      toast.success(`Updated successfully.`);
+    } catch (err) {
+      // Revert on failure
+      setData(prev => prev.map(p => p.prompt_key === item.prompt_key ? { ...p, [field]: item[field] } : p));
+      toast.error('Failed to update status.');
+    }
+  };
+
   const toggleSelect = (key) => {
     setSelectedKeys(prev => 
       prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
@@ -1804,9 +1818,48 @@ const AdminDashboard = () => {
                           </td>
                           {(view === 'prompts' || view === 'blogs') && (
                             <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
-                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
                                 {view === 'prompts' && (
-                                  <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.is_premium ? 'PRO' : 'FREE'}</span>
+                                  <span
+                                    onClick={() => handleToggleStatus(item, 'is_premium')}
+                                    title="Click to toggle PRO / FREE"
+                                    style={{
+                                      padding: '4px 8px',
+                                      background: item.is_premium ? 'rgba(251,191,36,0.15)' : 'rgba(255,255,255,0.04)',
+                                      color: item.is_premium ? '#fbbf24' : 'var(--text-secondary)',
+                                      border: item.is_premium ? '1px solid rgba(251,191,36,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                                      borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700,
+                                      cursor: 'pointer', userSelect: 'none', transition: 'all 0.2s'
+                                    }}
+                                  >{item.is_premium ? 'PRO' : 'FREE'}</span>
+                                )}
+                                {view === 'prompts' && (
+                                  <span
+                                    onClick={() => handleToggleStatus(item, 'is_draft')}
+                                    title="Click to toggle Draft / Published"
+                                    style={{
+                                      padding: '4px 8px',
+                                      background: item.is_draft ? 'rgba(156,163,175,0.15)' : 'rgba(16,185,129,0.12)',
+                                      color: item.is_draft ? '#9ca3af' : '#10b981',
+                                      border: item.is_draft ? '1px solid rgba(156,163,175,0.3)' : '1px solid rgba(16,185,129,0.3)',
+                                      borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700,
+                                      cursor: 'pointer', userSelect: 'none', transition: 'all 0.2s'
+                                    }}
+                                  >{item.is_draft ? 'DRAFT' : 'PUB'}</span>
+                                )}
+                                {view === 'prompts' && (
+                                  <span
+                                    onClick={() => handleToggleStatus(item, 'hide_prompt_box')}
+                                    title="Click to toggle Hidden / Visible"
+                                    style={{
+                                      padding: '4px 8px',
+                                      background: item.hide_prompt_box ? 'rgba(251,191,36,0.12)' : 'rgba(255,255,255,0.03)',
+                                      color: item.hide_prompt_box ? '#fbbf24' : 'rgba(255,255,255,0.2)',
+                                      border: item.hide_prompt_box ? '1px solid rgba(251,191,36,0.3)' : '1px solid rgba(255,255,255,0.06)',
+                                      borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700,
+                                      cursor: 'pointer', userSelect: 'none', transition: 'all 0.2s'
+                                    }}
+                                  >{item.hide_prompt_box ? 'HIDDEN' : 'SHOWN'}</span>
                                 )}
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Opened (Views)">
                                   <Eye size={12} /> {item.view_count || 0}

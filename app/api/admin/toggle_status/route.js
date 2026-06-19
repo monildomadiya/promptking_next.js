@@ -1,0 +1,37 @@
+export const dynamic = 'force-dynamic';
+import { NextResponse } from 'next/server';
+import db from '@/lib/db';
+import { getSession } from '@/lib/session';
+import { cacheInvalidate } from '@/lib/cache';
+
+export async function POST(req) {
+  const session = await getSession();
+  if (!session?.isAdmin) return NextResponse.json({ error: 'Admin access required' }, { status: 401 });
+
+  try {
+    const { key, field, value } = await req.json();
+    if (!key || !field) return NextResponse.json({ error: 'Key and field are required' }, { status: 400 });
+
+    // Only allow safe fields to be toggled
+    const allowedFields = ['is_premium', 'is_draft', 'is_featured', 'hide_prompt_box'];
+    if (!allowedFields.includes(field)) {
+      return NextResponse.json({ error: 'Field not allowed' }, { status: 400 });
+    }
+
+    if (field === 'is_premium') {
+      await db`UPDATE prompts SET is_premium = ${value ? 1 : 0} WHERE prompt_key = ${key}`;
+    } else if (field === 'is_draft') {
+      await db`UPDATE prompts SET is_draft = ${value ? 1 : 0} WHERE prompt_key = ${key}`;
+    } else if (field === 'is_featured') {
+      await db`UPDATE prompts SET is_featured = ${value ? 1 : 0} WHERE prompt_key = ${key}`;
+    } else if (field === 'hide_prompt_box') {
+      await db`UPDATE prompts SET hide_prompt_box = ${value ? 1 : 0} WHERE prompt_key = ${key}`;
+    }
+
+    cacheInvalidate('all_prompts_listing');
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('toggle_status error:', error);
+    return NextResponse.json({ error: 'Failed to update status' }, { status: 500 });
+  }
+}

@@ -25,12 +25,12 @@ export async function GET(req) {
     `;
 
     return NextResponse.json({
-      prompts:  Number(promptStats.total_prompts)  || 0,
-      copies:   Number(promptStats.total_copies)   || 0,
-      unlocks:  Number(promptStats.total_unlocks)  || 0,
-      views:    Number(promptStats.total_views)    || 0,
-      likes:    Number(promptStats.total_likes)    || 0,
-      blogs:    Number(blogStats.total_blogs)      || 0,
+      prompts:  parseInt(promptStats.total_prompts)  || 0,
+      copies:   parseInt(promptStats.total_copies)   || 0,
+      unlocks:  parseInt(promptStats.total_unlocks)  || 0,
+      views:    parseInt(promptStats.total_views)    || 0,
+      likes:    parseInt(promptStats.total_likes)    || 0,
+      blogs:    parseInt(blogStats.total_blogs)      || 0,
     });
   } catch (error) {
     console.error('Dashboard stats error:', error);

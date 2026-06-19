@@ -1,0 +1,23 @@
+export const dynamic = 'force-dynamic';
+import { NextResponse } from 'next/server';
+import db from '@/lib/db';
+import { getSession } from '@/lib/session';
+
+export async function POST(req) {
+  const session = await getSession();
+  if (!session?.isAdmin) return NextResponse.json({ error: 'Admin access required' }, { status: 401 });
+
+  try {
+    const { key, is_featured } = await req.json();
+    if (!key) return NextResponse.json({ error: 'Key is required' }, { status: 400 });
+
+    await db`
+      UPDATE prompts SET is_featured = ${is_featured ? 1 : 0} WHERE prompt_key = ${key}
+    `;
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('toggle_featured error:', error);
+    return NextResponse.json({ error: 'Failed to update featured status' }, { status: 500 });
+  }
+}
