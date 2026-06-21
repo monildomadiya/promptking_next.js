@@ -14,9 +14,9 @@ export async function POST(req) {
       SET view_count = 0, copy_count = 0, unlock_count = 0, like_count = 0
     `;
 
-    // Clear analytics_events table if it exists
+    // Clear analytics_daily table if it exists
     try {
-      await db`DELETE FROM analytics_events`;
+      await db`TRUNCATE TABLE analytics_daily`;
     } catch (e) {
       // Table may not exist — that's fine
     }

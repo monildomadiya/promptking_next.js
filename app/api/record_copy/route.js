@@ -1,22 +1,7 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 
-async function ensureAnalyticsTable() {
-  try {
-    await db`
-      CREATE TABLE IF NOT EXISTS analytics_events (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        event_type VARCHAR(50) NOT NULL,
-        item_key VARCHAR(255),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        INDEX idx_event_type (event_type),
-        INDEX idx_created_at (created_at)
-      )
-    `;
-  } catch (e) {
-    // Ignore — table already exists or DB issue
-  }
-}
+
 
 export async function POST(req) {
   try {
@@ -30,15 +15,15 @@ export async function POST(req) {
       WHERE prompt_key = ${key} OR slug = ${key}
     `;
 
-    // Insert into analytics_events (auto-create table if needed)
+    // Record daily copy in analytics_daily
     try {
-      await ensureAnalyticsTable();
       await db`
-        INSERT INTO analytics_events (event_type, item_key, created_at) 
-        VALUES ('copy', ${key}, NOW())
+        INSERT INTO analytics_daily (date, views, copies, unlocks) 
+        VALUES (CURDATE(), 0, 1, 0)
+        ON DUPLICATE KEY UPDATE copies = copies + 1
       `;
     } catch (e) {
-      console.warn('analytics_events insert failed:', e.message);
+      console.warn('analytics_daily insert failed:', e.message);
     }
 
     return NextResponse.json({ success: true });
