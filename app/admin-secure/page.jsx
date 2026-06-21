@@ -427,6 +427,15 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
           </div>
         </div>
       </td>
+      <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
+        {item.is_premium ? (
+          <span style={{ fontFamily: 'monospace', fontSize: '0.85rem', color: '#fbbf24', letterSpacing: '2px', background: 'rgba(251,191,36,0.1)', padding: '4px 8px', borderRadius: '4px' }}>
+            {item.password || '----'}
+          </span>
+        ) : (
+          <span style={{ color: 'var(--text-muted)' }}>-</span>
+        )}
+      </td>
       <td style={{ padding: isMobile ? '16px' : '20px 24px', textAlign: 'right' }}>
         <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', alignItems: 'center' }}>
           <div
@@ -1238,16 +1247,20 @@ const AdminDashboard = () => {
     let extraData = {};
 
     if (field === 'is_premium' && newValue === true) {
-      const pin = window.prompt(`Enter a PIN to make prompt "${item.title || item.prompt_key}" PRO:`);
+      const pin = window.prompt(`Enter a PIN (max 4 numeric digits) to make prompt "${item.title || item.prompt_key}" PRO:`);
       if (!pin) {
         toast.error("A PIN is required to set a prompt to PRO.");
+        return;
+      }
+      if (!/^\d{1,4}$/.test(pin)) {
+        toast.error("PIN must be numeric and maximum 4 digits.");
         return;
       }
       extraData.pin = pin;
     }
 
     // Optimistic UI update
-    setData(prev => prev.map(p => p.prompt_key === item.prompt_key ? { ...p, [field]: newValue } : p));
+    setData(prev => prev.map(p => p.prompt_key === item.prompt_key ? { ...p, [field]: newValue, ...(extraData.pin && { password: extraData.pin }) } : p));
     try {
       await api.post('/admin/toggle_status', { key: item.prompt_key, field, value: newValue, ...extraData });
       toast.success(`Updated successfully.`);
@@ -1742,6 +1755,7 @@ const AdminDashboard = () => {
                       )}
                       <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Resource Title</th>
                       {(view === 'prompts' || view === 'blogs') && <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Status</th>}
+                      {view === 'prompts' && <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Password</th>}
                       <th style={{ padding: isMobile ? '16px' : '24px', textAlign: 'right', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Controls</th>
                     </tr>
                   </thead>
@@ -1844,6 +1858,17 @@ const AdminDashboard = () => {
                                   </div>
                                 )}
                               </div>
+                            </td>
+                          )}
+                          {view === 'prompts' && (
+                            <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
+                              {item.is_premium ? (
+                                <span style={{ fontFamily: 'monospace', fontSize: '0.85rem', color: '#fbbf24', letterSpacing: '2px', background: 'rgba(251,191,36,0.1)', padding: '4px 8px', borderRadius: '4px' }}>
+                                  {item.password || '----'}
+                                </span>
+                              ) : (
+                                <span style={{ color: 'var(--text-muted)' }}>-</span>
+                              )}
                             </td>
                           )}
                           <td style={{ padding: isMobile ? '16px' : '20px 24px', textAlign: 'right' }}>
