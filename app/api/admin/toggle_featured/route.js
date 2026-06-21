@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getSession } from '@/lib/session';
+import { revalidatePath } from 'next/cache';
+import { cacheInvalidate } from '@/lib/cache';
 
 export async function POST(req) {
   const session = await getSession();
@@ -15,10 +17,8 @@ export async function POST(req) {
       UPDATE prompts SET is_featured = ${is_featured ? 1 : 0} WHERE prompt_key = ${key}
     `;
 
-    try {
-      const { revalidatePath } = require('next/cache');
-      revalidatePath('/', 'layout');
-    } catch (e) {}
+    cacheInvalidate('all_prompts_listing');
+    try { revalidatePath('/', 'layout'); } catch (e) {}
 
     return NextResponse.json({ success: true });
   } catch (error) {
