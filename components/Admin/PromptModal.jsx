@@ -193,7 +193,6 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
         hasErrors = true;
       }
     }
-    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
