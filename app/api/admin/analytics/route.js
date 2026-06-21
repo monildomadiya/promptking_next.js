@@ -79,25 +79,7 @@ export async function GET(req) {
       })));
     }
 
-    // Fallback: no events in selected range — show lifetime totals from prompts table
-    // as a single data point so the chart always has something meaningful to display
-    const [totals] = await db`
-      SELECT
-        COALESCE(SUM(view_count),   0) AS total_views,
-        COALESCE(SUM(copy_count),   0) AS total_copies,
-        COALESCE(SUM(unlock_count), 0) AS total_unlocks
-      FROM prompts
-    `;
-    const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const tv = Number(totals.total_views) || 0;
-    const tc = Number(totals.total_copies) || 0;
-    const tu = Number(totals.total_unlocks) || 0;
-
-    // Only return the fallback if there is at least some data to show
-    if (tv > 0 || tc > 0 || tu > 0) {
-      return NextResponse.json([{ date: today, view: tv, copy: tc, unlock: tu }]);
-    }
-
+    // If no events in selected range, return empty array so frontend shows 'No analytics data yet' empty state
     return NextResponse.json([]);
 
   } catch (error) {
