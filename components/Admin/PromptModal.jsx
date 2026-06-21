@@ -106,6 +106,17 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
 
       setFormData({
         ...prompt,
+        prompt_key: prompt.prompt_key || '',
+        slug: prompt.slug || '',
+        title: prompt.title || '',
+        website_category_id: prompt.website_category_id || '',
+        thumbnail_url: prompt.thumbnail_url || '',
+        ai_type: prompt.ai_type || 'ChatGPT',
+        image_ratio: prompt.image_ratio || '4 / 5',
+        prompt_text: prompt.prompt_text || '',
+        img_after: prompt.img_after || '',
+        img_before: prompt.img_before || '',
+        ig_link: prompt.ig_link || '',
         faqs: parsedFaqs,
         sub_prompts: parsedSubPrompts,
         is_image_slider: Boolean(prompt.is_image_slider),
