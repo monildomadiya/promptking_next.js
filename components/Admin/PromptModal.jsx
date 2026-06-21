@@ -186,9 +186,13 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     if (!formData.ai_type?.trim()) newErrors.ai_type = true;
     if (!formData.slug?.trim()) newErrors.slug = true;
     
-    if (formData.is_premium && (!formData.password || formData.password.trim() === '')) {
-      newErrors.password = true;
-      toast.error("⚠️ SECURITY REQUIRED: Premium content must have an unlock PIN/Password.");
+    if (formData.is_premium) {
+      if (!formData.password || !/^\d{4}$/.test(formData.password)) {
+        newErrors.password = true;
+        toast.error("⚠️ SECURITY REQUIRED: Premium content must have an EXACTLY 4-digit numeric PIN.");
+        hasErrors = true;
+      }
+    }
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -601,8 +605,10 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                     <input 
                       type="text" 
                       value={formData.password}
+                      maxLength={4}
                       onChange={(e) => {
-                        setFormData({ ...formData, password: e.target.value });
+                        const val = e.target.value.replace(/\D/g, ''); // only allow digits
+                        setFormData({ ...formData, password: val });
                         if (errors.password) setErrors(prev => ({ ...prev, password: false }));
                       }}
                       className={`glass-input ${errors.password ? 'has-error' : ''}`}

@@ -1252,8 +1252,8 @@ const AdminDashboard = () => {
         toast.error("A PIN is required to set a prompt to PRO.");
         return;
       }
-      if (!/^\d{1,4}$/.test(pin)) {
-        toast.error("PIN must be numeric and maximum 4 digits.");
+      if (!/^\d{4}$/.test(pin)) {
+        toast.error("PIN must be EXACTLY 4 numeric digits.");
         return;
       }
       extraData.pin = pin;
