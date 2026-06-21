@@ -3,9 +3,6 @@ import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getAdminAuth } from '@/lib/auth';
 
-// Safely format a date value from MariaDB (may be a Date object or string)
-function formatDate(val) {
-
 // Ensure analytics_daily table exists (idempotent)
 async function ensureAnalyticsTable() {
   try {
@@ -19,6 +16,9 @@ async function ensureAnalyticsTable() {
     `;
   } catch (e) {}
 }
+
+// Safely format a date value from MariaDB (may be a Date object or string)
+function formatDate(val) {
   try {
     const d = val instanceof Date ? val : new Date(val);
     // Adjust for local timezone offset to prevent off-by-one day issues
