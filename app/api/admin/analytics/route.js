@@ -5,6 +5,20 @@ import { getAdminAuth } from '@/lib/auth';
 
 // Safely format a date value from MariaDB (may be a Date object or string)
 function formatDate(val) {
+
+// Ensure analytics_daily table exists (idempotent)
+async function ensureAnalyticsTable() {
+  try {
+    await db`
+      CREATE TABLE IF NOT EXISTS analytics_daily (
+        date DATE PRIMARY KEY,
+        views INT DEFAULT 0,
+        copies INT DEFAULT 0,
+        unlocks INT DEFAULT 0
+      )
+    `;
+  } catch (e) {}
+}
   try {
     const d = val instanceof Date ? val : new Date(val);
     // Adjust for local timezone offset to prevent off-by-one day issues
@@ -20,6 +34,7 @@ export async function GET(req) {
   if (!isAdmin) return NextResponse.json({ error: 'Admin access required' }, { status: 401 });
 
   try {
+    await ensureAnalyticsTable();
     const url = new URL(req.url);
     const daysParam = url.searchParams.get('days') || '30';
 

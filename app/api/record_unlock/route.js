@@ -1,7 +1,18 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 
-
+async function ensureAnalyticsTable() {
+  try {
+    await db`
+      CREATE TABLE IF NOT EXISTS analytics_daily (
+        date DATE PRIMARY KEY,
+        views INT DEFAULT 0,
+        copies INT DEFAULT 0,
+        unlocks INT DEFAULT 0
+      )
+    `;
+  } catch (e) {}
+}
 
 export async function POST(req) {
   try {
@@ -17,6 +28,7 @@ export async function POST(req) {
 
     // Record daily unlock in analytics_daily
     try {
+      await ensureAnalyticsTable();
       await db`
         INSERT INTO analytics_daily (date, views, copies, unlocks) 
         VALUES (CURDATE(), 0, 0, 1)
