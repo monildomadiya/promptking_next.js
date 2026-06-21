@@ -1,11 +1,11 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { getSession } from '@/lib/session';
+import { getAdminAuth } from '@/lib/auth';
 
 export async function GET(req) {
-  const session = await getSession();
-  if (!session?.isAdmin) return NextResponse.json({ error: 'Admin access required' }, { status: 401 });
+  const isAdmin = await getAdminAuth(req);
+  if (!isAdmin) return NextResponse.json({ error: 'Admin access required' }, { status: 401 });
 
   try {
     // Prompt stats

@@ -1,14 +1,14 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { getSession } from '@/lib/session';
+import { getAdminAuth } from '@/lib/auth';
 import { cacheInvalidate } from '@/lib/cache';
 
 import { revalidatePath } from 'next/cache';
 
 export async function POST(req) {
-  const session = await getSession();
-  if (!session?.isAdmin) return NextResponse.json({ error: 'Admin access required' }, { status: 401 });
+  const isAdmin = await getAdminAuth(req);
+  if (!isAdmin) return NextResponse.json({ error: 'Admin access required' }, { status: 401 });
 
   try {
     const { key, field, value } = await req.json();
