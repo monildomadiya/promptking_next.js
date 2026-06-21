@@ -22,7 +22,7 @@ export async function POST(req) {
 
     if (field === 'is_premium') {
       if (value && pin) {
-        await db`UPDATE prompts SET is_premium = 1, pin = ${pin} WHERE prompt_key = ${key}`;
+        await db`UPDATE prompts SET is_premium = 1, password = ${pin} WHERE prompt_key = ${key}`;
       } else {
         await db`UPDATE prompts SET is_premium = ${value ? 1 : 0} WHERE prompt_key = ${key}`;
       }
