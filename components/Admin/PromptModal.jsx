@@ -124,6 +124,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
         twitter_description: prompt.twitter_description || '',
         twitter_image: prompt.twitter_image || '',
         tags: typeof prompt.tags === 'string' ? prompt.tags : '',
+        password: prompt.password || '',
         gallery_urls: prompt.gallery_urls || prompt.galleryUrls || '[]'
       });
       setOriginalKey(prompt.prompt_key);
