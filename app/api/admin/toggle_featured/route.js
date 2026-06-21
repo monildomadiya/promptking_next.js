@@ -17,7 +17,6 @@ export async function POST(req) {
       UPDATE prompts SET is_featured = ${is_featured ? 1 : 0} WHERE prompt_key = ${key}
     `;
 
-    cacheInvalidate('all_prompts_listing');
     try { revalidatePath('/', 'layout'); } catch (e) {}
 
     return NextResponse.json({ success: true });

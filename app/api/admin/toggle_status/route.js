@@ -30,7 +30,6 @@ export async function POST(req) {
       await db`UPDATE prompts SET is_featured = ${value ? 1 : 0} WHERE prompt_key = ${key}`;
     }
 
-    cacheInvalidate('all_prompts_listing');
     try {
       revalidatePath('/', 'layout');
     } catch (e) {}
