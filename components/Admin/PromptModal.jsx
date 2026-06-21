@@ -33,7 +33,11 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     is_image_slider: false,
     gallery_urls: '[]',
     is_featured: false,
-    publish_date: ''
+    publish_date: '',
+    prompt_text: '',
+    img_after: '',
+    img_before: '',
+    ig_link: ''
   });
   const [errors, setErrors] = useState({});
   const [originalKey, setOriginalKey] = useState(null);
