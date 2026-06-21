@@ -11,7 +11,7 @@ export async function POST(req) {
   if (!isAdmin) return NextResponse.json({ error: 'Admin access required' }, { status: 401 });
 
   try {
-    const { key, field, value } = await req.json();
+    const { key, field, value, pin } = await req.json();
     if (!key || !field) return NextResponse.json({ error: 'Key and field are required' }, { status: 400 });
 
     // Only allow safe fields to be toggled
@@ -21,7 +21,11 @@ export async function POST(req) {
     }
 
     if (field === 'is_premium') {
-      await db`UPDATE prompts SET is_premium = ${value ? 1 : 0} WHERE prompt_key = ${key}`;
+      if (value && pin) {
+        await db`UPDATE prompts SET is_premium = 1, pin = ${pin} WHERE prompt_key = ${key}`;
+      } else {
+        await db`UPDATE prompts SET is_premium = ${value ? 1 : 0} WHERE prompt_key = ${key}`;
+      }
     } else if (field === 'is_featured') {
       await db`UPDATE prompts SET is_featured = ${value ? 1 : 0} WHERE prompt_key = ${key}`;
     }

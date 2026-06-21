@@ -1235,10 +1235,21 @@ const AdminDashboard = () => {
 
   const handleToggleStatus = async (item, field) => {
     const newValue = !item[field];
+    let extraData = {};
+
+    if (field === 'is_premium' && newValue === true) {
+      const pin = window.prompt(`Enter a PIN to make prompt "${item.title || item.prompt_key}" PRO:`);
+      if (!pin) {
+        toast.error("A PIN is required to set a prompt to PRO.");
+        return;
+      }
+      extraData.pin = pin;
+    }
+
     // Optimistic UI update
     setData(prev => prev.map(p => p.prompt_key === item.prompt_key ? { ...p, [field]: newValue } : p));
     try {
-      await api.post('/admin/toggle_status', { key: item.prompt_key, field, value: newValue });
+      await api.post('/admin/toggle_status', { key: item.prompt_key, field, value: newValue, ...extraData });
       toast.success(`Updated successfully.`);
     } catch (err) {
       // Revert on failure
