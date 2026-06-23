@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, Activity, ChevronLeft, ChevronRight, CheckCircle, Eye } from '@/components/Common/Icons';
+import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, ChevronLeft, ChevronRight, CheckCircle } from '@/components/Common/Icons';
 import confetti from 'canvas-confetti';
 import api from '@/lib/api';
 import Shimmer from '@/components/Common/Shimmer';
@@ -66,16 +66,6 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
     }
   }, [key, initialPrompt, initialSuggestedPrompts]);
 
-  // Always record a view on mount — even when initialPrompt is provided via SSR.
-  // Previously this was only called inside fetchPrompt(), which was skipped for SSR pages.
-  useEffect(() => {
-    const promptKey = initialPrompt?.prompt_key || initialPrompt?.key || key;
-    if (promptKey) {
-      api.post('/record_view', { key: promptKey }).catch(err => {
-        console.error('Failed to record view:', err);
-      });
-    }
-  }, [key]);
 
   const fetchPrompt = async () => {
     const cacheKey = `pk_prompt_${key}`;
@@ -266,7 +256,6 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
     try {
       const brandedText = `${prompt.promptText}\n\n- Copied from PromptKing.in`;
       await navigator.clipboard.writeText(brandedText);
-      await api.post('/record_copy', { key: prompt.prompt_key || prompt.key || key });
       setIsCopied(true);
       
       // Success Confetti for Free content
@@ -527,14 +516,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                   border: `1px solid ${brandColor || 'rgba(255,255,255,0.1)'}`,
                   color: brandColor || 'white'
                 }}>{prompt.aiType || 'AI'}</span>
-                <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', fontWeight: 600 }}>
-                  <Activity size={14} style={{ marginRight: '5px', verticalAlign: 'middle' }} />
-                  {prompt.copyCount || 0} Successful Copies
-                </span>
-                <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center' }}>
-                  <Eye size={14} style={{ marginRight: '5px' }} />
-                  {prompt.viewCount || 0} Views
-                </span>
+
               </div>
               <h1 className="prompt-detail-title" style={{ 
                 fontSize: '2.4rem', 
