@@ -15,7 +15,12 @@ export async function generateMetadata({ params }) {
 
     const category = rows[0];
     const title = category.meta_title || `${category.name} Prompts - PromptKing`;
-    const description = category.meta_desc || `Explore the best AI prompts in the ${category.name} category.`;
+    
+    let plainDesc = '';
+    if (category.description) {
+      plainDesc = category.description.replace(/<[^>]*>?/gm, '').substring(0, 160);
+    }
+    const description = category.meta_description || category.meta_desc || plainDesc || `Explore the best AI prompts in the ${category.name} category.`;
 
     return {
       title,

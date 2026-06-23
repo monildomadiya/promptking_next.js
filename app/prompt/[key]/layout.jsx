@@ -18,8 +18,15 @@ export async function generateMetadata({ params }) {
     }
 
     const prompt = rows[0];
-    const title = prompt.meta_title || `${prompt.prompt_text?.substring(0, 50)}... - PromptKing`;
-    const description = prompt.prompt_text?.substring(0, 160) || 'Discover amazing AI prompts on PromptKing.';
+    const title = prompt.meta_title || prompt.title || `${prompt.prompt_text?.substring(0, 50)}... - PromptKing`;
+    
+    // Strip HTML from description for fallback
+    let plainDesc = '';
+    if (prompt.description) {
+      plainDesc = prompt.description.replace(/<[^>]*>?/gm, '').substring(0, 160);
+    }
+    
+    const description = prompt.meta_description || plainDesc || prompt.prompt_text?.substring(0, 160) || 'Discover amazing AI prompts on PromptKing.';
     const images = [];
 
     // Attempt to parse gallery URLs for OG image
@@ -36,6 +43,20 @@ export async function generateMetadata({ params }) {
         }
       }
     }
+    
+    // Fallbacks if no gallery
+    if (images.length === 0) {
+      if (prompt.thumbnail_url) images.push(prompt.thumbnail_url);
+      else if (prompt.img_after) images.push(prompt.img_after);
+      else if (prompt.img_before) images.push(prompt.img_before);
+    }
+
+    const ogImages = images.length > 0 ? images.map(img => ({
+      url: img,
+      width: 1200,
+      height: 630,
+      alt: title
+    })) : undefined;
 
     return {
       title,
@@ -44,7 +65,7 @@ export async function generateMetadata({ params }) {
         title,
         description,
         url: `https://promptking.in/prompt/${key}`,
-        images: images.length > 0 ? images : undefined,
+        images: ogImages,
       },
       twitter: {
         card: 'summary_large_image',

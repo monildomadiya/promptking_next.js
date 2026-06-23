@@ -448,6 +448,23 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
   };
 
   const schemas = [promptSchema];
+  
+  // Add SoftwareSourceCode schema for strong AI Model/AIO optimization
+  schemas.push({
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareSourceCode',
+    'name': prompt.title,
+    'description': `An AI Prompt engineered for ${prompt.aiType || 'Generative AI'}.`,
+    'programmingLanguage': 'Natural Language',
+    'codeSampleType': 'AI Prompt',
+    'text': prompt.promptText || prompt.prompt_text || prompt.title,
+    'url': prompt.canonical_url || `https://promptking.in/prompt/${prompt.key}`,
+    'creator': {
+      '@type': 'Organization',
+      'name': 'PromptKing'
+    }
+  });
+
   if (parsedFaqs && parsedFaqs.length > 0) {
     schemas.push({
       '@context': 'https://schema.org',

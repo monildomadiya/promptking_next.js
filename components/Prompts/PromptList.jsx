@@ -204,34 +204,22 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
         </div>
       )}
 
-      {/* Prompt Grid - JS Masonry for Horizontal Distribution */}
-      <div style={{ display: 'flex', gap: isMobile ? '12px' : '20px', width: '100%', alignItems: 'flex-start' }}>
-        {Array.from({ length: isMobile ? 2 : 4 }).map((_, colIndex) => {
-          const colPrompts = pagedPrompts.filter((_, idx) => idx % (isMobile ? 2 : 4) === colIndex);
-          if (colPrompts.length === 0) return null;
-          
-          return (
-            <div key={colIndex} style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '12px' : '25px', flex: 1, minWidth: 0 }}>
-              {colPrompts.map((p, pIdx) => {
-                const globalIndex = pIdx * (isMobile ? 2 : 4) + colIndex;
-                return (
-                  <div key={p.prompt_key || p.id}>
-                    <PromptCard
-                      prompt={p}
-                      isUnlocked={!p.isPremium || activeUnlockedKey === (p.prompt_key || p.id)}
-                      onUnlock={() => setActiveUnlockedKey(p.prompt_key || p.id)}
-                      onLock={() => setActiveUnlockedKey(null)}
-                      searchTerm={search}
-                      isHighlighted={!!search && (p.prompt_key || '').toLowerCase().includes(search.toLowerCase())}
-                      isPriority={globalIndex < (isMobile ? 4 : 8)}
-                      isMobile={isMobile}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
+      {/* Prompt Grid - CSS Masonry for SSR Hydration Fix */}
+      <div className="css-masonry-grid">
+        {pagedPrompts.map((p, idx) => (
+          <div key={p.prompt_key || p.id}>
+            <PromptCard
+              prompt={p}
+              isUnlocked={!p.isPremium || activeUnlockedKey === (p.prompt_key || p.id)}
+              onUnlock={() => setActiveUnlockedKey(p.prompt_key || p.id)}
+              onLock={() => setActiveUnlockedKey(null)}
+              searchTerm={search}
+              isHighlighted={!!search && (p.prompt_key || '').toLowerCase().includes(search.toLowerCase())}
+              isPriority={idx < 8}
+              isMobile={isMobile}
+            />
+          </div>
+        ))}
       </div>
 
       {/* Pagination */}

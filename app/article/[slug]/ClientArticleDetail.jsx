@@ -26,7 +26,7 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
     const catsCache = getCache('pk_categories');
     let fetchedCategories = catsCache || [];
 
-    if (cachedData && catsCache) {
+    if (cachedData && cachedData.blog && cachedData.blog.slug === slug && catsCache) {
       setBlog(cachedData.blog);
       setOtherBlogs(cachedData.otherBlogs);
       setCategories(catsCache);
@@ -75,10 +75,16 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
   };
 
   useEffect(() => {
-    if (!initialBlog || !initialCategories) {
+    if (initialBlog && initialBlog.slug === slug) {
+      setBlog(initialBlog);
+      setOtherBlogs(initialOtherBlogs || []);
+      setCategories(initialCategories || []);
+      setLoading(false);
+    } else {
+      setLoading(true);
       fetchArticle();
     }
-  }, [slug, initialBlog, initialCategories]);
+  }, [slug, initialBlog, initialCategories, initialOtherBlogs]);
 
   if (loading) return (
     <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '60px 20px' }}>
@@ -160,26 +166,19 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
   }
 
   // Generate Table of Contents
-  const extractHeadings = () => {
-    if (!blog.content) return [];
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(blog.content, 'text/html');
-    const headings = doc.querySelectorAll('h2, h3');
-    return Array.from(headings).map(h => ({
-      tag: h.tagName.toLowerCase(),
-      text: h.textContent,
-      id: h.textContent.toLowerCase().replace(/[^a-z0-9]+/g, '-')
-    }));
-  };
+  let headings = [];
+  let finalContent = blog.content || '';
 
-  const headings = extractHeadings();
-
-  // Inject IDs into content for TOC linking
-  let finalContent = blog.content;
-  if (blog.enable_table_of_contents !== false && headings.length > 0) {
-    headings.forEach(h => {
-      const regex = new RegExp(`(<${h.tag}[^>]*>)(.*?)(</${h.tag}>)`, 'i');
-      finalContent = finalContent.replace(regex, `$1<a id="${h.id}"></a>$2$3`);
+  if (blog.content && blog.enable_table_of_contents !== false) {
+    let counter = 0;
+    finalContent = finalContent.replace(/<(h[23])([^>]*)>([\s\S]*?)<\/\1>/gi, (match, p1, p2, p3) => {
+      const text = p3.replace(/<[^>]*>?/gm, '').trim(); 
+      if (!text) return match;
+      const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + counter++;
+      headings.push({ tag: p1.toLowerCase(), text, id });
+      
+      // Inject the id into the heading tag
+      return `<${p1} id="${id}"${p2}>${p3}</${p1}>`;
     });
   }
 

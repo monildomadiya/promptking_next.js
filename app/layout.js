@@ -27,11 +27,33 @@ export const metadata = {
     title: 'PromptKing - Premium AI Prompts Library',
     description: 'Discover 1000+ free and premium AI prompts for ChatGPT, Midjourney, Claude, and more.',
     siteName: 'PromptKing',
+    images: [
+      {
+        url: 'https://promptking.in/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'PromptKing - Premium AI Prompts Library',
+      }
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'PromptKing - Premium AI Prompts',
     description: 'Discover high-quality AI prompts for ChatGPT, Midjourney, and more.',
+    images: ['https://promptking.in/og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
