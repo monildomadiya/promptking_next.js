@@ -1728,9 +1728,10 @@ body.shorts-modal-open {
   }
 }
   
-.css-masonry-grid { column-count: 4; column-gap: 20px; width: 100%; }  
-.css-masonry-grid > div { break-inside: avoid; margin-bottom: 25px; }  
-@media (max-width: 1100px) { .css-masonry-grid { column-count: 2; column-gap: 12px; } .css-masonry-grid > div { margin-bottom: 12px; } }
+.css-masonry-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; align-items: start; }
+.css-masonry-grid > div { margin-bottom: 0px; }
+@media (max-width: 1100px) { .css-masonry-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } .css-masonry-grid > div { margin-bottom: 0px; } }
+@media (max-width: 600px) { .css-masonry-grid { grid-template-columns: 1fr; } }
 
 
 .author-box { position: relative; display: flex; align-items: center; justify-content: flex-start; gap: 32px; padding: 40px; border-radius: 24px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); margin-top: 40px; overflow: hidden; }
