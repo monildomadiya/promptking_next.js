@@ -205,7 +205,6 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
       if (!formData.password || !/^\d{4}$/.test(formData.password)) {
         newErrors.password = true;
         toast.error("⚠️ SECURITY REQUIRED: Premium content must have an EXACTLY 4-digit numeric PIN.");
-        hasErrors = true;
       }
     }
 

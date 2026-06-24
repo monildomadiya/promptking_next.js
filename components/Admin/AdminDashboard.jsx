@@ -461,7 +461,7 @@ const AdminDashboard = () => {
   const [analyticsData, setAnalyticsData] = useState([]);
   const [promptAnalytics, setPromptAnalytics] = useState([]);
   const [blogAnalytics, setBlogAnalytics] = useState([]);
-  const [stats, setStats] = useState({ prompts: 0, copies: 0, unlocks: 0 });
+  const [stats, setStats] = useState({ prompts: 0, copies: 0, unlocks: 0, views: 0 });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isKingDialogOpen, setIsKingDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -1159,9 +1159,9 @@ const AdminDashboard = () => {
             <motion.div key="dashboard" {...pageTransition}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', marginBottom: '48px' }}>
                 <StatCard label="Total Prompts" value={stats.prompts} color="#ff4d4d" icon={<TableProperties size={24} />} />
-                <StatCard label="Total Views" value={analyticsData.reduce((acc, curr) => acc + (curr.view || 0), 0)} color="#10b981" icon={<Layers size={24} />} />
-                <StatCard label="Total Copies" value={analyticsData.reduce((acc, curr) => acc + (curr.copy || 0), 0)} color="#3b82f6" icon={<Activity size={24} />} />
-                <StatCard label="Total Unlocks" value={analyticsData.reduce((acc, curr) => acc + (curr.unlock || 0), 0)} color="#fbbf24" icon={<Crown size={24} />} />
+                <StatCard label="Total Views" value={stats.views || 0} color="#10b981" icon={<Layers size={24} />} />
+                <StatCard label="Total Copies" value={stats.copies || 0} color="#3b82f6" icon={<Activity size={24} />} />
+                <StatCard label="Total Unlocks" value={stats.unlocks || 0} color="#fbbf24" icon={<Crown size={24} />} />
               </div>
               <div style={{ ...glassPanelStyle, padding: '30px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
