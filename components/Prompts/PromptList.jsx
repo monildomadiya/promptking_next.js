@@ -212,14 +212,14 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
             <h2 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: 'white' }}>Featured Picks</h2>
           </div>
           <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
+            display: 'flex', 
+            flexWrap: 'wrap',
             gap: '20px', 
             width: '100%',
-            alignItems: 'start'
+            alignItems: 'stretch'
           }}>
             {pagedPrompts.filter(p => p.isFeatured).map((p, idx) => (
-              <div key={p.prompt_key || p.id}>
+              <div key={p.prompt_key || p.id} style={{ flex: '1 1 300px', maxWidth: '100%' }}>
                 <PromptCard
                   prompt={p}
                   isUnlocked={!p.isPremium || activeUnlockedKey === (p.prompt_key || p.id)}
