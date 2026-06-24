@@ -632,7 +632,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                 gap: '16px', 
                 padding: '10px 20px', 
                 background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)', 
-                border: '2px solid rgba(255,255,255,0.25)', 
+                border: '1px solid rgba(255, 255, 255,0.25)', 
                 borderRadius: '50px',
                 backdropFilter: 'blur(10px)',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
@@ -938,7 +938,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginTop: '35px' }}>
               <div style={{ 
                 background: 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%)', 
-                border: '2px solid rgba(255,255,255,0.2)', 
+                border: '1px solid rgba(255, 255, 255,0.2)', 
                 borderRadius: '20px', 
                 padding: '24px',
                 display: 'flex',
@@ -959,7 +959,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
               
               <div style={{ 
                 background: 'linear-gradient(135deg, rgba(229,9,20,0.15) 0%, rgba(229,9,20,0.05) 100%)', 
-                border: '2px solid rgba(229,9,20,0.35)', 
+                border: '1px solid rgba(229, 9, 20,0.35)', 
                 borderRadius: '20px', 
                 padding: '24px',
                 display: 'flex',

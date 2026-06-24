@@ -153,7 +153,7 @@ const AuthorModal = ({ author, onClose, onSave }) => {
                 <img 
                   src={formData.image} 
                   alt="Preview" 
-                  style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)' }}
+                  style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '1px solid rgba(255, 255, 255,0.1)' }}
                   onError={(e) => e.target.style.display = 'none'}
                 />
               </div>

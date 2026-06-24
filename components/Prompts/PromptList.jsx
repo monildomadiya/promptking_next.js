@@ -204,51 +204,23 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
         </div>
       )}
 
-      {/* Featured Prompts Grid */}
-      {pagedPrompts.filter(p => p.isFeatured).length > 0 && (
-        <div style={{ marginBottom: '40px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-            <div style={{ width: '4px', height: '20px', background: 'var(--accent-main)', borderRadius: '2px' }} />
-            <h2 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: 'white' }}>Featured Picks</h2>
+      {/* Prompt Grid - CSS Masonry for SSR Hydration Fix */}
+      <div className="css-masonry-grid">
+        {pagedPrompts.map((p, idx) => (
+          <div key={p.prompt_key || p.id}>
+            <PromptCard
+              prompt={p}
+              isUnlocked={!p.isPremium || activeUnlockedKey === (p.prompt_key || p.id)}
+              onUnlock={() => setActiveUnlockedKey(p.prompt_key || p.id)}
+              onLock={() => setActiveUnlockedKey(null)}
+              searchTerm={search}
+              isHighlighted={!!search && (p.prompt_key || '').toLowerCase().includes(search.toLowerCase())}
+              isPriority={idx < 8}
+              isMobile={isMobile}
+            />
           </div>
-          <div className="css-masonry-grid">
-            {pagedPrompts.filter(p => p.isFeatured).map((p, idx) => (
-              <div key={p.prompt_key || p.id}>
-                <PromptCard
-                  prompt={p}
-                  isUnlocked={!p.isPremium || activeUnlockedKey === (p.prompt_key || p.id)}
-                  onUnlock={() => setActiveUnlockedKey(p.prompt_key || p.id)}
-                  onLock={() => setActiveUnlockedKey(null)}
-                  searchTerm={search}
-                  isHighlighted={!!search && (p.prompt_key || '').toLowerCase().includes(search.toLowerCase())}
-                  isPriority={true}
-                  isMobile={isMobile}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Regular Prompt Grid - CSS Masonry for SSR Hydration Fix */}
-      {pagedPrompts.filter(p => !p.isFeatured).length > 0 && (
-        <div className="css-masonry-grid">
-          {pagedPrompts.filter(p => !p.isFeatured).map((p, idx) => (
-            <div key={p.prompt_key || p.id}>
-              <PromptCard
-                prompt={p}
-                isUnlocked={!p.isPremium || activeUnlockedKey === (p.prompt_key || p.id)}
-                onUnlock={() => setActiveUnlockedKey(p.prompt_key || p.id)}
-                onLock={() => setActiveUnlockedKey(null)}
-                searchTerm={search}
-                isHighlighted={!!search && (p.prompt_key || '').toLowerCase().includes(search.toLowerCase())}
-                isPriority={idx < 8}
-                isMobile={isMobile}
-              />
-            </div>
-          ))}
-        </div>
-      )}
+        ))}
+      </div>
 
       {/* Pagination */}
       {totalPages > 1 && (

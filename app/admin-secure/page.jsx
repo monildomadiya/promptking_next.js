@@ -570,7 +570,7 @@ const BrandingPanel = ({ onSave, isMobile }) => {
             <SectionTitle title="Favicon" />
             <div style={{ 
               aspectRatio: '1', borderRadius: '20px', background: 'rgba(0,0,0,0.4)', 
-              border: '2px solid rgba(229,9,20,0.2)', display: 'flex', alignItems: 'center', 
+              border: '1px solid rgba(229, 9, 20,0.2)', display: 'flex', alignItems: 'center', 
               justifyContent: 'center', padding: '20px', position: 'relative', overflow: 'hidden'
             }}>
               <img src="/favicon.png" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '12px' }} alt="Favicon" />
