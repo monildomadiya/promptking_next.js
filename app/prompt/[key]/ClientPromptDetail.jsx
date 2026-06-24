@@ -139,6 +139,9 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
     if (!initialSuggestedPrompts || initialSuggestedPrompts.length === 0) {
       fetchSuggestions();
     }
+    
+    // Record view
+    api.post('/record_view', { key: key }).catch(err => console.error("Failed to record view:", err));
   }, [key, initialPrompt, initialSuggestedPrompts]);
 
 
@@ -333,6 +336,9 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
       await navigator.clipboard.writeText(brandedText);
       setIsCopied(true);
       
+      // Record copy
+      api.post('/record_copy', { key: prompt.prompt_key || prompt.key || key }).catch(err => console.error("Failed to record copy:", err));
+      
       // Success Confetti for Free content
       const box = document.getElementById(`box-detail`);
       if (box) {
@@ -489,7 +495,17 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
 
   // Parse Tags
   let parsedTags = [];
-  try { parsedTags = typeof prompt.tags === 'string' ? JSON.parse(prompt.tags) : (prompt.tags || []); } catch(e) {}
+  try {
+    if (typeof prompt.tags === 'string') {
+      if (prompt.tags.trim().startsWith('[')) {
+        parsedTags = JSON.parse(prompt.tags);
+      } else {
+        parsedTags = prompt.tags.split(',').map(t => t.trim()).filter(Boolean);
+      }
+    } else if (Array.isArray(prompt.tags)) {
+      parsedTags = prompt.tags;
+    }
+  } catch(e) {}
 
   const promptSchema = {
     '@context': 'https://schema.org',
@@ -1329,7 +1345,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {parsedFaqs.map((faq, i) => (
-                    <div key={i} style={{ background: 'rgba(255,255,255,0.25)', padding: '25px', borderRadius: '20px', border: '1px solid rgba(255, 255, 255,0.15)' }}>
+                    <div key={i} style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '25px', borderRadius: '20px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
                       <h3 style={{ fontSize: '1.1rem', marginBottom: '12px', color: 'white', fontWeight: 700 }}>{faq.question}</h3>
                       <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, margin: 0 }}>{faq.answer}</p>
                     </div>
