@@ -1,7 +1,7 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, ChevronLeft, ChevronRight, CheckCircle } from '@/components/Common/Icons';
+import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, ChevronLeft, ChevronRight, CheckCircle, Tag } from '@/components/Common/Icons';
 import confetti from 'canvas-confetti';
 import api from '@/lib/api';
 import Shimmer from '@/components/Common/Shimmer';
@@ -11,6 +11,81 @@ import SEOMetadata from '@/components/SEO/SEOMetadata';
 import AdSenseUnit from '@/components/Ads/AdSenseUnit';
 import { getCache, setCache } from '@/utils/cacheUtils';
 import { useAppContext } from '@/components/AppContext';
+
+const OTPInput = ({ value, onChange, length = 4, showError }) => {
+  const inputRefs = useRef([]);
+
+  const handleChange = (e, index) => {
+    const val = e.target.value;
+    // Allow empty string for backspace or single digit
+    const char = val.substring(val.length - 1);
+    
+    const pinArray = value.padEnd(length, ' ').split('');
+    pinArray[index] = char || ' ';
+    const newPin = pinArray.join('').trimEnd();
+    
+    onChange(newPin);
+    
+    if (char && char !== ' ' && index < length - 1) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === 'Backspace' && !value[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text/plain').slice(0, length);
+    if (!pastedData) return;
+    
+    onChange(pastedData);
+    
+    if (pastedData.length < length) {
+      inputRefs.current[pastedData.length]?.focus();
+    } else {
+      inputRefs.current[length - 1]?.focus();
+    }
+  };
+
+  return (
+    <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+      {Array.from({ length }).map((_, index) => (
+        <input
+          key={index}
+          ref={el => inputRefs.current[index] = el}
+          type="password"
+          inputMode="numeric"
+          maxLength={2}
+          value={value[index] && value[index] !== ' ' ? value[index] : ''}
+          onChange={(e) => handleChange(e, index)}
+          onKeyDown={(e) => handleKeyDown(e, index)}
+          onPaste={handlePaste}
+          style={{
+            width: '50px',
+            height: '60px',
+            borderRadius: '16px',
+            border: showError ? '2px solid #ff4444' : '1px solid rgba(255,255,255,0.05)',
+            background: 'rgba(255,255,255,0.02)',
+            color: 'white',
+            textAlign: 'center',
+            outline: 'none',
+            fontSize: '1.8rem',
+            fontWeight: 'bold',
+            transition: 'all 0.3s ease',
+            backdropFilter: 'blur(10px)',
+            boxShadow: value[index] && value[index] !== ' ' ? '0 0 15px rgba(255,215,0,0.2)' : 'none'
+          }}
+          onFocus={(e) => e.target.style.borderColor = 'var(--accent-main)'}
+          onBlur={(e) => e.target.style.borderColor = showError ? '#ff4444' : 'rgba(255,255,255,0.05)'}
+        />
+      ))}
+    </div>
+  );
+};
 
 const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSettings }) => {
   const { isMobile } = useAppContext();
@@ -316,12 +391,12 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
 
                {/* Hero Image Shimmer */}
                <div className="hero-section glass-panel" style={{
-                 background: 'rgba(255, 255, 255, 0.02)',
+                 background: 'rgba(255, 255, 255, 0.25)',
                  backdropFilter: 'blur(30px)',
                  WebkitBackdropFilter: 'blur(30px)',
                  borderRadius: '32px',
                  padding: '12px',
-                 border: '1px solid rgba(255, 255, 255, 0.05)',
+                 border: '1px solid rgba(255, 255, 255, 0.15)',
                  boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
                  position: 'relative',
                  overflow: 'hidden'
@@ -335,7 +410,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                     backdropFilter: 'blur(20px)',
                     WebkitBackdropFilter: 'blur(20px)',
                     borderRadius: '32px', 
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    border: '1px solid rgba(255, 255, 255,0.25)',
                     flex: 1,
                     minHeight: '350px'
                   }}>
@@ -358,8 +433,8 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
 
           <aside className="detail-sidebar">
             <div style={{ 
-              background: 'rgba(255, 255, 255, 0.02)', 
-              border: '1px solid rgba(255, 255, 255, 0.05)', 
+              background: 'rgba(255, 255, 255, 0.25)', 
+              border: '1px solid rgba(255, 255, 255, 0.15)', 
               borderRadius: '28px', 
               padding: '28px'
             }}>
@@ -411,6 +486,10 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
   // Parse FAQs
   let parsedFaqs = [];
   try { parsedFaqs = typeof prompt.faqs === 'string' ? JSON.parse(prompt.faqs) : (prompt.faqs || []); } catch(e) {}
+
+  // Parse Tags
+  let parsedTags = [];
+  try { parsedTags = typeof prompt.tags === 'string' ? JSON.parse(prompt.tags) : (prompt.tags || []); } catch(e) {}
 
   const promptSchema = {
     '@context': 'https://schema.org',
@@ -512,7 +591,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                   borderRadius: '10px',
                   fontWeight: 800,
                   textTransform: 'uppercase',
-                  background: 'rgba(255,255,255,0.03)',
+                  background: 'rgba(255,255,255,0.1)',
                   border: `1px solid ${brandColor || 'rgba(255,255,255,0.1)'}`,
                   color: brandColor || 'white'
                 }}>{prompt.aiType || 'AI'}</span>
@@ -529,16 +608,36 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                 WebkitTextFillColor: 'transparent'
               }}>{prompt.title}</h1>
               
-              {/* E-E-A-T Badges (Expertise, Authoritativeness, Trust) */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '15px', padding: '12px 16px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <img src="https://promptking.in/favicon.png" alt="PromptKing Logo" style={{ width: '20px', height: '20px', borderRadius: '50%' }} />
-                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'white' }}>PromptKing Team</span>
-                  <CheckCircle size={14} color="#27C93F" />
-                  <span style={{ fontSize: '0.75rem', color: '#27C93F', fontWeight: 700, textTransform: 'uppercase' }}>Verified Expert</span>
+              {/* E-E-A-T Badges (Expertise, Authoritativeness, Trust) - Premium UI */}
+              <div style={{ 
+                display: 'inline-flex', 
+                flexWrap: 'wrap', 
+                alignItems: 'center', 
+                gap: '16px', 
+                padding: '10px 20px', 
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)', 
+                border: '2px solid rgba(255,255,255,0.25)', 
+                borderRadius: '50px',
+                backdropFilter: 'blur(10px)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ 
+                    width: '28px', height: '28px', borderRadius: '50%', background: 'var(--accent-main)', 
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 10px rgba(229,9,20,0.5)', overflow: 'hidden'
+                  }}>
+                    <img src={prompt.author_image ? optimizeImage(prompt.author_image, 50) : "https://promptking.in/favicon.png"} alt={prompt.author_name || "PromptKing Team"} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'white', letterSpacing: '0.2px' }}>{prompt.author_name || 'PromptKing Team'}</span>
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(39, 201, 63, 0.1)', padding: '4px 10px', borderRadius: '20px', border: '1px solid rgba(39, 201, 63, 0.2)' }}>
+                    <CheckCircle size={12} color="#27C93F" />
+                    <span style={{ fontSize: '0.7rem', color: '#27C93F', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Verified Expert</span>
+                  </div>
                 </div>
-                <div style={{ width: '4px', height: '4px', background: 'rgba(255,255,255,0.2)', borderRadius: '50%' }}></div>
-                <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)' }}>
+                <div style={{ width: '4px', height: '4px', background: 'rgba(255,255,255,0.3)', borderRadius: '50%' }}></div>
+                <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                   Updated on {new Date(prompt.updated_at || prompt.created_at || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                 </div>
               </div>
@@ -548,7 +647,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
             <div className={`media-prompt-container ${isListicle ? 'listicle-mode' : ''}`} style={{ display: 'flex', gap: '40px', alignItems: 'stretch', flexDirection: isListicle ? 'column' : 'row' }}>
               {/* Hero Section: Image Display */}
             <div className="hero-section glass-panel" style={{
-              background: 'rgba(255, 255, 255, 0.02)',
+              background: 'rgba(255, 255, 255, 0.08)',
               backdropFilter: 'blur(30px)',
               WebkitBackdropFilter: 'blur(30px)',
               borderRadius: '32px',
@@ -635,7 +734,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
               overflow: 'hidden',
               display: 'flex', 
               flexDirection: 'column', 
-              border: isUnlocked ? (prompt.isPremium ? '2px solid #FFD700' : (isCopied ? '2px solid #27C93F' : '2px solid var(--accent-main)')) : '1px solid rgba(255,255,255,0.08)',
+              border: isUnlocked ? (prompt.isPremium ? '2px solid #FFD700' : (isCopied ? '2px solid #27C93F' : '2px solid var(--accent-main)')) : '1px solid rgba(255, 255, 255,0.08)',
               boxShadow: isUnlocked ? (prompt.isPremium ? '0 15px 50px rgba(255, 215, 0, 0.15)' : (isCopied ? '0 15px 50px rgba(39, 201, 63, 0.3)' : '0 15px 50px rgba(229, 9, 20, 0.2)')) : 'none',
               transform: isUnlocked ? (isCopied && !prompt.isPremium ? 'scale(1.02)' : 'scale(1.01)') : 'scale(1)',
               minHeight: '350px',
@@ -644,7 +743,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
               flex: 1
             }}>
               {/* Vault Header */}
-              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '15px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '15px 20px', borderBottom: '1px solid rgba(255, 255, 255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#FF5F56', opacity: 0.8 }}></div>
                   <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#FFBD2E', opacity: 0.8 }}></div>
@@ -724,27 +823,13 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                     position: 'absolute', inset: 0,
                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '30px', zIndex: 10, gap: '20px'
                   }}>
-                    <div style={{ width: '100%', maxWidth: '200px' }}>
+                    <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
                       <form onSubmit={(e) => e.preventDefault()}>
-                        <input 
-                          type="password" 
-                          placeholder="••••" 
-                          value={pin}
-                          onChange={(e) => checkAutoUnlock(e.target.value)}
-                          style={{ 
-                            width: '100%',
-                            height: '55px',
-                            borderRadius: '16px',
-                            border: showError ? '2px solid #ff4444' : '1px solid rgba(255,255,255,0.15)',
-                            background: 'rgba(255,255,255,0.05)',
-                            color: 'white', 
-                            textAlign: 'center', 
-                            outline: 'none', 
-                            letterSpacing: '8px', 
-                            fontSize: '1.6rem', 
-                            transition: 'all 0.3s ease',
-                            backdropFilter: 'blur(10px)'
-                          }} 
+                        <OTPInput 
+                          value={pin} 
+                          onChange={(newPin) => checkAutoUnlock(newPin)} 
+                          showError={showError} 
+                          length={4} 
                         />
                       </form>
                     </div>
@@ -755,24 +840,24 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                       <button 
                         onClick={() => setShowVideoModal(true)}
                         style={{ 
-                          background: 'rgba(255,255,255,0.03)', 
+                          background: 'rgba(255,255,255,0.1)', 
                           fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', gap: '8px', 
                           padding: '8px 16px', borderRadius: '10px',
-                          textDecoration: 'none', border: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer',
+                          textDecoration: 'none', border: '1px solid rgba(255, 255, 255,0.15)', cursor: 'pointer',
                           transition: 'all 0.3s ease'
                         }}
                         onMouseOver={(e) => { 
                           const isMobile = window.innerWidth <= 1100;
                           if (!isMobile) {
                             e.currentTarget.style.color = 'white'; 
-                            e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; 
+                            e.currentTarget.style.background = 'rgba(255,255,255,0.25)'; 
                           }
                         }}
                         onMouseOut={(e) => { 
                           const isMobile = window.innerWidth <= 1100;
                           if (!isMobile) {
                             e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; 
-                            e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; 
+                            e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; 
                           }
                         }}
                       >
@@ -833,21 +918,49 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
               videoUrl={prompt.igLink} 
             />
 
-            <div style={{ 
-              marginTop: '10px', 
-              marginBottom: '30px', 
-              padding: '16px 20px', 
-              background: 'rgba(255, 255, 255, 0.02)', 
-              borderRadius: '16px', 
-              border: '1px solid rgba(255, 255, 255, 0.05)',
-              borderLeft: '4px solid var(--accent-main)'
-            }}>
-              <p style={{ margin: '0 0 8px 0', fontSize: '0.95rem', color: 'rgba(255,255,255,0.8)' }}>
-                <strong style={{ color: 'white' }}>Tip:</strong> Use different AI tools to get the best results.
-              </p>
-              <p style={{ margin: 0, fontSize: '0.95rem', color: 'rgba(255,255,255,0.8)' }}>
-                <strong style={{ color: 'white' }}>Note:</strong> The final edited image may vary based on the original photo.
-              </p>
+            {/* Premium Tip & Note UI */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginTop: '35px' }}>
+              <div style={{ 
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%)', 
+                border: '2px solid rgba(255,255,255,0.2)', 
+                borderRadius: '20px', 
+                padding: '24px',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '16px',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+              }}>
+                <div style={{ background: 'rgba(255, 215, 0, 0.1)', padding: '12px', borderRadius: '14px', color: '#FFD700', flexShrink: 0 }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 12 3a4.65 4.65 0 0 0-4.5 8.5c.76.76 1.23 1.52 1.41 2.5"></path></svg>
+                </div>
+                <div>
+                  <h4 style={{ margin: '0 0 6px 0', fontSize: '1.05rem', color: 'white', fontWeight: 800 }}>Pro Tip</h4>
+                  <p style={{ margin: 0, fontSize: '0.9rem', color: 'rgba(255,255,255,0.65)', lineHeight: 1.6 }}>
+                    Use different AI tools like Midjourney or DALL-E to get varied, unique results.
+                  </p>
+                </div>
+              </div>
+              
+              <div style={{ 
+                background: 'linear-gradient(135deg, rgba(229,9,20,0.15) 0%, rgba(229,9,20,0.05) 100%)', 
+                border: '2px solid rgba(229,9,20,0.35)', 
+                borderRadius: '20px', 
+                padding: '24px',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '16px',
+                boxShadow: '0 10px 30px rgba(229,9,20,0.1)'
+              }}>
+                <div style={{ background: 'rgba(229,9,20,0.15)', padding: '12px', borderRadius: '14px', color: 'var(--accent-main)', flexShrink: 0 }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                </div>
+                <div>
+                  <h4 style={{ margin: '0 0 6px 0', fontSize: '1.05rem', color: 'white', fontWeight: 800 }}>Important Note</h4>
+                  <p style={{ margin: 0, fontSize: '0.9rem', color: 'rgba(255,255,255,0.65)', lineHeight: 1.6 }}>
+                    The final generated image may vary slightly based on the AI version and original photo.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Gallery Section - Moved below Notes & Tips */}
@@ -872,7 +985,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                         className="gallery-thumb-item"
                         style={{
                           cursor: 'pointer', borderRadius: '16px', overflow: 'hidden',
-                          aspectRatio: '1 / 1', border: '1px solid rgba(255,255,255,0.08)',
+                          aspectRatio: '1 / 1', border: '1px solid rgba(255, 255, 255,0.25)',
                           background: '#111', position: 'relative', boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
                           transition: 'transform 0.25s ease, box-shadow 0.25s ease'
                         }}
@@ -910,13 +1023,13 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                         onClick={() => setLightboxIndex(null)}
                         style={{
                           position: 'absolute', top: '20px', right: '24px', zIndex: 10001,
-                          background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+                          background: 'rgba(255,255,255,0.25)', border: '1px solid rgba(255,255,255,0.15)',
                           color: 'white', width: '44px', height: '44px', borderRadius: '50%',
                           fontSize: '1.3rem', cursor: 'pointer', display: 'flex',
                           alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', transition: '0.2s'
                         }}
                         onMouseEnter={e => e.currentTarget.style.background = 'rgba(229,9,20,0.5)'}
-                        onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.25)'}
                       >✕</button>
 
                       {/* Prev */}
@@ -925,13 +1038,13 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                           onClick={e => { e.stopPropagation(); setLightboxIndex((lightboxIndex - 1 + galleryImages.length) % galleryImages.length); }}
                           style={{
                             position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', zIndex: 10001,
-                            background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+                            background: 'rgba(255,255,255,0.25)', border: '1px solid rgba(255,255,255,0.15)',
                             color: 'white', width: '50px', height: '50px', borderRadius: '50%',
                             fontSize: '1.5rem', cursor: 'pointer', display: 'flex',
                             alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', transition: '0.2s'
                           }}
                           onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
-                          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+                          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.25)'}
                         >‹</button>
                       )}
 
@@ -944,7 +1057,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                         style={{
                           maxWidth: '90vw', maxHeight: '86vh', objectFit: 'contain',
                           borderRadius: '20px', boxShadow: '0 40px 80px rgba(0,0,0,0.8)',
-                          border: '1px solid rgba(255,255,255,0.08)',
+                          border: '1px solid rgba(255, 255, 255,0.25)',
                           animation: 'lightboxImgIn 0.28s cubic-bezier(0.34,1.56,0.64,1)'
                         }}
                       />
@@ -955,20 +1068,20 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                           onClick={e => { e.stopPropagation(); setLightboxIndex((lightboxIndex + 1) % galleryImages.length); }}
                           style={{
                             position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', zIndex: 10001,
-                            background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+                            background: 'rgba(255,255,255,0.25)', border: '1px solid rgba(255,255,255,0.15)',
                             color: 'white', width: '50px', height: '50px', borderRadius: '50%',
                             fontSize: '1.5rem', cursor: 'pointer', display: 'flex',
                             alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', transition: '0.2s'
                           }}
                           onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
-                          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+                          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.25)'}
                         >›</button>
                       )}
 
                       {/* Counter */}
                       <div style={{
                         position: 'absolute', bottom: '22px', left: '50%', transform: 'translateX(-50%)',
-                        background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(10px)',
+                        background: 'rgba(255,255,255,0.25)', backdropFilter: 'blur(10px)',
                         border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.7)',
                         fontSize: '0.8rem', fontWeight: 700, padding: '6px 18px', borderRadius: '20px', letterSpacing: '1px'
                       }}>
@@ -994,12 +1107,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
               <div className="detail-description-section" style={{
                 padding: '20px 0'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
-                  <div style={{ width: '4px', height: '24px', background: 'var(--accent-main)', borderRadius: '2px' }} />
-                  <h3 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0 }}>
-                    Logic & Instructions
-                  </h3>
-                </div>
+
                 <div 
                   className="blog-content" 
                   style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.9, fontSize: '1.1rem' }}
@@ -1020,7 +1128,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
               if (!parsedSubPrompts || parsedSubPrompts.length === 0) return null;
 
               return (
-                <div style={{ padding: '30px 0', borderTop: '1px solid rgba(255,255,255,0.05)', marginTop: '20px' }}>
+                <div style={{ padding: '30px 0', borderTop: '1px solid rgba(255, 255, 255,0.15)', marginTop: '20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
                     <div style={{ width: '4px', height: '24px', background: 'var(--accent-main)', borderRadius: '2px' }} />
                     <h2 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0, color: 'white' }}>
@@ -1032,7 +1140,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                     {parsedSubPrompts.map((sp, idx) => (
                       <div key={idx} style={{ 
                         background: 'var(--surface-1)', 
-                        border: '1px solid rgba(255,255,255,0.05)', 
+                        border: '1px solid rgba(255, 255, 255,0.15)', 
                         borderRadius: '24px', 
                         overflow: 'hidden' 
                       }}>
@@ -1041,16 +1149,16 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                           <div style={{ 
                             display: 'flex', 
                             flexDirection: 'column',
-                            borderBottom: '1px solid rgba(255,255,255,0.05)'
+                            borderBottom: '1px solid rgba(255, 255, 255,0.15)'
                           }}>
                             {sp.imgBefore && sp.imgAfter ? (
                               <div style={{ display: 'flex' }}>
-                                <div style={{ flex: 1, borderRight: '1px solid rgba(255,255,255,0.05)' }}>
-                                  <div style={{ padding: '8px 12px', background: 'rgba(255,255,255,0.02)', fontSize: '0.75rem', fontWeight: 800, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px' }}>Before</div>
+                                <div style={{ flex: 1, borderRight: '1px solid rgba(255, 255, 255,0.15)' }}>
+                                  <div style={{ padding: '8px 12px', background: 'rgba(255,255,255,0.25)', fontSize: '0.75rem', fontWeight: 800, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px' }}>Before</div>
                                   <img src={sp.imgBefore} alt="Before" style={{ width: '100%', height: 'auto', display: 'block' }} />
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                  <div style={{ padding: '8px 12px', background: 'rgba(255,255,255,0.02)', fontSize: '0.75rem', fontWeight: 800, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px' }}>After</div>
+                                  <div style={{ padding: '8px 12px', background: 'rgba(255,255,255,0.25)', fontSize: '0.75rem', fontWeight: 800, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px' }}>After</div>
                                   <img src={sp.imgAfter} alt="After" style={{ width: '100%', height: 'auto', display: 'block' }} />
                                 </div>
                               </div>
@@ -1146,74 +1254,65 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
             })()}
 
             {/* NEW: How to Use Prompt Section */}
-            <section className="how-to-use-section" style={{ padding: '30px 0', borderTop: '1px solid rgba(255,255,255,0.05)', marginTop: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
-                <div style={{ width: '4px', height: '24px', background: 'var(--accent-main)', borderRadius: '2px' }} />
-                <h2 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0, color: 'white' }}>
-                  How to Use this AI Prompt?
-                </h2>
-              </div>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
-                {[
-                  { step: "01", title: "Copy Prompt", desc: "Click the copy button above to instantly capture the full, optimized prompt text to your clipboard." },
-                  { step: "02", title: "Choose AI Tool", desc: "Open your favorite AI website like ChatGPT, Midjourney, or Bing. Trying different tools can give you even more amazing and professional results." },
-                  { step: "03", title: "Paste & Customize", desc: "Paste the prompt into the tool. You can easily tweak any part of the text to match your exact creative vision." },
-                  { step: "04", title: "Generate Magic", desc: "Press enter and watch as the AI generates stunning, high-quality results based on your custom prompt in seconds." }
-                ].map((item, i) => (
-                  <div key={i} style={{ 
-                    background: 'rgba(255,255,255,0.03)', 
-                    padding: '24px', 
-                    borderRadius: '20px', 
-                    border: '1px solid rgba(255,255,255,0.06)',
-                    transition: 'all 0.3s ease'
-                  }}>
-                    <div style={{ color: 'var(--accent-main)', fontSize: '0.8rem', fontWeight: 900, marginBottom: '10px', opacity: 0.6 }}>STEP {item.step}</div>
-                    <h4 style={{ color: 'white', fontSize: '1.1rem', fontWeight: 700, marginBottom: '10px' }}>{item.title}</h4>
-                    <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', lineHeight: 1.6, margin: 0 }}>{item.desc}</p>
-                  </div>
+            {prompt.description && prompt.description.replace(/<[^>]*>?/gm, '').trim() !== '' && (
+              <section className="how-to-use-section" style={{ padding: '30px 0', borderTop: '1px solid rgba(255, 255, 255,0.15)', marginTop: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
+                  <div style={{ width: '4px', height: '24px', background: 'var(--accent-main)', borderRadius: '2px' }} />
+                  <h2 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0, color: 'white' }}>
+                    How to Use this AI Prompt?
+                  </h2>
+                </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+                  {[
+                    { step: "01", title: "Copy Prompt", desc: "Click the copy button above to instantly capture the full, optimized prompt text to your clipboard." },
+                    { step: "02", title: "Choose AI Tool", desc: "Open your favorite AI website like ChatGPT, Midjourney, or Bing. Trying different tools can give you even more amazing and professional results." },
+                    { step: "03", title: "Paste & Customize", desc: "Paste the prompt into the tool. You can easily tweak any part of the text to match your exact creative vision." },
+                    { step: "04", title: "Generate Magic", desc: "Press enter and watch as the AI generates stunning, high-quality results based on your custom prompt in seconds." }
+                  ].map((item, i) => (
+                    <div key={i} style={{ 
+                      background: 'rgba(255,255,255,0.1)', 
+                      padding: '24px', 
+                      borderRadius: '20px', 
+                      border: '1px solid rgba(255, 255, 255,0.2)',
+                      transition: 'all 0.3s ease'
+                    }}>
+                      <div style={{ color: 'var(--accent-main)', fontSize: '0.8rem', fontWeight: 900, marginBottom: '10px', opacity: 0.6 }}>STEP {item.step}</div>
+                      <h4 style={{ color: 'white', fontSize: '1.1rem', fontWeight: 700, marginBottom: '10px' }}>{item.title}</h4>
+                      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', lineHeight: 1.6, margin: 0 }}>{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Tags */}
+            {parsedTags && parsedTags.length > 0 && (
+              <div style={{ marginTop: '50px', display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
+                <Tag size={18} color="var(--text-dim)" />
+                {parsedTags.map((tag, i) => (
+                  <span key={i} style={{ background: 'rgba(255,255,255,0.15)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.85rem', color: 'var(--text-secondary)', border: '1px solid rgba(255, 255, 255,0.15)' }}>
+                    {tag}
+                  </span>
                 ))}
               </div>
-            </section>
+            )}
 
             {/* Author Box */}
-            <div className="author-box" style={{
-              marginTop: '50px',
-              padding: '40px',
-              background: 'linear-gradient(145deg, rgba(255,255,255,0.02) 0%, rgba(229,9,20,0.05) 100%)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '24px',
-              display: 'flex',
-              gap: '30px',
-              alignItems: 'center',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
-              <div style={{
-                position: 'absolute',
-                top: '-50px', right: '-50px',
-                width: '150px', height: '150px',
-                background: 'var(--accent-main)',
-                filter: 'blur(80px)',
-                opacity: 0.15,
-                borderRadius: '50%'
-              }} />
-              <div style={{ flexShrink: 0 }}>
+            <div className="author-box">
+              <div className="author-box-bg" />
+              <div className="author-box-img-container">
                 <img 
                   src={prompt.author_image ? optimizeImage(prompt.author_image, 150) : "https://github.com/monildomadiya.png"} 
                   alt={prompt.author_name || 'PromptKing Admin'} 
-                  style={{ 
-                    width: '90px', height: '90px', borderRadius: '50%', 
-                    objectFit: 'cover', border: '3px solid rgba(255,255,255,0.1)',
-                    boxShadow: '0 10px 20px rgba(0,0,0,0.3)'
-                  }} 
+                  className="author-box-img"
                   onError={(e) => { e.target.src = 'https://promptking.in/favicon.png' }}
                 />
               </div>
-              <div style={{ zIndex: 1 }}>
-                <div style={{ fontSize: '0.8rem', color: 'var(--accent-main)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '5px' }}>Prompt Creator</div>
-                <h4 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'white', marginBottom: '10px' }}>{prompt.author_name || 'PromptKing Admin'}</h4>
-                <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, margin: 0 }}>
+              <div className="author-box-content">
+                <div className="author-box-label">Prompt Creator</div>
+                <h4 className="author-box-name">{prompt.author_name || 'PromptKing Admin'}</h4>
+                <p className="author-box-desc">
                   {prompt.author_description || 'Passionate about AI and creative workflows. Exploring the frontiers of prompt engineering to help you unlock the true potential of tools like ChatGPT, Midjourney, and Gemini.'}
                 </p>
               </div>
@@ -1221,7 +1320,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
 
             {/* FAQ Section */}
             {parsedFaqs && parsedFaqs.length > 0 && (
-              <section style={{ marginTop: '50px', paddingTop: '40px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              <section style={{ marginTop: '50px', paddingTop: '40px', borderTop: '1px solid rgba(255, 255, 255,0.15)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '30px' }}>
                   <div style={{ width: '4px', height: '24px', background: 'var(--accent-main)', borderRadius: '2px' }} />
                   <h2 style={{ fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0, color: 'white' }}>
@@ -1230,7 +1329,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {parsedFaqs.map((faq, i) => (
-                    <div key={i} style={{ background: 'rgba(255,255,255,0.02)', padding: '25px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div key={i} style={{ background: 'rgba(255,255,255,0.25)', padding: '25px', borderRadius: '20px', border: '1px solid rgba(255, 255, 255,0.15)' }}>
                       <h3 style={{ fontSize: '1.1rem', marginBottom: '12px', color: 'white', fontWeight: 700 }}>{faq.question}</h3>
                       <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, margin: 0 }}>{faq.answer}</p>
                     </div>
@@ -1275,7 +1374,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                       padding: '12px',
                       borderRadius: '18px',
                       background: 'rgba(255,255,255,0.02)',
-                      border: '1px solid rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255, 255, 255,0.05)',
                       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                     }} 
                     className="suggested-card-item"
@@ -1287,7 +1386,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                       overflow: 'hidden', 
                       flexShrink: 0, 
                       background: '#111',
-                      border: '1px solid rgba(255,255,255,0.05)'
+                      border: '1px solid rgba(255, 255, 255,0.15)'
                     }}>
                       <img src={s.imgAfter} alt={s.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: '0.5s' }} className="suggestion-img" />
                     </div>
