@@ -1287,10 +1287,10 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                     { step: "04", title: "Generate Magic", desc: "Press enter and watch as the AI generates stunning, high-quality results based on your custom prompt in seconds." }
                   ].map((item, i) => (
                     <div key={i} style={{ 
-                      background: 'rgba(255,255,255,0.1)', 
+                      background: 'rgba(255, 255, 255, 0.02)', 
                       padding: '24px', 
                       borderRadius: '20px', 
-                      border: '1px solid rgba(255, 255, 255,0.2)',
+                      border: '1px solid rgba(255, 255, 255, 0.05)',
                       transition: 'all 0.3s ease'
                     }}>
                       <div style={{ color: 'var(--accent-main)', fontSize: '0.8rem', fontWeight: 900, marginBottom: '10px', opacity: 0.6 }}>STEP {item.step}</div>
