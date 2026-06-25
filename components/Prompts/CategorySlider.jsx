@@ -54,7 +54,7 @@ const CategorySlider = ({ initialCategories = [] }) => {
           <Link 
             key={cat.id} 
             href={`/category/${cat.slug}`}
-            className="category-slider-item"
+            className="category-slider-item glass-card"
             style={{
               textDecoration: 'none',
               borderRadius: '24px',
@@ -62,8 +62,10 @@ const CategorySlider = ({ initialCategories = [] }) => {
               overflow: 'hidden',
               scrollSnapAlign: 'start',
               boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-              border: '1px solid rgba(255,255,255,0.05)',
-              background: 'var(--surface-1)'
+              border: '1px solid rgba(255,255,255,0.1)',
+              background: 'rgba(255, 255, 255, 0.02)',
+              backdropFilter: 'blur(15px)',
+              WebkitBackdropFilter: 'blur(15px)',
             }}
           >
             {cat.image_url ? (
@@ -77,43 +79,42 @@ const CategorySlider = ({ initialCategories = [] }) => {
                   width: '100%', 
                   height: '100%', 
                   objectFit: 'cover',
-                  filter: 'brightness(0.6) saturate(1.2)',
-                  transition: 'transform 0.4s ease'
+                  transition: 'transform 0.5s ease',
                 }} 
+                className="category-slider-img"
               />
             ) : (
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #e50914 0%, #000 100%)', opacity: 0.8 }} />
             )}
-            
-            <div style={{ 
-              position: 'absolute', 
-              inset: 0, 
-              background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 60%)' 
-            }} />
+
+            {cat.tag && (
+              <span className="category-slider-tag" style={{ 
+                position: 'absolute',
+                top: '15px',
+                left: '15px',
+                background: 'rgba(229, 9, 20, 0.9)', 
+                color: 'white', 
+                fontSize: '0.65rem', 
+                fontWeight: 800, 
+                padding: '6px 12px', 
+                borderRadius: '12px', 
+                textTransform: 'uppercase', 
+                letterSpacing: '1px',
+                zIndex: 3,
+                backdropFilter: 'blur(5px)'
+              }}>
+                {cat.tag}
+              </span>
+            )}
 
             <div className="category-slider-content">
-              {cat.tag && (
-                <span className="category-slider-tag" style={{ 
-                  background: 'var(--accent-main)', 
-                  color: 'white', 
-                  fontSize: '0.65rem', 
-                  fontWeight: 800, 
-                  padding: '4px 10px', 
-                  borderRadius: '20px', 
-                  textTransform: 'uppercase', 
-                  letterSpacing: '1px', 
-                  marginBottom: '10px',
-                  display: 'inline-block'
-                }}>
-                  {cat.tag}
-                </span>
-              )}
               <h3 className="category-slider-title" style={{ 
                 color: 'white', 
-                fontSize: '1.25rem', 
-                fontWeight: 800, 
-                letterSpacing: '-0.3px',
-                margin: 0
+                fontSize: '1.5rem', 
+                fontWeight: 900, 
+                letterSpacing: '-0.5px',
+                margin: 0,
+                textShadow: '0 2px 10px rgba(0,0,0,0.5)'
               }}>
                 {cat.name}
               </h3>

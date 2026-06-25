@@ -195,6 +195,61 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
                    safeAiType.includes('midjourney') ? 'midjourney' : '';
 
 
+  const isListicle = !!prompt.website_category_id;
+
+  if (isListicle) {
+    return (
+      <Link href={`/prompt/${prompt.slug || prompt.prompt_key || prompt.key}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
+        <div className="listicle-card pro-card-hover glass-card" style={{
+          background: 'rgba(255, 255, 255, 0.03)',
+          backdropFilter: 'blur(15px)',
+          WebkitBackdropFilter: 'blur(15px)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '24px',
+          overflow: 'hidden',
+          transition: 'all 0.4s ease-in-out',
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
+        }}>
+          {/* 1200x628 Aspect Ratio Image */}
+          <div style={{ width: '100%', aspectRatio: '1200 / 628', background: '#111', position: 'relative', overflow: 'hidden' }}>
+            <img 
+              src={optimizeImage(prompt.thumbnail_url || prompt.imgAfter || prompt.img_after || prompt.imgBefore || prompt.img_before, 600)} 
+              alt={prompt.title} 
+              loading={isPriority ? "eager" : "lazy"}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} 
+              className="listicle-card-img"
+            />
+            {/* Tag / Badge */}
+            {prompt.aiType && (
+              <div style={{ position: 'absolute', top: '15px', left: '15px', background: 'var(--accent-main)', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '6px 12px', borderRadius: '12px', textTransform: 'uppercase', letterSpacing: '1px', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
+                {prompt.aiType}
+              </div>
+            )}
+          </div>
+          
+          {/* Content */}
+          <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '12px', lineHeight: 1.3, color: 'white' }}>
+              {prompt.title}
+            </h3>
+            {/* Excerpt if description exists */}
+            {prompt.description && (
+              <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.6)', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0, lineHeight: 1.6 }}>
+                {prompt.description.replace(/<[^>]*>?/gm, '')}
+              </p>
+            )}
+            <div style={{ marginTop: 'auto', paddingTop: '20px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-main)', fontWeight: 800, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Read Listicle <ArrowRight size={16} />
+            </div>
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
   return (
     <div ref={cardRef} className="pro-card pro-card-hover masonry-grid-item glass-card" style={{
       background: 'rgba(255, 255, 255, 0.03)',
@@ -272,7 +327,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
             background: '#111'
           }}>
             <img 
-              src={optimizeImage(prompt.imgAfter, isMobile ? 450 : 600)} 
+              src={optimizeImage(prompt.thumbnail_url || prompt.imgAfter || prompt.img_after, isMobile ? 450 : 600)} 
               alt={`${prompt.title} - ${prompt.aiType || 'AI'} Prompt Result (After)`} 
               loading={isPriority ? "eager" : "lazy"} 
               fetchPriority={isPriority ? "high" : "auto"}
@@ -336,10 +391,10 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
             
 
           </div>
-        ) : (prompt.imgAfter || prompt.imgBefore) && (
+        ) : (prompt.thumbnail_url || prompt.imgAfter || prompt.img_after || prompt.imgBefore || prompt.img_before) && (
           <div className="prompt-image-container" style={{ width: '100%', margin: `0 0 15px 0`, aspectRatio: ratio, background: '#111', overflow: 'hidden', position: 'relative' }}>
             <img 
-              src={optimizeImage(prompt.imgAfter || prompt.imgBefore, isMobile ? 450 : 600)} 
+              src={optimizeImage(prompt.thumbnail_url || prompt.imgAfter || prompt.img_after || prompt.imgBefore || prompt.img_before, isMobile ? 450 : 600)} 
               alt={`${prompt.title} - ${prompt.aiType || 'AI'} Prompt Example`} 
               loading={isPriority ? "eager" : "lazy"} 
               fetchPriority={isPriority ? "high" : "auto"}

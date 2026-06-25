@@ -59,7 +59,7 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
   const prevSearch = useRef(search);
   const prevFilter = useRef(filter);
 
-  const itemsPerPage = isMobile ? 8 : 12;
+  const itemsPerPage = isMobile ? 12 : 16;
 
   // ── Fetch data from API ──────────────────────────────────────────────────────
   const fetchData = useCallback(async (silent = false) => {

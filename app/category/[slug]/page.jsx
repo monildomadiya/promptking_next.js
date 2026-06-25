@@ -63,27 +63,104 @@ const CategoryPage = () => {
       
 
       {/* Category Header */}
-      <div style={{ 
-        display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
-        background: 'linear-gradient(180deg, rgba(229, 9, 20, 0.1) 0%, transparent 100%)',
-        padding: '60px 20px', borderRadius: '30px', marginBottom: '40px', border: '1px solid rgba(255,255,255,0.05)'
-      }}>
-        {category.tag && (
-          <span style={{ 
-            background: 'var(--accent-main)', color: 'white', fontSize: '0.75rem', fontWeight: 800, 
-            padding: '6px 14px', borderRadius: '20px', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '20px'
-          }}>
-            {category.tag}
-          </span>
-        )}
-        <h1 style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px' }}>
-          {category.name}
-        </h1>
-        {category.description && (
-          <p style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.7)', maxWidth: '700px', lineHeight: '1.6' }}>
-            {category.description}
-          </p>
-        )}
+      <style dangerouslySetInnerHTML={{__html: `
+        .category-header {
+          position: relative;
+          padding: 60px 40px;
+          border-radius: 32px;
+          margin-bottom: 50px;
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 30px;
+        }
+        .category-title {
+          font-size: clamp(2rem, 8vw, 4rem);
+          font-weight: 900;
+          margin-bottom: 20px;
+          letter-spacing: -1.5px;
+          background: linear-gradient(to right, #fff, rgba(255,255,255,0.6));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          line-height: 1.1;
+        }
+        .stat-box-container {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          min-width: 180px;
+        }
+        .header-content-left {
+          position: relative;
+          z-index: 1;
+          flex: 1 1 300px;
+        }
+        @media (max-width: 768px) {
+          .category-header {
+            padding: 40px 25px;
+            border-radius: 24px;
+            gap: 20px;
+          }
+          .header-content-left {
+            flex: 1 1 100%;
+          }
+          .stat-box-container {
+            width: 100%;
+            min-width: 100%;
+          }
+          .category-title {
+            font-size: 2.5rem;
+          }
+        }
+      `}} />
+      <div className="category-header">
+        {/* Glowing Orbs */}
+        <div style={{ position: 'absolute', top: '-50%', left: '-10%', width: '300px', height: '300px', background: 'var(--accent-main)', borderRadius: '50%', filter: 'blur(100px)', opacity: 0.15, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: '-50%', right: '-10%', width: '400px', height: '400px', background: '#4285f4', borderRadius: '50%', filter: 'blur(120px)', opacity: 0.1, pointerEvents: 'none' }} />
+
+        <div className="header-content-left">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+            {category.tag && (
+              <span style={{ 
+                background: 'rgba(229, 9, 20, 0.15)', color: 'var(--accent-main)', fontSize: '0.75rem', fontWeight: 800, 
+                padding: '6px 14px', borderRadius: '12px', textTransform: 'uppercase', letterSpacing: '1.5px', border: '1px solid rgba(229, 9, 20, 0.3)'
+              }}>
+                {category.tag}
+              </span>
+            )}
+            <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>
+              Collection
+            </span>
+          </div>
+          
+          <h1 className="category-title">
+            {category.name}
+          </h1>
+          
+          {category.description && category.description.toLowerCase() !== category.name.toLowerCase() && category.description.toLowerCase() !== category.tag?.toLowerCase() && (
+            <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.6)', maxWidth: '650px', lineHeight: '1.6', margin: 0 }}>
+              {category.description}
+            </p>
+          )}
+        </div>
+
+        <div className="stat-box-container">
+          <div style={{ background: 'rgba(0,0,0,0.3)', padding: '20px', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)', textAlign: 'center', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
+            <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'white', marginBottom: '5px', lineHeight: 1 }}>
+              {prompts.length}
+            </div>
+            <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: 800 }}>
+              Prompts
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Prompts Grid */}

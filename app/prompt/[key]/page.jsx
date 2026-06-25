@@ -53,7 +53,8 @@ export default async function PromptPage({ params }) {
         author_image: selectedAuthor?.image || 'https://promptking.in/favicon.png',
         author_description: selectedAuthor?.description || 'Passionate about AI and creative workflows. Exploring the frontiers of prompt engineering to help you unlock the true potential of tools like ChatGPT, Midjourney, and Gemini.',
         promptText: p.prompt_text || p.promptText,
-        imgAfter: p.img_after || p.imgAfter,
+        thumbnail_url: p.thumbnail_url,
+        imgAfter: p.thumbnail_url || p.img_after || p.imgAfter,
         imgBefore: p.img_before || p.imgBefore,
         isPremium: p.is_premium || p.isPremium,
         aiType: p.ai_type || p.aiType,
@@ -65,17 +66,19 @@ export default async function PromptPage({ params }) {
         viewCount: p.view_count || p.view_count
       };
 
-      if (p.category_id) {
+      if (p.website_category_id) {
         const suggestRows = await db`
           SELECT * FROM prompts 
-          WHERE category_id = ${p.category_id} AND id != ${p.id} 
-          ORDER BY id DESC LIMIT 20
+          WHERE website_category_id = ${p.website_category_id} AND prompt_key != ${p.prompt_key} 
+          ORDER BY prompt_key DESC LIMIT 20
         `;
-        
-        // Shuffle the 20 recent prompts in JavaScript to avoid the slow ORDER BY RAND() SQL query
-        // Use a seeded shuffle or simple logic if strictly pure is needed. For now, we can ignore the warning or use a stable shuffle. 
-        // But since this is a server component, Math.random is fine, but let's just disable the warning.
-        // eslint-disable-next-line react-hooks/purity
+        initialSuggestedPrompts = suggestRows.sort(() => 0.5 - Math.random()).slice(0, 4);
+      } else if (p.category_id) {
+        const suggestRows = await db`
+          SELECT * FROM prompts 
+          WHERE category_id = ${p.category_id} AND prompt_key != ${p.prompt_key} 
+          ORDER BY prompt_key DESC LIMIT 20
+        `;
         initialSuggestedPrompts = suggestRows.sort(() => 0.5 - Math.random()).slice(0, 4);
       }
     }

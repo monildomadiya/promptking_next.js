@@ -1,12 +1,36 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
+import { getAdminAuth } from '@/lib/auth';
+
+const parseDbBool = (val) => {
+  if (val === null || val === undefined) return false;
+  if (Buffer.isBuffer(val)) return val[0] === 1;
+  return val == 1 || val === true || val === 'true';
+};
 
 export async function GET(req) {
+  const isAdmin = await getAdminAuth(req);
+  if (!isAdmin) return NextResponse.json({ error: "Admin access required" }, { status: 401 });
+
   try {
-    const rows = await db`SELECT * FROM website_categories ORDER BY id DESC`;
-    return NextResponse.json(rows);
+    let rows = await db`SELECT * FROM prompts WHERE website_category_id IS NOT NULL AND website_category_id != '' ORDER BY sort_order ASC, prompt_key ASC`;
+    const formatted = rows.map(r => ({
+      ...r,
+      copy_count:       Number(r.copy_count || 0),
+      unlock_count:     Number(r.unlock_count || 0),
+      like_count:       Number(r.like_count || 0),
+      view_count:       Number(r.view_count || 0),
+      correct_attempts: Number(r.correct_attempts || 0),
+      wrong_attempts:   Number(r.wrong_attempts || 0),
+      is_featured:      parseDbBool(r.is_featured),
+      is_premium:       parseDbBool(r.is_premium),
+      publish_date:     r.publish_date,
+      metaTitle:        r.meta_title
+    }));
+    return NextResponse.json(formatted);
   } catch (error) {
-    return NextResponse.json([]);
+    console.error('ADMIN LISTICLES DB ERROR:', error.message);
+    return NextResponse.json({ error: "Failed to fetch listicles" }, { status: 500 });
   }
 }

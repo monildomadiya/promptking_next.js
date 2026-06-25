@@ -592,8 +592,8 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
           <ArrowLeft size={18} /> Back
         </button>
 
-        {/* Grid or Column Layout depending on Listicle */}
-        <div style={{ display: isListicle ? 'flex' : 'grid', flexDirection: isListicle ? 'column' : 'row', gridTemplateColumns: isListicle ? 'none' : 'minmax(0, 1fr) 350px', gap: '40px', maxWidth: isListicle ? '900px' : 'none', margin: isListicle ? '0 auto' : '0' }} className="detail-layout">
+        {/* Grid Layout for both normal prompts and listicles (with sidebar) */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: '40px', maxWidth: isListicle ? '1600px' : 'none', margin: isListicle ? '0 auto' : '0' }} className="detail-layout">
           
           {/* Main Content (Left) */}
           <article ref={contentRef} className="detail-main-content" style={{ width: '100%' }}>
@@ -640,11 +640,12 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
               boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
               position: 'relative',
               overflow: 'hidden',
-              flexShrink: 0
+              flexShrink: 0,
+              width: isListicle ? '100%' : 'auto'
             }}>
               <div style={{ borderRadius: '24px', overflow: 'hidden', position: 'relative' }}>
                 {prompt.isImageSlider ? (
-                  <div className="slider-container" style={{ position: 'relative', aspectRatio: (prompt.image_ratio || prompt.imageRatio || '16 / 9').replace(/\s+/g, ' ').trim(), width: '100%' }}>
+                  <div className="slider-container" style={{ position: 'relative', aspectRatio: isListicle ? '1200 / 628' : (prompt.image_ratio || prompt.imageRatio || '16 / 9').replace(/\s+/g, ' ').trim(), width: '100%' }}>
                     <img src={optimizeImage(prompt.imgAfter)} alt={`${prompt.title} - ${prompt.aiType || 'AI'} Generated Prompt Result (After)`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                     <img 
                       src={optimizeImage(prompt.imgBefore)} 
@@ -693,7 +694,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                     />
                   </div>
                 ) : (prompt.imgAfter || prompt.imgBefore) && (
-                  <div style={{ width: '100%', aspectRatio: (prompt.image_ratio || prompt.imageRatio || '16 / 9').replace(/\s+/g, ' ').trim(), background: '#111', position: 'relative' }}>
+                  <div style={{ width: '100%', aspectRatio: isListicle ? '1200 / 628' : (prompt.image_ratio || prompt.imageRatio || '16 / 9').replace(/\s+/g, ' ').trim(), background: '#111', position: 'relative' }}>
                     <img src={optimizeImage(prompt.imgAfter || prompt.imgBefore)} alt={`${prompt.title} - High Quality ${prompt.aiType || 'AI'} Prompt Example`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                 )}
@@ -703,11 +704,12 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
             </div>
 
             {/* Right Column: Prompt Vault & Buttons */}
-            <div className="prompt-vault-column" style={{ 
-              display: 'flex', 
-              flexDirection: 'column',
-              gap: '20px'
-            }}>
+            {(!isListicle || (isListicle && prompt.promptText && prompt.promptText.replace(/<[^>]*>?/gm, '').trim() !== '')) && (
+              <div className="prompt-vault-column" style={{ 
+                display: 'flex', 
+                flexDirection: 'column',
+                gap: '20px'
+              }}>
               {/* Interactive Vault Section */}
               <div id="box-detail" className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse-detail' : ''} ${isRelocking ? 'vault-relock-animate' : ''}`} style={{
               background: 'rgba(15, 15, 20, 0.4)', 
@@ -892,10 +894,9 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                 {isCopied ? <><Check size={22} /> Copied!</> : <><Copy size={22} /> Copy Full Prompt</>}
               </button>
             )}
-
-            </div> {/* Close Right Column */}
-            </div> {/* Close Media & Prompt Split */}
-
+            </div>
+            )}
+            </div>
             <YouTubeModal 
               isOpen={showVideoModal} 
               onClose={() => setShowVideoModal(false)} 
@@ -1086,20 +1087,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
               </div>
             )}
 
-            {/* Content Section: Description */}
-            {prompt.description && prompt.description.replace(/<[^>]*>?/gm, '').trim() !== '' && (
-              <div className="detail-description-section" style={{
-                padding: '20px 0'
-              }}>
-
-                <div 
-                  className="blog-content" 
-                  style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.9, fontSize: '1.1rem' }}
-                  dangerouslySetInnerHTML={{ __html: prompt.description }}
-                />
-              </div>
-            )}
-
+            {/* Description is now moved below Multi-Prompt */}
             {/* NEW: Multi-Prompt / Listicle Section */}
             {(() => {
               let parsedSubPrompts = [];
@@ -1237,8 +1225,29 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
               );
             })()}
 
-            {/* NEW: How to Use Prompt Section */}
+            {/* Content Section: Description */}
             {prompt.description && prompt.description.replace(/<[^>]*>?/gm, '').trim() !== '' && (
+              <div className="detail-description-section" style={{
+                padding: '20px 0',
+                borderTop: '1px solid rgba(255, 255, 255,0.15)',
+                marginTop: '20px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
+                  <div style={{ width: '4px', height: '24px', background: 'var(--accent-main)', borderRadius: '2px' }} />
+                  <h2 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0, color: 'white' }}>
+                    About This
+                  </h2>
+                </div>
+                <div 
+                  className="blog-content" 
+                  style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.9, fontSize: '1.1rem' }}
+                  dangerouslySetInnerHTML={{ __html: prompt.description }}
+                />
+              </div>
+            )}
+
+            {/* NEW: How to Use Prompt Section */}
+            {!isListicle && prompt.description && prompt.description.replace(/<[^>]*>?/gm, '').trim() !== '' && (
               <section className="how-to-use-section" style={{ padding: '30px 0', borderTop: '1px solid rgba(255, 255, 255,0.15)', marginTop: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
                   <div style={{ width: '4px', height: '24px', background: 'var(--accent-main)', borderRadius: '2px' }} />
@@ -1325,7 +1334,6 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
           </article>
 
           {/* Sidebar (Right) */}
-          {!isListicle && (
           <aside className="detail-sidebar">
             <div style={{ 
               background: 'rgba(255, 255, 255, 0.02)', 
@@ -1411,7 +1419,6 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
               )}
             </div>
           </aside>
-          )}
         </div>
       </div>
     </div>

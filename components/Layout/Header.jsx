@@ -2,14 +2,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, X, Crown, Coffee } from '../Common/Icons';
+import { Search, X, Crown, Coffee, Compass, ChevronRight } from '../Common/Icons';
 import AdSenseUnit from '../Ads/AdSenseUnit';
+
+import api from '@/lib/api';
 
 const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilters, onLogoClick, settings, isAdmin, onHeightChange }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+  const [categories, setCategories] = useState([]);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   // Use ref for lastScrollY — avoids re-registering scroll listener on every scroll event
   const lastScrollY = useRef(0);
   const navigate = useRouter();
@@ -26,6 +30,8 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
   };
 
   useEffect(() => {
+    api.get('/website_categories').then(res => setCategories(res.data)).catch(console.error);
+    
     setIsMobile(window.innerWidth <= 1100);
     const handleResize = () => setIsMobile(window.innerWidth <= 1100);
     window.addEventListener('resize', handleResize);
@@ -82,7 +88,9 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
       }}>
         <div className="header-inner-flex">
           <div className="header-logo-container" style={{ 
-            display: (isMobile && isSearchExpanded) ? 'none' : 'flex'
+            display: (isMobile && isSearchExpanded) ? 'none' : 'flex',
+            alignItems: 'center',
+            gap: isMobile ? '10px' : '30px'
           }}>
             <Link 
               href="/" 
@@ -101,188 +109,117 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
             display: 'flex', 
             alignItems: 'center', 
             gap: isMobile ? '10px' : '20px',
-            flex: isMobile && isSearchExpanded ? 1 : 'initial',
+            flex: 'initial',
             justifyContent: 'flex-end',
             minWidth: 0
           }}>
-            <div style={{ 
-              flex: isMobile && isSearchExpanded ? 1 : 'initial',
-              position: 'relative',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              transition: 'all 0.3s ease',
-              gap: '10px',
-              minWidth: 0
-            }}>
-              {isMobile && !isSearchExpanded ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  {isHomePage && (
-                    <button 
-                      onClick={() => setFilter(filter === 'premium' ? 'all' : 'premium')}
-                      className="pro-card-hover"
-                      title="Premium Prompts"
-                      aria-label="Filter Premium"
-                      style={{ 
-                        width: '38px', height: '38px', borderRadius: '50%', 
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                        background: filter === 'premium' ? 'rgba(255, 193, 7, 0.15)' : 'rgba(255,255,255,0.03)',
-                        border: filter === 'premium' ? '1px solid rgba(255, 193, 7, 0.3)' : '1px solid rgba(255,255,255,0.08)',
-                        color: filter === 'premium' ? '#FFC107' : 'rgba(255,255,255,0.7)',
-                        transition: '0.3s',
-                        backdropFilter: 'blur(10px)',
-                        padding: 0
-                      }}
-                    >
-                      <Crown size={18} fill={filter === 'premium' ? '#FFC107' : 'none'} style={{ display: 'block' }} />
-                    </button>
-                  )}
-                  <a 
-                    href="https://ko-fi.com/M5H720SAJV"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title="Buy me a coffee"
-                    aria-label="Buy me a coffee"
-                    style={{ 
-                      width: '38px', height: '38px', borderRadius: '50%', 
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                      background: 'rgba(255, 193, 7, 0.15)',
-                      border: '1px solid rgba(255, 193, 7, 0.3)',
-                      color: '#FFC107',
-                      transition: '0.3s',
-                      backdropFilter: 'blur(10px)',
-                      padding: 0,
-                      textDecoration: 'none'
-                    }}
-                    className="coffee-btn-hover"
-                  >
-                    <Coffee size={18} style={{ display: 'block' }} />
-                  </a>
-                    <div 
-                      className="glass-button-secondary"
-                      onClick={() => setIsSearchExpanded(true)}
-                      aria-label="Open search"
-                      role="button"
-                      style={{ 
-                        width: '38px', height: '38px', borderRadius: '50%', 
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'
-                      }}
-                    >
-                      <Search size={18} />
-                    </div>
-                </div>
-              ) : (
-                <div style={{ 
-                  width: isMobile && isSearchExpanded ? '100%' : (isMobile ? '0' : '350px'), 
-                  position: 'relative', 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  flex: isMobile && isSearchExpanded ? 1 : 'initial'
-                }}>
-                  <Search 
-                    size={18} 
-                    style={{ 
-                      position: 'absolute', 
-                      left: '16px', 
-                      color: 'var(--text-secondary)',
-                      opacity: 0.6
-                    }} 
-                  />
-                  <input 
-                    type="text" 
-                    autoFocus={isMobile && isSearchExpanded}
-                    placeholder={isMobile ? "Search prompts..." : "Search prompts..."}
-                    value={search}
-                    onChange={(e) => {
-                      setSearch(e.target.value);
-                      if (!isHomePage) {
-                        navigate.push('/');
-                      }
-                    }}
-                    onBlur={() => {
-                      if (isMobile && search.trim() === '') {
-                        setIsSearchExpanded(false);
-                      }
-                    }}
-                    className="glass-input"
-                    style={{ 
-                      width: '100%', 
-                      padding: isMobile ? '10px 15px 10px 45px' : '12px 15px 12px 45px', 
-                      borderRadius: '50px',
-                      fontSize: isMobile ? '16px' : '0.9rem',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      height: isMobile ? '45px' : '48px'
-                    }} 
-                  />
-                  {((isMobile && isSearchExpanded) || search) && (
-                    <div 
-                      onPointerDown={(e) => {
-                        e.preventDefault(); 
-                        setSearch('');
-                        if (isMobile) setIsSearchExpanded(false);
-                      }}
-                      style={{ 
-                        position: 'absolute', 
-                        right: '5px', 
-                        padding: '10px',
-                        cursor: 'pointer',
-                        zIndex: 10,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      <X size={20} style={{ color: 'var(--text-secondary)' }} />
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-            
-            {!isMobile && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                {isHomePage && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <button 
-                      onClick={() => setFilter(filter === 'premium' ? 'all' : 'premium')}
-                      className="pro-card-hover"
-                      title="Premium Prompts"
-                      style={{ 
-                        width: '42px', height: '42px', borderRadius: '50%', 
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                        background: filter === 'premium' ? 'rgba(255, 193, 7, 0.15)' : 'rgba(255,255,255,0.03)',
-                        border: filter === 'premium' ? '1px solid rgba(255, 193, 7, 0.3)' : '1px solid rgba(255,255,255,0.08)',
-                        color: filter === 'premium' ? '#FFC107' : 'rgba(255,255,255,0.7)',
-                        transition: '0.3s',
-                        backdropFilter: 'blur(10px)',
-                        padding: 0
-                      }}
-                    >
-                      <Crown size={20} fill={filter === 'premium' ? '#FFC107' : 'none'} style={{ display: 'block' }} />
-                    </button>
-                  </div>
-                )}
-                <a 
-                  href="https://ko-fi.com/M5H720SAJV"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="coffee-btn-hover desktop-coffee-btn"
+            {categories.length > 0 && (
+              <div 
+                className="category-dropdown-wrapper"
+                onMouseEnter={() => !isMobile && setShowCategoryDropdown(true)}
+                onMouseLeave={() => !isMobile && setShowCategoryDropdown(false)}
+                onClick={() => isMobile && setShowCategoryDropdown(!showCategoryDropdown)}
+                style={{ position: 'relative' }}
+              >
+                <div 
+                  className="explore-btn-hover"
                   style={{ 
-                    display: 'flex', alignItems: 'center', gap: '8px',
-                    height: '42px', borderRadius: '21px', 
-                    padding: '0 16px',
-                    cursor: 'pointer',
-                    background: 'rgba(255, 193, 7, 0.15)',
-                    border: '1px solid rgba(255, 193, 7, 0.3)',
-                    color: '#FFC107',
-                    transition: '0.3s',
-                    backdropFilter: 'blur(10px)',
-                    textDecoration: 'none'
+                    color: 'rgba(255,255,255,0.8)',
+                    background: 'rgba(255,255,255,0.03)',
+                    fontWeight: 600, 
+                    cursor: 'pointer', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px',
+                    padding: isMobile ? '0 15px' : '0 25px', 
+                    height: '50px',
+                    fontSize: '0.95rem', 
+                    transition: 'all 0.3s ease',
+                    borderRadius: '16px',
+                    border: '1px solid',
+                    borderColor: showCategoryDropdown ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.08)',
+                    whiteSpace: 'nowrap'
                   }}
                 >
-                  <Coffee size={20} style={{ display: 'block' }} />
-                  <span className="hide-on-mobile" style={{ fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.5px' }}>Support Us</span>
-                </a>
+                  <Compass size={18} style={{ display: 'block', color: 'var(--text-secondary)' }} />
+                  Explore
+                </div>
+                {showCategoryDropdown && (
+                  <div style={{
+                    position: 'absolute', top: 'calc(100% + 15px)', right: 0, 
+                    background: 'rgba(15, 15, 20, 0.95)', backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)',
+                    border: '1px solid rgba(255,255,255,0.08)', borderRadius: '24px',
+                    padding: isMobile ? '20px' : '24px', minWidth: isMobile ? '300px' : '480px', zIndex: 100,
+                    boxShadow: '0 30px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05)',
+                    display: 'flex', flexDirection: 'column', gap: '16px',
+                    transformOrigin: 'top right'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                      <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)', fontWeight: 600 }}>Discover Categories</span>
+                    </div>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+                      gap: '12px'
+                    }}>
+                      {categories.map(c => (
+                        <Link 
+                          key={c.id} 
+                          href={`/category/${c.slug}`}
+                          onClick={() => setShowCategoryDropdown(false)}
+                          style={{
+                            color: 'rgba(255,255,255,0.9)', padding: '12px 16px', borderRadius: '16px',
+                            textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+                            fontSize: '0.95rem', fontWeight: 500,
+                            background: 'rgba(255,255,255,0.02)',
+                            border: '1px solid rgba(255,255,255,0.02)'
+                          }}
+                          onMouseEnter={(e) => { 
+                            e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; 
+                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                            e.currentTarget.style.color = 'white'; 
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                            e.currentTarget.querySelector('.menu-icon').style.transform = 'translateX(4px)';
+                            e.currentTarget.querySelector('.menu-icon').style.opacity = '1';
+                          }}
+                          onMouseLeave={(e) => { 
+                            e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; 
+                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.02)';
+                            e.currentTarget.style.color = 'rgba(255,255,255,0.9)'; 
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.querySelector('.menu-icon').style.transform = 'translateX(0)';
+                            e.currentTarget.querySelector('.menu-icon').style.opacity = '0.5';
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-main)', opacity: 0.8, boxShadow: '0 0 10px var(--accent-main)' }}></div>
+                            {c.name}
+                          </div>
+                          <ChevronRight size={16} className="menu-icon" style={{ opacity: 0.5, transition: '0.3s', color: 'var(--text-secondary)' }} />
+                        </Link>
+                      ))}
+                    </div>
+                    
+                    {/* View All Categories Link */}
+                    <div style={{ marginTop: '8px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
+                      <Link 
+                        href="/categories"
+                        onClick={() => setShowCategoryDropdown(false)}
+                        style={{
+                          color: 'var(--accent-main)', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none',
+                          display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '20px',
+                          background: 'rgba(255, 193, 7, 0.1)', transition: '0.3s'
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 193, 7, 0.2)'; e.currentTarget.style.transform = 'scale(1.05)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255, 193, 7, 0.1)'; e.currentTarget.style.transform = 'scale(1)'; }}
+                      >
+                        View All Categories <ChevronRight size={14} />
+                      </Link>
+                    </div>
+
+                  </div>
+                )}
               </div>
             )}
           </div>
