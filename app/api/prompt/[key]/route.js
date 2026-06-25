@@ -20,14 +20,22 @@ export async function GET(req, { params }) {
       return val == 1 || val === true || val === 'true';
     };
 
-    const authors = await db`SELECT * FROM authors ORDER BY id ASC LIMIT 1`;
-    const defaultAuthor = authors.length > 0 ? authors[0] : null;
+    let selectedAuthor = null;
+    if (row.author_id) {
+      const specificAuthor = await db`SELECT * FROM authors WHERE id = ${row.author_id}`;
+      if (specificAuthor.length > 0) selectedAuthor = specificAuthor[0];
+    }
+    
+    if (!selectedAuthor) {
+      const authors = await db`SELECT * FROM authors ORDER BY id ASC LIMIT 1`;
+      selectedAuthor = authors.length > 0 ? authors[0] : null;
+    }
 
     const prompt = {
       ...row,
-      author_name: defaultAuthor?.name || 'PromptKing Admin',
-      author_image: defaultAuthor?.image || 'https://promptking.in/favicon.png',
-      author_description: defaultAuthor?.description || 'Passionate about AI and creative workflows. Exploring the frontiers of prompt engineering to help you unlock the true potential of tools like ChatGPT, Midjourney, and Gemini.',
+      author_name: selectedAuthor?.name || 'PromptKing Admin',
+      author_image: selectedAuthor?.image || 'https://promptking.in/favicon.png',
+      author_description: selectedAuthor?.description || 'Passionate about AI and creative workflows. Exploring the frontiers of prompt engineering to help you unlock the true potential of tools like ChatGPT, Midjourney, and Gemini.',
       isImageSlider: parseDbBool(row.is_image_slider),
       copyCount: Number(row.copy_count),
       unlockCount: Number(row.unlock_count),

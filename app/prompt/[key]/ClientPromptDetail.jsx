@@ -624,39 +624,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                 WebkitTextFillColor: 'transparent'
               }}>{prompt.title}</h1>
               
-              {/* E-E-A-T Badges (Expertise, Authoritativeness, Trust) - Premium UI */}
-              <div style={{ 
-                display: 'inline-flex', 
-                flexWrap: 'wrap', 
-                alignItems: 'center', 
-                gap: '16px', 
-                padding: '10px 20px', 
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)', 
-                border: '1px solid rgba(255, 255, 255,0.25)', 
-                borderRadius: '50px',
-                backdropFilter: 'blur(10px)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ 
-                    width: '28px', height: '28px', borderRadius: '50%', background: 'var(--accent-main)', 
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 10px rgba(229,9,20,0.5)', overflow: 'hidden'
-                  }}>
-                    <img src={prompt.author_image ? optimizeImage(prompt.author_image, 50) : "https://promptking.in/favicon.png"} alt={prompt.author_name || "PromptKing Team"} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </div>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'white', letterSpacing: '0.2px' }}>{prompt.author_name || 'PromptKing Team'}</span>
-                  
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(39, 201, 63, 0.1)', padding: '4px 10px', borderRadius: '20px', border: '1px solid rgba(39, 201, 63, 0.2)' }}>
-                    <CheckCircle size={12} color="#27C93F" />
-                    <span style={{ fontSize: '0.7rem', color: '#27C93F', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Verified Expert</span>
-                  </div>
-                </div>
-                <div style={{ width: '4px', height: '4px', background: 'rgba(255,255,255,0.3)', borderRadius: '50%' }}></div>
-                <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                  Updated on {new Date(prompt.updated_at || prompt.created_at || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-                </div>
-              </div>
+
             </div>
 
             {/* Media & Prompt Split Container */}

@@ -75,7 +75,25 @@ export default async function ArticlePage({ params }) {
   try {
     const rows = await db`SELECT * FROM blogs WHERE slug = ${slug}`;
     if (rows && rows.length > 0) {
-      blog = rows[0];
+      const b = rows[0];
+      
+      let selectedAuthor = null;
+      if (b.author_id) {
+        const specificAuthor = await db`SELECT * FROM authors WHERE id = ${b.author_id}`;
+        if (specificAuthor.length > 0) selectedAuthor = specificAuthor[0];
+      }
+      
+      if (!selectedAuthor) {
+        const authors = await db`SELECT * FROM authors ORDER BY id ASC LIMIT 1`;
+        selectedAuthor = authors.length > 0 ? authors[0] : null;
+      }
+
+      blog = {
+        ...b,
+        author_name: selectedAuthor?.name || 'PromptKing Admin',
+        author_image: selectedAuthor?.image || 'https://promptking.in/favicon.png',
+        author_description: selectedAuthor?.description || 'Passionate about AI and creative workflows. Exploring the frontiers of prompt engineering to help you unlock the true potential of tools like ChatGPT, Midjourney, and Gemini.'
+      };
     }
 
     if (blog) {

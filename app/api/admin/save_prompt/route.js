@@ -111,7 +111,8 @@ export async function POST(req) {
           is_premium = ${p.is_premium ? 1 : 0},
           gallery_urls = ${p.gallery_urls || null},
           is_featured = ${p.is_featured ? 1 : 0},
-          publish_date = ${p.publish_date || null}
+          publish_date = ${p.publish_date || null},
+          author_id = ${p.author_id || null}
         WHERE prompt_key = ${originalKey}
       `;
     } else {
@@ -122,14 +123,14 @@ export async function POST(req) {
           og_title, og_description, og_image, twitter_title, twitter_description, twitter_image,
           faqs, tags,
           description, ai_type, prompt_text, img_before, img_after, 
-          ig_link, is_image_slider, image_ratio, password, is_premium, gallery_urls, is_featured, publish_date
+          ig_link, is_image_slider, image_ratio, password, is_premium, gallery_urls, is_featured, publish_date, author_id
         ) VALUES (
           ${finalKey}, ${finalSlug}, ${p.title}, ${p.website_category_id || null}, ${stringifyJson(p.sub_prompts)}, ${p.thumbnail_url || null}, ${p.meta_title || ''}, ${p.meta_description || null}, ${p.focus_keyword || null}, ${p.canonical_url || null},
           ${p.og_title || null}, ${p.og_description || null}, ${p.og_image || null}, ${p.twitter_title || null}, ${p.twitter_description || null}, ${p.twitter_image || null},
           ${stringifyJson(p.faqs)}, ${p.tags || null},
           ${p.description}, ${p.ai_type}, ${p.prompt_text}, 
           ${p.img_before}, ${p.img_after}, ${p.ig_link}, ${p.is_image_slider ? 1 : 0}, 
-          ${p.image_ratio}, ${p.password}, ${p.is_premium ? 1 : 0}, ${p.gallery_urls || null}, ${p.is_featured ? 1 : 0}, ${p.publish_date || null}
+          ${p.image_ratio}, ${p.password}, ${p.is_premium ? 1 : 0}, ${p.gallery_urls || null}, ${p.is_featured ? 1 : 0}, ${p.publish_date || null}, ${p.author_id || null}
         )
       `;
     }

@@ -50,11 +50,14 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     const resizeObserver = new ResizeObserver((entries) => {
-      for (let entry of entries) {
-        if (onHeightChange) {
-          onHeightChange(entry.target.offsetHeight + (isMobile ? 10 : 20));
+      window.requestAnimationFrame(() => {
+        if (!Array.isArray(entries) || !entries.length) return;
+        for (let entry of entries) {
+          if (onHeightChange) {
+            onHeightChange(entry.target.offsetHeight + (isMobile ? 10 : 20));
+          }
         }
-      }
+      });
     });
 
     if (headerRef.current) {

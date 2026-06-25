@@ -35,8 +35,23 @@ export default async function PromptPage({ params }) {
 
     if (promptRows.length > 0) {
       const p = promptRows[0];
+      
+      let selectedAuthor = null;
+      if (p.author_id) {
+        const specificAuthor = await db`SELECT * FROM authors WHERE id = ${p.author_id}`;
+        if (specificAuthor.length > 0) selectedAuthor = specificAuthor[0];
+      }
+      
+      if (!selectedAuthor) {
+        const authors = await db`SELECT * FROM authors ORDER BY id ASC LIMIT 1`;
+        selectedAuthor = authors.length > 0 ? authors[0] : null;
+      }
+
       initialPrompt = {
         ...p,
+        author_name: selectedAuthor?.name || 'PromptKing Admin',
+        author_image: selectedAuthor?.image || 'https://promptking.in/favicon.png',
+        author_description: selectedAuthor?.description || 'Passionate about AI and creative workflows. Exploring the frontiers of prompt engineering to help you unlock the true potential of tools like ChatGPT, Midjourney, and Gemini.',
         promptText: p.prompt_text || p.promptText,
         imgAfter: p.img_after || p.imgAfter,
         imgBefore: p.img_before || p.imgBefore,
