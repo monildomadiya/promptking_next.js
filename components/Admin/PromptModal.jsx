@@ -101,9 +101,8 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
   };
 
   useEffect(() => {
-    api.get('/categories').then(res => setCategories(res.data));
+    api.get('/admin/categories').then(res => setCategories(res.data)).catch(console.error);
     api.get('/website_categories').then(res => setWebsiteCategories(res.data));
-    api.get('/admin/authors').then(res => setAuthorsList(res.data)).catch(console.error);
     if (prompt) {
       let parsedFaqs = [];
       try { parsedFaqs = typeof prompt.faqs === 'string' ? JSON.parse(prompt.faqs) : (prompt.faqs || []); } catch(e) {}
@@ -372,20 +371,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                     ))}
                   </select>
                 </div>
-                <div>
-                  <Label text="Prompt Creator (Author)" />
-                  <select 
-                    value={formData.author_id}
-                    onChange={(e) => setFormData({ ...formData, author_id: e.target.value })}
-                    className="glass-input"
-                    style={{ width: '100%', padding: '14px', borderRadius: '14px', fontSize: '0.95rem', appearance: 'none', background: 'var(--surface-1)' }}
-                  >
-                    <option value="">Default Admin</option>
-                    {authorsList.map(a => (
-                      <option key={a.id} value={a.id}>{a.name}</option>
-                    ))}
-                  </select>
-                </div>
+
                 <div style={{ gridColumn: 'span 2' }}>
                   <Label text="Tags (comma separated)" />
                   <input

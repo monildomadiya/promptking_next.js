@@ -511,6 +511,7 @@ const AdminDashboard = () => {
         case 'n':
         case 'N':
           if (['prompts', 'listicles', 'blogs', 'categories', 'website_categories', 'authors', 'faqs'].includes(view)) {
+            if (view === 'authors' && data.length > 0) return;
             setEditingItem(null);
             setIsModalOpen(true);
           }
@@ -1149,7 +1150,7 @@ const AdminDashboard = () => {
                   />
                 )
               )}
-              {!isDragMode && <ActionButton label="CREATE" icon={<Plus size={18} />} onClick={() => { setEditingItem(null); setIsModalOpen(true); }} />}
+              {!isDragMode && (view !== 'authors' || data.length === 0) && <ActionButton label="CREATE" icon={<Plus size={18} />} onClick={() => { setEditingItem(null); setIsModalOpen(true); }} />}
             </div>
           )}
         </motion.header>

@@ -87,7 +87,7 @@ const BlogModal = ({ blog, onClose, onSave }) => {
     };
     window.addEventListener('keydown', handleEsc);
     
-    api.get('/admin/authors').then(res => setAuthorsList(res.data)).catch(console.error);
+
 
     return () => window.removeEventListener('keydown', handleEsc);
   }, [blog, onClose]);
@@ -508,21 +508,6 @@ const BlogModal = ({ blog, onClose, onSave }) => {
                   >
                     <option value="draft" style={{ background: '#1a1a1f' }}>Draft</option>
                     <option value="published" style={{ background: '#1a1a1f' }}>Published</option>
-                  </select>
-                </div>
-                <div>
-                  <Label text="Author" />
-                  <select 
-                    value={formData.author_id} 
-                    onChange={(e) => setFormData({ ...formData, author_id: e.target.value })}
-                    className="glass-input"
-                  >
-                    <option value="" style={{ background: '#1a1a1f' }}>Select Author...</option>
-                    {authorsList.map(a => (
-                      <option key={a.id} value={a.id} style={{ background: '#1a1a1f' }}>
-                        {a.name}
-                      </option>
-                    ))}
                   </select>
                 </div>
                 <div>
