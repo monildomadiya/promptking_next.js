@@ -43,52 +43,63 @@ const PrivacyPage = () => {
         }}>
           <section style={{ marginBottom: '50px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
-              <div style={{ 
-                padding: '12px', 
-                borderRadius: '16px', 
-                background: 'rgba(229, 9, 20, 0.1)', 
-                color: 'var(--accent-main)' 
-              }}>
+              <div style={{ padding: '12px', borderRadius: '16px', background: 'rgba(229, 9, 20, 0.1)', color: 'var(--accent-main)' }}>
                 <Shield size={28} />
               </div>
-              <h2 style={{ fontSize: '1.8rem', fontWeight: 800 }}>Privacy at PromptKing</h2>
+              <h2 style={{ fontSize: '1.8rem', fontWeight: 800 }}>Privacy Policy for PromptKing</h2>
             </div>
             <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: 1.8 }}>
-              At PromptKing, accessible from our website, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by PromptKing and how we use it.
+              At PromptKing, accessible from https://promptking.in, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by PromptKing and how we use it.
+            </p>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: 1.8, marginTop: '15px' }}>
+              If you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us.
             </p>
           </section>
 
           <section style={{ marginBottom: '50px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
-              <div style={{ 
-                padding: '12px', 
-                borderRadius: '16px', 
-                background: 'rgba(255, 255, 255, 0.05)', 
-                color: 'white' 
-              }}>
-                <FileText size={24} />
-              </div>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Log Files</h3>
-            </div>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.8 }}>
-              PromptKing follows a standard procedure of using log files. These files log visitors when they visit websites. All hosting companies do this and a part of hosting services' analytics. The information collected by log files include internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks.
-            </p>
-          </section>
-
-          <section style={{ marginBottom: '50px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
-              <div style={{ 
-                padding: '12px', 
-                borderRadius: '16px', 
-                background: 'rgba(255, 255, 255, 0.05)', 
-                color: 'white' 
-              }}>
+              <div style={{ padding: '12px', borderRadius: '16px', background: 'rgba(255, 255, 255, 0.05)', color: 'white' }}>
                 <Lock size={24} />
               </div>
               <h3 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Google DoubleClick DART Cookie</h3>
             </div>
             <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.8 }}>
-              Google is one of a third-party vendor on our site. It also uses cookies, known as DART cookies, to serve ads to our site visitors based upon their visit to our site and other sites on the internet. However, visitors may choose to decline the use of DART cookies by visiting the Google ad and content network Privacy Policy.
+              Google is one of a third-party vendor on our site. It also uses cookies, known as DART cookies, to serve ads to our site visitors based upon their visit to www.website.com and other sites on the internet. However, visitors may choose to decline the use of DART cookies by visiting the Google ad and content network Privacy Policy at the following URL – <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-main)' }}>https://policies.google.com/technologies/ads</a>
+            </p>
+          </section>
+
+          <section style={{ marginBottom: '50px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
+              <div style={{ padding: '12px', borderRadius: '16px', background: 'rgba(255, 255, 255, 0.05)', color: 'white' }}>
+                <ShieldCheck size={24} />
+              </div>
+              <h3 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Advertising Partners Privacy Policies</h3>
+            </div>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.8 }}>
+              You may consult this list to find the Privacy Policy for each of the advertising partners of PromptKing.
+            </p>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.8, marginTop: '15px' }}>
+              Third-party ad servers or ad networks uses technologies like cookies, JavaScript, or Web Beacons that are used in their respective advertisements and links that appear on PromptKing, which are sent directly to users' browser. They automatically receive your IP address when this occurs. These technologies are used to measure the effectiveness of their advertising campaigns and/or to personalize the advertising content that you see on websites that you visit.
+            </p>
+            <ul style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.8, marginTop: '15px', paddingLeft: '20px' }}>
+              <li>Third party vendors, including Google, use cookies to serve ads based on a user's prior visits to your website or other websites.</li>
+              <li>Google's use of advertising cookies enables it and its partners to serve ads to your users based on their visit to your sites and/or other sites on the Internet.</li>
+              <li>Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-main)' }}>Ads Settings</a> or by visiting <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-main)' }}>www.aboutads.info</a>.</li>
+            </ul>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.8, marginTop: '15px' }}>
+              Note that PromptKing has no access to or control over these cookies that are used by third-party advertisers.
+            </p>
+          </section>
+
+          <section style={{ marginBottom: '50px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
+              <div style={{ padding: '12px', borderRadius: '16px', background: 'rgba(255, 255, 255, 0.05)', color: 'white' }}>
+                <FileText size={24} />
+              </div>
+              <h3 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Log Files</h3>
+            </div>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.8 }}>
+              PromptKing follows a standard procedure of using log files. These files log visitors when they visit websites. All hosting companies do this and a part of hosting services' analytics. The information collected by log files include internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks. These are not linked to any information that is personally identifiable. The purpose of the information is for analyzing trends, administering the site, tracking users' movement on the website, and gathering demographic information.
             </p>
           </section>
 

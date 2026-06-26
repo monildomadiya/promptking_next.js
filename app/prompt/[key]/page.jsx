@@ -5,6 +5,57 @@ import { getSession } from '@/lib/session';
 
 export const revalidate = 60;
 
+export async function generateMetadata({ params }) {
+  const resolvedParams = await Promise.resolve(params);
+  const key = decodeURIComponent(resolvedParams.key);
+
+  let promptData = null;
+  try {
+    const promptRows = await db`
+      SELECT * FROM prompts 
+      WHERE prompt_key = ${key} OR (slug = ${key} AND slug IS NOT NULL AND slug != '')
+    `;
+    if (promptRows.length > 0) promptData = promptRows[0];
+  } catch (err) {}
+
+  if (!promptData) {
+    return { title: 'Prompt Not Found - PromptKing' };
+  }
+
+  const title = promptData.meta_title || `${promptData.title || 'AI Prompt'} - PromptKing`;
+  const description = promptData.meta_description || promptData.short_description || `Copy this free AI prompt for ChatGPT, Midjourney, and Gemini on PromptKing.`;
+  const image = promptData.thumbnail_url || promptData.img_after || 'https://promptking.in/og-image.png';
+  const canonicalUrl = `https://promptking.in/prompt/${promptData.slug || promptData.prompt_key}`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: title,
+        }
+      ],
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [image],
+    }
+  };
+}
+
 export default async function PromptPage({ params }) {
   const resolvedParams = await Promise.resolve(params);
   const key = decodeURIComponent(resolvedParams.key);

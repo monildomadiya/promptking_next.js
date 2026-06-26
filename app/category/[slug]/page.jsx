@@ -1,47 +1,79 @@
-"use client";
-import React, { useState, useEffect } from 'react';
-
-import { useParams } from 'next/navigation';
+import React from 'react';
+import db from '@/lib/db';
 import Link from 'next/link';
-
-
-import api from '@/lib/api';
 import PromptCard from '@/components/Prompts/PromptCard';
 
-const CategoryPage = () => {
-  const { slug } = useParams();
-  const [category, setCategory] = useState(null);
-  const [prompts, setPrompts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+const parseDbBool = (val) => {
+  if (val === null || val === undefined) return false;
+  if (Buffer.isBuffer(val)) return val[0] === 1;
+  return val == 1 || val === true || val === 'true';
+};
 
-  useEffect(() => {
-    const fetchCategoryData = async () => {
-      setLoading(true);
-      setError(false);
-      try {
-        const res = await api.get(`/category/${slug}`);
-        setCategory(res.data.category);
-        setPrompts(res.data.prompts || []);
-      } catch (err) {
-        console.error("Error fetching category:", err);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCategoryData();
-  }, [slug]);
+export async function generateMetadata({ params }) {
+  const resolvedParams = await Promise.resolve(params);
+  const { slug } = resolvedParams;
 
-  if (loading) {
-    return (
-      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ width: '40px', height: '40px', border: '3px solid rgba(255,255,255,0.1)', borderTopColor: 'var(--accent-main)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-      </div>
-    );
+  let category = null;
+  try {
+    const cats = await db`SELECT * FROM website_categories WHERE slug = ${slug}`;
+    if (cats.length > 0) category = cats[0];
+  } catch (err) {}
+
+  if (!category) {
+    return { title: 'Category Not Found - PromptKing' };
   }
 
-  if (error || !category) {
+  const title = category.meta_title || `${category.name} Prompts - PromptKing`;
+  const description = category.meta_description || category.description || `Explore our curated collection of ${category.name} AI prompts.`;
+  const canonicalUrl = `https://promptking.in/category/${category.slug}`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    }
+  };
+}
+
+export default async function CategoryPage({ params }) {
+  const resolvedParams = await Promise.resolve(params);
+  const { slug } = resolvedParams;
+
+  let category = null;
+  let prompts = [];
+
+  try {
+    const cats = await db`SELECT * FROM website_categories WHERE slug = ${slug}`;
+    if (cats.length > 0) {
+      category = cats[0];
+      const rows = await db`SELECT * FROM prompts WHERE website_category_id = ${category.id} ORDER BY sort_order ASC, prompt_key ASC`;
+      prompts = rows.map(r => ({
+        ...r,
+        copy_count:       Number(r.copy_count || 0),
+        unlock_count:     Number(r.unlock_count || 0),
+        like_count:       Number(r.like_count || 0),
+        view_count:       Number(r.view_count || 0),
+        is_featured:      parseDbBool(r.is_featured),
+        is_premium:       parseDbBool(r.is_premium)
+      }));
+    }
+  } catch (err) {
+    console.error("Error fetching category:", err);
+  }
+
+  if (!category) {
     return (
       <div style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
         <h2>Category Not Found</h2>
@@ -50,7 +82,7 @@ const CategoryPage = () => {
     );
   }
 
-  const schema = {
+  const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     "name": category.meta_title || category.name,
@@ -60,7 +92,7 @@ const CategoryPage = () => {
 
   return (
     <main style={{ minHeight: '100vh', padding: '40px 20px', color: 'white', maxWidth: '1400px', margin: '0 auto' }}>
-      
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* Category Header */}
       <style dangerouslySetInnerHTML={{__html: `
@@ -188,6 +220,4 @@ const CategoryPage = () => {
       </div>
     </main>
   );
-};
-
-export default CategoryPage;
+}

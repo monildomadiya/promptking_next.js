@@ -1,18 +1,6 @@
-
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import { GoogleAnalytics } from '@next/third-parties/google';
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 import { AppProvider } from "@/components/AppContext";
 import ClientLayout from "./ClientLayout";
@@ -86,16 +74,10 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <head>
-        <script 
-          async 
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2762946314678354" 
-          crossOrigin="anonymous"
-        ></script>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
-      </head>
       <body>
+
+        <script id="json-ld-website" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <script id="json-ld-org" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
         <GoogleAnalytics gaId={GA_ID} />
 
         <AppProvider>

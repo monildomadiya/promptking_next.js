@@ -71,50 +71,18 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
       <div style={{
         maxWidth: '1000px', margin: '60px auto 40px', padding: '0 20px',
       }}>
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.02)',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderRadius: '24px',
-          padding: isMobile ? '15px' : '10px 10px 10px 25px',
-          display: 'flex',
-          flexDirection: isMobile ? 'column' : 'row',
-          alignItems: 'center',
-          gap: isMobile ? '15px' : '20px',
-          boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
-        }}>
-          <div style={{ 
-            position: 'relative', 
-            display: 'flex', 
-            alignItems: 'center',
-            flex: 1,
-            width: '100%'
-          }}>
+        <div className="home-search-wrapper">
+          <div className="home-search-input-container">
             <Search 
               size={22} 
-              style={{ 
-                position: 'absolute', 
-                left: isMobile ? '15px' : '0', 
-                color: 'var(--text-secondary)',
-                opacity: 0.8
-              }} 
+              className="home-search-icon" 
             />
             <input 
               type="text" 
               placeholder="Search thousands of prompts..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              style={{ 
-                width: '100%', 
-                padding: isMobile ? '15px 20px 15px 50px' : '15px 20px 15px 40px', 
-                borderRadius: isMobile ? '16px' : '0',
-                fontSize: '1.1rem',
-                border: isMobile ? '1px solid rgba(255,255,255,0.08)' : 'none',
-                background: isMobile ? 'rgba(0,0,0,0.2)' : 'transparent',
-                color: 'white',
-                outline: 'none'
-              }} 
+              className="home-search-input" 
             />
             {search && (
               <div 
@@ -139,30 +107,17 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
             )}
           </div>
 
-          {!isMobile && <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.1)' }}></div>}
+          <div className="home-search-divider"></div>
 
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '12px', 
-            width: isMobile ? '100%' : 'auto' 
-          }}>
+          <div className="home-search-buttons-group">
             <button 
               onClick={() => setFilter(filter === 'premium' ? 'all' : 'premium')}
-              className="pro-card-hover"
+              className="pro-card-hover home-search-btn-pro"
               title="Premium Prompts"
               style={{ 
-                height: '50px', borderRadius: '16px', 
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer',
                 background: filter === 'premium' ? 'rgba(255, 193, 7, 0.15)' : 'rgba(255,255,255,0.03)',
                 border: filter === 'premium' ? '1px solid rgba(255, 193, 7, 0.4)' : '1px solid rgba(255,255,255,0.08)',
-                color: filter === 'premium' ? '#FFC107' : 'rgba(255,255,255,0.8)',
-                transition: 'all 0.3s ease',
-                flex: isMobile ? 1 : 'initial',
-                padding: isMobile ? '0 15px' : '0 25px',
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                whiteSpace: 'nowrap'
+                color: filter === 'premium' ? '#FFC107' : 'rgba(255,255,255,0.8)'
               }}
             >
               <Crown size={18} fill={filter === 'premium' ? '#FFC107' : 'none'} style={{ display: 'block' }} />
@@ -173,22 +128,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
               href="https://ko-fi.com/M5H720SAJV"
               target="_blank"
               rel="noopener noreferrer"
-              className="coffee-btn-hover"
-              style={{ 
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                height: '50px', borderRadius: '16px', 
-                padding: isMobile ? '0 15px' : '0 25px',
-                cursor: 'pointer',
-                background: 'rgba(255, 193, 7, 0.1)',
-                border: '1px solid rgba(255, 193, 7, 0.2)',
-                color: '#FFC107',
-                transition: 'all 0.3s ease',
-                flex: isMobile ? 1 : 'initial',
-                textDecoration: 'none',
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                whiteSpace: 'nowrap'
-              }}
+              className="coffee-btn-hover home-search-btn-coffee"
             >
               <Coffee size={18} style={{ display: 'block' }} />
               Support Us

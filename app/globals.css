@@ -1693,3 +1693,114 @@ body.shorts-modal-open {
 .author-box-name { font-size: 1.5rem; font-weight: 800; color: #fff; margin: 0; }
 .author-box-desc { font-size: 0.95rem; color: rgba(255, 255, 255, 0.6); line-height: 1.6; margin: 0; max-width: 600px; }
 @media (max-width: 768px) { .author-box { flex-direction: column; text-align: center; padding: 24px; gap: 16px; } }
+
+/* Home Page Search Responsive CSS */
+.home-search-wrapper {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 10px 10px 10px 25px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+.home-search-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+}
+.home-search-icon {
+  position: absolute; 
+  left: 0; 
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+.home-search-input {
+  width: 100%; 
+  padding: 15px 20px 15px 40px; 
+  border-radius: 0;
+  font-size: 1.1rem;
+  border: none;
+  background: transparent;
+  color: white;
+  outline: none;
+}
+.home-search-divider {
+  width: 1px; 
+  height: 40px; 
+  background: rgba(255,255,255,0.1);
+  display: block;
+}
+.home-search-buttons-group {
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  width: auto;
+}
+.home-search-btn-pro {
+  height: 50px; 
+  border-radius: 16px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 8px; 
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: initial;
+  padding: 0 25px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.home-search-btn-coffee {
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 8px;
+  height: 50px; 
+  border-radius: 16px; 
+  padding: 0 25px;
+  cursor: pointer;
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.2);
+  color: #FFC107;
+  transition: all 0.3s ease;
+  flex: initial;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .home-search-wrapper {
+    padding: 15px;
+    flex-direction: column;
+    gap: 15px;
+  }
+  .home-search-icon {
+    left: 15px;
+  }
+  .home-search-input {
+    padding: 15px 20px 15px 50px; 
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(0,0,0,0.2);
+  }
+  .home-search-divider {
+    display: none;
+  }
+  .home-search-buttons-group {
+    width: 100%;
+  }
+  .home-search-btn-pro, .home-search-btn-coffee {
+    flex: 1;
+    padding: 0 15px;
+  }
+}

@@ -641,7 +641,8 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
               position: 'relative',
               overflow: 'hidden',
               flexShrink: 0,
-              width: isListicle ? '100%' : 'auto'
+              width: isListicle ? '100%' : 'auto',
+              flex: isListicle ? 'none' : 1
             }}>
               <div style={{ borderRadius: '24px', overflow: 'hidden', position: 'relative' }}>
                 {prompt.isImageSlider ? (
@@ -708,7 +709,8 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
               <div className="prompt-vault-column" style={{ 
                 display: 'flex', 
                 flexDirection: 'column',
-                gap: '20px'
+                gap: '20px',
+                flex: isListicle ? 'none' : 1
               }}>
               {/* Interactive Vault Section */}
               <div id="box-detail" className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse-detail' : ''} ${isRelocking ? 'vault-relock-animate' : ''}`} style={{
