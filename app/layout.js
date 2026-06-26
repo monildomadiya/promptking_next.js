@@ -7,14 +7,17 @@ import ClientLayout from "./ClientLayout";
 
 export const metadata = {
   metadataBase: new URL('https://promptking.in'),
-  title: "PromptKing - Premium AI Prompts Library",
-  description: "Discover 1000+ free and premium AI prompts for ChatGPT, Midjourney, Claude, and more. Elevate your AI engineering skills.",
+  title: "PromptKing - Free & Premium AI Prompts Library for ChatGPT, Midjourney & More",
+  description: "Discover 1000+ free and premium AI prompts for ChatGPT, Midjourney, Claude, Gemini, and more. Browse by category, copy instantly, and elevate your AI engineering skills with PromptKing.",
+  alternates: {
+    canonical: 'https://promptking.in',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://promptking.in',
-    title: 'PromptKing - Premium AI Prompts Library',
-    description: 'Discover 1000+ free and premium AI prompts for ChatGPT, Midjourney, Claude, and more.',
+    title: 'PromptKing - Free & Premium AI Prompts Library',
+    description: 'Discover 1000+ free and premium AI prompts for ChatGPT, Midjourney, Claude, and more. Elevate your AI engineering skills.',
     siteName: 'PromptKing',
     images: [
       {
@@ -27,8 +30,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'PromptKing - Premium AI Prompts',
-    description: 'Discover high-quality AI prompts for ChatGPT, Midjourney, and more.',
+    title: 'PromptKing - Free & Premium AI Prompts',
+    description: 'Discover 1000+ free and premium AI prompts for ChatGPT, Midjourney, Claude and more. Start exploring today!',
     images: ['https://promptking.in/og-image.png'],
   },
   robots: {
@@ -74,6 +77,14 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en">
+      <head>
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2762946314678354"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+      </head>
       <body>
 
         <script id="json-ld-website" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />

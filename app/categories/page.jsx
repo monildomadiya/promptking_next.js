@@ -6,21 +6,25 @@ import { cacheGet, cacheSet } from '@/lib/cache';
 export const revalidate = 60;
 
 export const metadata = {
-  title: 'Explore AI Prompts Categories - PromptKing',
-  description: 'Browse all categories of free, premium, and expert-crafted AI prompts for ChatGPT, Midjourney, Gemini, and more.',
+  title: 'Explore AI Prompts Categories - PromptKing | Browse by Topic',
+  description: 'Browse all categories of free, premium, and expert-crafted AI prompts for ChatGPT, Midjourney, Gemini, Claude, and more. Find the perfect prompt by topic, use case, or AI tool.',
+  alternates: {
+    canonical: 'https://promptking.in/categories',
+  },
 };
 
 async function fetchAllCategories() {
-  const CACHE_KEY = 'all_categories_page';
+  const CACHE_KEY = 'all_website_categories_page';
   const cached = cacheGet(CACHE_KEY);
   if (cached) return cached;
 
   try {
-    const rows = await db`SELECT id, name, slug FROM categories ORDER BY name ASC`;
+    // Fetch website_categories (not AI-type categories)
+    const rows = await db`SELECT id, name, slug, image_url, tag FROM website_categories ORDER BY created_at DESC`;
     cacheSet(CACHE_KEY, rows, 10 * 60 * 1000); // 10 minutes cache
     return rows;
   } catch (error) {
-    console.error("Error fetching categories:", error);
+    console.error("Error fetching website categories:", error);
     return [];
   }
 }

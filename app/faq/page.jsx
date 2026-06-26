@@ -3,11 +3,14 @@ import db from '@/lib/db';
 import ClientFAQ from './ClientFAQ';
 
 export const metadata = {
-  title: 'Frequently Asked Questions - PromptKing',
-  description: 'Find answers to common questions about using PromptKing, AI Prompts, billing, and our prompt library.',
+  title: 'Frequently Asked Questions - PromptKing | Help & Support',
+  description: 'Find answers to the most common questions about PromptKing — how to use AI prompts, billing, free vs premium plans, supported AI tools like ChatGPT & Midjourney, and more.',
+  alternates: {
+    canonical: 'https://promptking.in/faq',
+  },
   openGraph: {
-    title: 'Frequently Asked Questions - PromptKing',
-    description: 'Find answers to common questions about using PromptKing, AI Prompts, billing, and our prompt library.',
+    title: 'Frequently Asked Questions - PromptKing | Help & Support',
+    description: 'Find answers to the most common questions about PromptKing — AI prompts, billing, free vs premium plans, and supported tools.',
     url: 'https://promptking.in/faq',
   }
 };

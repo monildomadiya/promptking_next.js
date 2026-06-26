@@ -1,120 +1,34 @@
-"use client";
-import React from 'react';
-import { Gavel, Scale, FileSignature, AlertCircle } from '@/components/Common/Icons';
+import ClientTermsPage from './ClientTermsPage';
 
-import SocialSidebar from '@/components/Prompts/SocialSidebar';
-import SEOMetadata from '@/components/SEO/SEOMetadata';
-
-const TermsPage = () => {
+export default function TermsPage() {
   return (
-    <div className="layout-with-sidebar">
-      <SEOMetadata 
-        title="Terms & Conditions - PromptKing"
-        description="Your guide to using PromptKing respectfully and legally. Terms of service and conditions."
-        url="https://promptking.in/terms"
-      />
-      <div className="main-content-area">
-        <header className="blog-hero" style={{ marginBottom: '40px' }}>
-          <div style={{ 
-            display: 'inline-block', 
-            padding: '8px 20px', 
-            background: 'rgba(255,255,255,0.05)', 
-            borderRadius: '100px', 
-            fontSize: '0.85rem', 
-            fontWeight: 600, 
-            color: 'var(--accent-main)',
-            marginBottom: '20px',
-            border: '1px solid rgba(255,255,255,0.1)'
-          }}>
-            LEGAL CENTER
-          </div>
-          <h1 style={{ fontSize: '3.5rem' }}>Terms & Conditions</h1>
-          <p>Your guide to using PromptKing respectfully and legally.</p>
-        </header>
-
-        <div style={{ 
-          maxWidth: '850px', 
-          margin: '0 auto',
-          padding: '60px',
-          background: 'rgba(255, 255, 255, 0.02)',
-          borderRadius: '40px',
-          border: '1px solid var(--border-color)',
-          backdropFilter: 'blur(20px)',
-        }}>
-          <section style={{ marginBottom: '50px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
-              <div style={{ 
-                padding: '12px', 
-                borderRadius: '16px', 
-                background: 'rgba(229, 9, 20, 0.1)', 
-                color: 'var(--accent-main)' 
-              }}>
-                <Gavel size={28} />
-              </div>
-              <h2 style={{ fontSize: '1.8rem', fontWeight: 800 }}>Welcome to PromptKing</h2>
-            </div>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem', lineHeight: 1.8 }}>
-              By accessing this website, you agree to be bound by these terms and conditions. We've designed these to protect both our community and our intellectual property.
-            </p>
-          </section>
-
-          <section style={{ marginBottom: '50px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
-              <div style={{ 
-                padding: '12px', 
-                borderRadius: '16px', 
-                background: 'rgba(255, 255, 255, 0.05)', 
-                color: 'white' 
-              }}>
-                <Scale size={24} />
-              </div>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 700 }}>1. Intellectual Property</h3>
-            </div>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.8 }}>
-              Unless otherwise stated, PromptKing owns the intellectual property rights for all material on the website. You may access this for personal use, but you must not republish or sell our prompts without permission.
-            </p>
-          </section>
-
-          <section style={{ marginBottom: '50px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
-              <div style={{ 
-                padding: '12px', 
-                borderRadius: '16px', 
-                background: 'rgba(255, 255, 255, 0.05)', 
-                color: 'white' 
-              }}>
-                <FileSignature size={24} />
-              </div>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 700 }}>2. User Content</h3>
-            </div>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.8 }}>
-              Parts of this website offer an opportunity for users to post and exchange opinions. PromptKing does not filter or edit comments prior to their presence on the website.
-            </p>
-          </section>
-
-          <section style={{ 
-            background: 'rgba(229, 9, 20, 0.05)', 
-            padding: '40px', 
-            borderRadius: '32px', 
-            border: '1px solid rgba(229, 9, 20, 0.2)',
-            display: 'flex',
-            gap: '20px',
-            alignItems: 'flex-start'
-          }}>
-            <AlertCircle size={32} style={{ color: 'var(--accent-main)', flexShrink: 0 }} />
-            <div>
-              <h3 style={{ fontSize: '1.3rem', marginBottom: '10px' }}>3. Disclaimer of Liability</h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: 1.6 }}>
-                We do not guarantee the results generated by external AI models using our prompts. Use of AI tools is at your own discretion and risk.
-              </p>
-            </div>
-          </section>
-        </div>
+    <>
+      <div
+        aria-hidden="false"
+        style={{
+          position: 'absolute', width: '1px', height: '1px', padding: 0,
+          margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)',
+          whiteSpace: 'nowrap', border: 0,
+        }}
+      >
+        <h1>Terms and Conditions - PromptKing</h1>
+        <p>
+          These Terms and Conditions govern your use of the PromptKing website and all related
+          services, products, and AI prompts available on the platform. By accessing or using
+          PromptKing, you agree to be bound by these terms. Please read them carefully before
+          using our services. PromptKing provides a library of free and premium AI prompts for
+          personal and commercial use, subject to the terms outlined here. Free prompts may be
+          used for personal, educational, or commercial projects without attribution. Premium
+          prompts are available through purchase and are licensed for personal or commercial use
+          by the purchasing user only. Redistribution, resale, or sharing of premium prompts is
+          strictly prohibited without explicit written permission from PromptKing. Users must not
+          use PromptKing prompts to generate content that is illegal, harmful, defamatory, or
+          violates the terms of service of any AI platform. PromptKing reserves the right to
+          update these terms at any time. Continued use of the platform after changes constitutes
+          acceptance of the updated terms.
+        </p>
       </div>
-      <SocialSidebar />
-    </div>
+      <ClientTermsPage />
+    </>
   );
-};
-
-export default TermsPage;
-
+}
