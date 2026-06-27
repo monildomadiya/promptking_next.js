@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, ChevronLeft, ChevronRight, CheckCircle, Tag } from '@/components/Common/Icons';
+import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, ChevronLeft, ChevronRight, CheckCircle, Tag, X } from '@/components/Common/Icons';
 import confetti from 'canvas-confetti';
 import api from '@/lib/api';
 import Shimmer from '@/components/Common/Shimmer';
@@ -1017,7 +1017,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                         }}
                         onMouseEnter={e => e.currentTarget.style.background = 'rgba(229,9,20,0.5)'}
                         onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.25)'}
-                      >✕</button>
+                      ><X size={20} /></button>
 
                       {/* Prev */}
                       {galleryImages.length > 1 && (

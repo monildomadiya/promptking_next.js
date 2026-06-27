@@ -7,8 +7,8 @@ import ClientLayout from "./ClientLayout";
 
 export const metadata = {
   metadataBase: new URL('https://promptking.in'),
-  title: "PromptKing - Free & Premium AI Prompts Library for ChatGPT, Midjourney & More",
-  description: "Discover 1000+ free and premium AI prompts for ChatGPT, Midjourney, Claude, Gemini, and more. Browse by category, copy instantly, and elevate your AI engineering skills with PromptKing.",
+  title: "PromptKing – Best AI Prompts for ChatGPT, Gemini & Midjourney",
+  description: "Explore 1000+ free AI prompts for ChatGPT, Gemini, and Midjourney. Copy ready-to-use prompts for writing, coding, design, and more — all in one place.",
   alternates: {
     canonical: 'https://promptking.in',
   },
@@ -16,8 +16,8 @@ export const metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://promptking.in',
-    title: 'PromptKing - Free & Premium AI Prompts Library',
-    description: 'Discover 1000+ free and premium AI prompts for ChatGPT, Midjourney, Claude, and more. Elevate your AI engineering skills.',
+    title: 'PromptKing – Best AI Prompts for ChatGPT, Gemini & Midjourney',
+    description: 'Explore 1000+ free AI prompts for ChatGPT, Gemini, and Midjourney. Copy ready-to-use prompts for writing, coding, design, and more — all in one place.',
     siteName: 'PromptKing',
     images: [
       {
@@ -30,8 +30,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'PromptKing - Free & Premium AI Prompts',
-    description: 'Discover 1000+ free and premium AI prompts for ChatGPT, Midjourney, Claude and more. Start exploring today!',
+    title: 'PromptKing – Best AI Prompts for ChatGPT, Gemini & Midjourney',
+    description: 'Explore 1000+ free AI prompts for ChatGPT, Gemini, and Midjourney. Copy ready-to-use prompts for writing, coding, design, and more — all in one place.',
     images: ['https://promptking.in/og-image.png'],
   },
   robots: {

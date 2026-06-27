@@ -207,7 +207,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
     if (formData.is_premium) {
       if (!formData.password || !/^\d{4}$/.test(formData.password)) {
         newErrors.password = true;
-        toast.error("⚠️ SECURITY REQUIRED: Premium content must have an EXACTLY 4-digit numeric PIN.");
+        toast.error("SECURITY REQUIRED: Premium content must have an EXACTLY 4-digit numeric PIN.");
       }
     }
 
@@ -596,7 +596,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                             <button type="button"
                               onClick={() => { const updated = imgs.filter((_, i) => i !== idx); setFormData({ ...formData, gallery_urls: JSON.stringify(updated) }); }}
                               style={{ background: 'rgba(229,9,20,0.15)', border: '1px solid rgba(229,9,20,0.3)', color: 'var(--accent-main)', width: '26px', height: '26px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', flexShrink: 0 }}
-                            >✕</button>
+                            ><X size={14} /></button>
                           </div>
                         ))}
                         <Hint text={`${imgs.length} image${imgs.length > 1 ? 's' : ''} added.`} />

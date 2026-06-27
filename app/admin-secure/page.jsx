@@ -14,7 +14,7 @@ import {
   Table, Edit, Trash, Plus, Settings, FileText, 
   TableProperties, LogOut, ChevronRight, Layout, 
   Share2, Palette, Activity, Users, Layers, Crown,
-  Eye, Copy, ExternalLink
+  Eye, Copy, ExternalLink, PieChart
 } from '@/components/Common/Icons';
 import PromptModal from '@/components/Admin/PromptModal';
 import ListicleModal from '@/components/Admin/ListicleModal';
@@ -1672,7 +1672,7 @@ const AdminDashboard = () => {
                       borderRadius: '16px',
                       border: '1px dashed rgba(255,255,255,0.1)'
                     }}>
-                      <div style={{ fontSize: '2.5rem' }}>📊</div>
+                      <div style={{ display: 'flex', justifyContent: 'center' }}><PieChart size={48} color="rgba(255,255,255,0.3)" /></div>
                       <div style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 700, fontSize: '1.1rem' }}>No analytics data yet</div>
                       <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.85rem', textAlign: 'center', maxWidth: '320px', lineHeight: 1.6 }}>
                         Data will appear here once users start viewing, copying, and unlocking prompts on your site.

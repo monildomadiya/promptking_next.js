@@ -1,6 +1,7 @@
 "use client";
 import toast from 'react-hot-toast';
 import React, { useRef, useEffect, useState } from 'react';
+import { ExternalLink, Image, X, Grid, Youtube } from '../Common/Icons';
 
 const CustomEditor = ({ value, onChange }) => {
   const contentRef = useRef(null);
@@ -202,22 +203,22 @@ const CustomEditor = ({ value, onChange }) => {
           saveRange();
           const url = window.prompt('Enter URL (include https://):');
           if (url) { restoreRange(); exec('createLink', url); }
-        }} title="Insert Link">🔗 Link</Btn>
+        }} title="Insert Link"><ExternalLink size={14} style={{ marginRight: '4px', display: 'inline-block', verticalAlign: 'middle' }}/> Link</Btn>
         <Btn onClick={() => exec('unlink')} title="Remove Link">Unlink</Btn>
         <Divider />
 
         {/* Image */}
-        <Btn onClick={() => { saveRange(); setShowImageModal(true); }} title="Insert Image">🖼 Image</Btn>
+        <Btn onClick={() => { saveRange(); setShowImageModal(true); }} title="Insert Image"><Image size={14} style={{ marginRight: '4px', display: 'inline-block', verticalAlign: 'middle' }}/> Image</Btn>
 
         {/* Table */}
-        <Btn onClick={() => { saveRange(); setShowTableModal(true); }} title="Insert Table">⊞ Table</Btn>
+        <Btn onClick={() => { saveRange(); setShowTableModal(true); }} title="Insert Table"><Grid size={14} style={{ marginRight: '4px', display: 'inline-block', verticalAlign: 'middle' }}/> Table</Btn>
 
         {/* YouTube */}
-        <Btn onClick={() => { saveRange(); setShowYoutubeModal(true); }} title="Embed YouTube">▶ YouTube</Btn>
+        <Btn onClick={() => { saveRange(); setShowYoutubeModal(true); }} title="Embed YouTube"><Youtube size={14} style={{ marginRight: '4px', display: 'inline-block', verticalAlign: 'middle' }}/> YouTube</Btn>
         <Divider />
 
         {/* Clear */}
-        <Btn onClick={() => exec('removeFormat')} title="Clear Formatting">✕ Clear</Btn>
+        <Btn onClick={() => exec('removeFormat')} title="Clear Formatting"><X size={14} style={{ marginRight: '4px', display: 'inline-block', verticalAlign: 'middle' }}/> Clear</Btn>
       </div>
 
       {/* === CONTENT AREA === */}
@@ -300,7 +301,7 @@ const CustomEditor = ({ value, onChange }) => {
 
       {/* === IMAGE MODAL === */}
       {showImageModal && (
-        <EditorModal title="🖼 Insert Image" onClose={() => setShowImageModal(false)}>
+        <EditorModal title="Insert Image" onClose={() => setShowImageModal(false)}>
           <input
             autoFocus
             type="text"
