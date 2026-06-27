@@ -1804,3 +1804,55 @@ body.shorts-modal-open {
     padding: 0 15px;
   }
 }
+
+.home-hero-title {
+  font-size: 3.3rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 20px;
+  line-height: 1.2;
+  max-width: 850px;
+  margin-left: auto;
+  margin-right: auto;
+  text-wrap: balance;
+  letter-spacing: -1px;
+}
+
+.home-hero-subtitle {
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.65);
+  max-width: 600px;
+  margin: 20px auto 0;
+  line-height: 1.6;
+  text-wrap: balance;
+}
+
+@media (max-width: 768px) {
+  .home-hero-title {
+    font-size: 2.2rem;
+  }
+  .home-hero-subtitle {
+    font-size: 1rem;
+  }
+}
+
+/* FOUC Fixes */
+.header-actions { display: flex; align-items: center; gap: 20px; flex: initial; justify-content: flex-end; min-width: 0; }
+.explore-btn-hover { padding: 0 25px !important; }
+.category-dropdown-menu { padding: 24px !important; min-width: 480px !important; }
+.category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.copy-btn-mobile-margin { margin-bottom: 0 !important; }
+.contact-grid-container { display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; max-width: 1200px; margin: 0 auto; }
+
+@media (max-width: 1100px) {
+  .header-actions { gap: 10px; }
+  .explore-btn-hover { padding: 0 15px !important; }
+  .category-dropdown-menu { padding: 20px !important; min-width: 300px !important; }
+  .category-grid { grid-template-columns: 1fr; }
+  .copy-btn-mobile-margin { margin-bottom: 20px !important; }
+}
+@media (max-width: 768px) {
+  .contact-grid-container { grid-template-columns: 1fr; }
+}

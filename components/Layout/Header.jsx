@@ -105,14 +105,7 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
             </Link>
           </div>
 
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: isMobile ? '10px' : '20px',
-            flex: 'initial',
-            justifyContent: 'flex-end',
-            minWidth: 0
-          }}>
+          <div className="header-actions">
             {categories.length > 0 && (
               <div 
                 className="category-dropdown-wrapper"
@@ -131,7 +124,6 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                     display: 'flex', 
                     alignItems: 'center', 
                     gap: '8px',
-                    padding: isMobile ? '0 15px' : '0 25px', 
                     height: '50px',
                     fontSize: '0.95rem', 
                     transition: 'all 0.3s ease',
@@ -145,11 +137,11 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                   Explore
                 </div>
                 {showCategoryDropdown && (
-                  <div style={{
+                  <div className="category-dropdown-menu" style={{
                     position: 'absolute', top: 'calc(100% + 15px)', right: 0, 
                     background: 'rgba(15, 15, 20, 0.95)', backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)',
                     border: '1px solid rgba(255,255,255,0.08)', borderRadius: '24px',
-                    padding: isMobile ? '20px' : '24px', minWidth: isMobile ? '300px' : '480px', zIndex: 100,
+                    zIndex: 100,
                     boxShadow: '0 30px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05)',
                     display: 'flex', flexDirection: 'column', gap: '16px',
                     transformOrigin: 'top right'
@@ -157,11 +149,7 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                       <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)', fontWeight: 600 }}>Discover Categories</span>
                     </div>
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
-                      gap: '12px'
-                    }}>
+                    <div className="category-grid">
                       {categories.map(c => (
                         <Link 
                           key={c.id} 

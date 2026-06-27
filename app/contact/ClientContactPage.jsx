@@ -56,13 +56,7 @@ const ClientContactPage = () => {
           <p>Have questions or feedback? We'd love to hear from you.</p>
         </header>
 
-        <div style={{ 
-          display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1.5fr',
-          gap: '40px',
-          maxWidth: '1200px',
-          margin: '0 auto'
-        }}>
+        <div className="contact-grid-container">
           {/* Contact Info */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div className="glass-card" style={{ padding: '30px', borderRadius: '30px', background: 'rgba(255,255,255,0.02)' }}>

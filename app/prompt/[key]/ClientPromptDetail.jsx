@@ -884,13 +884,13 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
             {(!isUnlocked && !prompt.isPremium) && (
               <button 
                 onClick={handleCopy}
+                className="copy-btn-mobile-margin"
                 style={{
                   width: '100%', background: isCopied ? 'var(--success)' : 'white', color: isCopied ? 'white' : 'black',
                   border: 'none', padding: '18px', borderRadius: '20px', fontWeight: 900, fontSize: '1.1rem', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', transition: '0.3s ease',
                   boxShadow: isCopied ? '0 0 30px rgba(39, 201, 63, 0.3)' : '0 10px 30px rgba(0,0,0,0.3)',
-                  marginTop: '0px',
-                  marginBottom: isMobile ? '20px' : '0'
+                  marginTop: '0px'
                 }}
               >
                 {isCopied ? <><Check size={22} /> Copied!</> : <><Copy size={22} /> Copy Full Prompt</>}

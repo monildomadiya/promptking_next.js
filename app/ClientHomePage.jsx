@@ -66,30 +66,11 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
           }}></div>
         )}
 
-        <h1 style={{ 
-          fontSize: isMobile ? '2.2rem' : '3.3rem', 
-          fontWeight: 900, 
-          background: 'linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%)', 
-          WebkitBackgroundClip: 'text', 
-          WebkitTextFillColor: 'transparent',
-          marginBottom: '20px',
-          lineHeight: 1.2,
-          maxWidth: '850px',
-          margin: '0 auto',
-          textWrap: 'balance',
-          letterSpacing: '-1px'
-        }}>
+        <h1 className="home-hero-title">
           {categorySlug ? `${categorySlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} AI Prompts` : 'The Best AI Prompts for ChatGPT, Gemini & Midjourney'}
         </h1>
         {!categorySlug && (
-          <p style={{
-            fontSize: isMobile ? '1rem' : '1.15rem',
-            color: 'rgba(255,255,255,0.65)',
-            maxWidth: '600px',
-            margin: '20px auto 0',
-            lineHeight: 1.6,
-            textWrap: 'balance'
-          }}>
+          <p className="home-hero-subtitle">
             Copy-paste ready prompts for writers, creators, students, and professionals. Save hours — just pick a prompt and go.
           </p>
         )}
@@ -183,7 +164,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
           lineHeight: 1.8,
           fontSize: '1.05rem'
         }}>
-          <h2 style={{ fontSize: '2rem', color: '#fff', marginBottom: '20px', fontWeight: 700 }}>What is PromptKing?</h2>
+          <h2 style={{ fontSize: '2rem', color: '#fff', marginBottom: '20px', fontWeight: 700, lineHeight: 1.2 }}>What is PromptKing?</h2>
           <p style={{ marginBottom: '20px' }}>
             PromptKing is a free AI prompt library designed for anyone who uses ChatGPT, Google Gemini, or Midjourney. Whether you're a student, marketer, developer, or creative professional — we have prompts that save you time and deliver better results.
           </p>
@@ -197,7 +178,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
             <li style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle size={18} color="#4CAF50" /> New prompts added every week</li>
           </ul>
 
-          <h2 style={{ fontSize: '2rem', color: '#fff', marginBottom: '20px', fontWeight: 700 }}>Why Use PromptKing?</h2>
+          <h2 style={{ fontSize: '2rem', color: '#fff', marginBottom: '20px', fontWeight: 700, lineHeight: 1.2 }}>Why Use PromptKing?</h2>
           <p style={{ marginBottom: '20px' }}>
             Most people spend 20–30 minutes crafting a single AI prompt — only to get mediocre results. PromptKing solves that.
           </p>
@@ -211,7 +192,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
             Whether you're generating images in Midjourney, writing content with ChatGPT, or doing research with Gemini — PromptKing helps you get better results, faster.
           </p>
 
-          <h2 style={{ fontSize: '2rem', color: '#fff', marginBottom: '20px', fontWeight: 700 }}>The Ultimate AI Prompt Library</h2>
+          <h2 style={{ fontSize: '2rem', color: '#fff', marginBottom: '20px', fontWeight: 700, lineHeight: 1.2 }}>The Ultimate AI Prompt Library</h2>
           <p style={{ marginBottom: '20px' }}>
             Looking for the best ChatGPT prompts? Want Midjourney prompts that create stunning images? Need Gemini prompts for research and writing? You've come to the right place.
           </p>
