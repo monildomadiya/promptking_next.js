@@ -21,6 +21,11 @@ export async function generateMetadata({ params }) {
   }
 
   const title = blogData.meta_title || blogData.title || 'AI Article - PromptKing';
+  let plainDesc = '';
+  if (blogData.content) {
+    plainDesc = blogData.content.replace(/<[^>]*>?/gm, '').substring(0, 160);
+  }
+  const description = blogData.meta_description || blogData.excerpt || plainDesc || `Read "${blogData.title || 'article'}" on PromptKing Blog.`;
   let image = blogData.og_image || blogData.featured_image || 'https://promptking.in/og-image.jpg';
   if (image.startsWith('/')) image = `https://promptking.in${image}`;
   else if (!image.startsWith('http')) image = `https://promptking.in/${image}`;

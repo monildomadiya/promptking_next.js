@@ -23,6 +23,11 @@ export async function generateMetadata({ params }) {
   }
 
   const title = promptData.meta_title || `${promptData.title || 'AI Prompt'} - PromptKing`;
+  let plainDesc = '';
+  if (promptData.description) {
+    plainDesc = promptData.description.replace(/<[^>]*>?/gm, '').substring(0, 160);
+  }
+  const description = promptData.meta_description || plainDesc || `Unlock the "${promptData.title || 'AI'}" AI prompt on PromptKing. Works with ${promptData.ai_type || 'AI'}.`;
   let image = promptData.thumbnail_url || promptData.img_after || 'https://promptking.in/og-image.jpg';
   if (image.startsWith('/')) image = `https://promptking.in${image}`;
   else if (!image.startsWith('http')) image = `https://promptking.in/${image}`;
