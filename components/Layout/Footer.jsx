@@ -140,8 +140,10 @@ const Footer = ({ onLogoClick }) => {
             {( !isMobile || openSections.legal ) && (
               <ul style={listStyle}>
                 <FooterLink to="/privacy" text="Privacy Policy" />
+                <FooterLink to="/privacy#5" text="Cookie Policy" />
                 <FooterLink to="/terms" text="Terms of Service" />
                 <FooterLink to="/disclaimer" text="Disclaimer" />
+                <FooterLink to="/adsense-policy" text="Ads Policy" />
               </ul>
             )}
           </div>

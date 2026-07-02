@@ -23,8 +23,9 @@ export async function generateMetadata({ params }) {
   }
 
   const title = promptData.meta_title || `${promptData.title || 'AI Prompt'} - PromptKing`;
-  const description = promptData.meta_description || promptData.short_description || `Copy this free AI prompt for ChatGPT, Midjourney, and Gemini on PromptKing.`;
-  const image = promptData.thumbnail_url || promptData.img_after || 'https://promptking.in/og-image.png';
+  let image = promptData.thumbnail_url || promptData.img_after || 'https://promptking.in/og-image.jpg';
+  if (image.startsWith('/')) image = `https://promptking.in${image}`;
+  else if (!image.startsWith('http')) image = `https://promptking.in/${image}`;
   const canonicalUrl = `https://promptking.in/prompt/${promptData.slug || promptData.prompt_key}`;
 
   return {
@@ -149,11 +150,108 @@ export default async function PromptPage({ params }) {
     console.error("Error fetching prompt detail server-side:", error);
   }
 
+  // Parse tags for SSR
+  let parsedTags = [];
+  try {
+    if (initialPrompt?.tags) {
+      parsedTags = typeof initialPrompt.tags === 'string'
+        ? (initialPrompt.tags.trim().startsWith('[') ? JSON.parse(initialPrompt.tags) : initialPrompt.tags.split(',').map(t => t.trim()).filter(Boolean))
+        : (Array.isArray(initialPrompt.tags) ? initialPrompt.tags : []);
+    }
+  } catch (e) {}
+
+  // Parse FAQs for SSR
+  let parsedFaqs = [];
+  try {
+    if (initialPrompt?.faqs) {
+      parsedFaqs = typeof initialPrompt.faqs === 'string' ? JSON.parse(initialPrompt.faqs) : (initialPrompt.faqs || []);
+    }
+  } catch (e) {}
+
   return (
-    <ClientPromptDetail 
-      initialPrompt={initialPrompt} 
-      initialSuggestedPrompts={initialSuggestedPrompts}
-      adsSettings={adsSettings}
-    />
+    <>
+      {/*
+        Server-rendered prompt content — visible to Google AdSense & search crawlers
+        without JavaScript. Fixes "low value content" rejection.
+      */}
+      {initialPrompt && (
+        <article
+          aria-label={`${initialPrompt.title} AI Prompt`}
+          style={{
+            position: 'absolute',
+            width: '1px',
+            height: '1px',
+            padding: 0,
+            margin: '-1px',
+            overflow: 'hidden',
+            clip: 'rect(0,0,0,0)',
+            whiteSpace: 'nowrap',
+            border: 0,
+          }}
+        >
+          <h1>{initialPrompt.title}</h1>
+
+          {initialPrompt.ai_type && (
+            <p><strong>AI Tool:</strong> {initialPrompt.ai_type}</p>
+          )}
+
+          {initialPrompt.short_description && (
+            <p>{initialPrompt.short_description}</p>
+          )}
+
+          {initialPrompt.description && (
+            <div dangerouslySetInnerHTML={{ __html: initialPrompt.description }} />
+          )}
+
+          {parsedTags.length > 0 && (
+            <section>
+              <h2>Tags</h2>
+              <ul>
+                {parsedTags.map((tag, i) => <li key={i}>{tag}</li>)}
+              </ul>
+            </section>
+          )}
+
+          {parsedFaqs.length > 0 && (
+            <section>
+              <h2>Frequently Asked Questions</h2>
+              <dl>
+                {parsedFaqs.map((faq, i) => (
+                  <div key={i}>
+                    <dt><strong>{faq.question}</strong></dt>
+                    <dd>{faq.answer}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )}
+
+          <section>
+            <h2>About This Prompt</h2>
+            <p>
+              This is a professionally engineered AI prompt from the PromptKing library, 
+              designed for use with {initialPrompt.ai_type || 'AI tools'} such as ChatGPT, 
+              Midjourney, Google Gemini, and Claude. Copy this prompt instantly and use it 
+              to generate high-quality AI output. PromptKing offers 1000+ free and premium 
+              AI prompts across 50+ categories for creators, developers, and marketers.
+            </p>
+            <nav aria-label="Prompt breadcrumb">
+              <ol>
+                <li><a href="/">Home</a></li>
+                <li><a href="/">Prompts</a></li>
+                <li>{initialPrompt.title}</li>
+              </ol>
+            </nav>
+          </section>
+        </article>
+      )}
+
+      <ClientPromptDetail 
+        initialPrompt={initialPrompt} 
+        initialSuggestedPrompts={initialSuggestedPrompts}
+        adsSettings={adsSettings}
+      />
+    </>
   );
 }
+

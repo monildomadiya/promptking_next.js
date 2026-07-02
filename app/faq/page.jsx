@@ -12,6 +12,20 @@ export const metadata = {
     title: 'Frequently Asked Questions - PromptKing | Help & Support',
     description: 'Find answers to the most common questions about PromptKing — AI prompts, billing, free vs premium plans, and supported tools.',
     url: 'https://promptking.in/faq',
+    images: [
+      {
+        url: 'https://promptking.in/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'PromptKing FAQ',
+      }
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Frequently Asked Questions - PromptKing | Help & Support',
+    description: 'Find answers to the most common questions about PromptKing — AI prompts, billing, free vs premium plans, and supported tools.',
+    images: ['https://promptking.in/og-image.jpg'],
   }
 };
 

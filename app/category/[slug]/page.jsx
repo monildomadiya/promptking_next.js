@@ -27,6 +27,10 @@ export async function generateMetadata({ params }) {
   const description = category.meta_description || category.description || `Explore our curated collection of ${category.name} AI prompts.`;
   const canonicalUrl = `https://promptking.in/category/${category.slug}`;
 
+  let image = category.image_url || 'https://promptking.in/og-image.jpg';
+  if (image.startsWith('/')) image = `https://promptking.in${image}`;
+  else if (!image.startsWith('http')) image = `https://promptking.in/${image}`;
+
   return {
     title,
     description,
@@ -38,11 +42,20 @@ export async function generateMetadata({ params }) {
       description,
       url: canonicalUrl,
       type: 'website',
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: title,
+        }
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: [image],
     }
   };
 }

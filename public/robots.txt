@@ -1,24 +1,77 @@
 User-agent: *
 Allow: /
 Allow: /api/sitemap.xml
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /ai-plugin.json
+Allow: /.well-known/ai-plugin.json
 Disallow: /api/admin/
 Disallow: /admin/
 Disallow: /admin-secure/
 Disallow: /admin-secure
 
+# ── OpenAI / ChatGPT ──────────────────────────
 User-agent: GPTBot
 Allow: /
 
 User-agent: ChatGPT-User
 Allow: /
 
+User-agent: OAI-SearchBot
+Allow: /
+
+# ── Google AI ─────────────────────────────────
 User-agent: Google-Extended
 Allow: /
 
+# ── Anthropic / Claude ────────────────────────
 User-agent: anthropic-ai
 Allow: /
 
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+# ── Perplexity ────────────────────────────────
 User-agent: PerplexityBot
 Allow: /
+
+# ── Cohere ────────────────────────────────────
+User-agent: cohere-ai
+Allow: /
+
+# ── Meta AI ───────────────────────────────────
+User-agent: meta-externalagent
+Allow: /
+
+# ── Apple ─────────────────────────────────────
+User-agent: Applebot
+Allow: /
+
+# ── ByteDance ─────────────────────────────────
+User-agent: Bytespider
+Allow: /
+
+# ── Common AI research & archiving crawlers ───
+User-agent: ia_archiver
+Allow: /
+
+User-agent: Diffbot
+Allow: /
+
+User-agent: DuckAssistBot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+# ── AI content files ──────────────────────────
+# Machine-readable content manifest for LLMs
+# See: /llms.txt and /llms-full.txt
 
 Sitemap: https://promptking.in/sitemap.xml

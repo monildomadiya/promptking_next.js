@@ -9,9 +9,9 @@ import SEOMetadata from '@/components/SEO/SEOMetadata';
 import { optimizeImage } from '@/utils/imageUtils';
 import { getCache, setCache } from '@/utils/cacheUtils';
 
-const ClientBlogPage = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [loading, setLoading] = useState(true);
+const ClientBlogPage = ({ initialBlogs = [] }) => {
+  const [blogs, setBlogs] = useState(initialBlogs);
+  const [loading, setLoading] = useState(initialBlogs.length === 0);
 
 
   async function fetchBlogs() {
@@ -37,6 +37,7 @@ const ClientBlogPage = () => {
   };
 
   useEffect(() => {
+    if (initialBlogs && initialBlogs.length > 0) return; // already have SSR data
     fetchBlogs();
   }, []);
 

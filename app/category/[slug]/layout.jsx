@@ -22,6 +22,10 @@ export async function generateMetadata({ params }) {
     }
     const description = category.meta_description || category.meta_desc || plainDesc || `Explore the best AI prompts in the ${category.name} category.`;
 
+    let image = category.image_url || 'https://promptking.in/og-image.jpg';
+    if (image.startsWith('/')) image = `https://promptking.in${image}`;
+    else if (!image.startsWith('http')) image = `https://promptking.in/${image}`;
+
     return {
       title,
       description,
@@ -29,11 +33,20 @@ export async function generateMetadata({ params }) {
         title,
         description,
         url: `https://promptking.in/category/${slug}`,
+        images: [
+          {
+            url: image,
+            width: 1200,
+            height: 630,
+            alt: title,
+          }
+        ],
       },
       twitter: {
-        card: 'summary',
+        card: 'summary_large_image',
         title,
         description,
+        images: [image],
       }
     };
   } catch (error) {

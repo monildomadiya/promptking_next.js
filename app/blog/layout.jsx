@@ -10,11 +10,20 @@ export const metadata = {
     description: "Explore expert tutorials, creative tips, and the latest news about AI prompts, ChatGPT, Midjourney, Gemini, Claude, and prompt engineering.",
     url: "https://promptking.in/blog",
     type: "website",
+    images: [
+      {
+        url: 'https://promptking.in/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'PromptKing Blog',
+      }
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "PromptKing Blog - AI Tips & Updates",
     description: "Expert insights, tutorials, and news about AI prompts, creative workflows, and the latest from the PromptKing platform.",
+    images: ['https://promptking.in/og-image.jpg'],
   }
 };
 

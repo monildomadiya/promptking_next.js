@@ -21,8 +21,9 @@ export async function generateMetadata({ params }) {
   }
 
   const title = blogData.meta_title || blogData.title || 'AI Article - PromptKing';
-  const description = blogData.meta_description || blogData.excerpt || blogData.short_description || 'Read this AI engineering article on PromptKing.';
-  const image = blogData.og_image || blogData.featured_image || 'https://promptking.in/og-image.png';
+  let image = blogData.og_image || blogData.featured_image || 'https://promptking.in/og-image.jpg';
+  if (image.startsWith('/')) image = `https://promptking.in${image}`;
+  else if (!image.startsWith('http')) image = `https://promptking.in/${image}`;
   const canonicalUrl = blogData.canonical_url || `https://promptking.in/article/${slug}`;
 
   let tagsArray = [];

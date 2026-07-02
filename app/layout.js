@@ -21,10 +21,18 @@ export const metadata = {
     siteName: 'PromptKing',
     images: [
       {
+        url: 'https://promptking.in/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'PromptKing - Premium AI Prompts Library',
+        type: 'image/jpeg',
+      },
+      {
         url: 'https://promptking.in/og-image.png',
         width: 1200,
         height: 630,
         alt: 'PromptKing - Premium AI Prompts Library',
+        type: 'image/png',
       }
     ],
   },
@@ -32,7 +40,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'PromptKing – Best AI Prompts for ChatGPT, Gemini & Midjourney',
     description: 'Explore 1000+ free AI prompts for ChatGPT, Gemini, and Midjourney. Copy ready-to-use prompts for writing, coding, design, and more — all in one place.',
-    images: ['https://promptking.in/og-image.png'],
+    images: ['https://promptking.in/og-image.jpg'],
   },
   robots: {
     index: true,
@@ -50,6 +58,7 @@ export const metadata = {
 };
 
 const GA_ID = "G-1HK9T17LSR";
+const ADSENSE_CLIENT = "ca-pub-2762946314678354";
 
 export default function RootLayout({ children }) {
   const jsonLd = {
@@ -57,9 +66,13 @@ export default function RootLayout({ children }) {
     '@type': 'WebSite',
     name: 'PromptKing',
     url: 'https://promptking.in',
+    description: 'The ultimate free AI prompt library with 1000+ expert-engineered prompts for ChatGPT, Gemini, Midjourney, Claude, and more.',
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://promptking.in/?q={search_term_string}',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: 'https://promptking.in/?q={search_term_string}'
+      },
       'query-input': 'required name=search_term_string'
     }
   };
@@ -69,26 +82,56 @@ export default function RootLayout({ children }) {
     '@type': 'Organization',
     name: 'PromptKing',
     url: 'https://promptking.in',
-    logo: 'https://promptking.in/promptking-logo.svg',
-    sameAs: [
-      // Add social links here if needed
-    ]
+    logo: {
+      '@type': 'ImageObject',
+      url: 'https://promptking.in/promptking-logo.svg',
+      width: 180,
+      height: 60,
+    },
+    description: 'PromptKing is the world\'s leading free AI prompt library, providing 1000+ expert-engineered prompts for ChatGPT, Gemini, Midjourney, and Claude.',
+    foundingDate: '2024',
+    areaServed: 'Worldwide',
+    knowsAbout: [
+      'AI Prompts',
+      'Prompt Engineering',
+      'ChatGPT',
+      'Midjourney',
+      'Google Gemini',
+      'Claude AI',
+      'Generative AI',
+      'Image Generation',
+      'Text Generation'
+    ],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      url: 'https://promptking.in/contact',
+      availableLanguage: 'English'
+    },
+    sameAs: []
   };
 
   return (
     <html lang="en">
       <head>
-        <Script
+        {/* Google AdSense — placed in head without strategy to avoid data-nscript conflict */}
+        <script
           async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2762946314678354"
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
           crossOrigin="anonymous"
-          strategy="afterInteractive"
         />
       </head>
       <body>
-
-        <script id="json-ld-website" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-        <script id="json-ld-org" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
+        <script
+          id="json-ld-website"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <script
+          id="json-ld-org"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
         <GoogleAnalytics gaId={GA_ID} />
 
         <AppProvider>
