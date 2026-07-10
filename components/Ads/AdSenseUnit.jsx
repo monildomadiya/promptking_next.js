@@ -1,70 +1,63 @@
 "use client";
 import React, { useEffect, useRef } from 'react';
 
-const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', style = {} }) => {
+const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', style = {}, className = '' }) => {
   const adRef = useRef(null);
   const pushed = useRef(false);
 
   useEffect(() => {
-    // Don't push if already pushed for this instance or missing params
-    if (pushed.current || !client || !slot) return;
+    pushed.current = false;
+  }, [client, slot]);
+
+  useEffect(() => {
+    if (pushed.current || !client || !slot || !adRef.current) return;
 
     const tryPush = () => {
+      if (pushed.current || !adRef.current) return;
+
+      // Check if this ins element already has an ad loaded inside it
+      if (adRef.current.getAttribute('data-adsbygoogle-status') === 'done' ||
+          adRef.current.innerHTML.trim() !== '') {
+        pushed.current = true;
+        return;
+      }
+
       try {
-        if (typeof window !== 'undefined' && window.adsbygoogle && adRef.current) {
-          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        if (typeof window !== 'undefined') {
+          window.adsbygoogle = window.adsbygoogle || [];
+          window.adsbygoogle.push({});
           pushed.current = true;
         }
       } catch (e) {
-        // Silently ignore "already has ad" errors — these are harmless
         if (!String(e).includes('already')) {
           console.error("AdSense error:", e);
         }
       }
     };
 
-    // Check if the adsbygoogle script is already loaded
     const adsScript = document.querySelector('script[src*="adsbygoogle.js"]');
     if (adsScript) {
-      // If the script element exists, wait for it to actually load
       if (adsScript.dataset.loaded === 'true') {
         tryPush();
       } else {
-        adsScript.addEventListener('load', () => {
+        const onLoad = () => {
           adsScript.dataset.loaded = 'true';
           tryPush();
-        });
-        // In case it already loaded but we missed the event
-        if (window.adsbygoogle) {
-          tryPush();
-        }
+        };
+        adsScript.addEventListener('load', onLoad);
+        tryPush();
+        return () => adsScript.removeEventListener('load', onLoad);
       }
     } else {
-      // Script not yet in DOM — wait for it via MutationObserver
-      const observer = new MutationObserver(() => {
-        const script = document.querySelector('script[src*="adsbygoogle.js"]');
-        if (script) {
-          observer.disconnect();
-          script.addEventListener('load', () => {
-            script.dataset.loaded = 'true';
-            tryPush();
-          });
-          // In case it already loaded
-          if (window.adsbygoogle) {
-            tryPush();
-          }
-        }
-      });
-      observer.observe(document.head, { childList: true });
-
-      return () => observer.disconnect();
+      // Push immediately into queue; when adsbygoogle.js loads it processes all queued items
+      tryPush();
     }
   }, [client, slot]);
 
   if (!client || !slot) return null;
 
   return (
-    <div className="adsense-container" style={{ margin: '20px 0', textAlign: 'center', ...style }}>
+    <div className={`adsense-container ${className}`} style={{ margin: '20px 0', textAlign: 'center', overflow: 'hidden', ...style }}>
       <ins
         ref={adRef}
         className="adsbygoogle"
@@ -79,3 +72,4 @@ const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', style
 };
 
 export default AdSenseUnit;
+

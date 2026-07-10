@@ -55,6 +55,9 @@ export const metadata = {
       'max-snippet': -1,
     },
   },
+  other: {
+    'google-adsense-account': 'ca-pub-2762946314678354',
+  },
 };
 
 const GA_ID = "G-1HK9T17LSR";

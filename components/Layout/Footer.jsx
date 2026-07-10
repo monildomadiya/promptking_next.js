@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight, ChevronDown, ChevronUp } from '../Common/Icons';
+import AdSenseUnit from '../Ads/AdSenseUnit';
 import api from '@/lib/api';
 
 const Footer = ({ onLogoClick }) => {
@@ -46,7 +47,13 @@ const Footer = ({ onLogoClick }) => {
   };
 
   return (
-    <footer style={{
+    <>
+      {settings?.adsense_enabled === '1' && settings?.adsense_slot_footer && (
+        <div style={{ maxWidth: '1400px', margin: '20px auto', padding: '0 20px', width: '100%' }}>
+          <AdSenseUnit client={settings.adsense_client_id} slot={settings.adsense_slot_footer} />
+        </div>
+      )}
+      <footer style={{
       background: 'linear-gradient(to bottom, var(--surface-0), #000000)',
       position: 'relative',
       padding: isMobile ? '60px 20px 40px' : '100px 40px 40px',
@@ -246,6 +253,7 @@ const Footer = ({ onLogoClick }) => {
         }
       `}</style>
     </footer>
+    </>
   );
 };
 

@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Search, X, Crown, Coffee, Compass, ChevronRight } from '../Common/Icons';
-import AdSenseUnit from '../Ads/AdSenseUnit';
 
 import api from '@/lib/api';
 
@@ -213,21 +212,6 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
           </div>
         </div>
       </header>
-      {/* Top Banner Ad - Policy Compliant Placement */}
-      {settings?.adsense_enabled === '1' && settings?.adsense_slot_header && (
-        <div style={{ 
-          position: 'fixed', 
-          top: isMobile ? '85px' : '130px', 
-          left: 0, 
-          right: 0, 
-          zIndex: 900,
-          background: 'rgba(0,0,0,0.2)',
-          padding: '10px 0',
-          backdropFilter: 'blur(10px)'
-        }}>
-          <AdSenseUnit client={settings.adsense_client_id} slot={settings.adsense_slot_header} />
-        </div>
-      )}
     </>
   );
 };
