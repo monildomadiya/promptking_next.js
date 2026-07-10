@@ -655,7 +655,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
             }}>
               <div style={{ borderRadius: '24px', overflow: 'hidden', position: 'relative' }}>
                 {prompt.isImageSlider ? (
-                  <div ref={sliderContainerRef} className="slider-container prompt-image-container" style={{ position: 'relative', aspectRatio: isListicle ? '1200 / 628' : (prompt.image_ratio || prompt.imageRatio || '16 / 9').replace(/\s+/g, ' ').trim(), width: '100%', touchAction: 'none', opacity: isSettingsLoaded ? 1 : 0, transition: 'opacity 0.3s ease-in-out' }}>
+                  <div ref={sliderContainerRef} className="slider-container prompt-image-container" style={{ position: 'relative', aspectRatio: isListicle ? '1200 / 628' : (prompt.image_ratio || prompt.imageRatio || '16 / 9').replace(/\s+/g, ' ').trim(), width: '100%', touchAction: 'pan-y', opacity: isSettingsLoaded ? 1 : 0, transition: 'opacity 0.3s ease-in-out' }}>
                     <img src={optimizeImage(prompt.imgAfter)} alt={`${prompt.title} - ${prompt.aiType || 'AI'} Generated Prompt Result (After)`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                     <img 
                       src={optimizeImage(prompt.imgBefore)} 
