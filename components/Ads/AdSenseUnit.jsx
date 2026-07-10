@@ -1,12 +1,29 @@
 "use client";
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', style = {}, className = '' }) => {
   const adRef = useRef(null);
   const pushed = useRef(false);
+  const [isUnfilled, setIsUnfilled] = useState(false);
 
   useEffect(() => {
     pushed.current = false;
+    setIsUnfilled(false);
+  }, [client, slot]);
+
+  useEffect(() => {
+    if (!adRef.current) return;
+    const checkStatus = () => {
+      const status = adRef.current?.getAttribute('data-adsbygoogle-status');
+      const adStatus = adRef.current?.getAttribute('data-ad-status');
+      if (status === 'unfilled' || adStatus === 'unfilled') {
+        setIsUnfilled(true);
+      }
+    };
+    checkStatus();
+    const observer = new MutationObserver(checkStatus);
+    observer.observe(adRef.current, { attributes: true, attributeFilter: ['data-adsbygoogle-status', 'data-ad-status'] });
+    return () => observer.disconnect();
   }, [client, slot]);
 
   useEffect(() => {
@@ -57,11 +74,20 @@ const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', style
   if (!client || !slot) return null;
 
   return (
-    <div className={`adsense-container ${className}`} style={{ margin: '20px 0', textAlign: 'center', overflow: 'hidden', ...style }}>
+    <div 
+      className={`adsense-container ${className}`} 
+      style={{ 
+        margin: '20px 0', 
+        textAlign: 'center', 
+        overflow: 'hidden', 
+        display: isUnfilled ? 'none' : 'block',
+        ...style 
+      }}
+    >
       <ins
         ref={adRef}
         className="adsbygoogle"
-        style={{ display: 'block' }}
+        style={{ display: isUnfilled ? 'none' : 'block', background: 'transparent' }}
         data-ad-client={client}
         data-ad-slot={slot}
         data-ad-format={format}

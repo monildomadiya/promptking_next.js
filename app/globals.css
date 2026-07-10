@@ -1856,3 +1856,30 @@ body.shorts-modal-open {
 @media (max-width: 768px) {
   .contact-grid-container { grid-template-columns: 1fr; }
 }
+
+/* AdSense Unfilled & Empty Container Styling Fix */
+ins.adsbygoogle {
+  background: transparent !important;
+}
+
+ins.adsbygoogle[data-adsbygoogle-status="unfilled"],
+ins.adsbygoogle[data-ad-status="unfilled"] {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Automatically collapse wrapper containers when AdSense returns unfilled */
+.adsense-container:has(ins.adsbygoogle[data-adsbygoogle-status="unfilled"]),
+.adsense-container:has(ins.adsbygoogle[data-ad-status="unfilled"]),
+div:has(> .adsense-container:has(ins.adsbygoogle[data-adsbygoogle-status="unfilled"])),
+div:has(> .adsense-container:has(ins.adsbygoogle[data-ad-status="unfilled"])) {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
