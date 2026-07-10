@@ -5,11 +5,12 @@ import { useParams } from 'next/navigation';
 import PromptList from '@/components/Prompts/PromptList';
 import SEOMetadata from '@/components/SEO/SEOMetadata';
 import { Search, X, Crown, Coffee, Copy, Image, FileText, HelpCircle, Lock, Filter, Shield, ArrowRight } from '@/components/Common/Icons';
+import AdSenseUnit from '@/components/Ads/AdSenseUnit';
 
 import { useAppContext } from '@/components/AppContext';
 
 const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteCategories = [] }) => {
-  const { search, setSearch, filter, setFilter, isMobile } = useAppContext();
+  const { search, setSearch, filter, setFilter, isMobile, settings } = useAppContext();
   const { categorySlug } = useParams();
 
   useEffect(() => {
@@ -145,6 +146,13 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
         </div>
       </div>
 
+      {/* Banner Ad Placement */}
+      {settings?.adsense_enabled === '1' && settings?.adsense_slot_header && (
+        <div style={{ maxWidth: '1400px', margin: '20px auto', padding: '0 20px', width: '100%' }}>
+          <AdSenseUnit client={settings.adsense_client_id} slot={settings.adsense_slot_header} />
+        </div>
+      )}
+
       <PromptList 
         search={search} 
         filter={filter} 
@@ -152,6 +160,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
         isMobile={isMobile}
         initialPrompts={initialPrompts}
         initialCategories={initialCategories}
+        settings={settings}
       />
 
       {!categorySlug && (

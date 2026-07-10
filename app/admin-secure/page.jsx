@@ -12,7 +12,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { 
   Table, Edit, Trash, Plus, Settings, FileText, 
-  TableProperties, LogOut, ChevronRight, Layout, 
+  TableProperties, LogOut, ChevronRight, ChevronLeft, Layout, 
   Share2, Palette, Activity, Users, Layers, Crown,
   Eye, Copy, ExternalLink, PieChart
 } from '@/components/Common/Icons';
@@ -473,6 +473,7 @@ const BrandingPanel = ({ onSave, isMobile }) => {
     try {
       await api.post('/admin/save_settings', settings);
       onSave();
+      localStorage.removeItem('siteSettings_ts');
       window.dispatchEvent(new CustomEvent('settingsUpdated'));
       toast.success("Branding settings applied!");
     } catch(e) { console.error(e); }
@@ -667,6 +668,8 @@ const SocialPanel = ({ onSave }) => {
     try {
       await api.post('/admin/save_settings', settings);
       onSave();
+      localStorage.removeItem('siteSettings_ts');
+      window.dispatchEvent(new CustomEvent('settingsUpdated'));
       toast.success("Social links updated!");
     } catch(e) { console.error(e); }
     finally { setIsSaving(false); }
@@ -753,6 +756,264 @@ const SocialPanel = ({ onSave }) => {
 
 
 
+const SliderPreview = ({ position, samplePrompt }) => {
+  const previewRef = useRef(null);
+  const isDraggingRef = useRef(false);
+  const [localValue, setLocalValue] = useState(Number(position));
+
+  // Sync with parent position when slider changes
+  useEffect(() => {
+    if (!isDraggingRef.current) {
+      setLocalValue(Number(position));
+    }
+  }, [position]);
+
+  const handlePointerDown = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    isDraggingRef.current = true;
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }, []);
+
+  const handlePointerMove = useCallback((e) => {
+    if (!isDraggingRef.current || !previewRef.current) return;
+    e.preventDefault();
+    const rect = previewRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percent = Math.min(100, Math.max(0, (x / rect.width) * 100));
+    setLocalValue(percent);
+  }, []);
+
+  const handlePointerUp = useCallback((e) => {
+    isDraggingRef.current = false;
+    if (e.currentTarget) {
+      try { e.currentTarget.releasePointerCapture(e.pointerId); } catch(ex) {}
+    }
+  }, []);
+
+  const beforeImg = samplePrompt?.img_before || samplePrompt?.imgBefore;
+  const afterImg = samplePrompt?.img_after || samplePrompt?.imgAfter || samplePrompt?.thumbnail_url;
+
+  if (!beforeImg || !afterImg) {
+    return (
+      <div style={{
+        width: '100%', aspectRatio: '16/9', borderRadius: '16px',
+        background: 'linear-gradient(135deg, rgba(168,85,247,0.08), rgba(168,85,247,0.02))',
+        border: '1px solid rgba(168,85,247,0.15)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        flexDirection: 'column', gap: '8px'
+      }}>
+        <Eye size={24} color="rgba(168,85,247,0.4)" />
+        <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.25)', fontWeight: 600 }}>
+          No before/after prompts found for preview
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div 
+        ref={previewRef} 
+        style={{ 
+          width: '100%', aspectRatio: '16/9', borderRadius: '16px',
+          position: 'relative', overflow: 'hidden',
+          border: '1px solid rgba(255,255,255,0.06)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)',
+          background: '#111',
+          cursor: 'default'
+        }}
+      >
+        {/* After image (bottom layer) */}
+        <img 
+          src={afterImg} 
+          alt="After" 
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} 
+        />
+        {/* Before image (clipped top layer) */}
+        <img 
+          src={beforeImg} 
+          alt="Before" 
+          style={{ 
+            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover',
+            clipPath: `inset(0 ${100 - localValue}% 0 0)`,
+            WebkitClipPath: `inset(0 ${100 - localValue}% 0 0)`,
+            zIndex: 2
+          }} 
+        />
+
+        {/* Before / After labels */}
+        <div style={{
+          position: 'absolute', top: '10px', left: '10px', zIndex: 15,
+          background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)',
+          borderRadius: '8px', padding: '4px 10px',
+          fontSize: '0.6rem', fontWeight: 700, color: 'rgba(255,255,255,0.8)',
+          textTransform: 'uppercase', letterSpacing: '0.5px',
+          border: '1px solid rgba(255,255,255,0.1)',
+          opacity: localValue > 8 ? 1 : 0,
+          transition: 'opacity 0.2s ease'
+        }}>Before</div>
+        <div style={{
+          position: 'absolute', top: '10px', right: '10px', zIndex: 15,
+          background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)',
+          borderRadius: '8px', padding: '4px 10px',
+          fontSize: '0.6rem', fontWeight: 700, color: 'rgba(255,255,255,0.8)',
+          textTransform: 'uppercase', letterSpacing: '0.5px',
+          border: '1px solid rgba(255,255,255,0.1)',
+          opacity: localValue < 92 ? 1 : 0,
+          transition: 'opacity 0.2s ease'
+        }}>After</div>
+
+        {/* Draggable handle zone */}
+        <div 
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          style={{ 
+            position: 'absolute', top: 0, bottom: 0, left: `${localValue}%`, width: '44px', 
+            zIndex: 10, transform: 'translateX(-50%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'ew-resize',
+            touchAction: 'none'
+          }}
+        >
+          {/* Glowing divider line */}
+          <div style={{
+            position: 'absolute', top: 0, bottom: 0, left: '50%', width: '2px',
+            background: 'rgba(255, 255, 255, 0.8)', transform: 'translateX(-50%)', pointerEvents: 'none',
+            boxShadow: '0 0 8px rgba(168, 85, 247, 0.5), 0 0 20px rgba(168, 85, 247, 0.2)'
+          }} />
+          {/* Glass capsule handle */}
+          <div
+            style={{
+              background: 'linear-gradient(180deg, rgba(168, 85, 247, 0.25), rgba(168, 85, 247, 0.08))',
+              borderRadius: '14px', width: '28px', height: '52px',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px',
+              backdropFilter: 'blur(20px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 12px rgba(168, 85, 247, 0.15)',
+              border: '1px solid rgba(168, 85, 247, 0.35)',
+              flexShrink: 0, pointerEvents: 'none', position: 'relative', zIndex: 2
+            }}
+          >
+            <ChevronLeft size={14} color="rgba(255, 255, 255, 0.85)" strokeWidth={2.5} style={{ display: 'block' }} />
+            <div style={{ width: '12px', height: '1px', background: 'rgba(255, 255, 255, 0.2)', borderRadius: '1px' }} />
+            <ChevronRight size={14} color="rgba(255, 255, 255, 0.85)" strokeWidth={2.5} style={{ display: 'block' }} />
+          </div>
+        </div>
+      </div>
+      {samplePrompt?.title && (
+        <div style={{ marginTop: '8px', fontSize: '0.65rem', color: 'rgba(255,255,255,0.2)', fontWeight: 500, textAlign: 'center' }}>
+          Preview using: {samplePrompt.title}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const UIPanel = ({ onSave, isMobile }) => {
+  const [settings, setSettings] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
+  const [samplePrompt, setSamplePrompt] = useState(null);
+
+  useEffect(() => {
+    api.get('/admin/settings').then(res => setSettings(res.data));
+    // Fetch a sample prompt with before/after images for the preview
+    api.get('/admin/prompts').then(res => {
+      if (Array.isArray(res.data)) {
+        const sliderPrompt = res.data.find(p => 
+          (p.is_image_slider === 1 || p.is_image_slider === true) && 
+          p.img_before && p.img_after
+        ) || res.data.find(p => p.img_before && p.img_after);
+        if (sliderPrompt) setSamplePrompt(sliderPrompt);
+      }
+    }).catch(() => {});
+  }, []);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await api.post('/admin/save_settings', settings);
+      onSave();
+      localStorage.removeItem('siteSettings_ts');
+      window.dispatchEvent(new CustomEvent('settingsUpdated'));
+      toast.success("UI settings applied!");
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const sliderPos = settings.slider_default_position || 50;
+
+  return (
+    <motion.div {...pageTransition} style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
+      {/* Header */}
+      <div style={{ ...glassPanelStyle, padding: isMobile ? '20px' : '24px 32px', display: 'flex', alignItems: isMobile ? 'flex-start' : 'center', justifyContent: 'space-between', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '16px' : '0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <div style={{ width: '45px', height: '45px', borderRadius: '12px', background: 'rgba(168,85,247,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Layout size={22} color="#a855f7" />
+          </div>
+          <div>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '2px' }}>UI Settings</h3>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-dim)', margin: 0 }}>Configure global UI components and slider behavior.</p>
+          </div>
+        </div>
+        <button 
+          onClick={handleSave} 
+          disabled={isSaving}
+          className="glass-button-secondary"
+          style={{ 
+            padding: '12px 24px', borderRadius: '12px', background: '#a855f7', 
+            color: 'white', border: 'none', fontWeight: 700, opacity: isSaving ? 0.5 : 1,
+            cursor: isSaving ? 'not-allowed' : 'pointer',
+            whiteSpace: 'nowrap', flexShrink: 0,
+            width: isMobile ? '100%' : 'auto'
+          }}
+        >
+          {isSaving ? "Saving..." : "Apply UI Settings"}
+        </button>
+      </div>
+
+      {/* Content */}
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(320px, 1fr))', gap: '25px' }}>
+        {/* Slider Controls Card */}
+        <div style={{ ...glassPanelStyle, padding: isMobile ? '20px' : '30px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <SectionTitle title="Global UI Components" />
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+              <Label text="Image Slider Default Position" />
+              <span style={{ 
+                fontSize: '0.85rem', color: '#a855f7', fontWeight: 800,
+                background: 'rgba(168,85,247,0.1)', padding: '4px 12px', borderRadius: '8px',
+                border: '1px solid rgba(168,85,247,0.2)', fontVariantNumeric: 'tabular-nums'
+              }}>
+                {sliderPos}%
+              </span>
+            </div>
+            <input 
+              type="range" 
+              min="0" max="100" 
+              value={sliderPos} 
+              onChange={e => setSettings({...settings, slider_default_position: e.target.value})} 
+              style={{ width: '100%', accentColor: '#a855f7', marginTop: '10px' }}
+            />
+            <Hint text="Sets where the before/after image slider starts globally (default is 50%)." />
+          </div>
+        </div>
+
+        {/* Live Preview Card */}
+        <div style={{ ...glassPanelStyle, padding: isMobile ? '20px' : '30px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <SectionTitle title="Slider Preview" />
+          <SliderPreview position={sliderPos} samplePrompt={samplePrompt} />
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
 const AdsPanel = ({ onSave }) => {
   const [settings, setSettings] = useState({});
   const [isSaving, setIsSaving] = useState(false);
@@ -766,6 +1027,8 @@ const AdsPanel = ({ onSave }) => {
     try {
       await api.post('/admin/save_settings', settings);
       onSave();
+      localStorage.removeItem('siteSettings_ts');
+      window.dispatchEvent(new CustomEvent('settingsUpdated'));
       toast.success("Ads configuration updated! Changes may take a moment to propagate.");
     } catch(e) { console.error(e); }
     finally { setIsSaving(false); }
@@ -862,6 +1125,15 @@ const AdsPanel = ({ onSave }) => {
                 placeholder="Slot ID" 
                 value={settings.adsense_slot_footer || ''} 
                 onChange={e => setSettings({...settings, adsense_slot_footer: e.target.value})} 
+              />
+            </div>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <Label text="In-Feed Native Ad Slot (Prompt Grid)" />
+              <input 
+                style={inputStyle} 
+                placeholder="Slot ID" 
+                value={settings.adsense_slot_infeed || ''} 
+                onChange={e => setSettings({...settings, adsense_slot_infeed: e.target.value})} 
               />
             </div>
           </div>
@@ -1343,6 +1615,7 @@ const AdminDashboard = () => {
     ]},
     { title: 'SYSTEM CONFIG', items: [
       { id: 'settings-branding', label: 'Branding', icon: <Palette size={20} /> },
+      { id: 'settings-ui', label: 'UI Settings', icon: <Layout size={20} /> },
       { id: 'settings-social', label: 'Channels', icon: <Share2 size={20} /> },
       { id: 'settings-ads', label: 'Ads Management', icon: <Activity size={20} /> },
     ]}
@@ -1717,6 +1990,7 @@ const AdminDashboard = () => {
           )}
 
           {view === 'settings-branding' && <BrandingPanel key="branding" onSave={() => fetchData('settings')} isMobile={isMobile} />}
+          {view === 'settings-ui' && <UIPanel key="ui" onSave={() => fetchData('settings')} isMobile={isMobile} />}
           {view === 'settings-social' && <SocialPanel key="social" onSave={() => fetchData('settings')} />}
           {view === 'settings-ads' && <AdsPanel key="ads" onSave={() => fetchData('settings')} />}
 

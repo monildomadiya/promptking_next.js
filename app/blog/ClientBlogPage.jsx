@@ -8,8 +8,11 @@ import SocialSidebar from '@/components/Prompts/SocialSidebar';
 import SEOMetadata from '@/components/SEO/SEOMetadata';
 import { optimizeImage } from '@/utils/imageUtils';
 import { getCache, setCache } from '@/utils/cacheUtils';
+import { useAppContext } from '@/components/AppContext';
+import AdSenseUnit from '@/components/Ads/AdSenseUnit';
 
 const ClientBlogPage = ({ initialBlogs = [] }) => {
+  const { settings } = useAppContext();
   const [blogs, setBlogs] = useState(initialBlogs);
   const [loading, setLoading] = useState(initialBlogs.length === 0);
 
@@ -186,7 +189,14 @@ const ClientBlogPage = ({ initialBlogs = [] }) => {
           </div>
         )}
       </div>
-      <SocialSidebar />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <SocialSidebar />
+        {settings?.adsense_enabled === '1' && settings?.adsense_slot_sidebar && (
+          <div style={{ position: 'sticky', top: '110px' }}>
+            <AdSenseUnit client={settings.adsense_client_id} slot={settings.adsense_slot_sidebar} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

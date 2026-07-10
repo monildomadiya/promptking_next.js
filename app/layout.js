@@ -58,7 +58,6 @@ export const metadata = {
 };
 
 const GA_ID = "G-1HK9T17LSR";
-const ADSENSE_CLIENT = "ca-pub-2762946314678354";
 
 export default function RootLayout({ children }) {
   const jsonLd = {
@@ -114,12 +113,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        {/* Google AdSense — placed in head without strategy to avoid data-nscript conflict */}
-        <script
-          async
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
-          crossOrigin="anonymous"
-        />
       </head>
       <body>
         <script

@@ -11,6 +11,25 @@ export const metadata = {
   alternates: {
     canonical: 'https://promptking.in/categories',
   },
+  openGraph: {
+    title: 'Explore AI Prompts Categories - PromptKing | Browse by Topic',
+    description: 'Browse all categories of free, premium, and expert-crafted AI prompts for ChatGPT, Midjourney, Gemini, Claude, and more.',
+    url: 'https://promptking.in/categories',
+    images: [
+      {
+        url: 'https://promptking.in/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'PromptKing Categories',
+      }
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Explore AI Prompts Categories - PromptKing | Browse by Topic',
+    description: 'Browse all categories of free, premium, and expert-crafted AI prompts for ChatGPT, Midjourney, Gemini, Claude, and more.',
+    images: ['https://promptking.in/og-image.jpg'],
+  },
 };
 
 async function fetchAllCategories() {

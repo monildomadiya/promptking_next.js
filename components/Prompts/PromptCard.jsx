@@ -5,6 +5,7 @@ import { Copy, Check, Eye, Lock, Unlock, Youtube, ArrowRight, Crown, Code, Insta
 import api, { SERVER_URL } from '@/lib/api';
 import YouTubeModal from '../Modals/YouTubeModal';
 import { optimizeImage } from '@/utils/imageUtils';
+import { useAppContext } from '../AppContext';
 
 // Defined at module level so React doesn't treat it as a new component type on every render
 const HighlightText = ({ text, highlight }) => {
@@ -21,7 +22,8 @@ const HighlightText = ({ text, highlight }) => {
 };
 
 const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searchTerm, isPriority = false, isMobile = false }) => {
-  const [sliderValue, setSliderValue] = useState(50);
+  const { settings, isSettingsLoaded } = useAppContext();
+  const [sliderValue, setSliderValue] = useState(Number(settings?.slider_default_position) || 50);
   const [pin, setPin] = useState('');
   const [showError, setShowError] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -34,7 +36,15 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
   const cardPadding = isMobile ? 10 : 18;
 
   const cardRef = React.useRef(null);
+  const sliderContainerRef = React.useRef(null);
+  const isDraggingRef = React.useRef(false);
 
+
+  React.useEffect(() => {
+    if (settings?.slider_default_position) {
+      setSliderValue(Number(settings.slider_default_position));
+    }
+  }, [settings?.slider_default_position]);
 
   React.useEffect(() => {
     if (isUnlocked && prompt.isPremium) {
@@ -57,18 +67,32 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
                     aiType.toLowerCase().includes('midjourney') ? '#a855f7' : 
                     'rgba(255,255,255,0.4)';
 
-  const handleSliderChange = (e) => {
-    setSliderValue(e.target.value);
-  };
+  const handleSliderDragStart = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    isDraggingRef.current = true;
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }, []);
+
+  const handleSliderDragMove = useCallback((e) => {
+    if (!isDraggingRef.current || !sliderContainerRef.current) return;
+    e.preventDefault();
+    const rect = sliderContainerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percent = Math.min(100, Math.max(0, (x / rect.width) * 100));
+    setSliderValue(percent);
+  }, []);
+
+  const handleSliderDragEnd = useCallback(() => {
+    isDraggingRef.current = false;
+  }, []);
 
   const checkAutoUnlock = (value) => {
     setPin(value);
     setShowError(false);
     const targetPass = String(prompt.password || '1234').trim();
     const inputPass = String(value || '').trim();
-    
-    // console.log(`Checking: "${inputPass}" vs "${targetPass}"`); 
-    
+
     if (inputPass === targetPass) {
       onUnlock();
       api.post('/record_unlock', { key: prompt.key }).catch(console.error);
@@ -321,10 +345,12 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
       }}>
         {/* Image Section */}
         {prompt.isImageSlider ? (
-          <div className="slider-container prompt-image-container" style={{ 
+          <div ref={sliderContainerRef} className="slider-container prompt-image-container" style={{ 
             aspectRatio: ratio, width: '100%', margin: `0 0 15px 0`,
             position: 'relative', overflow: 'hidden', borderBottom: '1px solid var(--border-color)',
-            background: '#111'
+            background: '#111',
+            opacity: isSettingsLoaded ? 1 : 0,
+            transition: 'opacity 0.3s ease-in-out'
           }}>
             <img 
               src={optimizeImage(prompt.thumbnail_url || prompt.imgAfter || prompt.img_after, isMobile ? 450 : 600)} 
@@ -352,42 +378,57 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
                 zIndex: 2
               }} 
             />
-            <div style={{ 
-              position: 'absolute', top: 0, bottom: 0, left: `${sliderValue}%`, width: '2px', 
-              background: 'white', zIndex: 3, transform: 'translateX(-50%)', pointerEvents: 'none',
-              display: 'flex', alignItems: 'center', justifyContent: 'center'
-            }}>
+            {/* Clickable overlay — navigates to prompt page on image click */}
+            <Link 
+              href={`/prompt/${prompt.slug || prompt.prompt_key || prompt.key}`}
+              style={{ position: 'absolute', inset: 0, zIndex: 5, cursor: 'pointer' }}
+              aria-label={`View ${prompt.title}`}
+            />
+            {/* Divider line + draggable handle — only this triggers the slider, not clicking the image */}
+            <div 
+              onPointerDown={handleSliderDragStart}
+              onPointerMove={handleSliderDragMove}
+              onPointerUp={handleSliderDragEnd}
+              style={{ 
+                position: 'absolute', top: 0, bottom: 0, left: `${sliderValue}%`, width: '44px', 
+                zIndex: 10, transform: 'translateX(-50%)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'ew-resize',
+                touchAction: 'none'
+              }}>
+              {/* Glowing divider line */}
+              <div style={{
+                position: 'absolute', top: 0, bottom: 0, left: '50%', width: '2px',
+                background: 'rgba(255, 255, 255, 0.8)', transform: 'translateX(-50%)', pointerEvents: 'none',
+                boxShadow: '0 0 8px rgba(255, 255, 255, 0.4), 0 0 20px rgba(255, 255, 255, 0.15)'
+              }} />
+              {/* Glass capsule handle */}
               <div 
                 style={{ 
-                  background: 'rgba(255, 255, 255, 0.7)', 
-                  color: 'black', 
-                  borderRadius: '20px', 
-                  width: '24px', 
-                  height: '40px', 
+                  background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.06))',
+                  borderRadius: '14px', 
+                  width: '28px', 
+                  height: '52px', 
                   display: 'flex', 
                   flexDirection: 'column', 
                   alignItems: 'center', 
                   justifyContent: 'center', 
-                  gap: '-8px',
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                  boxShadow: '0 4px 15px rgba(0,0,0,0.2)', 
-                  border: '1px solid rgba(255, 255, 255, 0.4)',
-                  flexShrink: 0
+                  gap: '2px',
+                  backdropFilter: 'blur(20px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 12px rgba(255, 255, 255, 0.08)', 
+                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                  flexShrink: 0,
+                  pointerEvents: 'none',
+                  position: 'relative',
+                  zIndex: 2
                 }}
               >
-                <ChevronLeft size={24} color="black" style={{ display: 'block', margin: '-4px 0' }} />
-                <ChevronRight size={24} color="black" style={{ display: 'block', margin: '-4px 0' }} />
+                <ChevronLeft size={14} color="rgba(255, 255, 255, 0.85)" strokeWidth={2.5} style={{ display: 'block' }} />
+                <div style={{ width: '12px', height: '1px', background: 'rgba(255, 255, 255, 0.2)', borderRadius: '1px' }} />
+                <ChevronRight size={14} color="rgba(255, 255, 255, 0.85)" strokeWidth={2.5} style={{ display: 'block' }} />
               </div>
             </div>
-            <input 
-              type="range" 
-              min="0" max="100" 
-              value={sliderValue} 
-              onChange={handleSliderChange}
-              aria-label="Image comparison slider"
-              style={{ position: 'absolute', inset: 0, zIndex: 10, opacity: 0, cursor: 'ew-resize', width: '100%', height: '100%' }}
-            />
             
 
           </div>

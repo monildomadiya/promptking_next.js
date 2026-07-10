@@ -11,8 +11,11 @@ import SEOMetadata from '@/components/SEO/SEOMetadata';
 import SocialSidebar from '@/components/Prompts/SocialSidebar';
 import { optimizeImage } from '@/utils/imageUtils';
 import { getCache, setCache } from '@/utils/cacheUtils';
+import { useAppContext } from '@/components/AppContext';
+import AdSenseUnit from '@/components/Ads/AdSenseUnit';
 
 const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories }) => {
+  const { settings } = useAppContext();
   const { slug } = useParams();
   const [blog, setBlog] = useState(initialBlog || null);
   const [otherBlogs, setOtherBlogs] = useState(initialOtherBlogs || []);
@@ -284,6 +287,13 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
             </div>
           )}
           
+          {/* Detail Article Ad Placement */}
+          {settings?.adsense_enabled === '1' && settings?.adsense_slot_detail && (
+            <div style={{ margin: '30px 0' }}>
+              <AdSenseUnit client={settings.adsense_client_id} slot={settings.adsense_slot_detail} />
+            </div>
+          )}
+
           <div 
             className="blog-content" 
             dangerouslySetInnerHTML={{ __html: finalContent }} 
@@ -390,6 +400,13 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
         {/* Sidebar */}
         <aside className="sidebar">
           <div style={{ display: 'flex', flexDirection: 'column', gap: '30px', position: 'sticky', top: '100px' }}>
+            {/* Sidebar Ad Placement */}
+            {settings?.adsense_enabled === '1' && settings?.adsense_slot_sidebar && (
+              <div style={{ width: '100%' }}>
+                <AdSenseUnit client={settings.adsense_client_id} slot={settings.adsense_slot_sidebar} />
+              </div>
+            )}
+            
             {/* More Articles Box */}
             <div style={{ 
               background: 'rgba(255,255,255,0.03)', 

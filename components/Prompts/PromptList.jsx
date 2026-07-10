@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import AdSenseUnit from '../Ads/AdSenseUnit';
 import PromptCard from './PromptCard';
 import MagicKingIntro from './MagicKingIntro';
 import Shimmer from '../Common/Shimmer';
@@ -30,7 +31,7 @@ const writeCache = (prompts, categories) => {
 let _savedPage = 1;
 
 // ─── Component ─────────────────────────────────────────────────────────────────
-const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], initialCategories = [] }) => {
+const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], initialCategories = [], settings }) => {
   // Seed from SSR data OR module cache immediately — never start empty if we have data
   const getInitialPrompts = () => {
     if (initialPrompts.length > 0) return initialPrompts;
@@ -207,18 +208,40 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
       {/* Prompt Grid - CSS Masonry for SSR Hydration Fix */}
       <div className="css-masonry-grid">
         {pagedPrompts.map((p, idx) => (
-          <div key={p.prompt_key || p.id}>
-            <PromptCard
-              prompt={p}
-              isUnlocked={!p.isPremium || activeUnlockedKey === (p.prompt_key || p.id)}
-              onUnlock={() => setActiveUnlockedKey(p.prompt_key || p.id)}
-              onLock={() => setActiveUnlockedKey(null)}
-              searchTerm={search}
-              isHighlighted={!!search && (p.prompt_key || '').toLowerCase().includes(search.toLowerCase())}
-              isPriority={idx < 8}
-              isMobile={isMobile}
-            />
-          </div>
+          <React.Fragment key={p.prompt_key || p.id}>
+            <div>
+              <PromptCard
+                prompt={p}
+                isUnlocked={!p.isPremium || activeUnlockedKey === (p.prompt_key || p.id)}
+                onUnlock={() => setActiveUnlockedKey(p.prompt_key || p.id)}
+                onLock={() => setActiveUnlockedKey(null)}
+                searchTerm={search}
+                isHighlighted={!!search && (p.prompt_key || '').toLowerCase().includes(search.toLowerCase())}
+                isPriority={idx < 8}
+                isMobile={isMobile}
+              />
+            </div>
+            {/* Inject an In-Feed Ad every 8 items if enabled */}
+            {settings?.adsense_enabled === '1' && settings?.adsense_slot_infeed && (idx + 1) % 8 === 0 && (
+              <div style={{
+                background: 'rgba(255,255,255,0.02)',
+                borderRadius: '24px',
+                border: '1px solid rgba(255,255,255,0.05)',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '280px'
+              }}>
+                <AdSenseUnit 
+                  client={settings.adsense_client_id} 
+                  slot={settings.adsense_slot_infeed} 
+                  format="fluid"
+                  style={{ margin: 0, width: '100%' }}
+                />
+              </div>
+            )}
+          </React.Fragment>
         ))}
       </div>
 

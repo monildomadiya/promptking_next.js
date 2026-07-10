@@ -87,8 +87,8 @@ const OTPInput = ({ value, onChange, length = 4, showError }) => {
   );
 };
 
-const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSettings }) => {
-  const { isMobile } = useAppContext();
+const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialError }) => {
+  const { isMobile, settings, isSettingsLoaded } = useAppContext();
   const { key } = useParams();
   const [prompt, setPrompt] = useState(initialPrompt || null);
   const [loading, setLoading] = useState(!initialPrompt);
@@ -100,7 +100,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
     router.back();
   };
 
-  const [sliderValue, setSliderValue] = useState(50);
+  const [sliderValue, setSliderValue] = useState(Number(settings?.slider_default_position) || 50);
   const [pin, setPin] = useState('');
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [showError, setShowError] = useState(false);
@@ -109,6 +109,15 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
   const [suggestedPrompts, setSuggestedPrompts] = useState(initialSuggestedPrompts || []);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(null);
+  
+  const sliderContainerRef = useRef(null);
+  const isDragging = useRef(false);
+
+  useEffect(() => {
+    if (settings?.slider_default_position) {
+      setSliderValue(Number(settings.slider_default_position));
+    }
+  }, [settings?.slider_default_position]);
 
   // Keyboard navigation for lightbox
   useEffect(() => {
@@ -646,7 +655,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
             }}>
               <div style={{ borderRadius: '24px', overflow: 'hidden', position: 'relative' }}>
                 {prompt.isImageSlider ? (
-                  <div className="slider-container" style={{ position: 'relative', aspectRatio: isListicle ? '1200 / 628' : (prompt.image_ratio || prompt.imageRatio || '16 / 9').replace(/\s+/g, ' ').trim(), width: '100%' }}>
+                  <div ref={sliderContainerRef} className="slider-container prompt-image-container" style={{ position: 'relative', aspectRatio: isListicle ? '1200 / 628' : (prompt.image_ratio || prompt.imageRatio || '16 / 9').replace(/\s+/g, ' ').trim(), width: '100%', touchAction: 'none', opacity: isSettingsLoaded ? 1 : 0, transition: 'opacity 0.3s ease-in-out' }}>
                     <img src={optimizeImage(prompt.imgAfter)} alt={`${prompt.title} - ${prompt.aiType || 'AI'} Generated Prompt Result (After)`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                     <img 
                       src={optimizeImage(prompt.imgBefore)} 
@@ -658,41 +667,65 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
                         zIndex: 2
                       }} 
                     />
-                    <div style={{ 
-                      position: 'absolute', top: 0, bottom: 0, left: `${sliderValue}%`, width: '3px', 
-                      background: 'white', zIndex: 3, transform: 'translateX(-50%)'
-                    }}>
-                      <div 
-                        style={{ 
-                          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', 
-                          background: 'rgba(255, 255, 255, 0.7)', 
-                          color: 'black', 
-                          borderRadius: '30px', 
-                          width: '26px', 
+                    <div 
+                      onPointerDown={(e) => {
+                        e.currentTarget.setPointerCapture(e.pointerId);
+                        isDragging.current = true;
+                      }}
+                      onPointerMove={(e) => {
+                        if (!isDragging.current || !sliderContainerRef.current) return;
+                        const rect = sliderContainerRef.current.getBoundingClientRect();
+                        let newWidth = ((e.clientX - rect.left) / rect.width) * 100;
+                        newWidth = Math.max(0, Math.min(100, newWidth));
+                        setSliderValue(newWidth);
+                      }}
+                      onPointerUp={(e) => {
+                        isDragging.current = false;
+                        e.currentTarget.releasePointerCapture(e.pointerId);
+                      }}
+                      onPointerCancel={(e) => {
+                        isDragging.current = false;
+                      }}
+                      style={{
+                        position: 'absolute', top: 0, bottom: 0, left: `${sliderValue}%`, zIndex: 10,
+                        width: '44px', transform: 'translateX(-50%)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'ew-resize', touchAction: 'none'
+                      }}
+                    >
+                      {/* Glowing divider line */}
+                      <div style={{
+                        position: 'absolute', top: 0, bottom: 0, left: '50%', width: '2px',
+                        background: 'rgba(255, 255, 255, 0.8)', transform: 'translateX(-50%)', pointerEvents: 'none',
+                        boxShadow: '0 0 8px rgba(255, 255, 255, 0.4), 0 0 20px rgba(255, 255, 255, 0.15)'
+                      }} />
+                      {/* Glass capsule handle */}
+                      <div
+                        style={{
+                          background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.06))',
+                          borderRadius: '14px', 
+                          width: '28px', 
                           height: '52px', 
                           display: 'flex', 
                           flexDirection: 'column', 
                           alignItems: 'center', 
                           justifyContent: 'center', 
-                          gap: '-10px',
-                          backdropFilter: 'blur(10px)',
-                          WebkitBackdropFilter: 'blur(10px)',
-                          boxShadow: '0 4px 20px rgba(0,0,0,0.2)', 
-                          border: '1px solid rgba(255, 255, 255, 0.4)',
-                          flexShrink: 0
+                          gap: '2px',
+                          backdropFilter: 'blur(20px) saturate(180%)',
+                          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 12px rgba(255, 255, 255, 0.08)', 
+                          border: '1px solid rgba(255, 255, 255, 0.25)',
+                          flexShrink: 0,
+                          pointerEvents: 'none',
+                          position: 'relative',
+                          zIndex: 2
                         }}
                       >
-                        <ChevronLeft size={24} color="black" style={{ display: 'block', margin: '-4px 0' }} />
-                        <ChevronRight size={24} color="black" style={{ display: 'block', margin: '-4px 0' }} />
+                        <ChevronLeft size={14} color="rgba(255, 255, 255, 0.85)" strokeWidth={2.5} style={{ display: 'block' }} />
+                        <div style={{ width: '12px', height: '1px', background: 'rgba(255, 255, 255, 0.2)', borderRadius: '1px' }} />
+                        <ChevronRight size={14} color="rgba(255, 255, 255, 0.85)" strokeWidth={2.5} style={{ display: 'block' }} />
                       </div>
                     </div>
-                    <input 
-                      type="range" 
-                      min="0" max="100" 
-                      value={sliderValue} 
-                      onChange={handleSliderChange}
-                      style={{ position: 'absolute', inset: 0, zIndex: 10, opacity: 0, cursor: 'ew-resize', width: '100%', height: '100%' }}
-                    />
                   </div>
                 ) : (prompt.imgAfter || prompt.imgBefore) && (
                   <div style={{ width: '100%', aspectRatio: isListicle ? '1200 / 628' : (prompt.image_ratio || prompt.imageRatio || '16 / 9').replace(/\s+/g, ' ').trim(), background: '#111', position: 'relative' }}>
@@ -1080,12 +1113,10 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
               );
             })()}
 
-            {/* Re-inserted copy button above */}
-
             {/* In-Content Ad Placement */}
-            {adsSettings?.adsense_enabled === '1' && adsSettings?.adsense_slot_detail && (
+            {settings?.adsense_enabled === '1' && settings?.adsense_slot_detail && (
               <div style={{ marginBottom: '40px' }}>
-                <AdSenseUnit client={adsSettings.adsense_client_id} slot={adsSettings.adsense_slot_detail} />
+                <AdSenseUnit client={settings.adsense_client_id} slot={settings.adsense_slot_detail} />
               </div>
             )}
 
@@ -1414,9 +1445,9 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, adsSetting
 
 
               {/* Sidebar Ad Placement */}
-              {adsSettings?.adsense_enabled === '1' && adsSettings?.adsense_slot_sidebar && (
+              {settings?.adsense_enabled === '1' && settings?.adsense_slot_sidebar && (
                 <div style={{ marginTop: '20px' }}>
-                  <AdSenseUnit client={adsSettings.adsense_client_id} slot={adsSettings.adsense_slot_sidebar} />
+                  <AdSenseUnit client={settings.adsense_client_id} slot={settings.adsense_slot_sidebar} />
                 </div>
               )}
             </div>
