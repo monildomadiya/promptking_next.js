@@ -146,9 +146,11 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
         </div>
       </div>
 
-      {/* Banner Ad Placement */}
+      {/* Banner Ad Placement — no vertical margin on the wrapper so its late
+          appearance (after client settings load) doesn't shift the grid; the
+          ad unit adds its own spacing only once an ad actually fills. */}
       {settings?.adsense_enabled === '1' && settings?.adsense_slot_header && (
-        <div style={{ maxWidth: '1400px', margin: '20px auto', padding: '0 20px', width: '100%' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 20px', width: '100%' }}>
           <AdSenseUnit client={settings.adsense_client_id} slot={settings.adsense_slot_header} />
         </div>
       )}

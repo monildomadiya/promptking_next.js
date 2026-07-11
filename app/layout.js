@@ -116,6 +116,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        {/* Preload above-the-fold font weights so Outfit is ready before first
+            paint. Combined with font-display:optional this prevents the hero
+            title from re-wrapping (layout shift) when the font loads. */}
+        <link rel="preload" href="/assets/fonts/Outfit-Regular.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
+        <link rel="preload" href="/assets/fonts/Outfit-Medium.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
+        <link rel="preload" href="/assets/fonts/Outfit-Black.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
         <Script
           id="adsbygoogle-init"
           async
