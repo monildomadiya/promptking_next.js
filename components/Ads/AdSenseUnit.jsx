@@ -91,15 +91,17 @@ const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', style
     <div
       className={`adsense-container ${className}`}
       style={{
-        // Keep full width so AdSense can measure the slot and request an ad,
-        // but stay invisible (0 opacity, no margin) until a real ad fills.
-        margin: status === 'filled' ? '20px 0' : 0,
-        minHeight: 0,
+        margin: '20px 0',
         textAlign: 'center',
         overflow: 'hidden',
-        opacity: status === 'filled' ? 1 : 0,
         transition: 'opacity 0.25s ease',
         ...style,
+        // While loading, occupy ZERO space (opacity alone still reserves
+        // layout height — that was the invisible empty gap). Width stays
+        // measurable so AdSense can still size and request the ad.
+        ...(status === 'filled'
+          ? { opacity: 1 }
+          : { opacity: 0, height: 0, minHeight: 0, margin: 0, padding: 0, border: 'none' }),
       }}
     >
       <ins
