@@ -48,7 +48,7 @@ export default async function Page() {
           border: 0,
         }}
       >
-        <h1>PromptKing - Free &amp; Premium AI Prompts Library</h1>
+        <h2>PromptKing - Free &amp; Premium AI Prompts Library</h2>
         <p>
           Discover over 1000 free and premium AI prompts for ChatGPT, Midjourney, Claude, Gemini,
           and other leading AI tools. PromptKing is the ultimate AI prompts library for creators,

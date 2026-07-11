@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import db from '@/lib/db';
 import ClientPromptDetail from './ClientPromptDetail';
 import { notFound } from 'next/navigation';
@@ -194,7 +195,7 @@ export default async function PromptPage({ params }) {
             border: 0,
           }}
         >
-          <h1>{initialPrompt.title}</h1>
+          <h2>{initialPrompt.title}</h2>
 
           {initialPrompt.ai_type && (
             <p><strong>AI Tool:</strong> {initialPrompt.ai_type}</p>
@@ -242,8 +243,8 @@ export default async function PromptPage({ params }) {
             </p>
             <nav aria-label="Prompt breadcrumb">
               <ol>
-                <li><a href="/">Home</a></li>
-                <li><a href="/">Prompts</a></li>
+                <li><Link href="/">Home</Link></li>
+                <li><Link href="/">Prompts</Link></li>
                 <li>{initialPrompt.title}</li>
               </ol>
             </nav>

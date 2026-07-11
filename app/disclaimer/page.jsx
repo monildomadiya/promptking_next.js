@@ -11,7 +11,7 @@ export default function DisclaimerPage() {
           whiteSpace: 'nowrap', border: 0,
         }}
       >
-        <h1>Disclaimer - PromptKing</h1>
+        <h2>Disclaimer - PromptKing</h2>
         <p>
           This disclaimer governs your use of the PromptKing website and all content, services,
           and AI prompts available on the platform. The information and prompts provided on

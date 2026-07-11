@@ -11,7 +11,7 @@ export default function TermsPage() {
           whiteSpace: 'nowrap', border: 0,
         }}
       >
-        <h1>Terms and Conditions - PromptKing</h1>
+        <h2>Terms and Conditions - PromptKing</h2>
         <p>
           These Terms and Conditions govern your use of the PromptKing website and all related
           services, products, and AI prompts available on the platform. By accessing or using

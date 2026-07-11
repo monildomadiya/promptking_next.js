@@ -32,7 +32,7 @@ export default async function BlogPage() {
           border: 0,
         }}
       >
-        <h1>PromptKing Blog — AI Prompt Tips, Guides &amp; Updates</h1>
+        <h2>PromptKing Blog — AI Prompt Tips, Guides &amp; Updates</h2>
         <p>
           The PromptKing Blog is your go-to resource for AI prompt engineering tutorials, creative writing
           guides, ChatGPT tips, Midjourney techniques, and the latest updates from the world of artificial

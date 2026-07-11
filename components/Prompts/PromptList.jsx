@@ -102,7 +102,7 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
       // Cold start — fetch and show skeleton
       fetchData(false);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Persist current page to module-level var (no state update on read) ───────
   useEffect(() => {

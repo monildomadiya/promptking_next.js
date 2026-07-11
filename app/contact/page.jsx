@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import ClientContactPage from './ClientContactPage';
 
 export default function ContactPage() {
@@ -21,7 +22,7 @@ export default function ContactPage() {
           border: 0,
         }}
       >
-        <h1>Contact PromptKing — Get in Touch with Our Team</h1>
+        <h2>Contact PromptKing — Get in Touch with Our Team</h2>
 
         <p>
           Have a question, feedback, or collaboration inquiry? The PromptKing team is here to help.
@@ -83,7 +84,7 @@ export default function ContactPage() {
 
         <nav aria-label="Contact page breadcrumb">
           <ol>
-            <li><a href="/">Home</a></li>
+            <li><Link href="/">Home</Link></li>
             <li>Contact Us</li>
           </ol>
         </nav>

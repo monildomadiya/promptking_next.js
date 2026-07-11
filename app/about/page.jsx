@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import ClientAboutPage from './ClientAboutPage';
 
 export default function AboutPage() {
@@ -21,7 +22,7 @@ export default function AboutPage() {
           border: 0,
         }}
       >
-        <h1>About PromptKing — Our Mission &amp; Story</h1>
+        <h2>About PromptKing — Our Mission &amp; Story</h2>
 
         <section>
           <h2>Who We Are</h2>
@@ -119,7 +120,7 @@ export default function AboutPage() {
 
         <nav aria-label="About page breadcrumb">
           <ol>
-            <li><a href="/">Home</a></li>
+            <li><Link href="/">Home</Link></li>
             <li>About PromptKing</li>
           </ol>
         </nav>
