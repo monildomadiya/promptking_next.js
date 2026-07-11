@@ -221,25 +221,22 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
                 isMobile={isMobile}
               />
             </div>
-            {/* Inject an In-Feed Ad every 8 items if enabled */}
+            {/* Inject an In-Feed Ad every 8 items if enabled.
+                No fixed-size wrapper: the ad unit stays invisible and takes
+                zero space until a real ad fills, so there is no blank box. */}
             {settings?.adsense_enabled === '1' && settings?.adsense_slot_infeed && (idx + 1) % 8 === 0 && (
-              <div style={{
-                background: 'rgba(255,255,255,0.02)',
-                borderRadius: '24px',
-                border: '1px solid rgba(255,255,255,0.05)',
-                overflow: 'hidden',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: '280px'
-              }}>
-                <AdSenseUnit 
-                  client={settings.adsense_client_id} 
-                  slot={settings.adsense_slot_infeed} 
-                  format="fluid"
-                  style={{ margin: 0, width: '100%' }}
-                />
-              </div>
+              <AdSenseUnit
+                client={settings.adsense_client_id}
+                slot={settings.adsense_slot_infeed}
+                format="fluid"
+                style={{
+                  margin: 0,
+                  width: '100%',
+                  background: 'rgba(255,255,255,0.02)',
+                  borderRadius: '24px',
+                  border: '1px solid rgba(255,255,255,0.05)',
+                }}
+              />
             )}
           </React.Fragment>
         ))}
