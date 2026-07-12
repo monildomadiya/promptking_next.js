@@ -19,12 +19,12 @@ const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', style
 
     const checkStatus = () => {
       const adStatus = el.getAttribute('data-ad-status');
-      // Only trust AdSense's own verdict. Do NOT reveal on the mere presence
-      // of an iframe — AdSense injects a blank/white loading iframe BEFORE it
-      // knows whether an ad exists, which is what caused the white flash.
+      const adsbygoogleStatus = el.getAttribute('data-adsbygoogle-status');
+      const hasIframe = el.querySelector('iframe');
+
       if (adStatus === 'unfilled') {
         setStatus('unfilled');
-      } else if (adStatus === 'filled') {
+      } else if (adStatus === 'filled' || hasIframe || adsbygoogleStatus === 'done') {
         setStatus('filled');
       }
     };
@@ -34,6 +34,8 @@ const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', style
     observer.observe(el, {
       attributes: true,
       attributeFilter: ['data-ad-status', 'data-adsbygoogle-status'],
+      childList: true,
+      subtree: true,
     });
     return () => observer.disconnect();
   }, [client, slot]);
