@@ -4,26 +4,22 @@ import React, { useEffect, useRef, useState } from 'react';
 const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', layoutKey = '', style = {}, className = '' }) => {
   const adRef = useRef(null);
   const pushed = useRef(false);
-  // 'loading' → invisible (no space, no flash) | 'filled' → fade in | 'unfilled' → unmounted
-  const [status, setStatus] = useState('loading');
+  const [status, setStatus] = useState('ready');
 
   useEffect(() => {
     pushed.current = false;
-    setStatus('loading');
+    setStatus('ready');
   }, [client, slot]);
 
-  // Watch the <ins> and only reveal it once a real ad is filled.
+  // Watch the <ins> and unmount if AdSense returns unfilled
   useEffect(() => {
     if (!adRef.current) return;
     const el = adRef.current;
 
     const checkStatus = () => {
       const adStatus = el.getAttribute('data-ad-status');
-
       if (adStatus === 'unfilled') {
         setStatus('unfilled');
-      } else if (adStatus === 'filled' || el.getAttribute('data-load-complete') === 'true') {
-        setStatus('filled');
       }
     };
 
@@ -98,10 +94,7 @@ const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', layou
         ...style,
         // While loading, occupy ZERO space (opacity alone still reserves
         // layout height — that was the invisible empty gap). Width stays
-        // measurable so AdSense can still size and request the ad.
-        ...(status === 'filled'
-          ? { opacity: 1 }
-          : { opacity: 0 }),
+        opacity: 1,
       }}
     >
       <ins
