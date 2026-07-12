@@ -22,17 +22,8 @@ const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', layou
 
       if (adStatus === 'unfilled') {
         setStatus('unfilled');
-      } else if (adStatus === 'filled') {
+      } else if (adStatus === 'filled' || el.getAttribute('data-load-complete') === 'true') {
         setStatus('filled');
-      } else {
-        const iframe = el.querySelector('iframe');
-        if (iframe && el.getAttribute('data-ad-status') !== 'unfilled') {
-          setTimeout(() => {
-            if (el && el.getAttribute('data-ad-status') !== 'unfilled') {
-              setStatus('filled');
-            }
-          }, 200);
-        }
       }
     };
 
