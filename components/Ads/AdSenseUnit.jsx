@@ -24,6 +24,15 @@ const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', style
         setStatus('unfilled');
       } else if (adStatus === 'filled') {
         setStatus('filled');
+      } else {
+        const iframe = el.querySelector('iframe');
+        if (iframe && el.getAttribute('data-ad-status') !== 'unfilled') {
+          setTimeout(() => {
+            if (el && el.getAttribute('data-ad-status') !== 'unfilled') {
+              setStatus('filled');
+            }
+          }, 200);
+        }
       }
     };
 
@@ -32,6 +41,8 @@ const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', style
     observer.observe(el, {
       attributes: true,
       attributeFilter: ['data-ad-status', 'data-adsbygoogle-status'],
+      childList: true,
+      subtree: true,
     });
     return () => observer.disconnect();
   }, [client, slot]);
@@ -99,7 +110,7 @@ const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', style
         // measurable so AdSense can still size and request the ad.
         ...(status === 'filled'
           ? { opacity: 1 }
-          : { opacity: 0, height: 0, minHeight: 0, margin: 0, padding: 0, border: 'none' }),
+          : { opacity: 0 }),
       }}
     >
       <ins
