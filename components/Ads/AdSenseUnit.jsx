@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
 
-const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', style = {}, className = '' }) => {
+const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', layoutKey = '', style = {}, className = '' }) => {
   const adRef = useRef(null);
   const pushed = useRef(false);
   // 'loading' → invisible (no space, no flash) | 'filled' → fade in | 'unfilled' → unmounted
@@ -121,6 +121,7 @@ const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', style
         data-ad-slot={slot}
         data-ad-format={format}
         data-full-width-responsive={responsive}
+        {...(layoutKey ? { 'data-ad-layout-key': layoutKey } : {})}
       />
     </div>
   );
