@@ -19,12 +19,10 @@ const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', style
 
     const checkStatus = () => {
       const adStatus = el.getAttribute('data-ad-status');
-      const adsbygoogleStatus = el.getAttribute('data-adsbygoogle-status');
-      const hasIframe = el.querySelector('iframe');
 
       if (adStatus === 'unfilled') {
         setStatus('unfilled');
-      } else if (adStatus === 'filled' || hasIframe || adsbygoogleStatus === 'done') {
+      } else if (adStatus === 'filled') {
         setStatus('filled');
       }
     };
@@ -34,8 +32,6 @@ const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', style
     observer.observe(el, {
       attributes: true,
       attributeFilter: ['data-ad-status', 'data-adsbygoogle-status'],
-      childList: true,
-      subtree: true,
     });
     return () => observer.disconnect();
   }, [client, slot]);
