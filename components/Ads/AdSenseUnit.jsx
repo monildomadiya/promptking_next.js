@@ -1,7 +1,12 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
+import { normalizeAdClient } from './normalizeAdClient';
 
-const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', layoutKey = '', style = {}, className = '' }) => {
+const AdSenseUnit = ({ client: rawClient, slot: rawSlot, format = 'auto', responsive = 'true', layoutKey = '', style = {}, className = '' }) => {
+  // Admin-editable values can carry a trailing space or a missing "ca-" prefix,
+  // which makes the manual unit unfillable. Normalize before rendering.
+  const client = normalizeAdClient(rawClient);
+  const slot = rawSlot ? String(rawSlot).trim() : rawSlot;
   const adRef = useRef(null);
   const pushed = useRef(false);
   const [status, setStatus] = useState('ready');
