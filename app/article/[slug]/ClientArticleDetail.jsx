@@ -380,6 +380,15 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
             </div>
           </div>
 
+          {/* Second in-content ad — deep in the article to capture scroll-depth
+              readers (reuses the responsive detail unit, allowed multiple times
+              per page by AdSense). */}
+          {settings?.adsense_enabled === '1' && settings?.adsense_slot_detail && (
+            <div style={{ margin: '50px 0 0' }}>
+              <AdSenseUnit client={settings.adsense_client_id} slot={settings.adsense_slot_detail} />
+            </div>
+          )}
+
           {/* FAQs */}
           {parsedFaqs && parsedFaqs.length > 0 && (
             <div style={{ marginTop: '60px', paddingTop: '40px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>

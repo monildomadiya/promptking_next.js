@@ -105,6 +105,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [showError, setShowError] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [showCopyModal, setShowCopyModal] = useState(false);
   const [isRelocking, setIsRelocking] = useState(false);
   const [suggestedPrompts, setSuggestedPrompts] = useState(initialSuggestedPrompts || []);
   const [showVideoModal, setShowVideoModal] = useState(false);
@@ -344,7 +345,15 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
       const brandedText = `${prompt.promptText}\n\n- Copied from PromptKing.in`;
       await navigator.clipboard.writeText(brandedText);
       setIsCopied(true);
-      
+
+      // Policy-safe monetization: the prompt is ALREADY on the clipboard above.
+      // We only surface a dismissible confirmation modal that carries an ad
+      // impression at this high-intent moment — the copy is never gated on the
+      // ad, so this stays within AdSense policy (no rewarded/forced views).
+      if (settings?.adsense_enabled === '1' && settings?.adsense_slot_detail) {
+        setShowCopyModal(true);
+      }
+
       // Record copy
       api.post('/record_copy', { key: prompt.prompt_key || prompt.key || key }).catch(err => console.error("Failed to record copy:", err));
       
@@ -1344,6 +1353,15 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
               </div>
             </div>
 
+            {/* Second in-content ad — deep in the page to capture scroll-depth
+                readers (reuses the responsive detail unit, which AdSense allows
+                to appear multiple times per page). */}
+            {settings?.adsense_enabled === '1' && settings?.adsense_slot_detail && (
+              <div style={{ marginTop: '40px' }}>
+                <AdSenseUnit client={settings.adsense_client_id} slot={settings.adsense_slot_detail} />
+              </div>
+            )}
+
             {/* FAQ Section */}
             {parsedFaqs && parsedFaqs.length > 0 && (
               <section style={{ marginTop: '50px', paddingTop: '40px', borderTop: '1px solid rgba(255, 255, 255,0.15)' }}>
@@ -1379,6 +1397,15 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
               WebkitBackdropFilter: 'blur(20px)',
               boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
             }}>
+              {/* Sidebar Ad — placed at the TOP of the sticky card so it stays
+                  in view while the user scrolls the (long) detail page, giving
+                  it far higher viewability than sitting below the list. */}
+              {settings?.adsense_enabled === '1' && settings?.adsense_slot_sidebar && (
+                <div style={{ marginBottom: '24px' }}>
+                  <AdSenseUnit client={settings.adsense_client_id} slot={settings.adsense_slot_sidebar} style={{ margin: 0 }} />
+                </div>
+              )}
+
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
                 <div style={{ width: '3px', height: '20px', background: 'var(--accent-main)', borderRadius: '2px' }} />
                 <h3 style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0 }}>
@@ -1441,19 +1468,99 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
                   </Link>
                 ))}
               </div>
-
-
-
-              {/* Sidebar Ad Placement */}
-              {settings?.adsense_enabled === '1' && settings?.adsense_slot_sidebar && (
-                <div style={{ marginTop: '20px' }}>
-                  <AdSenseUnit client={settings.adsense_client_id} slot={settings.adsense_slot_sidebar} />
-                </div>
-              )}
             </div>
           </aside>
         </div>
       </div>
+
+      {/* ─── Copy-success modal ───────────────────────────────────────────────
+          The prompt is copied to the clipboard the instant the user clicks Copy
+          (see handleCopy). This modal is purely a dismissible confirmation that
+          also carries one ad impression at a high-intent moment. The copy is
+          NEVER gated on the ad, the ad is clearly labelled "Advertisement", and
+          the close/continue controls are well separated from it — so this stays
+          fully within AdSense policy (no rewarded or forced ad views). */}
+      {showCopyModal && (
+        <div
+          onClick={() => setShowCopyModal(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 10050,
+            background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '20px', animation: 'pkCopyModalFade 0.2s ease',
+          }}
+        >
+          <style>{`
+            @keyframes pkCopyModalFade { from { opacity: 0; } to { opacity: 1; } }
+            @keyframes pkCopyModalPop { from { opacity: 0; transform: translateY(14px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+          `}</style>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'relative', width: '100%', maxWidth: '460px',
+              background: 'var(--surface-1, #141414)', border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '24px', padding: '28px', boxShadow: '0 30px 80px rgba(0,0,0,0.6)',
+              animation: 'pkCopyModalPop 0.28s cubic-bezier(0.34,1.56,0.64,1)',
+            }}
+          >
+            <button
+              onClick={() => setShowCopyModal(false)}
+              aria-label="Close"
+              style={{
+                position: 'absolute', top: '16px', right: '16px',
+                width: '36px', height: '36px', borderRadius: '50%',
+                background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)',
+                color: 'rgba(255,255,255,0.7)', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              <X size={18} />
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingRight: '40px' }}>
+              <div style={{
+                width: '44px', height: '44px', borderRadius: '50%', flexShrink: 0,
+                background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Check size={22} style={{ color: '#10b981' }} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#fff' }}>Prompt Copied!</h3>
+                <p style={{ margin: '3px 0 0', fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)' }}>
+                  Paste it into ChatGPT, Gemini or Midjourney.
+                </p>
+              </div>
+            </div>
+
+            {settings?.adsense_enabled === '1' && settings?.adsense_slot_detail && (
+              <div style={{ marginTop: '22px' }}>
+                <div style={{
+                  fontSize: '0.62rem', textTransform: 'uppercase', letterSpacing: '1.5px',
+                  color: 'rgba(255,255,255,0.28)', marginBottom: '6px', textAlign: 'center',
+                }}>Advertisement</div>
+                <AdSenseUnit
+                  client={settings.adsense_client_id}
+                  slot={settings.adsense_slot_detail}
+                  style={{ margin: 0 }}
+                />
+              </div>
+            )}
+
+            <button
+              onClick={() => setShowCopyModal(false)}
+              style={{
+                marginTop: '24px', width: '100%', padding: '13px',
+                background: 'var(--accent-gradient, #e50914)', color: '#fff',
+                border: 'none', borderRadius: '14px', fontWeight: 800,
+                fontSize: '0.95rem', cursor: 'pointer',
+              }}
+            >
+              Continue browsing
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
