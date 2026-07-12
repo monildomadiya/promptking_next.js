@@ -27,13 +27,12 @@ const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', layou
     const observer = new MutationObserver(checkStatus);
     observer.observe(el, {
       attributes: true,
-      attributeFilter: ['data-ad-status', 'data-adsbygoogle-status'],
-      childList: true,
-      subtree: true,
+      attributeFilter: ['data-ad-status'],
     });
     return () => observer.disconnect();
   }, [client, slot]);
 
+  // Push the ad request once adsbygoogle.js is ready
   useEffect(() => {
     if (pushed.current || !client || !slot || !adRef.current) return;
 
@@ -60,22 +59,35 @@ const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', layou
       }
     };
 
-    const adsScript = document.querySelector('script[src*="adsbygoogle.js"]');
-    if (adsScript) {
-      if (adsScript.dataset.loaded === 'true') {
-        tryPush();
-      } else {
-        const onLoad = () => {
-          adsScript.dataset.loaded = 'true';
-          tryPush();
-        };
-        adsScript.addEventListener('load', onLoad);
-        tryPush();
-        return () => adsScript.removeEventListener('load', onLoad);
-      }
-    } else {
-      // Push immediately into queue; when adsbygoogle.js loads it processes all queued items
+    // The adsbygoogle.js script is loaded via Next.js <Script> in layout.js.
+    // We need to wait for it to be fully loaded before pushing.
+    // Check if the script has already executed by seeing if adsbygoogle has
+    // been converted from a plain array to the real AdSense object.
+    const isScriptReady = () => {
+      return typeof window !== 'undefined' &&
+             window.adsbygoogle &&
+             // Once adsbygoogle.js loads, it replaces the plain array with
+             // its own object that has a .loaded property or is no longer a plain Array.
+             (typeof window.adsbygoogle.loaded !== 'undefined' || !Array.isArray(window.adsbygoogle));
+    };
+
+    if (isScriptReady()) {
+      // Script already loaded, push immediately
       tryPush();
+    } else {
+      // Script not loaded yet. Push into the queue — adsbygoogle.js will
+      // process all queued pushes when it loads.
+      tryPush();
+
+      // Also set up a fallback: retry after a short delay in case the push
+      // happened too early and got ignored.
+      const retryTimer = setTimeout(() => {
+        if (!pushed.current) {
+          tryPush();
+        }
+      }, 1500);
+
+      return () => clearTimeout(retryTimer);
     }
   }, [client, slot]);
 
@@ -90,11 +102,7 @@ const AdSenseUnit = ({ client, slot, format = 'auto', responsive = 'true', layou
         margin: '20px 0',
         textAlign: 'center',
         overflow: 'hidden',
-        transition: 'opacity 0.25s ease',
         ...style,
-        // While loading, occupy ZERO space (opacity alone still reserves
-        // layout height — that was the invisible empty gap). Width stays
-        opacity: 1,
       }}
     >
       <ins

@@ -17,19 +17,8 @@ const GoogleAdSense = ({ settings }) => {
           metaTag.content = settings.adsense_client_id;
         }
       }
-
-      // Check if the script already exists before adding a new one
-      const existingScript = document.querySelector(`script[src*="adsbygoogle.js"]`);
-      if (existingScript) return;
-
-      const script = document.createElement('script');
-      script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${settings.adsense_client_id}`;
-      script.async = true;
-      script.crossOrigin = "anonymous";
-      script.onload = () => {
-        script.dataset.loaded = "true";
-      };
-      document.head.appendChild(script);
+      // NOTE: The adsbygoogle.js script is loaded globally via Next.js <Script>
+      // tag in layout.js. Do NOT create a duplicate script here.
     }
   }, [settings?.adsense_enabled, settings?.adsense_client_id]);
 
@@ -37,4 +26,3 @@ const GoogleAdSense = ({ settings }) => {
 };
 
 export default GoogleAdSense;
-
