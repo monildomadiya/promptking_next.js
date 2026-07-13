@@ -785,12 +785,13 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
               </div>
               
               <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ 
-                  position: 'absolute', inset: 0, padding: '25px', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.9rem', color: '#fff', lineHeight: 1.8,
-                  filter: (isUnlocked && !isRelocking) ? 'none' : 'blur(12px)', 
+                <div style={{
+                  position: 'absolute', inset: 0, padding: '25px 25px 64px', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.9rem', color: '#fff', lineHeight: 1.8,
+                  filter: (isUnlocked && !isRelocking) ? 'none' : 'blur(12px)',
                   WebkitFilter: (isUnlocked && !isRelocking) ? 'none' : 'blur(12px)',
-                  userSelect: (isUnlocked && !isRelocking) ? 'text' : 'none', 
+                  userSelect: (isUnlocked && !isRelocking) ? 'text' : 'none',
                   overflowY: (isUnlocked && !isRelocking) ? 'auto' : 'hidden',
+                  overflowWrap: 'break-word', wordBreak: 'break-word',
                   transition: 'filter 0.5s ease-out, -webkit-filter 0.5s ease-out'
                 }}>
                   {prompt.promptText}
@@ -1483,6 +1484,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
       {showCopyModal && (
         <div
           onClick={() => setShowCopyModal(false)}
+          className="pk-copy-modal-overlay"
           style={{
             position: 'fixed', inset: 0, zIndex: 10050,
             background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
@@ -1493,11 +1495,21 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
           <style>{`
             @keyframes pkCopyModalFade { from { opacity: 0; } to { opacity: 1; } }
             @keyframes pkCopyModalPop { from { opacity: 0; transform: translateY(14px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+            /* Let the ad span the full modal-card width so a standard 300–336px
+               responsive unit fits on phones instead of being clipped by the
+               card padding + .adsense-container overflow:hidden. */
+            .pk-copy-modal-ad { margin-left: calc(-1 * var(--pk-modal-pad, 28px)); margin-right: calc(-1 * var(--pk-modal-pad, 28px)); }
+            @media (max-width: 480px) {
+              .pk-copy-modal-overlay { padding: 12px !important; }
+              .pk-copy-modal-card { --pk-modal-pad: 18px !important; padding-left: 18px !important; padding-right: 18px !important; }
+            }
           `}</style>
           <div
             onClick={(e) => e.stopPropagation()}
+            className="pk-copy-modal-card"
             style={{
               position: 'relative', width: '100%', maxWidth: '460px',
+              '--pk-modal-pad': '28px',
               background: 'var(--surface-1, #141414)', border: '1px solid rgba(255,255,255,0.1)',
               borderRadius: '24px', padding: '28px', boxShadow: '0 30px 80px rgba(0,0,0,0.6)',
               animation: 'pkCopyModalPop 0.28s cubic-bezier(0.34,1.56,0.64,1)',
@@ -1534,7 +1546,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
             </div>
 
             {settings?.adsense_enabled === '1' && settings?.adsense_slot_detail && (
-              <div style={{ marginTop: '22px' }}>
+              <div className="pk-copy-modal-ad" style={{ marginTop: '22px' }}>
                 <div style={{
                   fontSize: '0.62rem', textTransform: 'uppercase', letterSpacing: '1.5px',
                   color: 'rgba(255,255,255,0.28)', marginBottom: '6px', textAlign: 'center',
