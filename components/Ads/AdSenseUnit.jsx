@@ -107,6 +107,8 @@ const AdSenseUnit = ({ client: rawClient, slot: rawSlot, format = 'auto', respon
         margin: '20px 0',
         textAlign: 'center',
         overflow: 'hidden',
+        maxWidth: '100%',
+        width: '100%',
         ...style,
       }}
     >
