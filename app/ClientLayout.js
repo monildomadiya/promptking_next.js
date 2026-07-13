@@ -4,6 +4,7 @@ import { useAppContext } from '@/components/AppContext';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
 import GoogleAdSense from '@/components/Ads/GoogleAdSense';
+import AnchorAd from '@/components/Ads/AnchorAd';
 import { optimizeImage } from '@/utils/imageUtils';
 
 export default function ClientLayout({ children }) {
@@ -38,6 +39,7 @@ export default function ClientLayout({ children }) {
         {children}
       </div>
       {!isAdminPath && <Footer onLogoClick={resetHome} />}
+      {!isAdminPath && <AnchorAd settings={settings} />}
     </>
   );
 }

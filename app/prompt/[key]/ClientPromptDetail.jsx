@@ -1383,6 +1383,17 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
               </section>
             )}
 
+            {/* Multiplex "recommended" ad — native grid of related ads at the
+                very bottom of the article. Higher RPM than a plain banner and
+                blends with content. Inert until an admin sets the multiplex
+                slot, so it changes nothing on the live site until enabled. */}
+            {settings?.adsense_enabled === '1' && settings?.adsense_slot_multiplex && (
+              <div style={{ marginTop: '50px', paddingTop: '40px', borderTop: '1px solid rgba(255, 255, 255,0.15)' }}>
+                <div style={{ fontSize: '0.62rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: 'rgba(255,255,255,0.28)', marginBottom: '10px' }}>Advertisement</div>
+                <AdSenseUnit client={settings.adsense_client_id} slot={settings.adsense_slot_multiplex} format="autorelaxed" />
+              </div>
+            )}
+
           </article>
 
           {/* Sidebar (Right) */}

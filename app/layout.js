@@ -9,6 +9,15 @@ export const metadata = {
   metadataBase: new URL('https://promptking.in'),
   title: "PromptKing – Best AI Prompts for ChatGPT, Gemini & Midjourney",
   description: "Explore 1000+ free AI prompts for ChatGPT, Gemini, and Midjourney. Copy ready-to-use prompts for writing, coding, design, and more — all in one place.",
+  keywords: [
+    "AI prompts", "ChatGPT prompts", "Midjourney prompts", "Gemini prompts",
+    "free AI prompts", "prompt engineering", "AI image generator prompts",
+    "AI headshot generator", "AI photo editor", "AI logo maker",
+    "AI art generator", "text to image prompts", "AI content writing",
+    "AI marketing prompts", "AI resume builder", "AI business ideas",
+    "DALL-E prompts", "Stable Diffusion prompts", "prompt library",
+    "best AI prompts 2026", "viral AI photo trends", "AI selfie generator",
+  ],
   alternates: {
     canonical: 'https://promptking.in',
   },

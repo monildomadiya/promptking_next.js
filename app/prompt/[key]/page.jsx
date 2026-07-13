@@ -34,9 +34,30 @@ export async function generateMetadata({ params }) {
   else if (!image.startsWith('http')) image = `https://promptking.in/${image}`;
   const canonicalUrl = `https://promptking.in/prompt/${promptData.slug || promptData.prompt_key}`;
 
+  // Build per-prompt keywords from the title, AI tool and tags, plus evergreen
+  // high-intent terms — helps long-tail SEO and gives contextual ad targeting
+  // stronger, more commercial signals.
+  let tagKeywords = [];
+  try {
+    if (promptData.tags) {
+      tagKeywords = typeof promptData.tags === 'string'
+        ? (promptData.tags.trim().startsWith('[') ? JSON.parse(promptData.tags) : promptData.tags.split(',').map(t => t.trim()))
+        : (Array.isArray(promptData.tags) ? promptData.tags : []);
+    }
+  } catch (e) {}
+  const aiTool = promptData.ai_type || 'AI';
+  const keywords = [
+    ...(promptData.title ? [promptData.title, `${promptData.title} prompt`] : []),
+    `${aiTool} prompt`, `${aiTool} prompts`,
+    ...tagKeywords,
+    'AI prompt', 'AI image generator', 'prompt engineering',
+    'ChatGPT prompts', 'Midjourney prompts', 'free AI prompts', 'PromptKing',
+  ].filter(Boolean);
+
   return {
     title,
     description,
+    keywords,
     alternates: {
       canonical: canonicalUrl,
     },

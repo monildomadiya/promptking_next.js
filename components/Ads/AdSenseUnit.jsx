@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { normalizeAdClient } from './normalizeAdClient';
 
-const AdSenseUnit = ({ client: rawClient, slot: rawSlot, format = 'auto', responsive = 'true', layoutKey = '', style = {}, className = '' }) => {
+const AdSenseUnit = ({ client: rawClient, slot: rawSlot, format = 'auto', responsive = 'true', layoutKey = '', style = {}, className = '', onUnfilled = null }) => {
   // Admin-editable values can carry a trailing space or a missing "ca-" prefix,
   // which makes the manual unit unfillable. Normalize before rendering.
   const client = normalizeAdClient(rawClient);
@@ -36,6 +36,12 @@ const AdSenseUnit = ({ client: rawClient, slot: rawSlot, format = 'auto', respon
     });
     return () => observer.disconnect();
   }, [client, slot]);
+
+  // Notify the parent when the slot is unfilled so wrappers (e.g. a sticky
+  // anchor bar) can hide their own chrome instead of showing an empty shell.
+  useEffect(() => {
+    if (status === 'unfilled' && typeof onUnfilled === 'function') onUnfilled();
+  }, [status, onUnfilled]);
 
   // Push the ad request once adsbygoogle.js is ready
   useEffect(() => {

@@ -1129,15 +1129,33 @@ const AdsPanel = ({ onSave }) => {
             </div>
             <div style={{ gridColumn: '1 / -1' }}>
               <Label text="In-Feed Native Ad Slot (Prompt Grid)" />
-              <input 
-                style={inputStyle} 
-                placeholder="Slot ID" 
-                value={settings.adsense_slot_infeed || ''} 
-                onChange={e => setSettings({...settings, adsense_slot_infeed: e.target.value})} 
+              <input
+                style={inputStyle}
+                placeholder="Slot ID"
+                value={settings.adsense_slot_infeed || ''}
+                onChange={e => setSettings({...settings, adsense_slot_infeed: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label text="Anchor / Sticky Ad Slot (Mobile RPM booster)" />
+              <input
+                style={inputStyle}
+                placeholder="Slot ID"
+                value={settings.adsense_slot_anchor || ''}
+                onChange={e => setSettings({...settings, adsense_slot_anchor: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label text="Multiplex Slot (Recommended grid, format: autorelaxed)" />
+              <input
+                style={inputStyle}
+                placeholder="Slot ID"
+                value={settings.adsense_slot_multiplex || ''}
+                onChange={e => setSettings({...settings, adsense_slot_multiplex: e.target.value})}
               />
             </div>
           </div>
-          <Hint text="Leave blank to disable specific placements." />
+          <Hint text="Leave blank to disable specific placements. Anchor = create a 'Display' unit; Multiplex = create a 'Multiplex' unit in AdSense." />
         </div>
       </div>
     </motion.div>
