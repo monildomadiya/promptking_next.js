@@ -226,7 +226,7 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
                 loading="lazy"
                 width="1200"
                 height="630"
-                style={{ width: '100%', height: 'auto', borderRadius: '30px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', display: 'block' }} 
+                style={{ width: '100%', height: 'auto', borderRadius: '30px', boxShadow: '0 20px 40px rgba(17,24,39,0.12)', display: 'block' }}
               />
               {blog.featured_image_caption && (
                 <p style={{ textAlign: 'center', marginTop: '12px', fontSize: '0.85rem', color: 'var(--text-dim)', fontStyle: 'italic' }}>
@@ -242,15 +242,15 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
             </div>
           )}
 
-          <h1 className="article-page-title" style={{ 
-            marginBottom: '30px', 
-            lineHeight: 1.2, 
-            fontWeight: 800, 
-            color: 'white',
-            textShadow: '0 10px 30px rgba(0,0,0,0.3)'
+          <h1 className="article-page-title" style={{
+            marginBottom: '30px',
+            lineHeight: 1.2,
+            fontWeight: 800,
+            color: 'var(--text-main)',
+            textShadow: '0 10px 30px rgba(17,24,39,0.06)'
           }}>{blog.title}</h1>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'center', marginBottom: '40px', paddingBottom: '30px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'center', marginBottom: '40px', paddingBottom: '30px', borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
             {blog.author_name && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 500 }}>
                 <User size={16} color="var(--accent-main)" /> {blog.author_name}
@@ -294,10 +294,10 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
             </div>
           )}
 
-          <div 
-            className="blog-content" 
-            dangerouslySetInnerHTML={{ __html: finalContent }} 
-            style={{ fontSize: '1.15rem', lineHeight: 1.9, color: '#d1d1d1' }}
+          <div
+            className="blog-content"
+            dangerouslySetInnerHTML={{ __html: finalContent }}
+            style={{ fontSize: '1.15rem', lineHeight: 1.9, color: '#3f434a' }}
           />
 
           {/* Tags & Related Categories */}
@@ -306,7 +306,7 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center', marginBottom: '20px' }}>
                 <Tag size={18} color="var(--text-dim)" />
                 {parsedTags.map((tag, i) => (
-                  <span key={i} style={{ background: 'rgba(255,255,255,0.05)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.85rem', color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <span key={i} style={{ background: 'rgba(0,0,0,0.04)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.85rem', color: 'var(--text-secondary)', border: '1px solid rgba(0,0,0,0.08)' }}>
                     {tag}
                   </span>
                 ))}
@@ -321,7 +321,7 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
               if(matchedCats.length > 0) {
                 return (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center', padding: '20px', background: 'rgba(229,9,20,0.05)', border: '1px solid rgba(229,9,20,0.2)', borderRadius: '16px' }}>
-                    <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'white' }}>Related Prompts:</span>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-main)' }}>Related Prompts:</span>
                     {matchedCats.map(cat => {
                        const slug = cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-');
                        return (
@@ -341,8 +341,8 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
           <div className="author-box" style={{
             marginTop: '60px',
             padding: '40px',
-            background: 'linear-gradient(145deg, rgba(255,255,255,0.02) 0%, rgba(229,9,20,0.05) 100%)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            background: 'linear-gradient(145deg, #ffffff 0%, rgba(229,9,20,0.05) 100%)',
+            border: '1px solid rgba(0,0,0,0.08)',
             borderRadius: '24px',
             display: 'flex',
             gap: '30px',
@@ -363,18 +363,18 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
               <img 
                 src={blog.author_image ? optimizeImage(blog.author_image, 150) : "https://github.com/monildomadiya.png"} 
                 alt={blog.author_name || 'PromptKing Admin'} 
-                style={{ 
-                  width: '90px', height: '90px', borderRadius: '50%', 
-                  objectFit: 'cover', border: '3px solid rgba(255,255,255,0.1)',
-                  boxShadow: '0 10px 20px rgba(0,0,0,0.3)'
-                }} 
+                style={{
+                  width: '90px', height: '90px', borderRadius: '50%',
+                  objectFit: 'cover', border: '3px solid rgba(0,0,0,0.08)',
+                  boxShadow: '0 10px 20px rgba(17,24,39,0.1)'
+                }}
                 onError={(e) => { e.target.src = 'https://promptking.in/favicon.png' }}
               />
             </div>
             <div style={{ zIndex: 1 }}>
               <div style={{ fontSize: '0.8rem', color: 'var(--accent-main)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '5px' }}>About the Author</div>
-              <h4 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'white', marginBottom: '10px' }}>{blog.author_name || 'PromptKing Admin'}</h4>
-              <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, margin: 0 }}>
+              <h4 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '10px' }}>{blog.author_name || 'PromptKing Admin'}</h4>
+              <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>
                 {blog.author_description || 'Passionate about AI and creative workflows. Exploring the frontiers of prompt engineering to help you unlock the true potential of tools like ChatGPT, Midjourney, and Gemini.'}
               </p>
             </div>
@@ -391,12 +391,12 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
 
           {/* FAQs */}
           {parsedFaqs && parsedFaqs.length > 0 && (
-            <div style={{ marginTop: '60px', paddingTop: '40px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-              <h2 style={{ fontSize: '2rem', marginBottom: '30px', color: 'white', fontWeight: 800 }}>Frequently Asked Questions</h2>
+            <div style={{ marginTop: '60px', paddingTop: '40px', borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+              <h2 style={{ fontSize: '2rem', marginBottom: '30px', color: 'var(--text-main)', fontWeight: 800 }}>Frequently Asked Questions</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 {parsedFaqs.map((faq, i) => (
-                  <div key={i} style={{ background: 'rgba(255,255,255,0.02)', padding: '25px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                    <h3 style={{ fontSize: '1.2rem', marginBottom: '15px', color: 'white', fontWeight: 700 }}>{faq.question}</h3>
+                  <div key={i} style={{ background: '#ffffff', padding: '25px', borderRadius: '20px', border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 12px rgba(17,24,39,0.04)' }}>
+                    <h3 style={{ fontSize: '1.2rem', marginBottom: '15px', color: 'var(--text-main)', fontWeight: 700 }}>{faq.question}</h3>
                     <p style={{ fontSize: '1.05rem', color: 'var(--text-secondary)', lineHeight: 1.7, margin: 0 }}>{faq.answer}</p>
                   </div>
                 ))}
@@ -417,19 +417,19 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
             )}
             
             {/* More Articles Box */}
-            <div style={{ 
-              background: 'rgba(255,255,255,0.03)', 
+            <div style={{
+              background: '#ffffff',
               backdropFilter: 'blur(15px)',
               WebkitBackdropFilter: 'blur(15px)',
-              padding: '30px', 
-              borderRadius: '24px', 
-              border: '1px solid rgba(255,255,255,0.08)',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
+              padding: '30px',
+              borderRadius: '24px',
+              border: '1px solid rgba(0,0,0,0.08)',
+              boxShadow: '0 20px 40px rgba(17,24,39,0.08)'
             }}>
-              <h3 style={{ 
-                fontSize: '1.4rem', 
-                marginBottom: '25px', 
-                color: 'white', 
+              <h3 style={{
+                fontSize: '1.4rem',
+                marginBottom: '25px',
+                color: 'var(--text-main)',
                 fontWeight: 800,
                 display: 'flex',
                 alignItems: 'center',
@@ -448,7 +448,7 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
                     transition: '0.3s'
                   }} className="sidebar-blog-card">
                     {item.featured_image && (
-                      <div style={{ width: '70px', height: '54px', borderRadius: '12px', overflow: 'hidden', flexShrink: 0, border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <div style={{ width: '70px', height: '54px', borderRadius: '12px', overflow: 'hidden', flexShrink: 0, border: '1px solid rgba(0,0,0,0.08)' }}>
                         <img src={optimizeImage(item.featured_image, 150)} alt={item.title} loading="lazy" width="70" height="54" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       </div>
                     )}
@@ -459,9 +459,9 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
                         display: '-webkit-box', 
                         WebkitLineClamp: 2, 
                         WebkitBoxOrient: 'vertical', 
-                        overflow: 'hidden', 
+                        overflow: 'hidden',
                         lineHeight: 1.4,
-                        color: 'rgba(255,255,255,0.9)',
+                        color: 'var(--text-main)',
                         marginBottom: '4px'
                       }}>
                         {item.title}
@@ -483,8 +483,8 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
                 fontSize: '0.85rem',
                 padding: '12px',
                 borderRadius: '12px',
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.05)',
+                background: 'rgba(0,0,0,0.03)',
+                border: '1px solid rgba(0,0,0,0.08)',
                 transition: '0.3s'
               }} className="view-all-btn">
                 View All Posts

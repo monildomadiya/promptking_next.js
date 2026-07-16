@@ -19,10 +19,10 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: '50px', background: '#020202', color: 'white', minHeight: '100vh', fontFamily: 'sans-serif' }}>
-          <h1 style={{ color: '#ff4444' }}>Application Error</h1>
+        <div style={{ padding: '50px', background: 'var(--surface-0)', color: 'var(--text-main)', minHeight: '100vh', fontFamily: 'sans-serif' }}>
+          <h1 style={{ color: '#d21c28' }}>Application Error</h1>
           <p>Please take a screenshot of this error and share it so we can fix it:</p>
-          <pre style={{ background: '#111', padding: '20px', borderRadius: '10px', overflowX: 'auto', color: '#ff8888', whiteSpace: 'pre-wrap', fontSize: '12px' }}>
+          <pre style={{ background: '#f6f8fa', border: '1px solid rgba(0,0,0,0.1)', padding: '20px', borderRadius: '10px', overflowX: 'auto', color: '#c81e2b', whiteSpace: 'pre-wrap', fontSize: '12px' }}>
             {this.state.error && this.state.error.toString()}
             <br />
             {this.state.errorInfo && this.state.errorInfo.componentStack}

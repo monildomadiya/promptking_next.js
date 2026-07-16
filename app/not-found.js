@@ -42,7 +42,7 @@ export default function NotFound() {
         fontSize: 'clamp(6rem, 15vw, 12rem)',
         fontWeight: 900,
         lineHeight: 1,
-        background: 'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.03) 100%)',
+        background: 'linear-gradient(180deg, rgba(20,22,26,0.14) 0%, rgba(20,22,26,0.04) 100%)',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         letterSpacing: '-8px',
@@ -55,17 +55,17 @@ export default function NotFound() {
 
       {/* Glass card */}
       <div style={{
-        background: 'rgba(255, 255, 255, 0.03)',
+        background: '#ffffff',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        border: '1px solid rgba(0, 0, 0, 0.08)',
         borderRadius: '24px',
         padding: '40px 48px',
         maxWidth: '480px',
         width: '100%',
         position: 'relative',
         zIndex: 2,
-        boxShadow: '0 16px 48px rgba(0, 0, 0, 0.4)'
+        boxShadow: '0 16px 48px rgba(17, 24, 39, 0.12)'
       }}>
         {/* Icon */}
         <div style={{
@@ -86,7 +86,7 @@ export default function NotFound() {
         <h2 style={{
           fontSize: '1.5rem',
           fontWeight: 700,
-          color: 'white',
+          color: 'var(--text-main)',
           marginBottom: '12px',
           letterSpacing: '-0.5px'
         }}>
@@ -95,7 +95,7 @@ export default function NotFound() {
 
         <p style={{
           fontSize: '0.95rem',
-          color: 'rgba(255, 255, 255, 0.45)',
+          color: 'var(--text-secondary)',
           lineHeight: 1.7,
           marginBottom: '32px'
         }}>
@@ -131,7 +131,7 @@ export default function NotFound() {
       <p style={{
         marginTop: '32px',
         fontSize: '0.8rem',
-        color: 'rgba(255, 255, 255, 0.2)',
+        color: 'var(--text-muted)',
         position: 'relative',
         zIndex: 2
       }}>

@@ -18,13 +18,13 @@ const AdSensePolicyPage = () => {
           <div style={{ 
             display: 'inline-block', 
             padding: '8px 20px', 
-            background: 'rgba(255,255,255,0.05)', 
-            borderRadius: '100px', 
-            fontSize: '0.85rem', 
-            fontWeight: 600, 
+            background: 'rgba(0,0,0,0.04)',
+            borderRadius: '100px',
+            fontSize: '0.85rem',
+            fontWeight: 600,
             color: 'var(--accent-main)',
             marginBottom: '20px',
-            border: '1px solid rgba(255,255,255,0.1)'
+            border: '1px solid rgba(0,0,0,0.1)'
           }}>
             LEGAL & COMPLIANCE
           </div>
@@ -36,7 +36,7 @@ const AdSensePolicyPage = () => {
           maxWidth: '850px', 
           margin: '0 auto',
           padding: '60px',
-          background: 'rgba(255, 255, 255, 0.02)',
+          background: '#ffffff',
           borderRadius: '40px',
           border: '1px solid var(--border-color)',
           backdropFilter: 'blur(20px)',
@@ -63,8 +63,8 @@ const AdSensePolicyPage = () => {
               <div style={{ 
                 padding: '12px', 
                 borderRadius: '16px', 
-                background: 'rgba(255, 255, 255, 0.05)', 
-                color: 'white' 
+                background: 'rgba(0, 0, 0, 0.05)',
+                color: 'var(--text-main)'
               }}>
                 <Cookie size={24} />
               </div>
@@ -80,8 +80,8 @@ const AdSensePolicyPage = () => {
               <div style={{ 
                 padding: '12px', 
                 borderRadius: '16px', 
-                background: 'rgba(255, 255, 255, 0.05)', 
-                color: 'white' 
+                background: 'rgba(0, 0, 0, 0.05)',
+                color: 'var(--text-main)'
               }}>
                 <Globe size={24} />
               </div>
@@ -93,9 +93,9 @@ const AdSensePolicyPage = () => {
           </section>
 
           <div style={{ 
-            background: 'rgba(255, 255, 255, 0.03)', 
-            padding: '40px', 
-            borderRadius: '32px', 
+            background: '#ffffff',
+            padding: '40px',
+            borderRadius: '32px',
             border: '1px solid var(--border-color)',
             display: 'flex',
             gap: '20px',

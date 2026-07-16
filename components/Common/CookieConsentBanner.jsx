@@ -51,7 +51,7 @@ export default function CookieConsentBanner() {
       {/* Backdrop blur on mobile */}
       <div style={{
         position: 'fixed', inset: 0, zIndex: 9998,
-        background: 'rgba(0,0,0,0.5)',
+        background: 'rgba(17,24,39,0.35)',
         backdropFilter: 'blur(4px)',
         WebkitBackdropFilter: 'blur(4px)',
         display: showDetails ? 'block' : 'none',
@@ -69,13 +69,13 @@ export default function CookieConsentBanner() {
           transform: 'translateX(-50%)',
           width: 'min(680px, calc(100vw - 32px))',
           zIndex: 9999,
-          background: 'rgba(15, 15, 20, 0.98)',
+          background: 'rgba(255, 255, 255, 0.98)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255,255,255,0.1)',
+          border: '1px solid rgba(0,0,0,0.1)',
           borderRadius: '24px',
           padding: '28px',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04)',
+          boxShadow: '0 20px 60px rgba(17,24,39,0.18), 0 0 0 1px rgba(0,0,0,0.04)',
           animation: 'slideUpCookie 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
       >
@@ -96,18 +96,18 @@ export default function CookieConsentBanner() {
             🍪
           </div>
           <div>
-            <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'white', marginBottom: '6px' }}>
+            <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '6px' }}>
               We value your privacy
             </h3>
-            <p style={{ margin: 0, fontSize: '0.875rem', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
+            <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
               We use cookies to enhance your experience, serve personalized ads via{' '}
-              <strong style={{ color: 'rgba(255,255,255,0.75)' }}>Google AdSense</strong>, and analyze traffic.
+              <strong style={{ color: 'var(--text-main)' }}>Google AdSense</strong>, and analyze traffic.
               By clicking "Accept All", you consent to our use of cookies.{' '}
               <Link href="/privacy" style={{ color: 'var(--accent-main)', textDecoration: 'none', fontWeight: 600 }}>
                 Privacy Policy
               </Link>
               {' · '}
-              <Link href="/terms" style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>
+              <Link href="/terms" style={{ color: 'var(--text-dim)', textDecoration: 'none' }}>
                 Terms
               </Link>
             </p>
@@ -117,8 +117,8 @@ export default function CookieConsentBanner() {
         {/* Expanded Preferences */}
         {showDetails && (
           <div style={{
-            background: 'rgba(255,255,255,0.03)', borderRadius: '16px',
-            border: '1px solid rgba(255,255,255,0.07)',
+            background: 'rgba(0,0,0,0.03)', borderRadius: '16px',
+            border: '1px solid rgba(0,0,0,0.08)',
             padding: '20px', marginBottom: '20px',
             display: 'flex', flexDirection: 'column', gap: '16px'
           }}>
@@ -138,8 +138,8 @@ export default function CookieConsentBanner() {
             ].map(({ key, label, locked, desc }) => (
               <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
                 <div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'white', marginBottom: '3px' }}>{label}</div>
-                  <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.45)', lineHeight: 1.5 }}>{desc}</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '3px' }}>{label}</div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', lineHeight: 1.5 }}>{desc}</div>
                 </div>
                 <button
                   onClick={() => !locked && setPreferences(p => ({ ...p, [key]: !p[key] }))}
@@ -150,7 +150,7 @@ export default function CookieConsentBanner() {
                     flexShrink: 0, width: '48px', height: '26px', borderRadius: '13px',
                     border: 'none', cursor: locked ? 'default' : 'pointer',
                     position: 'relative', transition: 'background 0.25s',
-                    background: (locked || preferences[key]) ? 'var(--accent-main)' : 'rgba(255,255,255,0.15)',
+                    background: (locked || preferences[key]) ? 'var(--accent-main)' : 'rgba(0,0,0,0.18)',
                     opacity: locked ? 0.7 : 1,
                   }}
                 >
@@ -158,7 +158,7 @@ export default function CookieConsentBanner() {
                     position: 'absolute', top: '3px',
                     left: (locked || preferences[key]) ? '25px' : '3px',
                     width: '20px', height: '20px', borderRadius: '50%',
-                    background: 'white', transition: 'left 0.25s', boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
+                    background: 'white', transition: 'left 0.25s', boxShadow: '0 2px 6px rgba(17,24,39,0.25)'
                   }} />
                 </button>
               </div>
@@ -207,12 +207,12 @@ export default function CookieConsentBanner() {
             onClick={rejectNonEssential}
             id="cookie-reject-optional"
             style={{
-              padding: '13px 20px', background: 'transparent', color: 'rgba(255,255,255,0.35)',
+              padding: '13px 20px', background: 'transparent', color: 'var(--text-muted)',
               border: 'none', borderRadius: '50px', cursor: 'pointer',
               fontSize: '0.85rem', fontWeight: 600, transition: 'color 0.2s', flexShrink: 0
             }}
-            onMouseEnter={e => e.target.style.color = 'rgba(255,255,255,0.7)'}
-            onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.35)'}
+            onMouseEnter={e => e.target.style.color = 'var(--text-main)'}
+            onMouseLeave={e => e.target.style.color = 'var(--text-muted)'}
           >
             Reject Optional
           </button>
@@ -224,7 +224,7 @@ export default function CookieConsentBanner() {
 
 const secondaryBtnStyle = {
   flex: '1 1 140px', padding: '13px 24px',
-  background: 'rgba(255,255,255,0.06)', color: 'white',
-  border: '1px solid rgba(255,255,255,0.1)', borderRadius: '50px',
+  background: 'rgba(0,0,0,0.05)', color: 'var(--text-main)',
+  border: '1px solid rgba(0,0,0,0.1)', borderRadius: '50px',
   cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700, transition: 'all 0.2s',
 };

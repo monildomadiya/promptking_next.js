@@ -54,15 +54,15 @@ const Footer = ({ onLogoClick }) => {
         </div>
       )}
       <footer style={{
-      background: 'linear-gradient(to bottom, var(--surface-0), #000000)',
+      background: 'linear-gradient(to bottom, #ffffff, var(--surface-0))',
       position: 'relative',
       padding: isMobile ? '60px 20px 40px' : '100px 40px 40px',
       minHeight: isMobile ? '600px' : '400px',
-      color: 'white',
+      color: 'var(--text-main)',
       maxWidth: '1400px',
       margin: '0 auto',
       borderRadius: '32px 32px 0 0',
-      borderTop: '1px solid rgba(255,255,255,0.1)',
+      borderTop: '1px solid rgba(0,0,0,0.08)',
       paddingBottom: isMobile ? 'calc(var(--app-bottom-nav-height, 70px) + 20px)' : '40px',
       overflow: 'hidden'
     }}>
@@ -85,12 +85,12 @@ const Footer = ({ onLogoClick }) => {
         }}>
           {/* Brand Column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-            <Link href="/" onClick={onLogoClick} style={{ 
-              color: 'white', 
-              textDecoration: 'none', 
-              display: 'flex', 
+            <Link href="/" onClick={onLogoClick} style={{
+              color: 'var(--text-main)',
+              textDecoration: 'none',
+              display: 'flex',
               flexDirection: 'column',
-              alignItems: 'flex-start', 
+              alignItems: 'flex-start',
               gap: '8px'
             }}>
               <img 
@@ -98,19 +98,18 @@ const Footer = ({ onLogoClick }) => {
                 alt="PromptKing Logo" 
                 width="180"
                 height="55"
-                style={{ 
+                style={{
                   height: isMobile ? '45px' : '55px',
-                  width: 'auto', 
+                  width: 'auto',
                   objectFit: 'contain',
-                  filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.1))',
                   marginBottom: '4px'
-                }} 
+                }}
               />
-              <span style={{ 
-                fontSize: '1.8rem', 
-                fontWeight: 900, 
+              <span style={{
+                fontSize: '1.8rem',
+                fontWeight: 900,
                 letterSpacing: '-1.5px',
-                background: 'linear-gradient(to bottom, #fff, rgba(255,255,255,0.7))',
+                background: 'linear-gradient(to bottom, #14161a, rgba(20,22,26,0.7))',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent'
               }}>
@@ -166,24 +165,24 @@ const Footer = ({ onLogoClick }) => {
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '20px', lineHeight: 1.5 }}>
                   Expert tips sent straight to your inbox.
                 </p>
-                <div style={{ 
-                  position: 'relative', 
-                  background: 'rgba(255,255,255,0.03)', 
+                <div style={{
+                  position: 'relative',
+                  background: 'rgba(0,0,0,0.03)',
                   borderRadius: '50px',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(0,0,0,0.1)',
                   padding: '4px',
                   display: 'flex',
                   transition: '0.3s',
                 }} className="footer-input-wrapper">
-                  <input 
-                    type="email" 
-                    placeholder="Enter email..." 
+                  <input
+                    type="email"
+                    placeholder="Enter email..."
                     style={{
                       width: '100%',
                       padding: '12px 18px',
                       background: 'transparent',
                       border: 'none',
-                      color: 'white',
+                      color: 'var(--text-main)',
                       outline: 'none',
                       fontSize: '0.85rem'
                     }}
@@ -208,9 +207,9 @@ const Footer = ({ onLogoClick }) => {
           </div>
         </div>
 
-        <div style={{ 
-          paddingTop: '30px', 
-          borderTop: '1px solid rgba(255,255,255,0.05)', 
+        <div style={{
+          paddingTop: '30px',
+          borderTop: '1px solid rgba(0,0,0,0.07)',
           display: 'flex', 
           justifyContent: isMobile ? 'center' : 'space-between', 
           alignItems: 'center',
@@ -234,21 +233,21 @@ const Footer = ({ onLogoClick }) => {
 
       <style>{`
         .footer-input-wrapper:focus-within {
-          border-color: rgba(255,255,255,0.2) !important;
-          background: rgba(255,255,255,0.05) !important;
+          border-color: rgba(0,0,0,0.2) !important;
+          background: rgba(0,0,0,0.02) !important;
         }
         .footer-submit-btn:hover {
           transform: scale(0.95);
           box-shadow: 0 0 15px var(--accent-glow);
         }
         .social-link-icon:hover {
-          background: white !important;
-          color: black !important;
+          background: var(--accent-main) !important;
+          color: white !important;
           transform: translateY(-3px);
-          box-shadow: 0 5px 15px rgba(255,255,255,0.2);
+          box-shadow: 0 5px 15px rgba(229,9,20,0.25);
         }
         .footer-link-text:hover {
-          color: white !important;
+          color: var(--text-main) !important;
           transform: translateX(3px);
         }
       `}</style>
@@ -279,11 +278,11 @@ const columnTitleStyle = (isMobile) => ({
   letterSpacing: '1px',
   textTransform: 'uppercase',
   marginBottom: isMobile ? 0 : '30px',
-  color: 'white'
+  color: 'var(--text-main)'
 });
 
 const sectionWrapperStyle = (isMobile) => ({
-  borderBottom: isMobile ? '1px solid rgba(255,255,255,0.05)' : 'none',
+  borderBottom: isMobile ? '1px solid rgba(0,0,0,0.07)' : 'none',
   paddingBottom: isMobile ? '20px' : 0
 });
 

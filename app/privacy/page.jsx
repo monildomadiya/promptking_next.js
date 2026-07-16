@@ -48,7 +48,7 @@ export default function PrivacyPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div style={{ minHeight: '100vh', color: 'white', padding: '60px 20px', maxWidth: '900px', margin: '0 auto' }}>
+      <div style={{ minHeight: '100vh', color: 'var(--text-main)', padding: '60px 20px', maxWidth: '900px', margin: '0 auto' }}>
         
         {/* Header */}
         <header style={{ textAlign: 'center', marginBottom: '60px' }}>
@@ -64,18 +64,18 @@ export default function PrivacyPage() {
           <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4rem)', fontWeight: 900, marginBottom: '16px', letterSpacing: '-1px' }}>
             Privacy Policy
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '1rem' }}>
-            Last updated: <strong style={{ color: 'rgba(255,255,255,0.7)' }}>{lastUpdated}</strong>
+          <p style={{ color: 'var(--text-dim)', fontSize: '1rem' }}>
+            Last updated: <strong style={{ color: 'var(--text-secondary)' }}>{lastUpdated}</strong>
           </p>
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.95rem', marginTop: '10px' }}>
+          <p style={{ color: 'var(--text-dim)', fontSize: '0.95rem', marginTop: '10px' }}>
             Your privacy is our priority. This policy explains how PromptKing collects, uses, and protects your information.
           </p>
         </header>
 
         {/* Content Card */}
         <div style={{
-          background: 'rgba(255,255,255,0.02)', borderRadius: '32px',
-          border: '1px solid rgba(255,255,255,0.06)', padding: 'clamp(30px, 5vw, 60px)',
+          background: '#ffffff', borderRadius: '32px',
+          border: '1px solid rgba(0,0,0,0.07)', padding: 'clamp(30px, 5vw, 60px)',
           display: 'flex', flexDirection: 'column', gap: '50px'
         }}>
 
@@ -276,7 +276,7 @@ export default function PrivacyPage() {
             background: 'rgba(229, 9, 20, 0.05)', padding: '40px',
             borderRadius: '24px', border: '1px solid rgba(229, 9, 20, 0.15)'
           }}>
-            <h2 style={{ ...h2Style, color: 'white' }}>14. Contact Us</h2>
+            <h2 style={{ ...h2Style, color: 'var(--text-main)' }}>14. Contact Us</h2>
             <p style={pStyle}>
               If you have any questions about this Privacy Policy, please contact us:
             </p>
@@ -295,17 +295,17 @@ export default function PrivacyPage() {
 // Shared styles
 const h2Style = {
   fontSize: '1.4rem', fontWeight: 800, marginBottom: '16px',
-  color: 'white', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '12px'
+  color: 'var(--text-main)', borderBottom: '1px solid rgba(0,0,0,0.08)', paddingBottom: '12px'
 };
 const h3Style = {
-  fontSize: '1.1rem', fontWeight: 700, margin: '20px 0 10px', color: 'rgba(255,255,255,0.85)'
+  fontSize: '1.1rem', fontWeight: 700, margin: '20px 0 10px', color: 'var(--text-main)'
 };
 const pStyle = {
-  color: 'rgba(255,255,255,0.6)', fontSize: '1rem', lineHeight: 1.8, margin: 0
+  color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.8, margin: 0
 };
 const listStyle = {
   paddingLeft: '20px', margin: '12px 0',
-  color: 'rgba(255,255,255,0.6)', fontSize: '1rem', lineHeight: 2.0,
+  color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 2.0,
   display: 'flex', flexDirection: 'column', gap: '4px'
 };
 const linkStyle = {

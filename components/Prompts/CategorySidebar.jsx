@@ -56,9 +56,9 @@ const FilterItem = ({ label, value, icon: Icon, count, onClick, to, isActive, se
       justifyContent: 'space-between',
       padding: '10px 14px',
       borderRadius: '12px',
-      background: isActive ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
-      border: '1px solid ' + (isActive ? 'rgba(255, 255, 255, 0.1)' : 'transparent'),
-      color: isActive ? 'white' : 'var(--text-dim)',
+      background: isActive ? 'rgba(0, 0, 0, 0.05)' : 'transparent',
+      border: '1px solid ' + (isActive ? 'rgba(0, 0, 0, 0.1)' : 'transparent'),
+      color: isActive ? 'var(--text-main)' : 'var(--text-dim)',
       cursor: 'pointer',
       transition: 'all 0.2s ease',
       width: '100%',
@@ -67,8 +67,8 @@ const FilterItem = ({ label, value, icon: Icon, count, onClick, to, isActive, se
     }}
     onMouseOver={(e) => {
       if (!isActive) {
-        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
-        e.currentTarget.style.color = 'white';
+        e.currentTarget.style.background = 'rgba(0, 0, 0, 0.03)';
+        e.currentTarget.style.color = 'var(--text-main)';
       }
     }}
     onMouseOut={(e) => {
@@ -83,7 +83,7 @@ const FilterItem = ({ label, value, icon: Icon, count, onClick, to, isActive, se
         width: '18px',
         height: '18px',
         borderRadius: '50%',
-        border: '2px solid ' + (isActive ? 'var(--accent-main)' : 'rgba(255, 255, 255, 0.2)'),
+        border: '2px solid ' + (isActive ? 'var(--accent-main)' : 'rgba(0, 0, 0, 0.25)'),
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -101,7 +101,7 @@ const FilterItem = ({ label, value, icon: Icon, count, onClick, to, isActive, se
         fontSize: '0.75rem', 
         opacity: isActive ? 1 : 0.5,
         fontWeight: 600,
-        background: 'rgba(255, 255, 255, 0.05)',
+        background: 'rgba(0, 0, 0, 0.06)',
         padding: '2px 8px',
         borderRadius: '100px'
       }}>
@@ -132,11 +132,11 @@ const CategorySidebar = ({ filter, setFilter, counts = {}, categories = [] }) =>
     <div className="category-sidebar ecommerce-filter-ui" style={{ 
       padding: '24px', 
       borderRadius: '28px',
-      background: 'rgba(15, 15, 15, 0.6)',
+      background: 'rgba(255, 255, 255, 0.85)',
       backdropFilter: 'blur(30px)',
-      border: '1px solid rgba(255, 255, 255, 0.08)',
+      border: '1px solid rgba(0, 0, 0, 0.08)',
       minWidth: '280px',
-      boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+      boxShadow: '0 20px 60px rgba(17,24,39,0.1)',
     }}>
       {/* Search Header */}
       <div style={{ marginBottom: '25px' }}>
@@ -146,7 +146,7 @@ const CategorySidebar = ({ filter, setFilter, counts = {}, categories = [] }) =>
           justifyContent: 'space-between',
           marginBottom: '16px'
         }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'white', margin: 0 }}>Filter</h3>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>Filter</h3>
           {filter !== 'all' && (
             <Link 
               href="/"
@@ -188,17 +188,17 @@ const CategorySidebar = ({ filter, setFilter, counts = {}, categories = [] }) =>
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
               width: '100%',
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 255, 255, 0.05)',
+              background: 'rgba(0, 0, 0, 0.03)',
+              border: '1px solid rgba(0, 0, 0, 0.1)',
               borderRadius: '12px',
               padding: '12px 14px 12px 42px',
-              color: 'white',
+              color: 'var(--text-main)',
               fontSize: '0.85rem',
               outline: 'none',
               transition: 'all 0.3s ease'
             }}
-            onFocus={(e) => e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.15)'}
-            onBlur={(e) => e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.05)'}
+            onFocus={(e) => e.currentTarget.style.border = '1px solid rgba(0, 0, 0, 0.2)'}
+            onBlur={(e) => e.currentTarget.style.border = '1px solid rgba(0, 0, 0, 0.1)'}
           />
           {searchTerm && (
             <X 
@@ -268,9 +268,9 @@ const CategorySidebar = ({ filter, setFilter, counts = {}, categories = [] }) =>
 
       {/* Footer Info */}
       <div style={{ 
-        marginTop: '20px', 
-        paddingTop: '20px', 
-        borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+        marginTop: '20px',
+        paddingTop: '20px',
+        borderTop: '1px solid rgba(0, 0, 0, 0.07)',
         display: 'flex',
         alignItems: 'center',
         gap: '12px'

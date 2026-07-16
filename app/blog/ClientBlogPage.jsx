@@ -110,16 +110,16 @@ const ClientBlogPage = ({ initialBlogs = [] }) => {
       />
       <div className="main-content-area">
         <header className="blog-hero">
-          <div style={{ 
-            display: 'inline-block', 
-            padding: '8px 20px', 
-            background: 'rgba(255,255,255,0.05)', 
-            borderRadius: '100px', 
-            fontSize: '0.85rem', 
-            fontWeight: 600, 
+          <div style={{
+            display: 'inline-block',
+            padding: '8px 20px',
+            background: 'rgba(229,9,20,0.08)',
+            borderRadius: '100px',
+            fontSize: '0.85rem',
+            fontWeight: 600,
             color: 'var(--accent-main)',
             marginBottom: '20px',
-            border: '1px solid rgba(255,255,255,0.1)'
+            border: '1px solid rgba(229,9,20,0.2)'
           }}>
             INSIGHTS & UPDATES
           </div>
@@ -128,15 +128,15 @@ const ClientBlogPage = ({ initialBlogs = [] }) => {
         </header>
 
         {blogs.length === 0 ? (
-          <div style={{ 
-            textAlign: 'center', 
-            padding: '100px 40px', 
-            background: 'rgba(255,255,255,0.03)', 
+          <div style={{
+            textAlign: 'center',
+            padding: '100px 40px',
+            background: '#ffffff',
             backdropFilter: 'blur(15px)',
-            borderRadius: '32px', 
-            border: '1px solid rgba(255,255,255,0.08)' 
+            borderRadius: '32px',
+            border: '1px solid rgba(0,0,0,0.08)'
           }}>
-            <h2 style={{ fontSize: '1.5rem', marginBottom: '10px', color: 'white' }}>No articles yet</h2>
+            <h2 style={{ fontSize: '1.5rem', marginBottom: '10px', color: 'var(--text-main)' }}>No articles yet</h2>
             <p style={{ color: 'var(--text-secondary)' }}>We're currently crafting some amazing content for you. Check back soon!</p>
           </div>
         ) : (
@@ -155,12 +155,13 @@ const ClientBlogPage = ({ initialBlogs = [] }) => {
                       position: 'absolute', 
                       top: '20px', 
                       right: '20px', 
-                      background: 'rgba(0,0,0,0.6)', 
+                      background: 'rgba(0,0,0,0.6)',
                       backdropFilter: 'blur(10px)',
                       padding: '6px 14px',
                       borderRadius: '10px',
                       fontSize: '0.75rem',
                       fontWeight: 600,
+                      color: 'white',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '6px'

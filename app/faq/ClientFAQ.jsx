@@ -124,12 +124,12 @@ const ClientFAQ = ({ initialFaqs }) => {
             variants={itemVariants}
             style={{ 
               display: 'inline-flex', padding: '16px', borderRadius: '24px', 
-              background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)',
+              background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.07)',
               color: 'var(--accent-main)', marginBottom: '25px', position: 'relative', zIndex: 1
             }}>
             <MessageSquare size={36} />
           </motion.div>
-          <motion.h1 variants={itemVariants} style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1.5px', fontFamily: 'var(--font-heading)', position: 'relative', zIndex: 1, textShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
+          <motion.h1 variants={itemVariants} style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1.5px', fontFamily: 'var(--font-heading)', position: 'relative', zIndex: 1, textShadow: '0 10px 30px rgba(17,24,39,0.08)' }}>
             Knowledge Base
           </motion.h1>
           <motion.p variants={itemVariants} style={{ color: 'var(--text-secondary)', fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto 40px', position: 'relative', zIndex: 1, lineHeight: 1.6 }}>
@@ -154,10 +154,10 @@ const ClientFAQ = ({ initialFaqs }) => {
         {categories.map(cat => (
           <motion.section variants={itemVariants} key={cat} style={{ marginBottom: '60px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' }}>
-              <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: 'white', whiteSpace: 'nowrap' }}>
+              <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--text-main)', whiteSpace: 'nowrap' }}>
                 {cat}
               </h2>
-              <div style={{ height: '1px', background: 'linear-gradient(90deg, rgba(255,255,255,0.1), transparent)', width: '100%' }} />
+              <div style={{ height: '1px', background: 'linear-gradient(90deg, rgba(0,0,0,0.1), transparent)', width: '100%' }} />
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -171,9 +171,9 @@ const ClientFAQ = ({ initialFaqs }) => {
                     style={{ 
                       borderRadius: '24px', 
                       overflow: 'hidden',
-                      background: isOpen ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)',
-                      border: `1px solid ${isOpen ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)'}`,
-                      boxShadow: isOpen ? '0 20px 40px rgba(0,0,0,0.2)' : 'none',
+                      background: isOpen ? '#ffffff' : 'rgba(0,0,0,0.02)',
+                      border: `1px solid ${isOpen ? 'rgba(0,0,0,0.12)' : 'rgba(0,0,0,0.07)'}`,
+                      boxShadow: isOpen ? '0 20px 40px rgba(17,24,39,0.1)' : 'none',
                       transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
                     }}
                   >
@@ -185,7 +185,7 @@ const ClientFAQ = ({ initialFaqs }) => {
                         gap: '20px'
                       }}
                     >
-                      <span style={{ fontSize: '1.2rem', fontWeight: 700, color: isOpen ? 'white' : 'var(--text-main)', lineHeight: 1.4 }}>
+                      <span style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-main)', lineHeight: 1.4 }}>
                         {faq.question}
                       </span>
                       <motion.div 
@@ -193,7 +193,7 @@ const ClientFAQ = ({ initialFaqs }) => {
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                         style={{ 
                           width: '40px', height: '40px', borderRadius: '50%', 
-                          background: isOpen ? 'var(--accent-main)' : 'rgba(255,255,255,0.05)',
+                          background: isOpen ? 'var(--accent-main)' : 'rgba(0,0,0,0.05)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           flexShrink: 0, color: isOpen ? 'white' : 'var(--text-dim)'
                         }}
@@ -231,8 +231,8 @@ const ClientFAQ = ({ initialFaqs }) => {
         ))}
         
         {filteredFaqs.length === 0 && (
-          <motion.div variants={itemVariants} style={{ textAlign: 'center', padding: '60px', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px dashed rgba(255,255,255,0.1)' }}>
-            <HelpCircle size={48} style={{ opacity: 0.2, margin: '0 auto 20px', color: 'white' }} />
+          <motion.div variants={itemVariants} style={{ textAlign: 'center', padding: '60px', background: 'rgba(0,0,0,0.02)', borderRadius: '24px', border: '1px dashed rgba(0,0,0,0.12)' }}>
+            <HelpCircle size={48} style={{ opacity: 0.2, margin: '0 auto 20px', color: 'var(--text-main)' }} />
             <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '10px' }}>No Results Found</h3>
             <p style={{ color: 'var(--text-dim)' }}>Try adjusting your search terms.</p>
           </motion.div>

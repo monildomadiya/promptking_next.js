@@ -42,13 +42,13 @@ const ClientContactPage = () => {
           <div style={{ 
             display: 'inline-block', 
             padding: '8px 20px', 
-            background: 'rgba(255,255,255,0.05)', 
-            borderRadius: '100px', 
-            fontSize: '0.85rem', 
-            fontWeight: 600, 
+            background: 'rgba(0,0,0,0.04)',
+            borderRadius: '100px',
+            fontSize: '0.85rem',
+            fontWeight: 600,
             color: 'var(--accent-main)',
             marginBottom: '20px',
-            border: '1px solid rgba(255,255,255,0.1)'
+            border: '1px solid rgba(0,0,0,0.1)'
           }}>
             GET IN TOUCH
           </div>
@@ -59,7 +59,7 @@ const ClientContactPage = () => {
         <div className="contact-grid-container">
           {/* Contact Info */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div className="glass-card" style={{ padding: '30px', borderRadius: '30px', background: 'rgba(255,255,255,0.02)' }}>
+            <div className="glass-card" style={{ padding: '30px', borderRadius: '30px', background: '#ffffff' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
                 <div style={{ padding: '10px', borderRadius: '12px', background: 'rgba(229, 9, 20, 0.1)', color: 'var(--accent-main)' }}>
                   <Mail size={24} />
@@ -67,10 +67,10 @@ const ClientContactPage = () => {
                 <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Email Us</h3>
               </div>
               <p style={{ color: 'var(--text-dim)', fontSize: '0.95rem', marginBottom: '10px' }}>For support &amp; collaboration inquiries:</p>
-              <a href="mailto:promptking.in@gmail.com" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '1.1rem', wordBreak: 'break-all' }}>promptking.in@gmail.com</a>
+              <a href="mailto:promptking.in@gmail.com" style={{ color: 'var(--text-main)', textDecoration: 'none', fontWeight: 700, fontSize: '1.1rem', wordBreak: 'break-all' }}>promptking.in@gmail.com</a>
             </div>
 
-            <div className="glass-card" style={{ padding: '30px', borderRadius: '30px', background: 'rgba(255,255,255,0.02)' }}>
+            <div className="glass-card" style={{ padding: '30px', borderRadius: '30px', background: '#ffffff' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
                 <div style={{ padding: '10px', borderRadius: '12px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
                   <MessageCircle size={24} />
@@ -78,9 +78,9 @@ const ClientContactPage = () => {
                 <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Social Connect</h3>
               </div>
               <div style={{ display: 'flex', gap: '15px' }}>
-                <a href="#" style={{ padding: '10px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', color: 'white' }}><Instagram size={20} /></a>
-                <a href="#" style={{ padding: '10px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', color: 'white' }}><Youtube size={20} /></a>
-                <a href="#" style={{ padding: '10px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', color: 'white' }}><Twitter size={20} /></a>
+                <a href="#" style={{ padding: '10px', borderRadius: '12px', background: 'rgba(0,0,0,0.05)', color: 'var(--text-main)' }}><Instagram size={20} /></a>
+                <a href="#" style={{ padding: '10px', borderRadius: '12px', background: 'rgba(0,0,0,0.05)', color: 'var(--text-main)' }}><Youtube size={20} /></a>
+                <a href="#" style={{ padding: '10px', borderRadius: '12px', background: 'rgba(0,0,0,0.05)', color: 'var(--text-main)' }}><Twitter size={20} /></a>
               </div>
             </div>
           </div>
@@ -89,7 +89,7 @@ const ClientContactPage = () => {
           <div className="glass-card" style={{ 
             padding: '50px', 
             borderRadius: '40px', 
-            background: 'rgba(255, 255, 255, 0.03)',
+            background: '#ffffff',
             border: '1px solid var(--border-color)',
             position: 'relative',
             overflow: 'hidden'
@@ -125,7 +125,7 @@ const ClientContactPage = () => {
                 </div>
                 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: '10px' }}>Full Name</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '10px' }}>Full Name</label>
                   <input 
                     type="text" 
                     required 
@@ -133,12 +133,12 @@ const ClientContactPage = () => {
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     placeholder="Enter your name"
-                    style={{ width: '100%', padding: '16px', borderRadius: '15px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }} 
+                    style={{ width: '100%', padding: '16px', borderRadius: '15px', background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.1)' }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: '10px' }}>Email Address</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '10px' }}>Email Address</label>
                   <input 
                     type="email" 
                     required 
@@ -146,12 +146,12 @@ const ClientContactPage = () => {
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                     placeholder="hello@example.com"
-                    style={{ width: '100%', padding: '16px', borderRadius: '15px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }} 
+                    style={{ width: '100%', padding: '16px', borderRadius: '15px', background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.1)' }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: '10px' }}>Message</label>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '10px' }}>Message</label>
                   <textarea 
                     required 
                     rows="5"
@@ -159,7 +159,7 @@ const ClientContactPage = () => {
                     value={formData.message}
                     onChange={(e) => setFormData({...formData, message: e.target.value})}
                     placeholder="Tell us what's on your mind..."
-                    style={{ width: '100%', padding: '16px', borderRadius: '15px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', resize: 'none' }} 
+                    style={{ width: '100%', padding: '16px', borderRadius: '15px', background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.1)', resize: 'none' }}
                   ></textarea>
                 </div>
 

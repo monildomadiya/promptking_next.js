@@ -33,7 +33,7 @@ const BlogSection = () => {
 
   if (loading) {
     return (
-      <section style={{ padding: '80px 20px', background: 'rgba(255,255,255,0.02)', borderTop: '1px solid var(--border-color)' }}>
+      <section style={{ padding: '80px 20px', background: 'var(--surface-2)', borderTop: '1px solid var(--border-color)' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}>
             <div>
@@ -43,7 +43,7 @@ const BlogSection = () => {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '30px' }}>
             {[1, 2, 3].map(i => (
-              <div key={i} style={{ background: 'rgba(255, 255, 255, 0.03)', borderRadius: '24px', overflow: 'hidden', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+              <div key={i} style={{ background: '#ffffff', borderRadius: '24px', overflow: 'hidden', border: '1px solid rgba(0, 0, 0, 0.1)' }}>
                 <Shimmer height="220px" />
                 <div style={{ padding: '30px' }}>
                   <Shimmer height="24px" style={{ marginBottom: '15px' }} />
@@ -61,7 +61,7 @@ const BlogSection = () => {
   if (blogs.length === 0) return null;
 
   return (
-    <section style={{ padding: '80px 20px', background: 'rgba(255,255,255,0.02)', borderTop: '1px solid var(--border-color)' }}>
+    <section style={{ padding: '80px 20px', background: 'var(--surface-2)', borderTop: '1px solid var(--border-color)' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}>
           <div>
@@ -97,14 +97,14 @@ const BlogSection = () => {
               transition: '0.4s'
             }} className="blog-card-home">
               <div style={{ height: '220px', overflow: 'hidden' }}>
-                <img src={optimizeImage(blog.featured_image || 'https://via.placeholder.com/600x400/111/444?text=PromptKing+Blog', 600)} alt={blog.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: '0.5s' }} className="blog-img" />
+                <img src={optimizeImage(blog.featured_image || 'https://via.placeholder.com/600x400/eeeeee/999999?text=PromptKing+Blog', 600)} alt={blog.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: '0.5s' }} className="blog-img" />
               </div>
               <div style={{ padding: '30px' }}>
                 <h3 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '15px', lineHeight: 1.3 }}>{blog.title}</h3>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '20px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   {blog.content ? blog.content.replace(/<[^>]*>?/gm, '') : ''}
                 </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, color: 'white', fontSize: '0.9rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, color: 'var(--text-main)', fontSize: '0.9rem' }}>
                   Read More <ArrowRight size={16} />
                 </div>
               </div>
@@ -114,7 +114,7 @@ const BlogSection = () => {
       </div>
       <style>{`
         @media (hover: hover) {
-          .blog-card-home:hover { transform: translateY(-10px); border-color: var(--accent-main); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+          .blog-card-home:hover { transform: translateY(-10px); border-color: var(--accent-main); box-shadow: 0 20px 40px rgba(17,24,39,0.15); }
           .blog-card-home:hover .blog-img { transform: scale(1.05); }
           .view-all-btn:hover { background: var(--accent-main); color: white; transform: translateX(5px); }
         }

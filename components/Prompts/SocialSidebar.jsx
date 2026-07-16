@@ -82,7 +82,7 @@ const SocialSidebar = () => {
                 margin: 0,
                 fontSize: '0.85rem',
                 fontWeight: 800,
-                color: 'white',
+                color: 'var(--text-main)',
                 textTransform: 'uppercase',
                 letterSpacing: '2px',
                 whiteSpace: 'nowrap',

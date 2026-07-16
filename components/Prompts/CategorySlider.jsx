@@ -46,7 +46,7 @@ const CategorySlider = ({ initialCategories = [] }) => {
 
   return (
     <div style={{ padding: '0 20px', maxWidth: '1400px', margin: '40px auto 20px' }}>
-      <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '20px', letterSpacing: '-0.5px', color: 'white' }}>
+      <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '20px', letterSpacing: '-0.5px', color: 'var(--text-main)' }}>
         Browse by Category
       </h2>
       <div className="hide-scrollbar category-slider-container">
@@ -61,9 +61,9 @@ const CategorySlider = ({ initialCategories = [] }) => {
               position: 'relative',
               overflow: 'hidden',
               scrollSnapAlign: 'start',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              background: 'rgba(255, 255, 255, 0.02)',
+              boxShadow: '0 10px 30px rgba(17,24,39,0.12)',
+              border: '1px solid rgba(0,0,0,0.1)',
+              background: 'rgba(0, 0, 0, 0.02)',
               backdropFilter: 'blur(15px)',
               WebkitBackdropFilter: 'blur(15px)',
             }}

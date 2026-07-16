@@ -88,7 +88,7 @@ export default async function CategoryPage({ params }) {
 
   if (!category) {
     return (
-      <div style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+      <div style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-main)' }}>
         <h2>Category Not Found</h2>
         <Link href="/" style={{ marginTop: '20px', color: 'var(--accent-main)' }}>Return to Home</Link>
       </div>
@@ -104,7 +104,7 @@ export default async function CategoryPage({ params }) {
   };
 
   return (
-    <main style={{ minHeight: '100vh', padding: '40px 20px', color: 'white', maxWidth: '1400px', margin: '0 auto' }}>
+    <main style={{ minHeight: '100vh', padding: '40px 20px', color: 'var(--text-main)', maxWidth: '1400px', margin: '0 auto' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* Category Header */}
@@ -114,9 +114,9 @@ export default async function CategoryPage({ params }) {
           padding: 60px 40px;
           border-radius: 32px;
           margin-bottom: 50px;
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.05);
-          box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+          background: #ffffff;
+          border: 1px solid rgba(0, 0, 0, 0.07);
+          box-shadow: 0 30px 60px rgba(17,24,39,0.1);
           overflow: hidden;
           display: flex;
           align-items: center;
@@ -129,8 +129,9 @@ export default async function CategoryPage({ params }) {
           font-weight: 900;
           margin-bottom: 20px;
           letter-spacing: -1.5px;
-          background: linear-gradient(to right, #fff, rgba(255,255,255,0.6));
+          background: linear-gradient(to right, #14161a, #4a4e55);
           -webkit-background-clip: text;
+          background-clip: text;
           -webkit-text-fill-color: transparent;
           line-height: 1.1;
         }
@@ -180,7 +181,7 @@ export default async function CategoryPage({ params }) {
                 {category.tag}
               </span>
             )}
-            <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>
               Collection
             </span>
           </div>
@@ -190,18 +191,18 @@ export default async function CategoryPage({ params }) {
           </h1>
           
           {category.description && category.description.toLowerCase() !== category.name.toLowerCase() && category.description.toLowerCase() !== category.tag?.toLowerCase() && (
-            <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.6)', maxWidth: '650px', lineHeight: '1.6', margin: 0 }}>
+            <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', maxWidth: '650px', lineHeight: '1.6', margin: 0 }}>
               {category.description}
             </p>
           )}
         </div>
 
         <div className="stat-box-container">
-          <div style={{ background: 'rgba(0,0,0,0.3)', padding: '20px', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)', textAlign: 'center', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
-            <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'white', marginBottom: '5px', lineHeight: 1 }}>
+          <div style={{ background: 'rgba(0,0,0,0.04)', padding: '20px', borderRadius: '24px', border: '1px solid rgba(0,0,0,0.07)', textAlign: 'center', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
+            <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '5px', lineHeight: 1 }}>
               {prompts.length}
             </div>
-            <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: 800 }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: 800 }}>
               Prompts
             </div>
           </div>
@@ -210,7 +211,7 @@ export default async function CategoryPage({ params }) {
 
       {/* Prompts Grid */}
       <div>
-        <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '30px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '15px' }}>
+        <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '30px', borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: '15px' }}>
           Explore Prompts ({prompts.length})
         </h2>
         
@@ -226,7 +227,7 @@ export default async function CategoryPage({ params }) {
             ))}
           </div>
         ) : (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: 'rgba(255,255,255,0.4)' }}>
+          <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
             <p style={{ fontSize: '1.2rem' }}>No prompts found in this category yet.</p>
           </div>
         )}

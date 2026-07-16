@@ -165,10 +165,10 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
         <div className="css-masonry-grid">
           {Array.from({ length: skeletonCount }).map((_, i) => (
             <div key={i} style={{
-              background: 'rgba(255,255,255,0.03)',
+              background: '#ffffff',
               borderRadius: '24px',
               padding: '18px',
-              border: '1px solid rgba(255,255,255,0.08)'
+              border: '1px solid rgba(0,0,0,0.08)'
             }}>
               <Shimmer height={isMobile ? '140px' : '180px'} borderRadius="16px 16px 0 0" style={{ margin: '-18px -18px 15px -18px', width: 'calc(100% + 36px)' }} />
               <Shimmer height="18px" width="65%" style={{ marginBottom: '10px' }} />
@@ -188,12 +188,12 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
       {isRevalidating && (
         <div style={{
           position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999,
-          background: 'rgba(15,15,15,0.9)', backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(0,0,0,0.08)',
           borderRadius: '30px', padding: '6px 14px',
           display: 'flex', alignItems: 'center', gap: '8px',
-          fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', fontWeight: 600,
-          boxShadow: '0 4px 20px rgba(0,0,0,0.4)'
+          fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600,
+          boxShadow: '0 4px 20px rgba(17,24,39,0.12)'
         }}>
           <div style={{
             width: '7px', height: '7px', borderRadius: '50%',
@@ -232,9 +232,9 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
                 style={{
                   margin: 0,
                   width: '100%',
-                  background: 'rgba(255,255,255,0.02)',
+                  background: 'rgba(0,0,0,0.02)',
                   borderRadius: '24px',
-                  border: '1px solid rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(0,0,0,0.06)',
                 }}
               />
             )}
@@ -249,9 +249,9 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
             onClick={() => goToPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
             style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: currentPage === 1 ? 'rgba(255,255,255,0.3)' : 'white',
+              background: 'rgba(0,0,0,0.04)',
+              border: '1px solid rgba(0,0,0,0.1)',
+              color: currentPage === 1 ? 'var(--text-muted)' : 'var(--text-main)',
               padding: '8px 18px', borderRadius: '12px', fontWeight: 600,
               cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
               fontSize: isMobile ? '0.8rem' : '0.9rem',
@@ -267,15 +267,15 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
             }, [])
             .map((item, i) =>
               item === '…' ? (
-                <span key={`dots-${i}`} style={{ color: 'rgba(255,255,255,0.4)', padding: '0 4px' }}>…</span>
+                <span key={`dots-${i}`} style={{ color: 'var(--text-muted)', padding: '0 4px' }}>…</span>
               ) : (
                 <button
                   key={item}
                   onClick={() => goToPage(item)}
                   style={{
-                    background: currentPage === item ? 'var(--accent-main)' : 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    color: 'white',
+                    background: currentPage === item ? 'var(--accent-main)' : 'rgba(0,0,0,0.04)',
+                    border: currentPage === item ? '1px solid var(--accent-main)' : '1px solid rgba(0,0,0,0.1)',
+                    color: currentPage === item ? 'white' : 'var(--text-main)',
                     padding: '8px 14px', borderRadius: '10px', fontWeight: 700,
                     cursor: 'pointer',
                     boxShadow: currentPage === item ? '0 0 14px rgba(229,9,20,0.4)' : 'none',
@@ -291,9 +291,9 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
             onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
             style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: currentPage === totalPages ? 'rgba(255,255,255,0.3)' : 'white',
+              background: 'rgba(0,0,0,0.04)',
+              border: '1px solid rgba(0,0,0,0.1)',
+              color: currentPage === totalPages ? 'var(--text-muted)' : 'var(--text-main)',
               padding: '8px 18px', borderRadius: '12px', fontWeight: 600,
               cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
               fontSize: isMobile ? '0.8rem' : '0.9rem',

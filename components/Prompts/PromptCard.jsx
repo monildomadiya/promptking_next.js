@@ -64,8 +64,8 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
   const aiType = prompt.aiType || '';
   const brandColor = aiType.toLowerCase().includes('chatgpt') ? '#10a37f' :
                     aiType.toLowerCase().includes('gemini') ? '#4285f4' :
-                    aiType.toLowerCase().includes('midjourney') ? '#a855f7' : 
-                    'rgba(255,255,255,0.4)';
+                    aiType.toLowerCase().includes('midjourney') ? '#a855f7' :
+                    'rgba(0,0,0,0.4)';
 
   const handleSliderDragStart = useCallback((e) => {
     e.preventDefault();
@@ -225,20 +225,20 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
     return (
       <Link href={`/prompt/${prompt.slug || prompt.prompt_key || prompt.key}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
         <div className="listicle-card pro-card-hover glass-card" style={{
-          background: 'rgba(255, 255, 255, 0.03)',
+          background: '#ffffff',
           backdropFilter: 'blur(15px)',
           WebkitBackdropFilter: 'blur(15px)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          border: '1px solid rgba(0, 0, 0, 0.08)',
           borderRadius: '24px',
           overflow: 'hidden',
           transition: 'all 0.4s ease-in-out',
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
+          boxShadow: '0 10px 30px rgba(17,24,39,0.08)'
         }}>
           {/* 1200x628 Aspect Ratio Image */}
-          <div style={{ width: '100%', aspectRatio: '1200 / 628', background: '#111', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ width: '100%', aspectRatio: '1200 / 628', background: '#e8eaee', position: 'relative', overflow: 'hidden' }}>
             <img 
               src={optimizeImage(prompt.thumbnail_url || prompt.imgAfter || prompt.img_after || prompt.imgBefore || prompt.img_before, 600)} 
               alt={prompt.title} 
@@ -256,12 +256,12 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
           
           {/* Content */}
           <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-            <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '12px', lineHeight: 1.3, color: 'white' }}>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '12px', lineHeight: 1.3, color: 'var(--text-main)' }}>
               {prompt.title}
             </h3>
             {/* Excerpt if description exists */}
             {prompt.description && (
-              <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.6)', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0, lineHeight: 1.6 }}>
+              <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0, lineHeight: 1.6 }}>
                 {prompt.description.replace(/<[^>]*>?/gm, '')}
               </p>
             )}
@@ -276,10 +276,10 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
 
   return (
     <div ref={cardRef} className="pro-card pro-card-hover masonry-grid-item glass-card" style={{
-      background: 'rgba(255, 255, 255, 0.03)',
+      background: '#ffffff',
       backdropFilter: 'blur(15px)',
       WebkitBackdropFilter: 'blur(15px)',
-      border: isHighlighted ? '2px solid var(--accent-main)' : '1px solid rgba(255, 255, 255, 0.1)',
+      border: isHighlighted ? '2px solid var(--accent-main)' : '1px solid rgba(0, 0, 0, 0.1)',
       borderRadius: '24px',
       padding: `${cardPadding}px`,
       zIndex: isHighlighted ? 10 : 1,
@@ -348,7 +348,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
           <div ref={sliderContainerRef} className="slider-container prompt-image-container" style={{ 
             aspectRatio: ratio, width: '100%', margin: `0 0 15px 0`,
             position: 'relative', overflow: 'hidden', borderBottom: '1px solid var(--border-color)',
-            background: '#111',
+            background: '#e8eaee',
             opacity: isSettingsLoaded ? 1 : 0,
             transition: 'opacity 0.3s ease-in-out'
           }}>
@@ -433,7 +433,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
 
           </div>
         ) : (prompt.thumbnail_url || prompt.imgAfter || prompt.img_after || prompt.imgBefore || prompt.img_before) && (
-          <div className="prompt-image-container" style={{ width: '100%', margin: `0 0 15px 0`, aspectRatio: ratio, background: '#111', overflow: 'hidden', position: 'relative' }}>
+          <div className="prompt-image-container" style={{ width: '100%', margin: `0 0 15px 0`, aspectRatio: ratio, background: '#e8eaee', overflow: 'hidden', position: 'relative' }}>
             <img 
               src={optimizeImage(prompt.thumbnail_url || prompt.imgAfter || prompt.img_after || prompt.imgBefore || prompt.img_before, isMobile ? 450 : 600)} 
               alt={`${prompt.title} - ${prompt.aiType || 'AI'} Prompt Example`} 
@@ -452,17 +452,17 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
         {/* Header Info */}
         <Link href={`/prompt/${prompt.slug || prompt.prompt_key || prompt.key}`} style={{ color: 'inherit', textDecoration: 'none', display: 'block', padding: `0 ${cardPadding}px` }}>
           {prompt.isFeatured && (
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(229, 9, 20, 0.1)', border: '1px solid rgba(229, 9, 20, 0.3)', color: '#ff4d4d', padding: '2px 8px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>
-              <Star size={10} fill="#ff4d4d" color="#ff4d4d" />
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(229, 9, 20, 0.1)', border: '1px solid rgba(229, 9, 20, 0.3)', color: 'var(--accent-main)', padding: '2px 8px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>
+              <Star size={10} fill="var(--accent-main)" color="var(--accent-main)" />
               Featured
             </div>
           )}
-          <h3 style={{ 
-            fontSize: '1rem', 
-            fontWeight: 500, 
-            marginBottom: '8px', 
+          <h3 style={{
+            fontSize: '1rem',
+            fontWeight: 500,
+            marginBottom: '8px',
             lineHeight: 1.4,
-            color: 'rgba(255, 255, 255, 0.9)',
+            color: 'rgba(20, 22, 26, 0.92)',
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',

@@ -61,8 +61,8 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
         {!categorySlug && (
           <div style={{
             position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-            width: '100%', maxWidth: '800px', height: '100%', minHeight: '150px', 
-            background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0) 70%)',
+            width: '100%', maxWidth: '800px', height: '100%', minHeight: '150px',
+            background: 'radial-gradient(ellipse at center, rgba(229,9,20,0.06) 0%, rgba(255,255,255,0) 70%)',
             zIndex: -1, pointerEvents: 'none', filter: 'blur(30px)'
           }}></div>
         )}
@@ -107,11 +107,11 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  background: 'rgba(255,255,255,0.1)',
+                  background: 'rgba(0,0,0,0.08)',
                   borderRadius: '50%'
                 }}
               >
-                <X size={16} style={{ color: 'white' }} />
+                <X size={16} style={{ color: 'var(--text-secondary)' }} />
               </div>
             )}
           </div>
@@ -124,9 +124,9 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
               className="pro-card-hover home-search-btn-pro"
               title="Premium Prompts"
               style={{ 
-                background: filter === 'premium' ? 'rgba(255, 193, 7, 0.15)' : 'rgba(255,255,255,0.03)',
-                border: filter === 'premium' ? '1px solid rgba(255, 193, 7, 0.4)' : '1px solid rgba(255,255,255,0.08)',
-                color: filter === 'premium' ? '#FFC107' : 'rgba(255,255,255,0.8)'
+                background: filter === 'premium' ? 'rgba(255, 193, 7, 0.15)' : 'rgba(0,0,0,0.03)',
+                border: filter === 'premium' ? '1px solid rgba(255, 193, 7, 0.4)' : '1px solid rgba(0,0,0,0.1)',
+                color: filter === 'premium' ? '#b8860b' : 'rgba(20,22,26,0.8)'
               }}
             >
               <Crown size={18} fill={filter === 'premium' ? '#FFC107' : 'none'} style={{ display: 'block' }} />
@@ -173,8 +173,8 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
               50% { transform: translateY(-14px); }
             }
             .pk-feat-card {
-              background: rgba(255,255,255,0.025);
-              border: 1px solid rgba(255,255,255,0.07);
+              background: #ffffff;
+              border: 1px solid rgba(0,0,0,0.08);
               border-radius: 20px;
               padding: 26px 24px;
               display: flex;
@@ -183,6 +183,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
               transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
               position: relative;
               overflow: hidden;
+              box-shadow: 0 2px 12px rgba(17,24,39,0.04);
             }
             .pk-feat-card::after {
               content: '';
@@ -196,7 +197,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
             .pk-feat-card:hover {
               border-color: rgba(229,9,20,0.35);
               transform: translateY(-3px);
-              box-shadow: 0 16px 40px rgba(0,0,0,0.35), 0 0 0 1px rgba(229,9,20,0.12);
+              box-shadow: 0 16px 40px rgba(17,24,39,0.12), 0 0 0 1px rgba(229,9,20,0.12);
             }
             .pk-feat-card:hover::after { opacity: 1; }
             .pk-icon-box {
@@ -213,8 +214,8 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
             .pk-stat-box {
               flex: 1;
               min-width: 130px;
-              background: rgba(255,255,255,0.025);
-              border: 1px solid rgba(255,255,255,0.07);
+              background: #ffffff;
+              border: 1px solid rgba(0,0,0,0.08);
               border-radius: 18px;
               padding: 24px 16px;
               text-align: center;
@@ -230,17 +231,17 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
               gap: 7px;
               padding: 9px 16px;
               border-radius: 50px;
-              background: rgba(255,255,255,0.04);
-              border: 1px solid rgba(255,255,255,0.09);
+              background: rgba(0,0,0,0.04);
+              border: 1px solid rgba(0,0,0,0.1);
               font-size: 0.82rem;
               font-weight: 700;
-              color: rgba(255,255,255,0.7);
+              color: rgba(20,22,26,0.7);
               transition: all 0.22s ease;
             }
             .pk-ai-pill:hover {
-              background: rgba(255,255,255,0.09);
-              border-color: rgba(255,255,255,0.2);
-              color: #fff;
+              background: rgba(0,0,0,0.07);
+              border-color: rgba(0,0,0,0.2);
+              color: var(--text-main);
               transform: translateY(-2px);
             }
           `}</style>
@@ -266,11 +267,11 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
             <h2 style={{
               fontSize: 'clamp(1.9rem, 4.5vw, 3rem)', fontWeight: 900,
               letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '14px',
-              color: '#ffffff',
+              color: 'var(--text-main)',
             }}>
               Built for serious AI users
             </h2>
-            <p style={{ color: 'rgba(255,255,255,0.42)', fontSize: '1rem', maxWidth: '480px', margin: '0 auto', lineHeight: 1.7 }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', maxWidth: '480px', margin: '0 auto', lineHeight: 1.7 }}>
               Every feature is designed to save your time and get you better results from every AI tool.
             </p>
           </div>
@@ -332,8 +333,8 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
                   <Icon size={20} style={{ color }} />
                 </div>
                 <div style={{ position: 'relative', zIndex: 1 }}>
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#fff', margin: '0 0 6px' }}>{title}</h3>
-                  <p style={{ fontSize: '0.83rem', color: 'rgba(255,255,255,0.42)', lineHeight: 1.65, margin: 0 }}>{desc}</p>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 6px' }}>{title}</h3>
+                  <p style={{ fontSize: '0.83rem', color: 'var(--text-secondary)', lineHeight: 1.65, margin: 0 }}>{desc}</p>
                 </div>
               </div>
             ))}
@@ -347,8 +348,8 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
             justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px',
           }}>
             <div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: '#fff', marginBottom: '5px' }}>Ready to get better AI results?</h3>
-              <p style={{ color: 'rgba(255,255,255,0.42)', fontSize: '0.88rem', margin: 0 }}>Browse 1,000+ free prompts — no account needed.</p>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '5px' }}>Ready to get better AI results?</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', margin: 0 }}>Browse 1,000+ free prompts — no account needed.</p>
             </div>
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}

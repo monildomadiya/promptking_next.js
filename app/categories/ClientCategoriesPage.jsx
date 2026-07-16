@@ -12,12 +12,12 @@ export default function ClientCategoriesPage({ categories }) {
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
           <div style={{ 
             display: 'inline-flex', alignItems: 'center', gap: '10px', 
-            background: 'rgba(255,255,255,0.05)', padding: '10px 20px', 
-            borderRadius: '30px', border: '1px solid rgba(255,255,255,0.1)',
+            background: 'rgba(0,0,0,0.04)', padding: '10px 20px',
+            borderRadius: '30px', border: '1px solid rgba(0,0,0,0.1)',
             marginBottom: '20px'
           }}>
             <Compass size={20} style={{ color: 'var(--accent-main)' }} />
-            <span style={{ fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', fontSize: '0.9rem', color: 'rgba(255,255,255,0.8)' }}>
+            <span style={{ fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
               Explore Library
             </span>
           </div>
@@ -41,12 +41,10 @@ export default function ClientCategoriesPage({ categories }) {
               href={`/category/${c.slug}`}
               className="category-page-card"
               style={{
-                background: 'rgba(20, 20, 25, 0.6)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255,255,255,0.08)',
+                background: '#ffffff',
+                border: '1px solid rgba(0,0,0,0.1)',
                 borderRadius: '24px',
-                padding: c.image_url ? '0' : '30px',
+                padding: '0',
                 textDecoration: 'none',
                 display: 'flex',
                 flexDirection: 'column',
@@ -54,28 +52,33 @@ export default function ClientCategoriesPage({ categories }) {
                 position: 'relative',
                 overflow: 'hidden',
                 transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+                boxShadow: '0 10px 30px rgba(17,24,39,0.1)',
                 minHeight: '160px',
               }}
-              onMouseEnter={(e) => { 
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(0,0,0,0.18)';
                 e.currentTarget.style.transform = 'translateY(-5px) scale(1.02)';
-                e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.4)';
+                e.currentTarget.style.boxShadow = '0 20px 40px rgba(17,24,39,0.18)';
               }}
-              onMouseLeave={(e) => { 
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)';
                 e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
+                e.currentTarget.style.boxShadow = '0 10px 30px rgba(17,24,39,0.1)';
               }}
             >
-              {/* Background image if available */}
-              {c.image_url && (
+              {/* Background image (or branded fallback) */}
+              {c.image_url ? (
                 <div style={{
                   position: 'absolute', inset: 0,
                   backgroundImage: `url(${c.image_url})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
-                  opacity: 0.3,
+                  borderRadius: '24px',
+                }} />
+              ) : (
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  background: 'linear-gradient(135deg, #e50914 0%, #1a1a1a 100%)',
                   borderRadius: '24px',
                 }} />
               )}

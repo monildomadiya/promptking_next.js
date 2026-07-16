@@ -11,10 +11,10 @@ const MagicKingIntro = ({ isMobile }) => {
       marginBottom: '40px',
       position: 'relative',
       borderRadius: '32px',
-      background: 'rgba(15, 15, 15, 0.4)',
-      border: '1px solid rgba(255, 255, 255, 0.08)',
+      background: '#ffffff',
+      border: '1px solid rgba(0, 0, 0, 0.08)',
       backdropFilter: 'blur(20px)',
-      boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
+      boxShadow: '0 30px 60px rgba(17,24,39,0.1)',
       overflow: 'visible'
     }}>
       <div style={{
@@ -43,7 +43,7 @@ const MagicKingIntro = ({ isMobile }) => {
               maxHeight: '100%',
               maxWidth: '100%',
               objectFit: 'contain',
-              filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.5)) drop-shadow(0 0 15px rgba(229, 9, 20, 0.2))',
+              filter: 'drop-shadow(0 20px 40px rgba(17,24,39,0.18)) drop-shadow(0 0 15px rgba(229, 9, 20, 0.2))',
             }}
           />
         </div>
@@ -72,7 +72,7 @@ const MagicKingIntro = ({ isMobile }) => {
           <h2 style={{
             fontSize: isMobile ? '1.8rem' : '2.4rem',
             fontWeight: 900,
-            color: 'white',
+            color: 'var(--text-main)',
             marginBottom: '10px',
             lineHeight: 1.2,
           }}>

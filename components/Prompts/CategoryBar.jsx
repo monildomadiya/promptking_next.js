@@ -11,8 +11,8 @@ const FilterChip = ({ label, value, icon: Icon, count, isActive, onClick }) => (
       gap: '8px',
       padding: '10px 18px',
       borderRadius: '100px',
-      background: isActive ? 'var(--accent-main)' : 'rgba(255, 255, 255, 0.05)',
-      border: '1px solid ' + (isActive ? 'var(--accent-main)' : 'rgba(255, 255, 255, 0.1)'),
+      background: isActive ? 'var(--accent-main)' : 'rgba(0, 0, 0, 0.04)',
+      border: '1px solid ' + (isActive ? 'var(--accent-main)' : 'rgba(0, 0, 0, 0.1)'),
       color: isActive ? 'white' : 'var(--text-dim)',
       whiteSpace: 'nowrap',
       cursor: 'pointer',
@@ -28,7 +28,7 @@ const FilterChip = ({ label, value, icon: Icon, count, isActive, onClick }) => (
       <span style={{ 
         fontSize: '0.7rem', 
         opacity: 0.6,
-        background: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+        background: isActive ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.06)',
         padding: '2px 6px',
         borderRadius: '6px'
       }}>
@@ -54,7 +54,7 @@ const CategoryBar = ({ filter, setFilter, categories, counts }) => {
       zIndex: 100,
       background: 'var(--surface-0)',
       padding: '10px 0',
-      borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
+      borderBottom: '1px solid rgba(0, 0, 0, 0.07)'
     }}>
       <div 
         ref={scrollRef}
@@ -81,7 +81,7 @@ const CategoryBar = ({ filter, setFilter, categories, counts }) => {
             borderRadius: '12px',
             background: 'var(--accent-glow)',
             border: '1px solid var(--accent-main)',
-            color: 'white',
+            color: 'var(--accent-main)',
             cursor: 'pointer',
             flexShrink: 0,
             boxShadow: '0 4px 15px var(--accent-glow)'
@@ -90,14 +90,14 @@ const CategoryBar = ({ filter, setFilter, categories, counts }) => {
           <Layout size={18} />
         </button>
 
-        <div style={{ width: '1px', background: 'rgba(255, 255, 255, 0.1)', margin: '0 5px', flexShrink: 0 }} />
+        <div style={{ width: '1px', background: 'rgba(0, 0, 0, 0.1)', margin: '0 5px', flexShrink: 0 }} />
 
         <FilterChip label="All" value="all" icon={Grid} count={counts.all}  isActive={filter === 'all'} onClick={() => setFilter(filter === 'all' ? 'all' : 'all')} />
         <FilterChip label="Free" value="free" icon={Sparkles} count={counts.free}  isActive={filter === 'free'} onClick={() => setFilter(filter === 'free' ? 'all' : 'free')} />
         <FilterChip label="Premium" value="premium" icon={Crown} count={counts.premium}  isActive={filter === 'premium'} onClick={() => setFilter(filter === 'premium' ? 'all' : 'premium')} />
 
         
-        <div style={{ width: '1px', background: 'rgba(255, 255, 255, 0.1)', margin: '0 5px' }} />
+        <div style={{ width: '1px', background: 'rgba(0, 0, 0, 0.1)', margin: '0 5px' }} />
         
         {categories.map((cat) => (
           <FilterChip 

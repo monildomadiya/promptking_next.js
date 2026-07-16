@@ -75,13 +75,13 @@ const KingDialog = ({
                   fontSize: '1.25rem',
                   fontWeight: 800,
                   fontFamily: 'var(--font-heading)',
-                  color: 'white',
+                  color: 'var(--text-main)',
                   margin: 0,
                 }}>
                   {title}
                 </h3>
                 <motion.button
-                  whileHover={{ rotate: 90, background: 'rgba(255,255,255,0.05)' }}
+                  whileHover={{ rotate: 90, background: 'rgba(0,0,0,0.05)' }}
                   whileTap={{ scale: 0.9 }}
                   onClick={onClose}
                   style={{
@@ -116,7 +116,7 @@ const KingDialog = ({
               {footer && (
                 <div style={{
                   padding: '20px 32px',
-                  background: 'rgba(255,255,255,0.02)',
+                  background: 'rgba(0,0,0,0.02)',
                   borderTop: '1px solid var(--glass-border)',
                   display: 'flex',
                   justifyContent: 'flex-end',

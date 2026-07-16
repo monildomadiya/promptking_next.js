@@ -80,7 +80,7 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
   return (
     <>
       <header ref={headerRef} className="responsive-header" style={{
-        boxShadow: isScrolled ? '0 20px 40px rgba(0, 0, 0, 0.4)' : 'none',
+        boxShadow: isScrolled ? '0 20px 40px rgba(17, 24, 39, 0.1)' : 'none',
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         transform: isVisible ? 'translateY(0)' : 'translateY(-120%)',
         opacity: isVisible ? 1 : 0
@@ -115,20 +115,20 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
               >
                 <div 
                   className="explore-btn-hover"
-                  style={{ 
-                    color: 'rgba(255,255,255,0.8)',
-                    background: 'rgba(255,255,255,0.03)',
-                    fontWeight: 600, 
-                    cursor: 'pointer', 
-                    display: 'flex', 
-                    alignItems: 'center', 
+                  style={{
+                    color: 'rgba(20,22,26,0.8)',
+                    background: 'rgba(0,0,0,0.03)',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: '8px',
                     height: '50px',
-                    fontSize: '0.95rem', 
+                    fontSize: '0.95rem',
                     transition: 'all 0.3s ease',
                     borderRadius: '16px',
                     border: '1px solid',
-                    borderColor: showCategoryDropdown ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.08)',
+                    borderColor: showCategoryDropdown ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.08)',
                     whiteSpace: 'nowrap'
                   }}
                 >
@@ -137,15 +137,15 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                 </div>
                 {showCategoryDropdown && (
                   <div className="category-dropdown-menu" style={{
-                    position: 'absolute', top: 'calc(100% + 15px)', right: 0, 
-                    background: 'rgba(15, 15, 20, 0.95)', backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)',
-                    border: '1px solid rgba(255,255,255,0.08)', borderRadius: '24px',
+                    position: 'absolute', top: 'calc(100% + 15px)', right: 0,
+                    background: 'rgba(255, 255, 255, 0.98)', backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)',
+                    border: '1px solid rgba(0,0,0,0.08)', borderRadius: '24px',
                     zIndex: 100,
-                    boxShadow: '0 30px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05)',
+                    boxShadow: '0 30px 60px rgba(17,24,39,0.16), 0 0 0 1px rgba(0,0,0,0.03)',
                     display: 'flex', flexDirection: 'column', gap: '16px',
                     transformOrigin: 'top right'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
                       <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)', fontWeight: 600 }}>Discover Categories</span>
                     </div>
                     <div className="category-grid">
@@ -155,25 +155,25 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                           href={`/category/${c.slug}`}
                           onClick={() => setShowCategoryDropdown(false)}
                           style={{
-                            color: 'rgba(255,255,255,0.9)', padding: '12px 16px', borderRadius: '16px',
+                            color: 'rgba(20,22,26,0.9)', padding: '12px 16px', borderRadius: '16px',
                             textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                             fontSize: '0.95rem', fontWeight: 500,
-                            background: 'rgba(255,255,255,0.02)',
-                            border: '1px solid rgba(255,255,255,0.02)'
+                            background: 'rgba(0,0,0,0.025)',
+                            border: '1px solid rgba(0,0,0,0.04)'
                           }}
-                          onMouseEnter={(e) => { 
-                            e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; 
-                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                            e.currentTarget.style.color = 'white'; 
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(0,0,0,0.05)';
+                            e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)';
+                            e.currentTarget.style.color = 'var(--text-main)';
                             e.currentTarget.style.transform = 'translateY(-2px)';
                             e.currentTarget.querySelector('.menu-icon').style.transform = 'translateX(4px)';
                             e.currentTarget.querySelector('.menu-icon').style.opacity = '1';
                           }}
-                          onMouseLeave={(e) => { 
-                            e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; 
-                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.02)';
-                            e.currentTarget.style.color = 'rgba(255,255,255,0.9)'; 
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'rgba(0,0,0,0.025)';
+                            e.currentTarget.style.borderColor = 'rgba(0,0,0,0.04)';
+                            e.currentTarget.style.color = 'rgba(20,22,26,0.9)';
                             e.currentTarget.style.transform = 'translateY(0)';
                             e.currentTarget.querySelector('.menu-icon').style.transform = 'translateX(0)';
                             e.currentTarget.querySelector('.menu-icon').style.opacity = '0.5';
@@ -189,7 +189,7 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                     </div>
                     
                     {/* View All Categories Link */}
-                    <div style={{ marginTop: '8px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
+                    <div style={{ marginTop: '8px', paddingTop: '16px', borderTop: '1px solid rgba(0,0,0,0.07)', textAlign: 'center' }}>
                       <Link 
                         href="/categories"
                         onClick={() => setShowCategoryDropdown(false)}
