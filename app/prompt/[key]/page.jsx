@@ -91,6 +91,7 @@ export default async function PromptPage({ params }) {
   let initialPrompt = null;
   let initialSuggestedPrompts = [];
   let adsSettings = {};
+  let promptCategory = null;
 
   try {
     const promptRows = await db`
@@ -146,9 +147,13 @@ export default async function PromptPage({ params }) {
       };
 
       if (p.website_category_id) {
+        try {
+          const catRows = await db`SELECT slug, name FROM website_categories WHERE id = ${p.website_category_id}`;
+          if (catRows.length > 0) promptCategory = catRows[0];
+        } catch (e) {}
         const suggestRows = await db`
-          SELECT * FROM prompts 
-          WHERE website_category_id = ${p.website_category_id} AND prompt_key != ${p.prompt_key} 
+          SELECT * FROM prompts
+          WHERE website_category_id = ${p.website_category_id} AND prompt_key != ${p.prompt_key}
           ORDER BY prompt_key DESC LIMIT 20
         `;
         initialSuggestedPrompts = suggestRows.sort(() => 0.5 - Math.random()).slice(0, 4);
@@ -195,8 +200,97 @@ export default async function PromptPage({ params }) {
     }
   } catch (e) {}
 
+  // ── Structured data (JSON-LD) ──────────────────────────────────────
+  // Rendered server-side so crawlers reliably receive it. The client-side
+  // SEOMetadata component does not emit schema, so prompt pages previously
+  // shipped none. Mirrors the article page. ldStringify prevents a prompt
+  // body containing "</script>" from breaking out of the tag.
+  const ldStringify = (obj) => JSON.stringify(obj).replace(/</g, '\\u003c');
+  const canonicalUrl = initialPrompt
+    ? (initialPrompt.canonical_url || `https://promptking.in/prompt/${initialPrompt.slug || initialPrompt.prompt_key}`)
+    : '';
+
+  let promptImage = initialPrompt?.thumbnail_url || initialPrompt?.img_after || initialPrompt?.imgAfter || 'https://promptking.in/og-image.jpg';
+  if (promptImage.startsWith('/')) promptImage = `https://promptking.in${promptImage}`;
+  else if (!promptImage.startsWith('http')) promptImage = `https://promptking.in/${promptImage}`;
+
+  const plainPromptDesc = initialPrompt
+    ? (initialPrompt.meta_description
+        || (initialPrompt.description ? initialPrompt.description.replace(/<[^>]*>?/gm, '').trim().substring(0, 200) : '')
+        || initialPrompt.short_description
+        || `A professionally engineered ${initialPrompt.ai_type || 'AI'} prompt from PromptKing.`)
+    : '';
+
+  const creativeWorkJsonLd = initialPrompt ? {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: initialPrompt.title,
+    description: plainPromptDesc,
+    image: promptImage,
+    url: canonicalUrl,
+    genre: initialPrompt.ai_type || 'AI Prompt',
+    keywords: parsedTags.length ? parsedTags.join(', ') : `${initialPrompt.ai_type || 'AI'} prompt, prompt engineering, PromptKing`,
+    inLanguage: 'en',
+    isAccessibleForFree: !initialPrompt.isPremium,
+    datePublished: initialPrompt.created_at || undefined,
+    dateModified: initialPrompt.updated_at || initialPrompt.created_at || undefined,
+    author: { '@type': 'Organization', name: 'PromptKing', url: 'https://promptking.in' },
+    publisher: {
+      '@type': 'Organization',
+      name: 'PromptKing',
+      url: 'https://promptking.in',
+      logo: { '@type': 'ImageObject', url: 'https://promptking.in/promptking-logo.svg' },
+    },
+  } : null;
+
+  const softwareSourceJsonLd = initialPrompt ? {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareSourceCode',
+    name: initialPrompt.title,
+    description: `An AI prompt engineered for ${initialPrompt.ai_type || 'Generative AI'}.`,
+    programmingLanguage: 'Natural Language',
+    codeSampleType: 'AI Prompt',
+    text: initialPrompt.promptText || initialPrompt.prompt_text || initialPrompt.title,
+    url: canonicalUrl,
+    creator: { '@type': 'Organization', name: 'PromptKing' },
+  } : null;
+
+  const breadcrumbJsonLd = initialPrompt ? {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://promptking.in/' },
+      ...(promptCategory
+        ? [{ '@type': 'ListItem', position: 2, name: promptCategory.name, item: `https://promptking.in/category/${promptCategory.slug}` }]
+        : []),
+      { '@type': 'ListItem', position: promptCategory ? 3 : 2, name: initialPrompt.title, item: canonicalUrl },
+    ],
+  } : null;
+
+  const faqJsonLd = parsedFaqs.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: parsedFaqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+    })),
+  } : null;
+
   return (
     <>
+      {creativeWorkJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldStringify(creativeWorkJsonLd) }} />
+      )}
+      {softwareSourceJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldStringify(softwareSourceJsonLd) }} />
+      )}
+      {breadcrumbJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldStringify(breadcrumbJsonLd) }} />
+      )}
+      {faqJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldStringify(faqJsonLd) }} />
+      )}
       {/*
         Server-rendered prompt content — visible to Google AdSense & search crawlers
         without JavaScript. Fixes "low value content" rejection.
