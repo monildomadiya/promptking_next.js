@@ -22,7 +22,13 @@ const FilterChip = ({ label, value, icon: Icon, count, isActive, onClick }) => (
       boxShadow: isActive ? '0 8px 20px var(--accent-glow)' : 'none'
     }}
   >
-    {Icon && <Icon size={14} color={isActive ? 'white' : 'currentColor'} />}
+    {Icon && (
+      <Icon 
+        size={15} 
+        color={label === 'Premium' ? '#ffb703' : (isActive ? 'white' : 'currentColor')} 
+        fill={label === 'Premium' ? '#f59e0b' : 'none'} 
+      />
+    )}
     <span>{label}</span>
     {count !== undefined && (
       <span style={{ 

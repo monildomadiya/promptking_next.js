@@ -64,18 +64,19 @@ const glassPanelStyle = {
 };
 
 const glassCardStyle = {
-  background: 'rgba(255, 255, 255, 0.02)',
-  border: '1px solid rgba(255, 255, 255, 0.05)',
+  background: 'var(--surface-1)',
+  border: '1px solid var(--border-color)',
   borderRadius: '20px',
+  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.03)',
 };
 
 const inputStyle = {
   width: '100%',
   padding: '14px 18px',
-  background: 'rgba(255, 255, 255, 0.03)',
-  border: '1px solid rgba(255, 255, 255, 0.08)',
+  background: 'var(--surface-1)',
+  border: '1px solid var(--border-color)',
   borderRadius: '12px',
-  color: 'white',
+  color: 'var(--text-main)',
   fontSize: '0.95rem',
   transition: 'var(--transition-fast)',
   outline: 'none',
@@ -143,22 +144,22 @@ const AdminOtpInput = ({ value, onChange, length = 10 }) => {
               fontSize: '1.5rem',
               fontWeight: 'bold',
               borderRadius: '10px',
-              border: '1px solid rgba(255,255,255,0.1)',
-              background: 'rgba(255,255,255,0.05)',
-              color: 'white',
+              border: '1px solid var(--border-color)',
+              background: 'var(--surface-1)',
+              color: 'var(--text-main)',
               outline: 'none',
               transition: '0.2s',
-              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)'
+              boxShadow: '0 2px 5px rgba(0,0,0,0.03)'
             }}
             onFocus={e => {
               e.target.style.borderColor = 'var(--accent-main)';
-              e.target.style.background = 'rgba(255,255,255,0.1)';
-              e.target.style.boxShadow = '0 0 10px rgba(229, 9, 20, 0.2)';
+              e.target.style.background = '#ffffff';
+              e.target.style.boxShadow = '0 0 10px rgba(229, 9, 20, 0.12)';
             }}
             onBlur={e => {
-              e.target.style.borderColor = 'rgba(255,255,255,0.1)';
-              e.target.style.background = 'rgba(255,255,255,0.05)';
-              e.target.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.2)';
+              e.target.style.borderColor = 'var(--border-color)';
+              e.target.style.background = 'var(--surface-1)';
+              e.target.style.boxShadow = '0 2px 5px rgba(0,0,0,0.03)';
             }}
           />
         ))}
@@ -184,22 +185,22 @@ const AdminOtpInput = ({ value, onChange, length = 10 }) => {
                   fontSize: '1.5rem',
                   fontWeight: 'bold',
                   borderRadius: '10px',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  background: 'rgba(255,255,255,0.05)',
-                  color: 'white',
+                  border: '1px solid var(--border-color)',
+                  background: 'var(--surface-1)',
+                  color: 'var(--text-main)',
                   outline: 'none',
                   transition: '0.2s',
-                  boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)'
+                  boxShadow: '0 2px 5px rgba(0,0,0,0.03)'
                 }}
                 onFocus={e => {
                   e.target.style.borderColor = 'var(--accent-main)';
-                  e.target.style.background = 'rgba(255,255,255,0.1)';
-                  e.target.style.boxShadow = '0 0 10px rgba(229, 9, 20, 0.2)';
+                  e.target.style.background = '#ffffff';
+                  e.target.style.boxShadow = '0 0 10px rgba(229, 9, 20, 0.12)';
                 }}
                 onBlur={e => {
-                  e.target.style.borderColor = 'rgba(255,255,255,0.1)';
-                  e.target.style.background = 'rgba(255,255,255,0.05)';
-                  e.target.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.2)';
+                  e.target.style.borderColor = 'var(--border-color)';
+                  e.target.style.background = 'var(--surface-1)';
+                  e.target.style.boxShadow = '0 2px 5px rgba(0,0,0,0.03)';
                 }}
               />
             );
@@ -229,10 +230,10 @@ const NavItem = ({ item, active, onClick, isMobileView, collapsed }) => (
       fontWeight: 700,
       fontSize: '0.85rem',
       transition: 'all 0.2s ease',
-      color: active ? 'white' : 'var(--text-dim)',
-      background: active ? 'var(--accent-glow)' : 'rgba(255,255,255,0.02)',
-      border: `1px solid ${active ? 'rgba(229, 9, 20, 0.3)' : 'rgba(255,255,255,0.05)'}`,
-      boxShadow: active && !isMobileView ? 'inset 0 0 20px rgba(229, 9, 20, 0.1)' : 'none',
+      color: active ? 'var(--accent-main)' : 'var(--text-dim)',
+      background: active ? 'rgba(229, 9, 20, 0.08)' : 'var(--surface-1)',
+      border: `1px solid ${active ? 'rgba(229, 9, 20, 0.3)' : 'var(--border-color)'}`,
+      boxShadow: active && !isMobileView ? '0 2px 8px rgba(229, 9, 20, 0.08)' : '0 1px 3px rgba(0,0,0,0.02)',
       position: 'relative',
       whiteSpace: 'nowrap',
       flexShrink: 0,
@@ -1605,12 +1606,12 @@ const AdminDashboard = () => {
 
   if (!isAdmin) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--surface-0)' }}>
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} style={{ ...glassPanelStyle, padding: '48px', width: '400px', textAlign: 'center' }}>
+      <div className="admin-light" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--surface-0)' }}>
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} style={{ ...glassPanelStyle, padding: '48px', width: '400px', textAlign: 'center', background: '#ffffff', boxShadow: '0 10px 40px rgba(0,0,0,0.06)' }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '32px', width: '100%' }}>
             <img src={KingLogo} style={{ width: '120px', height: '120px', objectFit: 'contain' }} alt="Prompt King" />
           </div>
-          <h2 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '8px', fontFamily: 'var(--font-heading)', color: 'white' }}>Admin Portal</h2>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '8px', fontFamily: 'var(--font-heading)', color: 'var(--text-main)' }}>Admin Portal</h2>
           <p style={{ color: 'var(--text-dim)', marginBottom: '32px', fontSize: '0.9rem', fontWeight: 500 }}>Authenticated Access Only</p>
           <form onSubmit={handleLogin}>
             <AdminOtpInput value={password} onChange={setPassword} length={10} />
@@ -1643,36 +1644,35 @@ const AdminDashboard = () => {
   // (no dashboard content behind it) so screenshot tools don't repeat it.
   if (isModalOpen && view === 'prompts') {
     return (
-      <>
-        <Toaster position="top-right" toastOptions={{ style: { background: '#1a1a1a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } }} />
+      <div className="admin-light">
+        <Toaster position="top-right" toastOptions={{ style: { background: '#ffffff', color: '#14161a', border: '1px solid rgba(0,0,0,0.1)', boxShadow: '0 4px 12px rgba(0,0,0,0.06)' } }} />
         <PromptModal
           prompt={editingItem}
           onClose={() => setIsModalOpen(false)}
           onSave={() => { setIsModalOpen(false); fetchData(view); }}
         />
-      </>
+      </div>
     );
   }
   
   if (isModalOpen && view === 'listicles') {
     return (
-      <>
-        <Toaster position="top-right" toastOptions={{ style: { background: '#1a1a1a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } }} />
+      <div className="admin-light">
+        <Toaster position="top-right" toastOptions={{ style: { background: '#ffffff', color: '#14161a', border: '1px solid rgba(0,0,0,0.1)', boxShadow: '0 4px 12px rgba(0,0,0,0.06)' } }} />
         <ListicleModal
           prompt={editingItem}
           onClose={() => setIsModalOpen(false)}
           onSave={() => { setIsModalOpen(false); fetchData(view); }}
         />
-      </>
+      </div>
     );
   }
 
   return (
-    <div style={{ 
+    <div className="admin-light" style={{ 
       display: 'flex', 
       flexDirection: isMobile ? 'column' : 'row',
       minHeight: '100vh', 
-      color: 'white',
       overflowX: 'hidden'
     }}>
       {/* Sidebar (Desktop Only) */}

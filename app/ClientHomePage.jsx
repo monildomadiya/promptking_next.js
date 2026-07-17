@@ -124,12 +124,22 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
               className="pro-card-hover home-search-btn-pro"
               title="Premium Prompts"
               style={{ 
-                background: filter === 'premium' ? 'rgba(255, 193, 7, 0.15)' : 'rgba(0,0,0,0.03)',
-                border: filter === 'premium' ? '1px solid rgba(255, 193, 7, 0.4)' : '1px solid rgba(0,0,0,0.1)',
-                color: filter === 'premium' ? '#b8860b' : 'rgba(20,22,26,0.8)'
+                background: filter === 'premium' ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' : '#f8fafc',
+                border: filter === 'premium' ? '1px solid #0f172a' : '1px solid rgba(15, 23, 42, 0.12)',
+                color: filter === 'premium' ? '#ffffff' : '#0f172a',
+                boxShadow: filter === 'premium' ? '0 8px 20px rgba(15, 23, 42, 0.25)' : 'none'
               }}
             >
-              <Crown size={18} fill={filter === 'premium' ? '#FFC107' : 'none'} style={{ display: 'block' }} />
+              <Crown 
+                size={17} 
+                fill={filter === 'premium' ? '#f59e0b' : 'rgba(245, 158, 11, 0.18)'} 
+                style={{ 
+                  display: 'block', 
+                  color: filter === 'premium' ? '#ffb703' : '#d97706',
+                  filter: 'drop-shadow(0 0 4px rgba(245, 158, 11, 0.35))',
+                  transition: 'all 0.25s ease'
+                }} 
+              />
               Premium
             </button>
 
@@ -139,7 +149,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
               rel="noopener noreferrer"
               className="coffee-btn-hover home-search-btn-coffee"
             >
-              <Coffee size={18} style={{ display: 'block' }} />
+              <Coffee size={17} style={{ display: 'block' }} />
               Support Us
             </a>
           </div>
@@ -166,50 +176,49 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
       />
 
       {!categorySlug && (
-        <section style={{ maxWidth: '1200px', margin: '80px auto 60px', padding: '0 20px' }}>
+        <section style={{ maxWidth: '1400px', width: '100%', margin: '80px auto 60px', padding: isMobile ? '0 10px' : '0 20px' }}>
           <style>{`
             @keyframes pkFloatOrb {
               0%, 100% { transform: translateY(0px); }
               50% { transform: translateY(-14px); }
             }
             .pk-feat-card {
-              background: #ffffff;
-              border: 1px solid rgba(0,0,0,0.08);
+              background: #f8fafc;
+              border: 1px solid rgba(15, 23, 42, 0.08);
               border-radius: 20px;
-              padding: 26px 24px;
+              padding: 28px 24px;
               display: flex;
               align-items: flex-start;
               gap: 18px;
-              transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+              transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
               position: relative;
-              overflow: hidden;
-              box-shadow: 0 2px 12px rgba(17,24,39,0.04);
-            }
-            .pk-feat-card::after {
-              content: '';
-              position: absolute;
-              inset: 0;
-              border-radius: 20px;
-              background: radial-gradient(ellipse at 0% 0%, rgba(229,9,20,0.07) 0%, transparent 60%);
-              opacity: 0;
-              transition: opacity 0.3s ease;
+              box-shadow: 0 4px 18px rgba(15, 23, 42, 0.03);
             }
             .pk-feat-card:hover {
-              border-color: rgba(229,9,20,0.35);
-              transform: translateY(-3px);
-              box-shadow: 0 16px 40px rgba(17,24,39,0.12), 0 0 0 1px rgba(229,9,20,0.12);
+              background: #ffffff;
+              border-color: rgba(229, 9, 20, 0.35);
+              transform: translateY(-5px);
+              box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(229, 9, 20, 0.12);
             }
-            .pk-feat-card:hover::after { opacity: 1; }
             .pk-icon-box {
-              width: 46px;
-              height: 46px;
-              border-radius: 13px;
+              width: 48px;
+              height: 48px;
+              border-radius: 14px;
+              background: rgba(229, 9, 20, 0.06);
+              border: 1px solid rgba(229, 9, 20, 0.18);
               display: flex;
               align-items: center;
               justify-content: center;
               flex-shrink: 0;
-              position: relative;
-              z-index: 1;
+              color: #e50914;
+              box-shadow: 0 4px 14px rgba(229, 9, 20, 0.04);
+              transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s, border-color 0.3s;
+            }
+            .pk-feat-card:hover .pk-icon-box {
+              transform: scale(1.08) rotate(4deg);
+              background: rgba(229, 9, 20, 0.12);
+              border-color: rgba(229, 9, 20, 0.4);
+              box-shadow: 0 6px 18px rgba(229, 9, 20, 0.15);
             }
             .pk-stat-box {
               flex: 1;
@@ -281,93 +290,64 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
             {[
               {
                 Icon: Copy,
-                color: '#10b981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.2)',
+                color: '#e50914', bg: 'rgba(229,9,20,0.09)', border: 'rgba(229,9,20,0.22)',
                 title: 'One-Click Copy',
                 desc: 'Instantly copy any prompt to your clipboard with a single tap. Paste straight into ChatGPT, Gemini, or Midjourney.',
               },
               {
                 Icon: Image,
-                color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', border: 'rgba(167,139,250,0.2)',
+                color: '#d97706', bg: 'rgba(217,119,6,0.09)', border: 'rgba(217,119,6,0.22)',
                 title: 'Before/After Slider',
                 desc: 'See exactly what each prompt produces. Our interactive image slider lets you compare the original and AI result side by side.',
               },
               {
                 Icon: Crown,
-                color: '#f59e0b', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.2)',
+                color: '#e50914', bg: 'rgba(229,9,20,0.09)', border: 'rgba(229,9,20,0.22)',
                 title: 'Premium Prompts',
                 desc: 'Unlock exclusive expert-level prompts with a PIN. Premium prompts are engineered for maximum output quality.',
               },
               {
                 Icon: FileText,
-                color: '#38bdf8', bg: 'rgba(56,189,248,0.1)', border: 'rgba(56,189,248,0.2)',
+                color: '#d97706', bg: 'rgba(217,119,6,0.09)', border: 'rgba(217,119,6,0.22)',
                 title: 'Blog & Tutorials',
                 desc: 'Learn prompt engineering from our in-depth blog. Guides, tips, and tutorials to master ChatGPT, Gemini, and Midjourney.',
               },
               {
                 Icon: HelpCircle,
-                color: '#fb923c', bg: 'rgba(251,146,60,0.1)', border: 'rgba(251,146,60,0.2)',
+                color: '#e50914', bg: 'rgba(229,9,20,0.09)', border: 'rgba(229,9,20,0.22)',
                 title: 'FAQ on Every Prompt',
                 desc: 'Each prompt page includes a detailed FAQ — so you understand how, why, and where to use it for best results.',
               },
               {
                 Icon: Filter,
-                color: '#6366f1', bg: 'rgba(99,102,241,0.1)', border: 'rgba(99,102,241,0.2)',
+                color: '#d97706', bg: 'rgba(217,119,6,0.09)', border: 'rgba(217,119,6,0.22)',
                 title: 'Search & Filter',
                 desc: 'Search 1,000+ prompts by keyword or filter by AI tool and category. Find your perfect prompt in under 10 seconds.',
               },
               {
                 Icon: Lock,
-                color: '#e50914', bg: 'rgba(229,9,20,0.1)', border: 'rgba(229,9,20,0.2)',
+                color: '#e50914', bg: 'rgba(229,9,20,0.09)', border: 'rgba(229,9,20,0.22)',
                 title: 'Secure PIN Unlock',
                 desc: 'Premium prompt access is protected with a secure PIN system — so your exclusive content stays safe.',
               },
               {
                 Icon: Shield,
-                color: '#34d399', bg: 'rgba(52,211,153,0.1)', border: 'rgba(52,211,153,0.2)',
+                color: '#d97706', bg: 'rgba(217,119,6,0.09)', border: 'rgba(217,119,6,0.22)',
                 title: 'No Sign-Up Required',
                 desc: 'Browse and copy all free prompts without creating an account. Zero friction, full access, instant results.',
               },
-            ].map(({ Icon, color, bg, border, title, desc }) => (
+            ].map(({ Icon, title, desc }) => (
               <div key={title} className="pk-feat-card">
-                <div className="pk-icon-box" style={{ background: bg, border: `1px solid ${border}` }}>
-                  <Icon size={20} style={{ color }} />
+                <div className="pk-icon-box">
+                  <Icon size={21} />
                 </div>
-                <div style={{ position: 'relative', zIndex: 1 }}>
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 6px' }}>{title}</h3>
-                  <p style={{ fontSize: '0.83rem', color: 'var(--text-secondary)', lineHeight: 1.65, margin: 0 }}>{desc}</p>
+                <div>
+                  <h3 style={{ fontSize: '1.02rem', fontWeight: 800, color: '#0f172a', margin: '0 0 8px' }}>{title}</h3>
+                  <p style={{ fontSize: '0.86rem', color: '#475569', lineHeight: 1.68, margin: 0 }}>{desc}</p>
                 </div>
               </div>
             ))}
           </div>
-
-          {/* ─── CTA Strip ─── */}
-          <div style={{
-            background: 'linear-gradient(135deg, rgba(229,9,20,0.11) 0%, rgba(229,9,20,0.03) 100%)',
-            border: '1px solid rgba(229,9,20,0.18)', borderRadius: '22px',
-            padding: '32px 36px', display: 'flex', alignItems: 'center',
-            justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px',
-          }}>
-            <div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '5px' }}>Ready to get better AI results?</h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', margin: 0 }}>Browse 1,000+ free prompts — no account needed.</p>
-            </div>
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '8px',
-                padding: '13px 28px', background: 'var(--accent-gradient)',
-                color: '#fff', border: 'none', borderRadius: '50px',
-                fontWeight: 900, fontSize: '0.92rem', cursor: 'pointer',
-                boxShadow: '0 8px 28px rgba(229,9,20,0.32)', transition: 'all 0.22s ease',
-                whiteSpace: 'nowrap',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.04)'; e.currentTarget.style.boxShadow = '0 12px 36px rgba(229,9,20,0.48)'; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(229,9,20,0.32)'; }}
-            >
-              Explore Prompts <ArrowRight size={16} />
-            </button>
-          </div>
-
         </section>
       )}
     </main>

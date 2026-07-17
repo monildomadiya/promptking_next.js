@@ -54,204 +54,226 @@ const Footer = ({ onLogoClick }) => {
         </div>
       )}
       <footer style={{
-      background: 'linear-gradient(to bottom, #ffffff, var(--surface-0))',
-      position: 'relative',
-      padding: isMobile ? '60px 20px 40px' : '100px 40px 40px',
-      minHeight: isMobile ? '600px' : '400px',
-      color: 'var(--text-main)',
-      maxWidth: '1400px',
-      margin: '0 auto',
-      borderRadius: '32px 32px 0 0',
-      borderTop: '1px solid rgba(0,0,0,0.08)',
-      paddingBottom: isMobile ? 'calc(var(--app-bottom-nav-height, 70px) + 20px)' : '40px',
-      overflow: 'hidden'
-    }}>
-      {/* Decorative Top Glow */}
-      <div style={{
-        position: 'absolute',
-        top: 0, left: '20%', right: '20%',
-        height: '1px',
-        background: 'linear-gradient(90deg, transparent, var(--accent-main), transparent)',
-        opacity: 0.5,
-        boxShadow: '0 0 20px var(--accent-main)'
-      }} />
+        background: '#ffffff',
+        position: 'relative',
+        padding: isMobile ? '56px 24px 36px' : '75px 54px 44px',
+        color: 'var(--text-main)',
+        maxWidth: '1360px',
+        margin: isMobile ? '0 14px 24px' : '0 auto 40px',
+        borderRadius: '36px',
+        border: '1px solid rgba(15, 23, 42, 0.08)',
+        boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.05)',
+        overflow: 'hidden'
+      }}>
+        {/* ─── MAST RED GLOW EFFECT (Subtle, Refined Top Neon Line & Delicate Blush) ─── */}
+        {/* 1. Sleek Neon Red Beam along Top Edge */}
+        <div style={{
+          position: 'absolute',
+          top: 0, left: '18%', right: '18%',
+          height: '2px',
+          background: 'linear-gradient(90deg, transparent 0%, rgba(229, 9, 20, 0.85) 50%, transparent 100%)',
+          boxShadow: '0 0 16px rgba(229, 9, 20, 0.5)',
+          zIndex: 2
+        }} />
 
-      <div style={{ maxWidth: '1300px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 1fr 1fr', 
-          gap: isMobile ? '30px' : '40px',
-          marginBottom: '80px'
-        }}>
-          {/* Brand Column */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-            <Link href="/" onClick={onLogoClick} style={{
-              color: 'var(--text-main)',
-              textDecoration: 'none',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              gap: '8px'
-            }}>
-              <img
-                src="/promptking-logo.svg"
-                alt="PromptKing Logo"
-                width="55"
-                height="55"
-                style={{
-                  height: isMobile ? '45px' : '55px',
-                  width: 'auto',
-                  objectFit: 'contain',
-                  marginBottom: '4px'
-                }}
-              />
-              <span style={{
-                fontSize: '1.8rem',
-                fontWeight: 900,
-                letterSpacing: '-1.5px',
-                background: 'linear-gradient(to bottom, #14161a, rgba(20,22,26,0.7))',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
+        {/* 2. Soft, Refined Ambient Red Blush (Blends smoothly into Pure White) */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: '12%',
+          right: '12%',
+          height: '190px',
+          background: 'radial-gradient(ellipse at top center, rgba(229, 9, 20, 0.14) 0%, rgba(229, 9, 20, 0.04) 45%, transparent 75%)',
+          pointerEvents: 'none',
+          zIndex: 0
+        }} />
+
+        <div style={{ maxWidth: '1240px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: isMobile ? '1fr' : '2.2fr 1fr 1fr 1.3fr', 
+            gap: isMobile ? '36px' : '44px',
+            marginBottom: '65px'
+          }}>
+            {/* Brand Column */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+              <Link href="/" onClick={onLogoClick} style={{
+                color: 'var(--text-main)',
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px'
               }}>
-                PromptKing<span style={{ color: 'var(--accent-main)', WebkitTextFillColor: 'initial' }}>.</span>
-              </span>
-            </Link>
-            <p style={{ color: 'var(--text-muted)', lineHeight: 1.6, fontSize: '0.95rem', maxWidth: '400px' }}>
-              The premium library for AI engineering and creative workflows. Discover, unlock, and share world-class prompts for ChatGPT, Midjourney, and Gemini.
-            </p>
-          </div>
+                <img
+                  src="/promptking-logo.svg"
+                  alt="PromptKing Logo"
+                  width="48"
+                  height="48"
+                  style={{
+                    height: isMobile ? '42px' : '48px',
+                    width: 'auto',
+                    objectFit: 'contain'
+                  }}
+                />
+                <span style={{
+                  fontSize: '1.75rem',
+                  fontWeight: 900,
+                  letterSpacing: '-1.2px',
+                  color: '#0f172a'
+                }}>
+                  PromptKing<span style={{ color: '#e50914' }}>.</span>
+                </span>
+              </Link>
+              <p style={{ color: '#475569', lineHeight: 1.65, fontSize: '0.94rem', maxWidth: '370px', margin: 0 }}>
+                The premium library for AI engineering and creative workflows. Discover, unlock, and share world-class prompts for ChatGPT, Midjourney, and Gemini.
+              </p>
 
-          {/* Platform Section */}
-          <div style={sectionWrapperStyle(isMobile)}>
-            <div style={headerStyle(isMobile)} onClick={() => toggleSection('platform')}>
-              <h4 style={columnTitleStyle(isMobile)}>Platform</h4>
-              {isMobile && (openSections.platform ? <ChevronUp size={20} /> : <ChevronDown size={20} />)}
+              {/* Red Live Status Indicator (Matching BruttoNetto Style) */}
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '9px', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginTop: '4px' }}>
+                <span style={{
+                  width: '9px',
+                  height: '9px',
+                  borderRadius: '50%',
+                  background: '#e50914',
+                  boxShadow: '0 0 10px #e50914',
+                  display: 'inline-block'
+                }} />
+                AI Alchemy Systems Operational • <span style={{ color: '#e50914' }}>v3.0</span>
+              </div>
             </div>
-            {( !isMobile || openSections.platform ) && (
-              <ul style={listStyle}>
-                <FooterLink to="/blog" text="Our Blog" />
-                <FooterLink to="/faq" text="FAQ & Help" />
-                <FooterLink to="/about" text="About Us" />
-                <FooterLink to="/contact" text="Contact Us" />
-              </ul>
-            )}
-          </div>
 
-          {/* Legal Section */}
-          <div style={sectionWrapperStyle(isMobile)}>
-            <div style={headerStyle(isMobile)} onClick={() => toggleSection('legal')}>
-              <h4 style={columnTitleStyle(isMobile)}>Legal</h4>
-              {isMobile && (openSections.legal ? <ChevronUp size={20} /> : <ChevronDown size={20} />)}
+            {/* Platform Section */}
+            <div style={sectionWrapperStyle(isMobile)}>
+              <div style={headerStyle(isMobile)} onClick={() => toggleSection('platform')}>
+                <h4 style={columnTitleStyle(isMobile)}>Platform</h4>
+                {isMobile && (openSections.platform ? <ChevronUp size={20} /> : <ChevronDown size={20} />)}
+              </div>
+              {( !isMobile || openSections.platform ) && (
+                <ul style={listStyle}>
+                  <FooterLink to="/blog" text="Our Blog" />
+                  <FooterLink to="/faq" text="FAQ & Help" />
+                  <FooterLink to="/about" text="About Us" />
+                  <FooterLink to="/contact" text="Contact Us" />
+                </ul>
+              )}
             </div>
-            {( !isMobile || openSections.legal ) && (
-              <ul style={listStyle}>
-                <FooterLink to="/privacy" text="Privacy Policy" />
-                <FooterLink to="/privacy#5" text="Cookie Policy" />
-                <FooterLink to="/terms" text="Terms of Service" />
-                <FooterLink to="/disclaimer" text="Disclaimer" />
-                <FooterLink to="/adsense-policy" text="Ads Policy" />
-              </ul>
-            )}
-          </div>
 
-          {/* Newsletter Section */}
-          <div style={sectionWrapperStyle(isMobile)}>
-            <div style={headerStyle(isMobile)} onClick={() => toggleSection('newsletter')}>
-              <h4 style={columnTitleStyle(isMobile)}>Newsletter</h4>
-              {isMobile && (openSections.newsletter ? <ChevronUp size={20} /> : <ChevronDown size={20} />)}
+            {/* Legal Section */}
+            <div style={sectionWrapperStyle(isMobile)}>
+              <div style={headerStyle(isMobile)} onClick={() => toggleSection('legal')}>
+                <h4 style={columnTitleStyle(isMobile)}>Legal</h4>
+                {isMobile && (openSections.legal ? <ChevronUp size={20} /> : <ChevronDown size={20} />)}
+              </div>
+              {( !isMobile || openSections.legal ) && (
+                <ul style={listStyle}>
+                  <FooterLink to="/privacy" text="Privacy Policy" />
+                  <FooterLink to="/privacy#5" text="Cookie Policy" />
+                  <FooterLink to="/terms" text="Terms of Service" />
+                  <FooterLink to="/disclaimer" text="Disclaimer" />
+                  <FooterLink to="/adsense-policy" text="Ads Policy" />
+                </ul>
+              )}
             </div>
-            {( !isMobile || openSections.newsletter ) && (
-              <div>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '20px', lineHeight: 1.5 }}>
-                  Expert tips sent straight to your inbox.
-                </p>
-                <div style={{
-                  position: 'relative',
-                  background: 'rgba(0,0,0,0.03)',
-                  borderRadius: '50px',
-                  border: '1px solid rgba(0,0,0,0.1)',
-                  padding: '4px',
-                  display: 'flex',
-                  transition: '0.3s',
-                }} className="footer-input-wrapper">
-                  <input
-                    type="email"
-                    placeholder="Enter email..."
-                    style={{
-                      width: '100%',
-                      padding: '12px 18px',
-                      background: 'transparent',
-                      border: 'none',
-                      color: 'var(--text-main)',
-                      outline: 'none',
-                      fontSize: '0.85rem'
-                    }}
-                  />
-                  <button style={{
-                    padding: '0 18px',
-                    background: 'var(--accent-main)',
-                    border: 'none',
+
+            {/* Newsletter Section */}
+            <div style={sectionWrapperStyle(isMobile)}>
+              <div style={headerStyle(isMobile)} onClick={() => toggleSection('newsletter')}>
+                <h4 style={columnTitleStyle(isMobile)}>Newsletter</h4>
+                {isMobile && (openSections.newsletter ? <ChevronUp size={20} /> : <ChevronDown size={20} />)}
+              </div>
+              {( !isMobile || openSections.newsletter ) && (
+                <div>
+                  <p style={{ color: '#475569', fontSize: '0.88rem', marginBottom: '18px', lineHeight: 1.55, margin: '0 0 16px' }}>
+                    Expert AI prompts and workflows sent directly to your inbox.
+                  </p>
+                  <div style={{
+                    position: 'relative',
+                    background: '#ffffff',
                     borderRadius: '50px',
-                    color: 'white',
-                    cursor: 'pointer',
+                    border: '1px solid rgba(229, 9, 20, 0.25)',
+                    padding: '5px',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: '0.3s'
-                  }} className="footer-submit-btn">
-                    <ArrowRight size={16} />
-                  </button>
+                    boxShadow: '0 4px 16px rgba(229, 9, 20, 0.05)',
+                    transition: 'all 0.3s ease'
+                  }} className="footer-input-wrapper">
+                    <input
+                      type="email"
+                      placeholder="Enter email..."
+                      style={{
+                        width: '100%',
+                        padding: '10px 16px',
+                        background: 'transparent',
+                        border: 'none',
+                        color: '#0f172a',
+                        outline: 'none',
+                        fontSize: '0.86rem'
+                      }}
+                    />
+                    <button style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #e50914, #b80710)',
+                      border: 'none',
+                      color: 'white',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      boxShadow: '0 4px 12px rgba(229, 9, 20, 0.35)',
+                      transition: 'all 0.3s ease'
+                    }} className="footer-submit-btn">
+                      <ArrowRight size={17} />
+                    </button>
+                  </div>
                 </div>
+              )}
+            </div>
+          </div>
+
+          <div style={{
+            paddingTop: '26px',
+            borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+            display: 'flex', 
+            justifyContent: isMobile ? 'center' : 'space-between', 
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '18px',
+            textAlign: isMobile ? 'center' : 'left'
+          }}>
+            <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>
+              &copy; {currentYear} PromptKing. All rights reserved.
+            </p>
+
+            {!isMobile && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.83rem', color: '#64748b' }}>
+                <Link href="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy</Link>
+                <span>•</span>
+                <Link href="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Terms</Link>
+                <span>•</span>
+                <Link href="/contact" style={{ color: 'inherit', textDecoration: 'none' }}>Contact</Link>
               </div>
             )}
           </div>
         </div>
 
-        <div style={{
-          paddingTop: '30px',
-          borderTop: '1px solid rgba(0,0,0,0.07)',
-          display: 'flex', 
-          justifyContent: isMobile ? 'center' : 'space-between', 
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '20px',
-          textAlign: isMobile ? 'center' : 'left'
-        }}>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            &copy; {currentYear} PromptKing. All rights reserved.
-          </p>
-
-
-          {!isMobile && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10a37f', boxShadow: '0 0 10px #10a37f' }} />
-              All systems operational
-            </div>
-          )}
-        </div>
-      </div>
-
-      <style>{`
-        .footer-input-wrapper:focus-within {
-          border-color: rgba(0,0,0,0.2) !important;
-          background: rgba(0,0,0,0.02) !important;
-        }
-        .footer-submit-btn:hover {
-          transform: scale(0.95);
-          box-shadow: 0 0 15px var(--accent-glow);
-        }
-        .social-link-icon:hover {
-          background: var(--accent-main) !important;
-          color: white !important;
-          transform: translateY(-3px);
-          box-shadow: 0 5px 15px rgba(229,9,20,0.25);
-        }
-        .footer-link-text:hover {
-          color: var(--text-main) !important;
-          transform: translateX(3px);
-        }
-      `}</style>
-    </footer>
+        <style>{`
+          .footer-input-wrapper:focus-within {
+            border-color: #e50914 !important;
+            box-shadow: 0 0 18px rgba(229, 9, 20, 0.15) !important;
+          }
+          .footer-submit-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(229, 9, 20, 0.5) !important;
+          }
+          .footer-link-text:hover {
+            color: #e50914 !important;
+            transform: translateX(4px);
+          }
+        `}</style>
+      </footer>
     </>
   );
 };

@@ -16,27 +16,27 @@
   --accent-glow: hsla(var(--accent-hue), 92%, 47%, 0.12);
   --accent-gradient: linear-gradient(135deg, hsl(var(--accent-hue), 92%, 47%), hsl(var(--accent-hue), 92%, 35%));
 
-  /* Light surfaces (0 = page background, ascending = raised panels) */
-  --surface-0: #f4f5f7;
-  --surface-1: #ffffff;
-  --surface-2: #f7f8fa;
-  --surface-3: #eef0f3;
+  /* Light surfaces (0 = pure white page background, ascending = raised panels) */
+  --surface-0: #ffffff;
+  --surface-1: #f8fafc;
+  --surface-2: #f1f5f9;
+  --surface-3: #e2e8f0;
 
-  --glass-bg: rgba(255, 255, 255, 0.72);
-  --glass-border: rgba(0, 0, 0, 0.08);
-  --glass-blur: blur(12px);
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --glass-blur: blur(16px);
 
   /* Text on light backgrounds */
-  --text-main: #14161a;
-  --text-primary: #14161a;
-  --text-secondary: rgba(20, 22, 26, 0.62);
-  --text-dim: rgba(20, 22, 26, 0.55);
-  --text-muted: rgba(20, 22, 26, 0.38);
+  --text-main: #0f172a;
+  --text-primary: #0f172a;
+  --text-secondary: rgba(15, 23, 42, 0.68);
+  --text-dim: rgba(15, 23, 42, 0.52);
+  --text-muted: rgba(15, 23, 42, 0.38);
 
   /* Neutral helpers used across components */
-  --border-color: rgba(0, 0, 0, 0.1);
+  --border-color: rgba(15, 23, 42, 0.08);
   --surface-color: #ffffff;
-  --bg-color: #f4f5f7;
+  --bg-color: #ffffff;
 
   /* Flat UI: elevation tokens neutralized. Original values kept in
      comments so shadows can be restored (see "FLAT UI" block below). */
@@ -120,10 +120,11 @@ html {
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(0, 0, 0, 0.07);
-  backdrop-filter: blur(8px);
-  border-radius: 16px;
+  background: radial-gradient(circle at top left, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
   transition: var(--transition-normal);
 }
 
@@ -208,6 +209,337 @@ html {
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
   margin: 20px 0;
+}
+
+/* ============================================================
+   ADMIN DARK SCOPE
+   The admin panel always uses dark theme regardless of site mode.
+   All CSS variables are overridden to dark equivalents here.
+   ============================================================ */
+.admin-dark {
+  color-scheme: dark;
+  --surface-0:  #0a0a0f;
+  --surface-1:  #13131c;
+  --surface-2:  #1a1a26;
+  --surface-3:  #22222f;
+
+  --glass-bg:     rgba(15, 15, 25, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur:   blur(14px);
+
+  --text-main:      #f0f0f8;
+  --text-primary:   #f0f0f8;
+  --text-secondary: rgba(240, 240, 248, 0.72);
+  --text-dim:       rgba(240, 240, 248, 0.55);
+  --text-muted:     rgba(240, 240, 248, 0.35);
+
+  --border-color:   rgba(255, 255, 255, 0.1);
+  --surface-color:  #13131c;
+  --bg-color:       #0a0a0f;
+
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.6);
+
+  background-color: var(--surface-0);
+  color: var(--text-main);
+}
+
+/* Admin-dark overrides for glass utilities */
+.admin-dark .glass-panel {
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
+}
+
+.admin-dark .glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.admin-dark .glass-modal {
+  background: rgba(18, 18, 28, 0.97) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7) !important;
+}
+
+.admin-dark .glass-overlay {
+  background: rgba(0, 0, 0, 0.65) !important;
+}
+
+.admin-dark .glass-input {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f0f0f8 !important;
+}
+
+.admin-dark .glass-input:focus {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border-color: var(--accent-main) !important;
+}
+
+.admin-dark .glass-button-secondary {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(240, 240, 248, 0.7) !important;
+}
+
+.admin-dark .glass-divider {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+}
+
+.admin-dark .skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.09) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+}
+
+/* Admin-dark scrollbar */
+.admin-dark ::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+}
+.admin-dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================================
+   ADMIN LIGHT SCOPE & UNIVERSAL OVERRIDES
+   Converts the entire admin portal and its modals into crisp, premium Light Mode.
+   ============================================================ */
+.admin-light {
+  color-scheme: light;
+  --surface-0:  #ffffff;
+  --surface-1:  #f8fafc;
+  --surface-2:  #f1f5f9;
+  --surface-3:  #e2e8f0;
+
+  --glass-bg:     rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --glass-blur:   blur(16px);
+
+  --text-main:      #0f172a;
+  --text-primary:   #0f172a;
+  --text-secondary: rgba(15, 23, 42, 0.68);
+  --text-dim:       rgba(15, 23, 42, 0.52);
+  --text-muted:     rgba(15, 23, 42, 0.38);
+
+  --border-color:   rgba(15, 23, 42, 0.08);
+  --surface-color:  #ffffff;
+  --bg-color:       #ffffff;
+
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.09);
+
+  background-color: var(--surface-0);
+  color: var(--text-main);
+}
+
+/* Ensure typography and containers inside .admin-light use readable dark text */
+.admin-light,
+.admin-light table,
+.admin-light tr,
+.admin-light td,
+.admin-light th,
+.admin-light h1,
+.admin-light h2,
+.admin-light h3,
+.admin-light h4,
+.admin-light h5,
+.admin-light h6,
+.admin-light p,
+.admin-light li,
+.admin-light label {
+  color: var(--text-main);
+}
+
+/* Override any hardcoded white text on headings, labels, paragraphs, and generic wrappers */
+.admin-light h1[style*="color: white"],
+.admin-light h2[style*="color: white"],
+.admin-light h2[style*="color: 'white'"],
+.admin-light h3[style*="color: white"],
+.admin-light h4[style*="color: white"],
+.admin-light label[style*="color: white"],
+.admin-light p[style*="color: white"],
+.admin-light div[style*="color: white"]:not(button div):not(.pro-badge) {
+  color: var(--text-main) !important;
+}
+
+/* Override root modal color: white wrapper styles */
+.admin-light > div[style*="color: 'white'"],
+.admin-light > div[style*="color: white"],
+.admin-light .prompt-modal[style*="color: white"],
+.admin-light .listicle-modal[style*="color: white"] {
+  color: var(--text-main) !important;
+}
+
+/* Glass Panels and Cards */
+.admin-light .glass-panel {
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.admin-light .glass-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.07) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.admin-light .glass-modal {
+  background: rgba(255, 255, 255, 0.97) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+  color: var(--text-main) !important;
+}
+
+.admin-light .glass-overlay {
+  background: rgba(17, 24, 39, 0.38) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+/* Inputs, Selects, Textareas */
+.admin-light input:not([type="checkbox"]):not([type="radio"]),
+.admin-light select,
+.admin-light textarea,
+.admin-light .glass-input {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.14) !important;
+  color: #14161a !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+}
+
+.admin-light input:not([type="checkbox"]):not([type="radio"]):focus,
+.admin-light select:focus,
+.admin-light textarea:focus,
+.admin-light .glass-input:focus {
+  background: #ffffff !important;
+  border-color: var(--accent-main) !important;
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.1) !important;
+  color: #14161a !important;
+}
+
+.admin-light input::placeholder,
+.admin-light textarea::placeholder {
+  color: rgba(20, 22, 26, 0.42) !important;
+}
+
+/* Secondary Buttons */
+.admin-light .glass-button-secondary {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  color: rgba(20, 22, 26, 0.75) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.admin-light .glass-button-secondary:hover {
+  background: rgba(229, 9, 20, 0.08) !important;
+  color: var(--accent-main) !important;
+  border-color: rgba(229, 9, 20, 0.3) !important;
+}
+
+/* Override inline rgba backgrounds used for cards, sections, tables, headers inside admin */
+.admin-light div[style*="background: rgba(255, 255, 255, 0.02)"],
+.admin-light div[style*="background: rgba(255,255,255,0.02)"],
+.admin-light div[style*="background: rgba(255, 255, 255, 0.03)"],
+.admin-light div[style*="background: rgba(255,255,255,0.03)"],
+.admin-light div[style*="background: rgba(255, 255, 255, 0.05)"],
+.admin-light div[style*="background: rgba(255,255,255,0.05)"] {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.07) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.admin-light div[style*="background: rgba(255, 255, 255, 0.08)"],
+.admin-light div[style*="background: rgba(255,255,255,0.08)"],
+.admin-light div[style*="background: rgba(255, 255, 255, 0.1)"],
+.admin-light div[style*="background: rgba(255,255,255,0.1)"] {
+  background: #f8f9fc !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Modal Bottom Action Bars and Headers */
+.admin-light div[style*="background: rgba(10,10,12"],
+.admin-light div[style*="background: rgba(10, 10, 12"],
+.admin-light div[style*="background: rgba(17, 24, 39"] {
+  background: #f8f9fc !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Override inline rgba borders */
+.admin-light div[style*="border: 1px solid rgba(255,255,255"],
+.admin-light div[style*="border: 1px solid rgba(255, 255, 255"],
+.admin-light div[style*="border: 2px dashed rgba(255,255,255"] {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Tables in Admin */
+.admin-light table {
+  background: #ffffff;
+}
+
+.admin-light table th {
+  background: #f8f9fc !important;
+  color: rgba(20, 22, 26, 0.65) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+.admin-light table tr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+.admin-light table tr:hover {
+  background: #f8f9fa !important;
+}
+
+/* Labels and Hints */
+.admin-light label[style*="color: rgba(255,255,255"],
+.admin-light label[style*="color: rgba(255, 255, 255"] {
+  color: rgba(20, 22, 26, 0.72) !important;
+}
+
+.admin-light small[style*="color: rgba(255,255,255"],
+.admin-light small[style*="color: rgba(255, 255, 255"] {
+  color: rgba(20, 22, 26, 0.55) !important;
+}
+
+/* OTP inputs specifically */
+.admin-light input[inputmode="numeric"] {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.18) !important;
+  color: #14161a !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Before/After slider inside UI Settings preview */
+.admin-light div[style*="background: #111"],
+.admin-light div[style*="background: '#111'"] {
+  background: #eef0f5 !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Command Palette */
+.admin-light .command-palette-input {
+  color: #14161a !important;
+}
+
+/* Custom Editor in light mode */
+.admin-light div[contenteditable="true"] {
+  background: #ffffff !important;
+  color: #14161a !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Admin-light scrollbar */
+.admin-light ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.04);
+}
+.admin-light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
 }
 
 a {
@@ -1709,19 +2041,23 @@ body.shorts-modal-open {
 .author-box-desc { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin: 0; max-width: 600px; }
 @media (max-width: 768px) { .author-box { flex-direction: column; text-align: center; padding: 24px; gap: 16px; } }
 
-/* Home Page Search Responsive CSS */
+/* Home Page Search Responsive CSS - Showstopping Apple Light Mode Command Bar */
 .home-search-wrapper {
   background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 24px;
-  padding: 10px 10px 10px 25px;
+  border: 1.5px solid rgba(15, 23, 42, 0.12);
+  border-radius: 100px;
+  padding: 8px 10px 8px 24px;
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 20px;
-  box-shadow: 0 20px 50px rgba(17,24,39,0.1);
+  gap: 16px;
+  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(15, 23, 42, 0.02);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+.home-search-wrapper:focus-within {
+  border-color: rgba(229, 9, 20, 0.45);
+  box-shadow: 0 30px 70px -15px rgba(229, 9, 20, 0.16), 0 0 0 4px rgba(229, 9, 20, 0.08);
 }
 .home-search-input-container {
   position: relative;
@@ -1733,24 +2069,33 @@ body.shorts-modal-open {
 .home-search-icon {
   position: absolute; 
   left: 0; 
-  color: var(--text-secondary);
-  opacity: 0.8;
+  color: #475569;
+  transition: color 0.2s ease;
+}
+.home-search-wrapper:focus-within .home-search-icon {
+  color: #e50914;
 }
 .home-search-input {
   width: 100%;
-  padding: 15px 20px 15px 40px;
+  padding: 14px 20px 14px 38px;
   border-radius: 0;
-  font-size: 1.1rem;
+  font-size: 1.08rem;
+  font-weight: 500;
   border: none;
   background: transparent;
-  color: var(--text-main);
+  color: #0f172a;
   outline: none;
+}
+.home-search-input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
 }
 .home-search-divider {
   width: 1px;
-  height: 40px;
-  background: rgba(0,0,0,0.1);
+  height: 32px;
+  background: rgba(15, 23, 42, 0.1);
   display: block;
+  flex-shrink: 0;
 }
 .home-search-buttons-group {
   display: flex; 
@@ -1759,54 +2104,63 @@ body.shorts-modal-open {
   width: auto;
 }
 .home-search-btn-pro {
-  height: 50px; 
-  border-radius: 16px; 
+  height: 48px; 
+  border-radius: 100px; 
   display: flex; 
   align-items: center; 
   justify-content: center; 
   gap: 8px; 
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   flex: initial;
-  padding: 0 25px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  padding: 0 24px;
+  font-size: 0.92rem;
+  font-weight: 800;
   white-space: nowrap;
+}
+.home-search-btn-pro:hover {
+  transform: translateY(-2px);
 }
 .home-search-btn-coffee {
   display: flex; 
   align-items: center; 
   justify-content: center; 
   gap: 8px;
-  height: 50px; 
-  border-radius: 16px; 
-  padding: 0 25px;
+  height: 48px; 
+  border-radius: 100px; 
+  padding: 0 24px;
   cursor: pointer;
-  background: rgba(255, 193, 7, 0.1);
-  border: 1px solid rgba(255, 193, 7, 0.2);
-  color: #FFC107;
-  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #e50914 0%, #b80710 100%);
+  border: 1px solid rgba(229, 9, 20, 0.3);
+  color: #ffffff;
+  box-shadow: 0 8px 22px rgba(229, 9, 20, 0.28);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   flex: initial;
   text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 0.92rem;
+  font-weight: 800;
   white-space: nowrap;
+}
+.home-search-btn-coffee:hover {
+  transform: scale(1.04) translateY(-2px);
+  box-shadow: 0 12px 30px rgba(229, 9, 20, 0.45);
 }
 
 @media (max-width: 1100px) {
   .home-search-wrapper {
-    padding: 15px;
+    padding: 16px;
+    border-radius: 32px;
     flex-direction: column;
-    gap: 15px;
+    gap: 14px;
   }
   .home-search-icon {
-    left: 15px;
+    left: 16px;
   }
   .home-search-input {
-    padding: 15px 20px 15px 50px;
-    border-radius: 16px;
-    border: 1px solid rgba(0,0,0,0.1);
-    background: rgba(0,0,0,0.03);
+    padding: 14px 20px 14px 48px;
+    border-radius: 20px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    background: #f8fafc;
   }
   .home-search-divider {
     display: none;
@@ -1816,7 +2170,7 @@ body.shorts-modal-open {
   }
   .home-search-btn-pro, .home-search-btn-coffee {
     flex: 1;
-    padding: 0 15px;
+    padding: 0 18px;
   }
 }
 
