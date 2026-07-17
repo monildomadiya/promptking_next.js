@@ -93,10 +93,10 @@ const Footer = ({ onLogoClick }) => {
               alignItems: 'flex-start',
               gap: '8px'
             }}>
-              <img 
+              <img
                 src="/promptking-logo.svg"
-                alt="PromptKing Logo" 
-                width="180"
+                alt="PromptKing Logo"
+                width="55"
                 height="55"
                 style={{
                   height: isMobile ? '45px' : '55px',
