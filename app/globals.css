@@ -38,9 +38,11 @@
   --surface-color: #ffffff;
   --bg-color: #f4f5f7;
 
-  --shadow-sm: 0 4px 12px rgba(17, 24, 39, 0.06);
-  --shadow-md: 0 8px 24px rgba(17, 24, 39, 0.09);
-  --shadow-lg: 0 16px 48px rgba(17, 24, 39, 0.14);
+  /* Flat UI: elevation tokens neutralized. Original values kept in
+     comments so shadows can be restored (see "FLAT UI" block below). */
+  --shadow-sm: none; /* was: 0 4px 12px rgba(17, 24, 39, 0.06) */
+  --shadow-md: none; /* was: 0 8px 24px rgba(17, 24, 39, 0.09) */
+  --shadow-lg: none; /* was: 0 16px 48px rgba(17, 24, 39, 0.14) */
 
   --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1960,3 +1962,22 @@ ins.adsbygoogle {
     overflow-x: hidden;
   }
 }
+
+/* ============================================================
+   FLAT UI — SHADOWS OFF
+   Site-wide flat design: no box-shadow, text-shadow, or logo
+   drop-shadow anywhere. This blanket rule also overrides inline
+   React styles (admin dashboard, prompt detail, logo), which
+   editing the CSS alone would miss.
+   To bring shadows back, DELETE this whole block (and, if you
+   want the elevation tokens back, restore --shadow-sm/md/lg above).
+   ============================================================ */
+*, *::before, *::after {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+/* logo drop-shadow (set inline in MagicKingIntro) */
+img[alt="Prompt King"] {
+  filter: none !important;
+}
+/* ============ END FLAT UI — SHADOWS OFF ============ */
