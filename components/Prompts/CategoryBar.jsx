@@ -1,0 +1,121 @@
+"use client";
+import React, { useRef } from 'react';
+import { Sparkles, Crown, Zap, Image, Grid, Layout } from '../Common/Icons';
+
+const FilterChip = ({ label, value, icon: Icon, count, isActive, onClick }) => (
+  <button
+    onClick={onClick}
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      padding: '10px 18px',
+      borderRadius: '100px',
+      background: isActive ? 'var(--accent-main)' : 'rgba(0, 0, 0, 0.04)',
+      border: '1px solid ' + (isActive ? 'var(--accent-main)' : 'rgba(0, 0, 0, 0.1)'),
+      color: isActive ? 'white' : 'var(--text-dim)',
+      whiteSpace: 'nowrap',
+      cursor: 'pointer',
+      fontSize: '0.85rem',
+      fontWeight: isActive ? 700 : 600,
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      boxShadow: isActive ? '0 8px 20px var(--accent-glow)' : 'none'
+    }}
+  >
+    {Icon && (
+      <Icon 
+        size={15} 
+        color={label === 'Premium' ? '#ffb703' : (isActive ? 'white' : 'currentColor')} 
+        fill={label === 'Premium' ? '#f59e0b' : 'none'} 
+      />
+    )}
+    <span>{label}</span>
+    {count !== undefined && (
+      <span style={{ 
+        fontSize: '0.7rem', 
+        opacity: 0.6,
+        background: isActive ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.06)',
+        padding: '2px 6px',
+        borderRadius: '6px'
+      }}>
+        {count}
+      </span>
+    )}
+  </button>
+);
+
+const CategoryBar = ({ filter, setFilter, categories, counts }) => {
+  const scrollRef = useRef(null);
+
+  const isActive = (val) => filter === val;
+
+
+
+  return (
+    <div style={{
+      width: '100%',
+      marginBottom: '20px',
+      position: 'sticky',
+      top: '0',
+      zIndex: 100,
+      background: 'var(--surface-0)',
+      padding: '10px 0',
+      borderBottom: '1px solid rgba(0, 0, 0, 0.07)'
+    }}>
+      <div 
+        ref={scrollRef}
+        style={{
+          display: 'flex',
+          gap: '10px',
+          overflowX: 'auto',
+          padding: '5px 15px 15px',
+          scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch',
+          msOverflowStyle: 'none'
+        }}
+        className="no-scrollbar"
+      >
+        {/* Filter Trigger Button */}
+        <button
+          onClick={() => window.dispatchEvent(new CustomEvent('openFilters'))}
+          aria-label="Open filters"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '10px 14px',
+            borderRadius: '12px',
+            background: 'var(--accent-glow)',
+            border: '1px solid var(--accent-main)',
+            color: 'var(--accent-main)',
+            cursor: 'pointer',
+            flexShrink: 0,
+            boxShadow: '0 4px 15px var(--accent-glow)'
+          }}
+        >
+          <Layout size={18} />
+        </button>
+
+        <div style={{ width: '1px', background: 'rgba(0, 0, 0, 0.1)', margin: '0 5px', flexShrink: 0 }} />
+
+        <FilterChip label="All" value="all" icon={Grid} count={counts.all}  isActive={filter === 'all'} onClick={() => setFilter(filter === 'all' ? 'all' : 'all')} />
+        <FilterChip label="Free" value="free" icon={Sparkles} count={counts.free}  isActive={filter === 'free'} onClick={() => setFilter(filter === 'free' ? 'all' : 'free')} />
+        <FilterChip label="Premium" value="premium" icon={Crown} count={counts.premium}  isActive={filter === 'premium'} onClick={() => setFilter(filter === 'premium' ? 'all' : 'premium')} />
+
+        
+        <div style={{ width: '1px', background: 'rgba(0, 0, 0, 0.1)', margin: '0 5px' }} />
+        
+        {categories.map((cat) => (
+          <FilterChip 
+            key={cat.id}
+            label={cat.name}
+            value={cat.name.toLowerCase()}
+            count={counts.categories?.[cat.name.toLowerCase()] || 0}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default CategoryBar;

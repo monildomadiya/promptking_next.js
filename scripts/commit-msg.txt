@@ -1,0 +1,1 @@
+fix: resolve errors, add missing API routes, GA4, favicon and back navigation fix

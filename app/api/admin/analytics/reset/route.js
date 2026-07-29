@@ -1,0 +1,29 @@
+export const dynamic = 'force-dynamic';
+import { NextResponse } from 'next/server';
+import db from '@/lib/db';
+import { getAdminAuth } from '@/lib/auth';
+
+export async function POST(req) {
+  const isAdmin = await getAdminAuth(req);
+  if (!isAdmin) return NextResponse.json({ error: 'Admin access required' }, { status: 401 });
+
+  try {
+    // Reset all interaction counts on prompts
+    await db`
+      UPDATE prompts
+      SET view_count = 0, copy_count = 0, unlock_count = 0, like_count = 0
+    `;
+
+    // Clear analytics_daily table if it exists
+    try {
+      await db`TRUNCATE TABLE analytics_daily`;
+    } catch (e) {
+      // Table may not exist — that's fine
+    }
+
+    return NextResponse.json({ success: true, message: 'Analytics data has been reset.' });
+  } catch (error) {
+    console.error('Analytics reset error:', error);
+    return NextResponse.json({ error: 'Failed to reset analytics data' }, { status: 500 });
+  }
+}

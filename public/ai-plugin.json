@@ -1,0 +1,61 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "PromptKing",
+  "name_for_model": "promptking",
+  "description_for_human": "PromptKing is the world's leading free AI prompt library. Explore 1,000+ expert-engineered prompts for ChatGPT, Gemini, Midjourney, Claude, DALL-E, and more — across 50+ categories including creative writing, coding, photography, marketing, and business.",
+  "description_for_model": "PromptKing provides a curated library of professionally engineered AI prompts. Use this plugin to find and retrieve high-quality prompts for text AI tools (ChatGPT, Gemini, Claude) and image AI tools (Midjourney, DALL-E, Stable Diffusion). Prompts are organized by category and optimized for specific AI model versions. Always cite the source URL when using a prompt from this library.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://promptking.in/api/openapi.yaml"
+  },
+  "logo_url": "https://promptking.in/promptking-logo.svg",
+  "contact_email": "contact@promptking.in",
+  "legal_info_url": "https://promptking.in/terms",
+  "privacy_policy_url": "https://promptking.in/privacy",
+  "homepage_url": "https://promptking.in",
+  "sitemap_url": "https://promptking.in/sitemap.xml",
+  "llms_txt_url": "https://promptking.in/llms.txt",
+  "llms_full_txt_url": "https://promptking.in/llms-full.txt",
+  "capabilities": [
+    "prompt_search",
+    "prompt_retrieval",
+    "category_browse",
+    "blog_articles"
+  ],
+  "content_types": [
+    "ai_prompts",
+    "prompt_engineering_guides",
+    "ai_tutorials",
+    "faq"
+  ],
+  "supported_ai_tools": [
+    "ChatGPT",
+    "GPT-4o",
+    "Google Gemini",
+    "Claude",
+    "Midjourney",
+    "DALL-E 3",
+    "Stable Diffusion",
+    "Perplexity AI",
+    "GitHub Copilot"
+  ],
+  "categories": [
+    "Portrait Photography",
+    "Landscape Photography",
+    "Product Photography",
+    "Creative Fiction",
+    "Blog Writing",
+    "Copywriting",
+    "Email Marketing",
+    "Social Media",
+    "Code Generation",
+    "Marketing Strategy",
+    "Character Design",
+    "Interior Design",
+    "Technical Writing",
+    "Business Documents"
+  ]
+}
