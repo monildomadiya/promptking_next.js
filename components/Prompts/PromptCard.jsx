@@ -275,19 +275,19 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
   }
 
   return (
-    <div ref={cardRef} className="pro-card pro-card-hover masonry-grid-item glass-card" style={{
-      background: '#ffffff',
-      backdropFilter: 'blur(15px)',
-      WebkitBackdropFilter: 'blur(15px)',
-      border: isHighlighted ? '2px solid var(--accent-main)' : '1px solid rgba(0, 0, 0, 0.1)',
-      borderRadius: '24px',
-      padding: `${cardPadding}px`,
+    <div ref={cardRef} className="masonry-grid-item" style={{
+      background: 'transparent',
+      padding: '0',
+      border: isHighlighted ? '2px solid var(--accent-main)' : 'none',
+      borderRadius: '16px',
       zIndex: isHighlighted ? 10 : 1,
       transform: isHighlighted ? 'scale(1.02)' : 'scale(1)',
       transition: 'all 0.4s ease-in-out',
       boxShadow: isHighlighted ? '0 0 25px rgba(229, 9, 20, 0.3)' : 'none',
       position: 'relative',
-      overflow: isHighlighted ? 'visible' : 'hidden' // Only allow overflow for highlighted sticker
+      overflow: isHighlighted ? 'visible' : 'hidden', // Only allow overflow for highlighted sticker
+      display: 'flex',
+      flexDirection: 'column'
     }}>
       {/* Premium Badge - Top Right */}
       {prompt.isPremium && (
@@ -313,6 +313,30 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
         </div>
       )}
 
+      {/* Featured Badge - Top Right (below premium if premium exists) */}
+      {prompt.isFeatured && (
+        <div style={{
+          position: 'absolute', 
+          top: prompt.isPremium ? '56px' : '12px', 
+          right: '12px', 
+          background: 'rgba(0, 0, 0, 0.4)',
+          backdropFilter: 'blur(12px)', 
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(229, 9, 20, 0.5)', 
+          borderRadius: '50%',
+          width: '36px', 
+          height: '36px', 
+          display: 'flex', 
+          alignItems: 'center',
+          justifyContent: 'center', 
+          zIndex: 50, 
+          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+          pointerEvents: 'none'
+        }}>
+          <Star size={16} fill="var(--accent-main)" color="var(--accent-main)" />
+        </div>
+      )}
+
 
 
       {isHighlighted && (
@@ -333,22 +357,22 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
       )}
       {/* Top Content Wrapper - Animate disappearance */}
       <div style={{
-        maxHeight: (isUnlocked && prompt.isPremium) ? '0' : '600px',
+        maxHeight: (isUnlocked && prompt.isPremium) ? '0' : '2000px',
         opacity: (isUnlocked && prompt.isPremium) ? '0' : '1',
         overflow: 'hidden',
         transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
         pointerEvents: (isUnlocked && prompt.isPremium) ? 'none' : 'auto',
         marginBottom: (isUnlocked && prompt.isPremium) ? '0' : '8px',
-        margin: `-${cardPadding}px -${cardPadding}px 0 -${cardPadding}px`,
-        width: `calc(100% + ${cardPadding * 2}px)`,
-        borderRadius: '24px 24px 0 0'
+        width: '100%',
+        borderRadius: '16px'
       }}>
         {/* Image Section */}
         {prompt.isImageSlider ? (
           <div ref={sliderContainerRef} className="slider-container prompt-image-container" style={{ 
-            aspectRatio: ratio, width: '100%', margin: `0 0 15px 0`,
-            position: 'relative', overflow: 'hidden', borderBottom: '1px solid var(--border-color)',
+            aspectRatio: ratio, width: '100%', margin: '0',
+            position: 'relative', overflow: 'hidden',
             background: '#e8eaee',
+            borderRadius: '16px',
             opacity: isSettingsLoaded ? 1 : 0,
             transition: 'opacity 0.3s ease-in-out'
           }}>
@@ -433,7 +457,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
 
           </div>
         ) : (prompt.thumbnail_url || prompt.imgAfter || prompt.img_after || prompt.imgBefore || prompt.img_before) && (
-          <div className="prompt-image-container" style={{ width: '100%', margin: `0 0 15px 0`, aspectRatio: ratio, background: '#e8eaee', overflow: 'hidden', position: 'relative' }}>
+          <div className="prompt-image-container" style={{ width: '100%', margin: '0', aspectRatio: ratio, background: '#e8eaee', overflow: 'hidden', position: 'relative', borderRadius: '16px' }}>
             <img 
               src={optimizeImage(prompt.thumbnail_url || prompt.imgAfter || prompt.img_after || prompt.imgBefore || prompt.img_before, isMobile ? 450 : 600)} 
               alt={`${prompt.title} - ${prompt.aiType || 'AI'} Prompt Example`} 
@@ -450,21 +474,16 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
           </div>
         )}
         {/* Header Info */}
-        <Link href={`/prompt/${prompt.slug || prompt.prompt_key || prompt.key}`} style={{ color: 'inherit', textDecoration: 'none', display: 'block', padding: `0 ${cardPadding}px` }}>
-          {prompt.isFeatured && (
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(229, 9, 20, 0.1)', border: '1px solid rgba(229, 9, 20, 0.3)', color: 'var(--accent-main)', padding: '2px 8px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>
-              <Star size={10} fill="var(--accent-main)" color="var(--accent-main)" />
-              Featured
-            </div>
-          )}
+        <Link href={`/prompt/${prompt.slug || prompt.prompt_key || prompt.key}`} style={{ color: 'inherit', textDecoration: 'none', display: 'block', padding: '0 4px' }}>
           <h3 style={{
             fontSize: '1rem',
             fontWeight: 500,
+            marginTop: '4px',
             marginBottom: '8px',
             lineHeight: 1.4,
             color: 'rgba(20, 22, 26, 0.92)',
             display: '-webkit-box',
-            WebkitLineClamp: 2,
+            WebkitLineClamp: 1,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
             textOverflow: 'ellipsis'

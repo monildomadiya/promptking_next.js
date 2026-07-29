@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 import PromptCard from './PromptCard';
-import MagicKingIntro from './MagicKingIntro';
 import Shimmer from '../Common/Shimmer';
 import api from '@/lib/api';
 
@@ -286,8 +285,6 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
         </div>
       )}
 
-      {/* The Magic Ruler section */}
-      <MagicKingIntro isMobile={isMobile} />
     </div>
   );
 };

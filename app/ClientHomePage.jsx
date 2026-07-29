@@ -56,26 +56,6 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
         url={`https://promptking.in${categorySlug ? `/category/${categorySlug}` : '/'}`}
         schema={schema}
       />
-      <div style={{ position: 'relative', textAlign: 'center', marginTop: '70px', padding: '0 20px', zIndex: 10 }}>
-        {/* Subtle glowing background behind title */}
-        {!categorySlug && (
-          <div style={{
-            position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-            width: '100%', maxWidth: '800px', height: '100%', minHeight: '150px',
-            background: 'radial-gradient(ellipse at center, rgba(229,9,20,0.06) 0%, rgba(255,255,255,0) 70%)',
-            zIndex: -1, pointerEvents: 'none', filter: 'blur(30px)'
-          }}></div>
-        )}
-
-        <h1 className="home-hero-title">
-          {categorySlug ? `${categorySlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} AI Prompts` : 'The Best AI Prompts for ChatGPT, Gemini & Midjourney'}
-        </h1>
-        {!categorySlug && (
-          <p className="home-hero-subtitle">
-            Copy-paste ready prompts for writers, creators, students, and professionals. Save hours — just pick a prompt and go.
-          </p>
-        )}
-      </div>
 
       <div style={{
         maxWidth: '1000px', margin: '40px auto 40px', padding: '0 20px',

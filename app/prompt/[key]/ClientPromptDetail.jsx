@@ -110,9 +110,19 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
   const [suggestedPrompts, setSuggestedPrompts] = useState(initialSuggestedPrompts || []);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(null);
-  
+  const [descExpanded, setDescExpanded] = useState(false);
+  const [descOverflows, setDescOverflows] = useState(false);
+  const [expandedFaq, setExpandedFaq] = useState(null);
+  const descRef = useRef(null);
   const sliderContainerRef = useRef(null);
   const isDragging = useRef(false);
+
+  // Detect if description overflows the collapsed height
+  useEffect(() => {
+    if (descRef.current) {
+      setDescOverflows(descRef.current.scrollHeight > descRef.current.clientHeight + 2);
+    }
+  }, [prompt?.description]);
 
   useEffect(() => {
     if (settings?.slider_default_position) {
@@ -151,7 +161,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
     }
     
     // Record view
-    api.post('/record_view', { key: key }).catch(err => console.error("Failed to record view:", err));
+    api.post('/record_view', { key: key }).catch(err => console.warn("Failed to record view:", err));
   }, [key, initialPrompt, initialSuggestedPrompts]);
 
 
@@ -264,7 +274,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
     if (inputPass === targetPass) {
       setIsUnlocked(true);
       triggerConfetti();
-      api.post('/record_unlock', { key: prompt.prompt_key || prompt.key || key }).catch(err => console.error("Failed to record unlock:", err));
+      api.post('/record_unlock', { key: prompt.prompt_key || prompt.key || key }).catch(err => console.warn("Failed to record unlock:", err));
       
       // Auto-center the box so the user sees the unlocked content
       setTimeout(() => {
@@ -355,7 +365,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
       }
 
       // Record copy
-      api.post('/record_copy', { key: prompt.prompt_key || prompt.key || key }).catch(err => console.error("Failed to record copy:", err));
+      api.post('/record_copy', { key: prompt.prompt_key || prompt.key || key }).catch(err => console.warn("Failed to record copy:", err));
       
       // Success Confetti for Free content
       const box = document.getElementById(`box-detail`);
@@ -610,40 +620,25 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
           <ArrowLeft size={18} /> Back
         </button>
 
+        {/* Header Section: Title & Stats (Moved outside grid) */}
+        <div style={{ marginBottom: '35px' }}>
+          <h1 className="prompt-detail-title" style={{ 
+            fontSize: '2.4rem', 
+            fontWeight: 900, 
+            marginBottom: '15px', 
+            lineHeight: 1.1, 
+            letterSpacing: '-1px',
+            background: 'linear-gradient(to right, #14161a, #4a4e55)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}>{prompt.title}</h1>
+        </div>
+
         {/* Grid Layout for both normal prompts and listicles (with sidebar) */}
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: '40px', maxWidth: isListicle ? '1600px' : 'none', margin: isListicle ? '0 auto' : '0' }} className="detail-layout">
           
           {/* Main Content (Left) */}
           <article ref={contentRef} className="detail-main-content" style={{ width: '100%' }}>
-            
-            {/* Header Section: Title & Stats */}
-            <div style={{ marginBottom: '35px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '12px' }}>
-                <span className={`badge ${badgeClass}`} style={{ 
-                  fontSize: '0.75rem', 
-                  padding: '6px 16px',
-                  borderRadius: '10px',
-                  fontWeight: 800,
-                  textTransform: 'uppercase',
-                  background: 'rgba(0,0,0,0.04)',
-                  border: `1px solid ${brandColor || 'rgba(0,0,0,0.1)'}`,
-                  color: brandColor || 'var(--text-main)'
-                }}>{prompt.aiType || 'AI'}</span>
-
-              </div>
-              <h1 className="prompt-detail-title" style={{ 
-                fontSize: '2.4rem', 
-                fontWeight: 900, 
-                marginBottom: '15px', 
-                lineHeight: 1.1, 
-                letterSpacing: '-1px',
-                background: 'linear-gradient(to right, #14161a, #4a4e55)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}>{prompt.title}</h1>
-              
-
-            </div>
 
             {/* Media & Prompt Split Container */}
             <div className={`media-prompt-container ${isListicle ? 'listicle-mode' : ''}`} style={{ display: 'flex', gap: '40px', alignItems: 'stretch', flexDirection: isListicle ? 'column' : 'row' }}>
@@ -752,43 +747,64 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
                 display: 'flex', 
                 flexDirection: 'column',
                 gap: '20px',
-                flex: isListicle ? 'none' : 1
+                flex: isListicle ? 'none' : 1,
+                minWidth: 0,
+                overflow: 'visible'
               }}>
-              {/* Interactive Vault Section */}
+              {/* Interactive Vault Section - Clean Pinterest Style */}
               <div id="box-detail" className={`prompt-area ${isUnlocked ? 'unlocked' : ''} ${isCopied && !prompt.isPremium ? 'copy-success-pulse-detail' : ''} ${isRelocking ? 'vault-relock-animate' : ''}`} style={{
-              background: 'linear-gradient(160deg, #1b1d24 0%, #14151b 100%)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              borderRadius: '32px',
+              background: '#f8f8f8',
+              borderRadius: '24px',
               position: 'relative',
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
-              border: isUnlocked ? (prompt.isPremium ? '2px solid #FFD700' : (isCopied ? '2px solid #27C93F' : '2px solid var(--accent-main)')) : '1px solid rgba(255, 255, 255,0.12)',
-              boxShadow: isUnlocked ? (prompt.isPremium ? '0 15px 50px rgba(255, 215, 0, 0.15)' : (isCopied ? '0 15px 50px rgba(39, 201, 63, 0.3)' : '0 15px 50px rgba(229, 9, 20, 0.2)')) : 'none',
-              transform: isUnlocked ? (isCopied && !prompt.isPremium ? 'scale(1.02)' : 'scale(1.01)') : 'scale(1)',
+              border: isUnlocked 
+                ? (prompt.isPremium ? '2px solid #FFD700' : (isCopied ? '2px solid #27C93F' : '2px solid var(--accent-main)')) 
+                : '1px solid rgba(0, 0, 0, 0.1)',
+              boxShadow: isUnlocked 
+                ? (prompt.isPremium ? '0 10px 40px rgba(255, 215, 0, 0.12)' : (isCopied ? '0 10px 40px rgba(39, 201, 63, 0.15)' : '0 10px 40px rgba(229, 9, 20, 0.1)')) 
+                : '0 4px 20px rgba(0,0,0,0.04)',
+              transform: 'none',
               minHeight: '350px',
               transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
               height: '100%',
               flex: 1
             }}>
               {/* Vault Header */}
-              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '15px 20px', borderBottom: '1px solid rgba(255, 255, 255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#FF5F56', opacity: 0.8 }}></div>
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#FFBD2E', opacity: 0.8 }}></div>
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#27C93F', opacity: 0.8 }}></div>
+              <div style={{ 
+                padding: '14px 20px', 
+                borderBottom: '1px solid rgba(0, 0, 0, 0.06)', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between',
+                background: 'rgba(0,0,0,0.02)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#FF5F56' }}></div>
+                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#FFBD2E' }}></div>
+                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#27C93F' }}></div>
                 </div>
-                <div style={{ fontSize: '0.7rem', fontWeight: 800, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                  {isUnlocked ? 'Encrypted Data Accessed' : 'Security Vault Locked'}
+                <div style={{ 
+                  fontSize: '0.7rem', 
+                  fontWeight: 700, 
+                  color: 'rgba(0,0,0,0.3)', 
+                  textTransform: 'uppercase', 
+                  letterSpacing: '1px' 
+                }}>
+                  {isUnlocked ? 'Prompt Unlocked' : 'Prompt Locked'}
                 </div>
               </div>
               
               <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{
-                  position: 'absolute', inset: 0, padding: '25px 25px 64px', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.9rem', color: '#fff', lineHeight: 1.8,
-                  filter: (isUnlocked && !isRelocking) ? 'none' : 'blur(12px)',
-                  WebkitFilter: (isUnlocked && !isRelocking) ? 'none' : 'blur(12px)',
+                  position: 'absolute', inset: 0, padding: '20px 20px 64px', 
+                  fontFamily: '"Inter", "SF Pro Display", -apple-system, sans-serif', 
+                  fontSize: '0.9rem', 
+                  color: '#2d2d2d', 
+                  lineHeight: 1.8,
+                  filter: (isUnlocked && !isRelocking) ? 'none' : 'blur(8px)',
+                  WebkitFilter: (isUnlocked && !isRelocking) ? 'none' : 'blur(8px)',
                   userSelect: (isUnlocked && !isRelocking) ? 'text' : 'none',
                   overflowY: (isUnlocked && !isRelocking) ? 'auto' : 'hidden',
                   overflowWrap: 'break-word', wordBreak: 'break-word',
@@ -805,9 +821,9 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
                       position: 'absolute',
                       bottom: '15px',
                       right: '15px',
-                      background: isCopied ? 'var(--accent-main)' : 'rgba(255,255,255,0.1)',
-                      border: '1px solid rgba(255,255,255,0.2)',
-                      color: 'white',
+                      background: isCopied ? 'var(--accent-main)' : 'rgba(0,0,0,0.06)',
+                      border: '1px solid rgba(0,0,0,0.1)',
+                      color: isCopied ? 'white' : '#333',
                       padding: '10px 18px',
                       borderRadius: '12px',
                       display: 'flex',
@@ -871,24 +887,24 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
                       <button 
                         onClick={() => setShowVideoModal(true)}
                         style={{ 
-                          background: 'rgba(255,255,255,0.1)', 
-                          fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', gap: '8px', 
+                          background: 'rgba(0,0,0,0.05)', 
+                          fontSize: '0.8rem', color: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', gap: '8px', 
                           padding: '8px 16px', borderRadius: '10px',
-                          textDecoration: 'none', border: '1px solid rgba(255, 255, 255,0.15)', cursor: 'pointer',
+                          textDecoration: 'none', border: '1px solid rgba(0, 0, 0, 0.1)', cursor: 'pointer',
                           transition: 'all 0.3s ease'
                         }}
                         onMouseOver={(e) => { 
                           const isMobile = window.innerWidth <= 1100;
                           if (!isMobile) {
-                            e.currentTarget.style.color = 'white'; 
-                            e.currentTarget.style.background = 'rgba(255,255,255,0.25)'; 
+                            e.currentTarget.style.color = '#333'; 
+                            e.currentTarget.style.background = 'rgba(0,0,0,0.08)'; 
                           }
                         }}
                         onMouseOut={(e) => { 
                           const isMobile = window.innerWidth <= 1100;
                           if (!isMobile) {
-                            e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; 
-                            e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; 
+                            e.currentTarget.style.color = 'rgba(0,0,0,0.45)'; 
+                            e.currentTarget.style.background = 'rgba(0,0,0,0.05)'; 
                           }
                         }}
                       >
@@ -904,20 +920,21 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
                 )}
                 
                 {prompt?.isPremium && (
-                  <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 100 }}>
+                  <div style={{ position: 'absolute', top: '16px', right: '16px', zIndex: 100 }}>
                     <div style={{
-                      background: 'rgba(0,0,0,0.4)',
+                      background: 'rgba(255,255,255,0.9)',
                       backdropFilter: 'blur(10px)',
                       WebkitBackdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 215, 0, 0.3)',
                       borderRadius: '50%',
-                      width: '46px',
-                      height: '46px',
+                      width: '40px',
+                      height: '40px',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center'
+                      justifyContent: 'center',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
                     }}>
-                      <Crown size={22} fill="#FFD700" color="#FFD700" />
+                      <Crown size={20} fill="#FFD700" color="#FFD700" />
                     </div>
                   </div>
                 )}
@@ -1264,92 +1281,67 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
               );
             })()}
 
-            {/* Content Section: Description */}
+            {/* Content Section: Description - Pinterest Style */}
             {prompt.description && prompt.description.replace(/<[^>]*>?/gm, '').trim() !== '' && (
               <div className="detail-description-section" style={{
                 padding: '20px 0',
                 borderTop: '1px solid rgba(0, 0, 0,0.08)',
                 marginTop: '20px'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
-                  <div style={{ width: '4px', height: '24px', background: 'var(--accent-main)', borderRadius: '2px' }} />
-                  <h2 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0, color: 'var(--text-main)' }}>
-                    About This
-                  </h2>
+                <h2 style={{ fontSize: '1.1rem', fontWeight: 800, letterSpacing: '-0.3px', margin: '0 0 12px 0', color: 'var(--text-main)' }}>
+                  Description
+                </h2>
+                <div style={{ position: 'relative' }}>
+                  <div
+                    ref={descRef}
+                    className="blog-content"
+                    style={{
+                      color: '#3f434a',
+                      lineHeight: 1.8,
+                      fontSize: '1rem',
+                      maxHeight: descExpanded ? 'none' : '5.4em',
+                      overflow: 'hidden',
+                      transition: 'max-height 0.4s ease'
+                    }}
+                    dangerouslySetInnerHTML={{ __html: prompt.description }}
+                  />
+                  {!descExpanded && descOverflows && (
+                    <div style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: '40px',
+                      background: 'linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1))',
+                      pointerEvents: 'none'
+                    }} />
+                  )}
                 </div>
-                <div
-                  className="blog-content"
-                  style={{ color: '#3f434a', lineHeight: 1.9, fontSize: '1.1rem' }}
-                  dangerouslySetInnerHTML={{ __html: prompt.description }}
-                />
+                {descOverflows && (
+                  <button
+                    onClick={() => setDescExpanded(!descExpanded)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: '4px 0',
+                      marginTop: '4px',
+                      color: 'var(--text-main)',
+                      fontWeight: 700,
+                      fontSize: '0.9rem',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    {descExpanded ? '▴ Less' : '▾ More'}
+                  </button>
+                )}
               </div>
             )}
 
-            {/* NEW: How to Use Prompt Section */}
-            {!isListicle && prompt.description && prompt.description.replace(/<[^>]*>?/gm, '').trim() !== '' && (
-              <section className="how-to-use-section" style={{ padding: '30px 0', borderTop: '1px solid rgba(0, 0, 0,0.08)', marginTop: '20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
-                  <div style={{ width: '4px', height: '24px', background: 'var(--accent-main)', borderRadius: '2px' }} />
-                  <h2 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0, color: 'var(--text-main)' }}>
-                    How to Use this AI Prompt?
-                  </h2>
-                </div>
-                
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
-                  {[
-                    { step: "01", title: "Copy Prompt", desc: "Click the copy button above to instantly capture the full, optimized prompt text to your clipboard." },
-                    { step: "02", title: "Choose AI Tool", desc: "Open your favorite AI website like ChatGPT, Midjourney, or Bing. Trying different tools can give you even more amazing and professional results." },
-                    { step: "03", title: "Paste & Customize", desc: "Paste the prompt into the tool. You can easily tweak any part of the text to match your exact creative vision." },
-                    { step: "04", title: "Generate Magic", desc: "Press enter and watch as the AI generates stunning, high-quality results based on your custom prompt in seconds." }
-                  ].map((item, i) => (
-                    <div key={i} style={{
-                      background: '#ffffff',
-                      padding: '24px',
-                      borderRadius: '20px',
-                      border: '1px solid rgba(0, 0, 0, 0.08)',
-                      boxShadow: '0 2px 12px rgba(17,24,39,0.04)',
-                      transition: 'all 0.3s ease'
-                    }}>
-                      <div style={{ color: 'var(--accent-main)', fontSize: '0.8rem', fontWeight: 900, marginBottom: '10px', opacity: 0.85 }}>STEP {item.step}</div>
-                      <h4 style={{ color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: 700, marginBottom: '10px' }}>{item.title}</h4>
-                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.6, margin: 0 }}>{item.desc}</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
 
-            {/* Tags */}
-            {parsedTags && parsedTags.length > 0 && (
-              <div style={{ marginTop: '50px', display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
-                <Tag size={18} color="var(--text-dim)" />
-                {parsedTags.map((tag, i) => (
-                  <span key={i} style={{ background: 'rgba(0,0,0,0.04)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.85rem', color: 'var(--text-secondary)', border: '1px solid rgba(0, 0, 0,0.1)' }}>
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
 
-            {/* Author Box */}
-            <div className="author-box">
-              <div className="author-box-bg" />
-              <div className="author-box-img-container">
-                <img 
-                  src={prompt.author_image ? optimizeImage(prompt.author_image, 150) : "https://github.com/monildomadiya.png"} 
-                  alt={prompt.author_name || 'PromptKing Admin'} 
-                  className="author-box-img"
-                  onError={(e) => { e.target.src = 'https://promptking.in/favicon.png' }}
-                />
-              </div>
-              <div className="author-box-content">
-                <div className="author-box-label">Prompt Creator</div>
-                <h4 className="author-box-name">{prompt.author_name || 'PromptKing Admin'}</h4>
-                <p className="author-box-desc">
-                  {prompt.author_description || 'Passionate about AI and creative workflows. Exploring the frontiers of prompt engineering to help you unlock the true potential of tools like ChatGPT, Midjourney, and Gemini.'}
-                </p>
-              </div>
-            </div>
 
 
 
@@ -1362,11 +1354,59 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
                     Frequently Asked Questions
                   </h2>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
                   {parsedFaqs.map((faq, i) => (
-                    <div key={i} style={{ background: '#ffffff', padding: '25px', borderRadius: '20px', border: '1px solid rgba(0, 0, 0, 0.08)', boxShadow: '0 2px 12px rgba(17,24,39,0.04)' }}>
-                      <h3 style={{ fontSize: '1.1rem', marginBottom: '12px', color: 'var(--text-main)', fontWeight: 700 }}>{faq.question}</h3>
-                      <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', lineHeight: 1.7, margin: 0 }}>{faq.answer}</p>
+                    <div 
+                      key={i} 
+                      onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
+                      style={{ 
+                        padding: '16px 0', 
+                        borderBottom: i !== parsedFaqs.length - 1 ? '1px solid rgba(0,0,0,0.06)' : 'none', 
+                        cursor: 'pointer',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
+                        <h3 style={{ 
+                          fontSize: '1.05rem', 
+                          margin: 0, 
+                          color: expandedFaq === i ? 'var(--accent-main)' : 'var(--text-main)', 
+                          fontWeight: 700,
+                          transition: 'color 0.2s ease',
+                          lineHeight: 1.4
+                        }}>
+                          {faq.question}
+                        </h3>
+                        <div style={{
+                          color: expandedFaq === i ? 'var(--accent-main)' : 'var(--text-dim)',
+                          transform: expandedFaq === i ? 'rotate(180deg)' : 'rotate(0deg)',
+                          transition: 'transform 0.3s ease, color 0.3s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </div>
+                      
+                      <div style={{
+                        maxHeight: expandedFaq === i ? '500px' : '0px',
+                        opacity: expandedFaq === i ? 1 : 0,
+                        transition: 'all 0.3s ease-in-out',
+                        marginTop: expandedFaq === i ? '12px' : '0px'
+                      }}>
+                        <p style={{ 
+                          fontSize: '0.95rem', 
+                          color: 'var(--text-secondary)', 
+                          lineHeight: 1.6, 
+                          margin: 0
+                        }}>
+                          {faq.answer}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -1377,84 +1417,193 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
 
           </article>
 
-          {/* Sidebar (Right) */}
+          {/* Sidebar (Right) - Pinterest Style */}
           <aside className="detail-sidebar">
             <div style={{
-              background: '#ffffff',
-              border: '1px solid rgba(0, 0, 0, 0.08)',
-              borderRadius: '28px',
-              padding: '28px',
               position: 'sticky',
               top: '110px',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              boxShadow: '0 20px 40px rgba(17,24,39,0.08)'
             }}>
 
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '18px' }}>
                 <div style={{ width: '3px', height: '20px', background: 'var(--accent-main)', borderRadius: '2px' }} />
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0 }}>
-                  Related Creations
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0 }}>
+                  More like this
                 </h3>
               </div>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ columns: '2', columnGap: '12px' }}>
                 {suggestedPrompts.map(s => (
                   <Link 
                     key={s.key} 
                     href={`/prompt/${s.slug || s.prompt_key || s.key}`} 
                     style={{ 
-                      display: 'flex', 
-                      gap: '14px', 
+                      display: 'block',
                       textDecoration: 'none', 
                       color: 'inherit',
-                      padding: '12px',
-                      borderRadius: '18px',
-                      background: 'rgba(0,0,0,0.02)',
-                      border: '1px solid rgba(0, 0, 0,0.07)',
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                      breakInside: 'avoid',
+                      marginBottom: '12px',
                     }}
                     className="suggested-card-item"
                   >
                     <div style={{ 
-                      width: '85px', 
-                      height: '65px', 
-                      borderRadius: '12px', 
+                      borderRadius: '16px', 
                       overflow: 'hidden',
-                      flexShrink: 0,
                       background: '#e8eaee',
-                      border: '1px solid rgba(0, 0, 0,0.08)'
                     }}>
-                      <img src={s.imgAfter} alt={s.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: '0.5s' }} className="suggestion-img" />
+                      <img 
+                        src={s.imgAfter || s.img_after || s.imgBefore || s.img_before || s.thumbnail_url} 
+                        alt={s.title} 
+                        loading="lazy"
+                        style={{ 
+                          width: '100%', 
+                          height: 'auto',
+                          display: 'block',
+                          objectFit: 'cover', 
+                          transition: 'transform 0.4s ease',
+                        }} 
+                        className="suggestion-img" 
+                      />
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '4px' }}>
-                      <h4 style={{ 
-                        fontSize: '0.9rem', 
-                        fontWeight: 700, 
-                        lineHeight: 1.3, 
-                        display: '-webkit-box', 
-                        WebkitLineClamp: 2, 
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                        color: 'var(--text-main)'
-                      }}>{s.title}</h4>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ 
-                          fontSize: '0.65rem', 
-                          color: s.aiType?.toLowerCase().includes('chatgpt') ? '#10a37f' : (s.aiType?.toLowerCase().includes('gemini') ? '#4285f4' : 'var(--accent-main)'), 
-                          fontWeight: 800, 
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px'
-                        }}>{s.aiType}</span>
-                        <div style={{ width: '3px', height: '3px', borderRadius: '50%', background: 'rgba(0,0,0,0.25)' }} />
-                        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600 }}>Pro Choice</span>
-                      </div>
-                    </div>
+                    <h4 style={{ 
+                      fontSize: '0.8rem', 
+                      fontWeight: 600, 
+                      lineHeight: 1.3, 
+                      margin: '6px 2px 0',
+                      display: '-webkit-box', 
+                      WebkitLineClamp: 1, 
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      color: 'var(--text-main)'
+                    }}>{s.title}</h4>
                   </Link>
                 ))}
               </div>
             </div>
+            
+            {/* Premium Author Box in Sidebar */}
+            <div style={{ marginTop: '40px' }}>
+              <div style={{ 
+                background: '#ffffff', 
+                borderRadius: '24px', 
+                padding: '24px', 
+                border: '1px solid rgba(0,0,0,0.06)',
+                boxShadow: '0 10px 40px rgba(0,0,0,0.03), 0 2px 10px rgba(0,0,0,0.02)',
+                position: 'relative',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+              }}
+              className="premium-author-sidebar"
+              >
+                {/* Subtle gradient background accent */}
+                <div style={{
+                  position: 'absolute',
+                  top: 0, right: 0, left: 0, height: '80px',
+                  background: 'linear-gradient(135deg, rgba(229, 9, 20, 0.05) 0%, transparent 100%)',
+                  zIndex: 0
+                }} />
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', zIndex: 1, position: 'relative' }}>
+                  <div style={{
+                    width: '64px', height: '64px',
+                    borderRadius: '20px',
+                    padding: '3px',
+                    background: 'linear-gradient(135deg, #FF5F56, var(--accent-main))',
+                    flexShrink: 0,
+                    boxShadow: '0 8px 20px rgba(229, 9, 20, 0.2)'
+                  }}>
+                    <img 
+                      src={prompt.author_image ? optimizeImage(prompt.author_image, 150) : "https://github.com/monildomadiya.png"} 
+                      alt={prompt.author_name || 'PromptKing Admin'} 
+                      style={{
+                        width: '100%', height: '100%',
+                        borderRadius: '17px',
+                        objectFit: 'cover',
+                        background: '#fff'
+                      }}
+                      onError={(e) => { e.target.src = 'https://promptking.in/favicon.png' }}
+                    />
+                  </div>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ 
+                      fontSize: '0.7rem', 
+                      fontWeight: 800, 
+                      color: 'var(--accent-main)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1.5px'
+                    }}>
+                      Prompt Creator
+                    </div>
+                    <h4 style={{ 
+                      fontSize: '1.2rem', 
+                      fontWeight: 800, 
+                      color: 'var(--text-main)', 
+                      margin: 0,
+                      lineHeight: 1.2
+                    }}>
+                      {prompt.author_name || 'PromptKing Admin'}
+                    </h4>
+                  </div>
+                </div>
+
+                <p style={{ 
+                  fontSize: '0.9rem', 
+                  color: 'var(--text-secondary)', 
+                  lineHeight: 1.6, 
+                  margin: 0,
+                  zIndex: 1,
+                  position: 'relative'
+                }}>
+                  {prompt.author_description || 'Passionate about AI and creative workflows. Exploring the frontiers of prompt engineering to help you unlock the true potential of tools like ChatGPT, Midjourney, and Gemini.'}
+                </p>
+              </div>
+            </div>
+            
+            {/* Tags in Sidebar */}
+            {parsedTags && parsedTags.length > 0 && (
+              <div style={{ marginTop: '30px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                  <Tag size={16} color="var(--accent-main)" />
+                  <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: 'var(--text-main)', letterSpacing: '-0.2px' }}>
+                    Tags
+                  </h3>
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {parsedTags.map((tag, i) => (
+                    <Link 
+                      key={i} 
+                      href={`/?search=${encodeURIComponent(tag)}`}
+                      style={{ 
+                        background: 'rgba(0,0,0,0.03)', 
+                        padding: '6px 14px', 
+                        borderRadius: '20px', 
+                        fontSize: '0.8rem', 
+                        fontWeight: 600,
+                        color: 'var(--text-secondary)', 
+                        border: '1px solid rgba(0, 0, 0, 0.08)',
+                        textDecoration: 'none',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = 'var(--accent-main)';
+                        e.currentTarget.style.color = '#fff';
+                        e.currentTarget.style.borderColor = 'var(--accent-main)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = 'rgba(0,0,0,0.03)';
+                        e.currentTarget.style.color = 'var(--text-secondary)';
+                        e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.08)';
+                      }}
+                    >
+                      {tag}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </aside>
         </div>
       </div>

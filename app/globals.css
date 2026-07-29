@@ -1659,6 +1659,7 @@ body.shorts-modal-open {
   }
   .media-prompt-container .prompt-vault-column {
     width: calc(50% - 20px);
+    min-width: 0;
     margin-bottom: 0 !important;
   }
   .media-prompt-container .prompt-area {
@@ -1817,7 +1818,7 @@ body.shorts-modal-open {
   margin: 0 auto;
   max-width: 1400px;
   z-index: 2000;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -1855,34 +1856,6 @@ body.shorts-modal-open {
 .header-logo-link {
   display: flex;
   align-items: center;
-.media-prompt-container {
-    display: flex !important;
-    flex-direction: row !important;
-    gap: 40px;
-    align-items: stretch;
-    margin-bottom: 40px;
-  }
-  .media-prompt-container .hero-section {
-    margin-bottom: 0 !important;
-    width: calc(50% - 20px);
-    flex-shrink: 0;
-  }
-  .media-prompt-container .prompt-vault-column {
-    width: calc(50% - 20px);
-    margin-bottom: 0 !important;
-  }
-  .media-prompt-container .prompt-area {
-    margin-bottom: 0 !important;
-  }
-}
-
-@media (max-width: 1024px) {
-  .detail-layout { grid-template-columns: 1fr !important; }
-  .detail-sidebar { display: none; }
-  .media-prompt-container { flex-direction: column !important; }
-  .media-prompt-container .hero-section { width: 100% !important; margin-bottom: 20px !important; }
-  .media-prompt-container .prompt-vault-column { width: 100% !important; }
-  .media-prompt-container .prompt-area { margin-bottom: 20px !important; }
 }
 
 @media (max-width: 768px) {
@@ -1949,7 +1922,7 @@ body.shorts-modal-open {
   margin: 0 auto;
   max-width: 1400px;
   z-index: 2000;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -2028,7 +2001,7 @@ body.shorts-modal-open {
 .css-masonry-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; align-items: start; }
 .css-masonry-grid > div { margin-bottom: 0px; }
 @media (max-width: 1100px) { .css-masonry-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } .css-masonry-grid > div { margin-bottom: 0px; } }
-@media (max-width: 600px) { .css-masonry-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
+@media (max-width: 600px) { .css-masonry-grid { grid-template-columns: 1fr; gap: 16px; } }
 
 
 .author-box { position: relative; display: flex; align-items: center; justify-content: flex-start; gap: 32px; padding: 40px; border-radius: 24px; background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.07); margin-top: 40px; overflow: hidden; box-shadow: 0 4px 16px rgba(17, 24, 39, 0.05); }
