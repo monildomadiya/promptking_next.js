@@ -1,0 +1,67 @@
+{
+  "url": "https://promptking.in/",
+  "status_code": 200,
+  "content": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/assets/fonts/Outfit-Regular.ttf\" as=\"font\" crossorigin=\"anonymous\" type=\"font/ttf\"/><link rel=\"preload\" href=\"/assets/fonts/Outfit-Medium.ttf\" as=\"font\" crossorigin=\"anonymous\" type=\"font/ttf\"/><link rel=\"preload\" href=\"/assets/fonts/Outfit-Black.ttf\" as=\"font\" crossorigin=\"anonymous\" type=\"font/ttf\"/><link rel=\"preload\" as=\"image\" href=\"/pro...",
+  "raw_content": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/assets/fonts/Outfit-Regular.ttf\" as=\"font\" c...",
+  "is_spa": false,
+  "extracted_text": "Built for serious AI users\nEvery feature is designed to save your time and get you better results from every AI tool.\nOne-Click Copy\nInstantly copy any prompt to your clipboard with a single tap. Paste straight into ChatGPT, Gemini, or Midjourney.\nBefore/After Slider\nSee exactly what each prompt produces. Our interactive image slider lets you compare the original and AI result side by side.\nPremium Prompts\nUnlock exclusive expert-level prompts with a PIN. Premium prompts are engineered for maxim...",
+  "publication_date": "2026-01-01",
+  "accessibility_tree": null,
+  "headers": {
+    "Server": "nginx/1.24.0 (Ubuntu)",
+    "Date": "Thu, 30 Jul 2026 07:32:38 GMT",
+    "Content-Type": "text/html; charset=utf-8",
+    "Transfer-Encoding": "chunked",
+    "Connection": "keep-alive",
+    "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+    "X-Frame-Options": "SAMEORIGIN",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    "Vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding",
+    "x-nextjs-cache": "STALE",
+    "x-nextjs-prerender": "1",
+    "x-nextjs-stale-time": "300",
+    "X-Powered-By": "Next.js",
+    "Cache-Control": "s-maxage=60, stale-while-revalidate=31535940",
+    "ETag": "\"qsvnrvlxux9ne9\"",
+    "Content-Encoding": "gzip"
+  },
+  "redirect_chain": [],
+  "console_errors": [],
+  "render_diagnostics": [],
+  "render_engine": null,
+  "render_ms": null,
+  "mode_used": "raw",
+  "error": null,
+  "structured_data": {
+    "block_count": 2,
+    "processed_count": 2,
+    "total_bytes": 1152,
+    "truncated": false,
+    "blocks": [
+      {
+        "index": 1,
+        "size_bytes": 427,
+        "valid": true,
+        "types": [
+          "EntryPoint",
+          "SearchAction",
+          "WebSite"
+        ],
+        "types_truncated": false
+      },
+      {
+        "index": 2,
+        "size_bytes": 725,
+        "valid": true,
+        "types": [
+          "ContactPoint",
+          "ImageObject",
+          "Organization"
+        ],
+        "types_truncated": false
+      }
+    ]
+  }
+}
