@@ -124,6 +124,17 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
     return () => clearTimeout(t);
   }, [search]);
 
+  // The server-rendered payload omits promptText — it was 82% of the data and
+  // most visitors only browse the grid. Search matches prompt bodies, so top up
+  // the first time someone actually searches. Copying is handled per-card.
+  const toppedUp = useRef(false);
+  useEffect(() => {
+    if (toppedUp.current || !debouncedSearch) return;
+    if (!prompts.some(p => p.promptText === undefined)) return;
+    toppedUp.current = true;
+    fetchData(true);
+  }, [debouncedSearch, prompts, fetchData]);
+
   const filteredPrompts = useMemo(() => {
     const safeSearch = (debouncedSearch || '').toLowerCase();
     return prompts

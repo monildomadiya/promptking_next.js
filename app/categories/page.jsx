@@ -7,7 +7,7 @@ export const revalidate = 60;
 
 export const metadata = {
   title: 'Explore AI Prompts Categories - PromptKing | Browse by Topic',
-  description: 'Browse all categories of free, premium, and expert-crafted AI prompts for ChatGPT, Midjourney, Gemini, Claude, and more. Find the perfect prompt by topic, use case, or AI tool.',
+  description: 'Browse categories of free and premium AI prompts for ChatGPT, Midjourney, Gemini and Claude. Find the right prompt by topic, use case or AI tool.',
   alternates: {
     canonical: 'https://promptking.in/categories',
   },

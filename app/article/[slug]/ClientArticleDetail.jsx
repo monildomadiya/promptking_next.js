@@ -8,6 +8,7 @@ import api from '@/lib/api';
 import Shimmer from '@/components/Common/Shimmer';
 import { ArrowLeft, Clock, Calendar, Share2, ShieldCheck, Tag, User, Eye } from '@/components/Common/Icons';
 import SEOMetadata from '@/components/SEO/SEOMetadata';
+import { resolveCanonical, demoteHeadings } from '@/lib/seo';
 import SocialSidebar from '@/components/Prompts/SocialSidebar';
 import { optimizeImage } from '@/utils/imageUtils';
 import { getCache, setCache } from '@/utils/cacheUtils';
@@ -134,7 +135,7 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
     'dateModified': blog.updated_at || blog.created_at,
     'mainEntityOfPage': {
       '@type': 'WebPage',
-      '@id': blog.canonical_url || `https://promptking.in/article/${blog.slug}`
+      '@id': resolveCanonical(blog.canonical_url, `/article/${blog.slug}`)
     },
     'publisher': {
       '@type': 'Organization',
@@ -147,7 +148,7 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
     'author': [{
       '@type': 'Person',
       'name': blog.author_name || 'PromptKing',
-      'url': 'https://promptking.in'
+      'url': 'https://promptking.in/about'
     }]
   };
 
@@ -170,7 +171,9 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
 
   // Generate Table of Contents
   let headings = [];
-  let finalContent = blog.content || '';
+  // Admin-authored bodies routinely open with an <h1> repeating the title,
+  // which would give the page two <h1> elements. The layout owns the real one.
+  let finalContent = demoteHeadings(blog.content || '');
 
   if (blog.content && blog.enable_table_of_contents !== false) {
     let counter = 0;

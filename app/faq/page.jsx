@@ -4,7 +4,7 @@ import ClientFAQ from './ClientFAQ';
 
 export const metadata = {
   title: 'Frequently Asked Questions - PromptKing | Help & Support',
-  description: 'Find answers to the most common questions about PromptKing — how to use AI prompts, billing, free vs premium plans, supported AI tools like ChatGPT & Midjourney, and more.',
+  description: 'Answers to common questions about PromptKing — how to use AI prompts, free vs premium access, and supported tools like ChatGPT and Midjourney.',
   alternates: {
     canonical: 'https://promptking.in/faq',
   },

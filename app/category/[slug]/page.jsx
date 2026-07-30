@@ -1,7 +1,8 @@
 import React from 'react';
 import db from '@/lib/db';
-import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import PromptCard from '@/components/Prompts/PromptCard';
+import { seoTitle, seoDescription } from '@/lib/seo';
 
 const parseDbBool = (val) => {
   if (val === null || val === undefined) return false;
@@ -20,11 +21,15 @@ export async function generateMetadata({ params }) {
   } catch (err) {}
 
   if (!category) {
-    return { title: 'Category Not Found - PromptKing' };
+    // The page itself calls notFound(); keep the metadata non-indexable so a
+    // missing category can never be served as an indexable soft 404.
+    return { title: 'Category Not Found - PromptKing', robots: { index: false, follow: false } };
   }
 
-  const title = category.meta_title || `${category.name} Prompts - PromptKing`;
-  const description = category.meta_description || category.description || `Explore our curated collection of ${category.name} AI prompts.`;
+  const title = seoTitle(category.meta_title || `${category.name} Prompts - PromptKing`);
+  const description = seoDescription(
+    category.meta_description || category.description || `Explore our curated collection of ${category.name} AI prompts.`
+  );
   const canonicalUrl = `https://promptking.in/category/${category.slug}`;
 
   let image = category.image_url || 'https://promptking.in/og-image.jpg';
@@ -86,14 +91,9 @@ export default async function CategoryPage({ params }) {
     console.error("Error fetching category:", err);
   }
 
-  if (!category) {
-    return (
-      <div style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-main)' }}>
-        <h2>Category Not Found</h2>
-        <Link href="/" style={{ marginTop: '20px', color: 'var(--accent-main)' }}>Return to Home</Link>
-      </div>
-    );
-  }
+  // Return a real 404 rather than a 200 "Category Not Found" page, which Google
+  // treats as a soft 404 and which was previously indexable.
+  if (!category) notFound();
 
   const jsonLd = {
     "@context": "https://schema.org",

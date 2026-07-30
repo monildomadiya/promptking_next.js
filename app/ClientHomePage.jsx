@@ -60,6 +60,31 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
       <div style={{
         maxWidth: '1000px', margin: '40px auto 40px', padding: '0 20px',
       }}>
+        {/* The homepage previously shipped no <h1> and no copy above the prompt
+            grid — the first thing above the fold was an ad unit. */}
+        <header style={{ textAlign: 'center', marginBottom: '28px' }}>
+          <h1 style={{
+            fontSize: 'clamp(1.75rem, 5vw, 2.75rem)',
+            fontWeight: 900,
+            letterSpacing: '-1px',
+            lineHeight: 1.15,
+            margin: '0 0 12px',
+            color: 'var(--text-main)',
+          }}>
+            Free AI Prompts for ChatGPT, Gemini &amp; Midjourney
+          </h1>
+          <p style={{
+            fontSize: '1.05rem',
+            lineHeight: 1.6,
+            color: 'var(--text-secondary)',
+            maxWidth: '640px',
+            margin: '0 auto',
+          }}>
+            Hand-tested, copy-ready prompts for AI image generation, portraits and
+            creative work. Copy any prompt with one click — no sign-up required.
+          </p>
+        </header>
+
         <div className="home-search-wrapper">
           <div className="home-search-input-container">
             <Search 
@@ -68,7 +93,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
             />
             <input 
               type="text" 
-              placeholder="Search thousands of prompts..."
+              placeholder="Search AI prompts..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="home-search-input" 

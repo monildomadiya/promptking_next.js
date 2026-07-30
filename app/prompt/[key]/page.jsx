@@ -3,6 +3,7 @@ import db from '@/lib/db';
 import ClientPromptDetail from './ClientPromptDetail';
 import { notFound } from 'next/navigation';
 import { getSession } from '@/lib/session';
+import { seoTitle, seoDescription, demoteHeadings } from '@/lib/seo';
 
 export const revalidate = 60;
 
@@ -23,12 +24,14 @@ export async function generateMetadata({ params }) {
     return { title: 'Prompt Not Found - PromptKing' };
   }
 
-  const title = promptData.meta_title || `${promptData.title || 'AI Prompt'} - PromptKing`;
+  const title = seoTitle(promptData.meta_title || `${promptData.title || 'AI Prompt'} - PromptKing`);
   let plainDesc = '';
   if (promptData.description) {
-    plainDesc = promptData.description.replace(/<[^>]*>?/gm, '').substring(0, 160);
+    plainDesc = promptData.description.replace(/<[^>]*>?/gm, '');
   }
-  const description = promptData.meta_description || plainDesc || `Unlock the "${promptData.title || 'AI'}" AI prompt on PromptKing. Works with ${promptData.ai_type || 'AI'}.`;
+  const description = seoDescription(
+    promptData.meta_description || plainDesc || `Unlock the "${promptData.title || 'AI'}" AI prompt on PromptKing. Works with ${promptData.ai_type || 'AI'}.`
+  );
   let image = promptData.thumbnail_url || promptData.img_after || 'https://promptking.in/og-image.jpg';
   if (image.startsWith('/')) image = `https://promptking.in${image}`;
   else if (!image.startsWith('http')) image = `https://promptking.in/${image}`;
@@ -321,7 +324,7 @@ export default async function PromptPage({ params }) {
           )}
 
           {initialPrompt.description && (
-            <div dangerouslySetInnerHTML={{ __html: initialPrompt.description }} />
+            <div dangerouslySetInnerHTML={{ __html: demoteHeadings(initialPrompt.description) }} />
           )}
 
           {parsedTags.length > 0 && (
@@ -350,11 +353,11 @@ export default async function PromptPage({ params }) {
           <section>
             <h2>About This Prompt</h2>
             <p>
-              This is a professionally engineered AI prompt from the PromptKing library, 
-              designed for use with {initialPrompt.ai_type || 'AI tools'} such as ChatGPT, 
-              Midjourney, Google Gemini, and Claude. Copy this prompt instantly and use it 
-              to generate high-quality AI output. PromptKing offers 1000+ free and premium 
-              AI prompts across 50+ categories for creators, developers, and marketers.
+              This is a professionally engineered AI prompt from the PromptKing library,
+              designed for use with {initialPrompt.ai_type || 'AI tools'} such as ChatGPT,
+              Midjourney, Google Gemini, and Claude. Copy this prompt instantly and use it
+              to generate high-quality AI output. PromptKing offers a hand-tested library of
+              free and premium AI prompts for creators, developers, and marketers.
             </p>
             <nav aria-label="Prompt breadcrumb">
               <ol>

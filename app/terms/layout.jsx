@@ -1,6 +1,6 @@
 export const metadata = {
   title: "Terms and Conditions - PromptKing | Usage Agreement",
-  description: "Review PromptKing's Terms and Conditions. Understand your rights, responsibilities, and the rules governing use of our AI prompts library and platform services.",
+  description: "Review PromptKing's Terms and Conditions — your rights, your responsibilities, and the rules governing use of our AI prompts library.",
   alternates: {
     canonical: "https://promptking.in/terms",
   },

@@ -1,5 +1,6 @@
 import React from 'react';
 import db from '@/lib/db';
+import { resolveCanonical, seoTitle, seoDescription, cleanSchema } from '@/lib/seo';
 import ClientArticleDetail from './ClientArticleDetail';
 
 export async function generateMetadata({ params }) {
@@ -20,16 +21,18 @@ export async function generateMetadata({ params }) {
     return { title: 'Article Not Found - PromptKing' };
   }
 
-  const title = blogData.meta_title || blogData.title || 'AI Article - PromptKing';
+  const title = seoTitle(blogData.meta_title || blogData.title || 'AI Article - PromptKing');
   let plainDesc = '';
   if (blogData.content) {
-    plainDesc = blogData.content.replace(/<[^>]*>?/gm, '').substring(0, 160);
+    plainDesc = blogData.content.replace(/<[^>]*>?/gm, '');
   }
-  const description = blogData.meta_description || blogData.excerpt || plainDesc || `Read "${blogData.title || 'article'}" on PromptKing Blog.`;
+  const description = seoDescription(
+    blogData.meta_description || blogData.excerpt || plainDesc || `Read "${blogData.title || 'article'}" on PromptKing Blog.`
+  );
   let image = blogData.og_image || blogData.featured_image || 'https://promptking.in/og-image.jpg';
   if (image.startsWith('/')) image = `https://promptking.in${image}`;
   else if (!image.startsWith('http')) image = `https://promptking.in/${image}`;
-  const canonicalUrl = blogData.canonical_url || `https://promptking.in/article/${slug}`;
+  const canonicalUrl = resolveCanonical(blogData.canonical_url, `/article/${slug}`);
 
   let tagsArray = [];
   try {
@@ -107,15 +110,17 @@ export default async function ArticlePage({ params }) {
       otherBlogs = others;
     }
 
-    const catRows = await db`SELECT * FROM categories ORDER BY name ASC`;
+    // website_categories is what /category/[slug] resolves against. The legacy
+    // `categories` table produced "Related Prompts" links to 404 pages.
+    const catRows = await db`SELECT * FROM website_categories ORDER BY name ASC`;
     categories = catRows;
   } catch (err) {
     console.error('Failed to fetch blog data:', err);
   }
 
-  const canonicalUrl = blog ? (blog.canonical_url || `https://promptking.in/article/${slug}`) : '';
+  const canonicalUrl = blog ? resolveCanonical(blog.canonical_url, `/article/${slug}`) : '';
 
-  const jsonLd = blog ? {
+  const jsonLd = blog ? cleanSchema({
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     mainEntityOfPage: {
@@ -130,7 +135,7 @@ export default async function ArticlePage({ params }) {
     author: {
       '@type': 'Person',
       name: blog.author_name || 'PromptKing',
-      url: 'https://promptking.in'
+      url: 'https://promptking.in/about'
     },
     publisher: {
       '@type': 'Organization',
@@ -140,7 +145,7 @@ export default async function ArticlePage({ params }) {
         url: 'https://promptking.in/promptking-logo.svg'
       }
     }
-  } : null;
+  }) : null;
 
   let faqs = [];
   try { faqs = blog && blog.faqs ? (typeof blog.faqs === 'string' ? JSON.parse(blog.faqs) : blog.faqs) : []; } catch(e) {}

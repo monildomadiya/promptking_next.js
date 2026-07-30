@@ -153,9 +153,22 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
 
 
 
+  /**
+   * The server-rendered payload omits promptText (it was 82% of the page data).
+   * PromptList tops it up on hydration, but if a copy lands in that window we
+   * fetch this one prompt on demand rather than copying "undefined".
+   */
+  const resolvePromptText = async () => {
+    if (prompt.promptText) return prompt.promptText;
+    const res = await api.get(`/prompt/${encodeURIComponent(prompt.key)}`);
+    return res.data?.prompt_text || res.data?.promptText || '';
+  };
+
   const handleCopy = async () => {
     try {
-      const brandedText = `${prompt.promptText}\n\n- Copied from PromptKing.in`;
+      const promptText = await resolvePromptText();
+      if (!promptText) return;
+      const brandedText = `${promptText}\n\n- Copied from PromptKing.in`;
       await navigator.clipboard.writeText(brandedText);
       await api.post('/record_copy', { key: prompt.key });
       setIsCopied(true);
@@ -241,9 +254,12 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
           <div style={{ width: '100%', aspectRatio: '1200 / 628', background: '#e8eaee', position: 'relative', overflow: 'hidden' }}>
             <img 
               src={optimizeImage(prompt.thumbnail_url || prompt.imgAfter || prompt.img_after || prompt.imgBefore || prompt.img_before, 600)} 
-              alt={prompt.title} 
+              alt={prompt.title}
               loading={isPriority ? "eager" : "lazy"}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} 
+              decoding="async"
+              width="1200"
+              height="628"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
               className="listicle-card-img"
             />
             {/* Tag / Badge */}
