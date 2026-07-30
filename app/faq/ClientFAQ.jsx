@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, HelpCircle, Search, MessageSquare } from '@/components/Common/Icons';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import api from '@/lib/api';
 import Shimmer from '@/components/Common/Shimmer';
 import SocialSidebar from '@/components/Prompts/SocialSidebar';
@@ -202,27 +202,26 @@ const ClientFAQ = ({ initialFaqs }) => {
                       </motion.div>
                     </div>
                     
-                    <AnimatePresence>
-                      {isOpen && (
-                        <motion.div 
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3, ease: 'easeInOut' }}
-                          style={{ overflow: 'hidden' }}
-                        >
-                          <div style={{ 
-                            padding: '0 30px 30px 30px', color: 'var(--text-secondary)', 
-                            lineHeight: 1.8, fontSize: '1.05rem', 
-                          }}>
-                            {/* Inner styling to look like a premium text block */}
-                            <div style={{ paddingLeft: '20px', borderLeft: '3px solid var(--accent-main)' }}>
-                              {faq.answer}
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                    {/* The answer stays mounted and is collapsed with height, not
+                        unmounted. The page publishes FAQPage schema, and Google
+                        requires the marked-up answers to exist in the DOM. */}
+                    <motion.div
+                      initial={false}
+                      animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      style={{ overflow: 'hidden' }}
+                      aria-hidden={!isOpen}
+                    >
+                      <div style={{
+                        padding: '0 30px 30px 30px', color: 'var(--text-secondary)',
+                        lineHeight: 1.8, fontSize: '1.05rem',
+                      }}>
+                        {/* Inner styling to look like a premium text block */}
+                        <div style={{ paddingLeft: '20px', borderLeft: '3px solid var(--accent-main)' }}>
+                          {faq.answer}
+                        </div>
+                      </div>
+                    </motion.div>
                   </motion.div>
                 );
               })}

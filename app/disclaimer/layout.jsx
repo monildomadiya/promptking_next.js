@@ -1,6 +1,6 @@
 export const metadata = {
   title: "Disclaimer - PromptKing | Important Notice",
-  description: "Read the official disclaimer for PromptKing. Understand the limitations of liability, accuracy of AI-generated prompts, and important notices about using our platform.",
+  description: "PromptKing's official disclaimer — limitations of liability, the accuracy of AI-generated prompts, and important notices about using the site.",
   alternates: {
     canonical: "https://promptking.in/disclaimer",
   },

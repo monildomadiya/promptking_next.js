@@ -32,7 +32,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
       const formattedCategory = categorySlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
       return `Explore our curated collection of high-quality ${formattedCategory} prompts. Copy and use these free AI prompts instantly to improve your workflow.`;
     }
-    return "Explore 1000+ free AI prompts for ChatGPT, Gemini, and Midjourney. Copy ready-to-use prompts for writing, coding, design, and more — all in one place.";
+    return "Explore 100+ free AI prompts for ChatGPT, Gemini, and Midjourney. Copy ready-to-use prompts for writing, coding, design, and more — all in one place.";
   };
 
   const schema = {
@@ -58,8 +58,33 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
       />
 
       <div style={{
-        maxWidth: '1000px', margin: '40px auto 40px', padding: '0 20px',
+        maxWidth: 'var(--container-max)', margin: '40px auto 40px', padding: '0 20px',
       }}>
+        {/* The homepage previously shipped no <h1> and no copy above the prompt
+            grid — the first thing above the fold was an ad unit. */}
+        <header style={{ textAlign: 'center', marginBottom: '28px' }}>
+          <h1 style={{
+            fontSize: 'clamp(1.75rem, 5vw, 2.75rem)',
+            fontWeight: 900,
+            letterSpacing: '-1px',
+            lineHeight: 1.15,
+            margin: '0 0 12px',
+            color: 'var(--text-main)',
+          }}>
+            Free AI Prompts for ChatGPT, Gemini &amp; Midjourney
+          </h1>
+          <p style={{
+            fontSize: '1.05rem',
+            lineHeight: 1.6,
+            color: 'var(--text-secondary)',
+            maxWidth: '640px',
+            margin: '0 auto',
+          }}>
+            Hand-tested, copy-ready prompts for AI image generation, portraits and
+            creative work. Copy any prompt with one click — no sign-up required.
+          </p>
+        </header>
+
         <div className="home-search-wrapper">
           <div className="home-search-input-container">
             <Search 
@@ -68,7 +93,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
             />
             <input 
               type="text" 
-              placeholder="Search thousands of prompts..."
+              placeholder="Search AI prompts..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="home-search-input" 
@@ -149,7 +174,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
       />
 
       {!categorySlug && (
-        <section style={{ maxWidth: '1400px', width: '100%', margin: '80px auto 60px', padding: isMobile ? '0 10px' : '0 20px' }}>
+        <section style={{ maxWidth: 'var(--container-max)', width: '100%', margin: '80px auto 60px', padding: isMobile ? '0 10px' : '0 20px' }}>
           <style>{`
             @keyframes pkFloatOrb {
               0%, 100% { transform: translateY(0px); }
@@ -295,7 +320,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
                 Icon: Filter,
                 color: '#d97706', bg: 'rgba(217,119,6,0.09)', border: 'rgba(217,119,6,0.22)',
                 title: 'Search & Filter',
-                desc: 'Search 1,000+ prompts by keyword or filter by AI tool and category. Find your perfect prompt in under 10 seconds.',
+                desc: 'Search the full prompt library by keyword or filter by AI tool and category. Find your perfect prompt in under 10 seconds.',
               },
               {
                 Icon: Lock,

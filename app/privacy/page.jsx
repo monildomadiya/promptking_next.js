@@ -2,7 +2,7 @@ import React from 'react';
 
 export const metadata = {
   title: "Privacy Policy - PromptKing | How We Handle Your Data",
-  description: "Read PromptKing's complete Privacy Policy. Learn how we collect, use, protect, and share your data, cookies, and personal information on our AI prompts platform.",
+  description: "PromptKing's Privacy Policy — how we collect, use, protect and share your data, cookies and personal information on our AI prompts platform.",
   alternates: { canonical: "https://promptking.in/privacy" },
   openGraph: {
     title: "Privacy Policy - PromptKing",

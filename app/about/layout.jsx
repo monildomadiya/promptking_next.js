@@ -1,6 +1,6 @@
 export const metadata = {
   title: "About Us - PromptKing | Our Mission & Story",
-  description: "Discover the story behind PromptKing — the ultimate AI prompts library for ChatGPT, Midjourney, Claude & more. Learn about our mission to empower creators with powerful prompts.",
+  description: "Discover the story behind PromptKing — an AI prompts library for ChatGPT, Midjourney, Claude and more, built to help creators get better output.",
   alternates: {
     canonical: "https://promptking.in/about",
   },

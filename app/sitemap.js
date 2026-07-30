@@ -2,72 +2,105 @@ import db from '@/lib/db';
 
 export const revalidate = 3600; // Revalidate sitemap every hour
 
-export default async function sitemap() {
-  const baseUrl = 'https://promptking.in';
+const BASE_URL = 'https://promptking.in';
 
+/**
+ * Prefer a real modification date. Falling back to `new Date()` for every row
+ * makes every entry look like it changed on each sitemap fetch, which causes
+ * Google to discount lastmod entirely — so fall back to undefined instead.
+ */
+const modified = (...candidates) => {
+  for (const value of candidates) {
+    if (!value) continue;
+    const date = new Date(value);
+    if (!Number.isNaN(date.getTime())) return date;
+  }
+  return undefined;
+};
+
+export default async function sitemap() {
   let prompts = [];
   let categories = [];
   let blogs = [];
 
   try {
-    prompts = await db`SELECT slug, prompt_key, created_at FROM prompts`;
+    prompts = await db`SELECT slug, prompt_key, created_at, publish_date FROM prompts WHERE is_draft = 0 OR is_draft IS NULL`;
   } catch (error) {
     console.error('Error fetching prompts for sitemap:', error.message);
   }
 
   try {
-    categories = await db`SELECT slug FROM categories`;
+    // website_categories is the table /category/[slug] actually reads. The
+    // legacy `categories` table produced sitemap entries whose pages 404.
+    // Only list categories that have at least one prompt, so the sitemap can
+    // never advertise an empty collection page.
+    categories = await db`
+      SELECT c.slug, c.created_at
+      FROM website_categories c
+      JOIN prompts p ON p.website_category_id = c.id
+      GROUP BY c.id, c.slug, c.created_at
+    `;
   } catch (error) {
     console.error('Error fetching categories for sitemap:', error.message);
   }
 
   try {
-    blogs = await db`SELECT slug, created_at FROM blogs`;
+    blogs = await db`SELECT slug, created_at, published_at FROM blogs`;
   } catch (error) {
     console.error('Error fetching blogs for sitemap:', error.message);
   }
 
-  const promptUrls = prompts.map((prompt) => ({
-    url: `${baseUrl}/prompt/${prompt.slug || prompt.prompt_key}`,
-    lastModified: prompt.created_at ? new Date(prompt.created_at) : new Date(),
-    changeFrequency: 'weekly',
-    priority: 0.8,
-  }));
+  const promptUrls = prompts
+    .filter((prompt) => prompt.slug || prompt.prompt_key)
+    .map((prompt) => ({
+      url: `${BASE_URL}/prompt/${prompt.slug || prompt.prompt_key}`,
+      lastModified: modified(prompt.publish_date, prompt.created_at),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    }));
 
-  const categoryUrls = categories.map((category) => ({
-    url: `${baseUrl}/category/${category.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly',
-    priority: 0.7,
-  }));
+  const categoryUrls = categories
+    .filter((category) => category.slug)
+    .map((category) => ({
+      url: `${BASE_URL}/category/${category.slug}`,
+      lastModified: modified(category.created_at),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    }));
 
-  const blogUrls = blogs.map((blog) => ({
-    url: `${baseUrl}/article/${blog.slug}`,
-    lastModified: blog.created_at ? new Date(blog.created_at) : new Date(),
-    changeFrequency: 'weekly',
-    priority: 0.8,
-  }));
+  const blogUrls = blogs
+    .filter((blog) => blog.slug)
+    .map((blog) => ({
+      url: `${BASE_URL}/article/${blog.slug}`,
+      lastModified: modified(blog.published_at, blog.created_at),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    }));
 
-  return [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1.0,
-    },
+  const entries = [
+    { url: BASE_URL, changeFrequency: 'daily', priority: 1.0 },
     // Static pages
-    { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/categories`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
-    { url: `${baseUrl}/faq`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/privacy`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
-    { url: `${baseUrl}/terms`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
-    { url: `${baseUrl}/disclaimer`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
-    { url: `${baseUrl}/adsense-policy`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.2 },
+    { url: `${BASE_URL}/about`, changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${BASE_URL}/blog`, changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${BASE_URL}/categories`, changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${BASE_URL}/contact`, changeFrequency: 'monthly', priority: 0.4 },
+    { url: `${BASE_URL}/faq`, changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${BASE_URL}/privacy`, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${BASE_URL}/terms`, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${BASE_URL}/disclaimer`, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${BASE_URL}/adsense-policy`, changeFrequency: 'yearly', priority: 0.2 },
     // Dynamic content
     ...promptUrls,
     ...categoryUrls,
     ...blogUrls,
   ];
+
+  // A slug can appear in more than one source query; a duplicate <loc> is a
+  // sitemap validation error, so keep the first occurrence of each URL.
+  const seen = new Set();
+  return entries.filter((entry) => {
+    if (seen.has(entry.url)) return false;
+    seen.add(entry.url);
+    return true;
+  });
 }

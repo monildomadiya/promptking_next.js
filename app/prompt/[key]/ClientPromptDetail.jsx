@@ -8,6 +8,7 @@ import Shimmer from '@/components/Common/Shimmer';
 import Link from 'next/link';
 import YouTubeModal from '@/components/Modals/YouTubeModal';
 import SEOMetadata from '@/components/SEO/SEOMetadata';
+import { demoteHeadings } from '@/lib/seo';
 
 import { getCache, setCache } from '@/utils/cacheUtils';
 import { useAppContext } from '@/components/AppContext';
@@ -240,7 +241,8 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
     }
 
     try {
-      const response = await api.get('/get_data');
+      // Suggestion cards only render title/image/slug, so skip the prompt bodies.
+      const response = await api.get('/get_data?light=1');
       if (response.data && response.data.prompts) {
         const mapped = response.data.prompts.map(p => ({
           ...p,
@@ -405,7 +407,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
   if (loading) return (
     <div className="detail-page-wrapper" style={{ background: 'var(--surface-0)', minHeight: '100vh', color: 'var(--text-main)' }}>
       <SEOMetadata title="Loading Prompt... | PromptKing" />
-      <div className="container" style={{ padding: '40px 20px', maxWidth: '1400px', margin: '0 auto' }}>
+      <div className="container" style={{ padding: '40px 20px', maxWidth: 'var(--container-max)', margin: '0 auto' }}>
         {/* Back Link Shimmer */}
         <Shimmer height="20px" width="180px" style={{ marginBottom: '30px' }} />
         
@@ -613,7 +615,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
           { name: prompt.title, url: `https://promptking.in/prompt/${prompt.key}` }
         ]}
       />
-      <div className="container" style={{ padding: '40px 20px', maxWidth: '1400px', margin: '0 auto' }}>
+      <div className="container" style={{ padding: '40px 20px', maxWidth: 'var(--container-max)', margin: '0 auto' }}>
         
         {/* Back Button */}
         <button onClick={handleBack} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', marginBottom: '30px', fontWeight: 600, textDecoration: 'none', cursor: 'pointer', background: 'none', border: 'none', padding: 0 }} className="back-link">
@@ -1303,7 +1305,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
                       overflow: 'hidden',
                       transition: 'max-height 0.4s ease'
                     }}
-                    dangerouslySetInnerHTML={{ __html: prompt.description }}
+                    dangerouslySetInnerHTML={{ __html: demoteHeadings(prompt.description) }}
                   />
                   {!descExpanded && descOverflows && (
                     <div style={{
@@ -1573,9 +1575,12 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                   {parsedTags.map((tag, i) => (
-                    <Link 
-                      key={i} 
+                    <Link
+                      key={i}
                       href={`/?search=${encodeURIComponent(tag)}`}
+                      // These chips generated ~580 crawlable search URLs that all
+                      // canonicalise to the homepage — pure crawl-budget waste.
+                      rel="nofollow"
                       style={{ 
                         background: 'rgba(0,0,0,0.03)', 
                         padding: '6px 14px', 

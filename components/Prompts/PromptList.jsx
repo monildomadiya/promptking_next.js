@@ -124,6 +124,17 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
     return () => clearTimeout(t);
   }, [search]);
 
+  // The server-rendered payload omits promptText — it was 82% of the data and
+  // most visitors only browse the grid. Search matches prompt bodies, so top up
+  // the first time someone actually searches. Copying is handled per-card.
+  const toppedUp = useRef(false);
+  useEffect(() => {
+    if (toppedUp.current || !debouncedSearch) return;
+    if (!prompts.some(p => p.promptText === undefined)) return;
+    toppedUp.current = true;
+    fetchData(true);
+  }, [debouncedSearch, prompts, fetchData]);
+
   const filteredPrompts = useMemo(() => {
     const safeSearch = (debouncedSearch || '').toLowerCase();
     return prompts
@@ -160,7 +171,7 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
   if (loading) {
     const skeletonCount = isMobile ? 4 : 12;
     return (
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px', width: '100%', marginTop: '40px' }}>
+      <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '20px', width: '100%', marginTop: '40px' }}>
         <div className="css-masonry-grid">
           {Array.from({ length: skeletonCount }).map((_, i) => (
             <div key={i} style={{
@@ -181,7 +192,7 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
 
   // ── Main render ──────────────────────────────────────────────────────────────
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: isMobile ? '10px' : '0 20px', width: '100%', marginTop: '40px' }}>
+    <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: isMobile ? '10px' : '0 20px', width: '100%', marginTop: '40px' }}>
 
       {/* Silent background revalidation indicator */}
       {isRevalidating && (

@@ -24,13 +24,23 @@ const nextConfig = {
   // Compress responses with gzip
   compress: true,
 
-  // Redirect www to non-www to fix duplicate content SEO issue
+  // Don't advertise the framework version on every response
+  poweredByHeader: false,
+
   async redirects() {
     return [
+      // Redirect www to non-www to fix duplicate content SEO issue
       {
         source: '/:path*',
         has: [{ type: 'host', value: 'www.promptking.in' }],
         destination: 'https://promptking.in/:path*',
+        permanent: true, // 301 redirect
+      },
+      // Articles used to live at /blog/<slug> and those URLs now 404. Stale
+      // canonical_url rows still point at them, and they may hold backlinks.
+      {
+        source: '/blog/:slug',
+        destination: '/article/:slug',
         permanent: true, // 301 redirect
       },
     ];

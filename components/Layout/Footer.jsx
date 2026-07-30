@@ -3,11 +3,16 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight, ChevronDown, ChevronUp } from '../Common/Icons';
 
-import api from '@/lib/api';
+import { useAppContext } from '@/components/AppContext';
+
+const FOOTER_SETTINGS_DEFAULTS = { logo_url: '', logo_width_desktop: '150', logo_width_mobile: '120' };
 
 const Footer = ({ onLogoClick }) => {
   const [isMobile, setIsMobile] = useState(false);
-  const [settings, setSettings] = useState({ logo_url: '', logo_width_desktop: '150', logo_width_mobile: '120' });
+  // AppContext already loads (and localStorage-caches) settings. Fetching them
+  // again here meant every page requested /api/settings twice.
+  const { settings: contextSettings } = useAppContext();
+  const settings = { ...FOOTER_SETTINGS_DEFAULTS, ...(contextSettings || {}) };
   const [openSections, setOpenSections] = useState({
     platform: false,
     legal: false,
@@ -16,17 +21,7 @@ const Footer = ({ onLogoClick }) => {
 
   const currentYear = new Date().getFullYear();
 
-  const fetchSettings = async () => {
-    try {
-      const response = await api.get('/settings');
-      if (response.data) setSettings(prev => ({ ...prev, ...response.data }));
-    } catch (error) {
-      console.error("Failed to fetch settings", error);
-    }
-  };
-
   useEffect(() => {
-    fetchSettings();
     setIsMobile(window.innerWidth <= 768);
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', handleResize);
@@ -49,13 +44,14 @@ const Footer = ({ onLogoClick }) => {
   return (
     <>
 
-      <footer style={{
+      {/* Width/gutter live in globals.css (.pk-footer-card) so they can mirror
+          the header's breakpoints exactly and keep both cards edge-aligned
+          with the prompt grid. */}
+      <footer className="pk-footer-card" style={{
         background: '#ffffff',
         position: 'relative',
         padding: isMobile ? '56px 24px 36px' : '75px 54px 44px',
         color: 'var(--text-main)',
-        maxWidth: '1360px',
-        margin: isMobile ? '0 14px 24px' : '0 auto 40px',
         borderRadius: '36px',
         border: '1px solid rgba(15, 23, 42, 0.08)',
         boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.05)',
@@ -84,7 +80,7 @@ const Footer = ({ onLogoClick }) => {
           zIndex: 0
         }} />
 
-        <div style={{ maxWidth: '1240px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
+        <div style={{ width: '100%', margin: '0 auto', position: 'relative', zIndex: 10 }}>
           <div style={{ 
             display: 'grid', 
             gridTemplateColumns: isMobile ? '1fr' : '2.2fr 1fr 1fr 1.3fr', 

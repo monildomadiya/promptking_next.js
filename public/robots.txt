@@ -10,6 +10,11 @@ Disallow: /admin/
 Disallow: /admin-secure/
 Disallow: /admin-secure
 
+# Search result URLs all canonicalise to the homepage — keep them out of the
+# crawl so budget goes to prompt and article pages instead.
+Disallow: /*?search=
+Disallow: /*&search=
+
 # ── OpenAI / ChatGPT ──────────────────────────
 User-agent: GPTBot
 Allow: /

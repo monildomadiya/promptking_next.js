@@ -22,11 +22,19 @@ async function fetchWebsiteCategories() {
 
 export default async function Page() {
   // Fetch all data in parallel for fastest load
+  // Omit prompt_text from the server-rendered payload: it was ~82% of the data
+  // (206 KB of 252 KB) and is only needed when someone copies a card. PromptList
+  // fetches the full set in the background once hydrated.
   const [{ prompts, categories }, websiteCategories] = await Promise.all([
-    fetchAllData(),
+    fetchAllData({ includePromptText: false }),
     fetchWebsiteCategories(),
   ]);
-  
+
+  // Describe the library by its actual size rather than an aspirational number.
+  const promptCount = prompts && prompts.length
+    ? `${Math.floor(prompts.length / 50) * 50 || prompts.length}+`
+    : '';
+
   return (
     <>
       {/*
@@ -50,7 +58,7 @@ export default async function Page() {
       >
         <h2>PromptKing - Free &amp; Premium AI Prompts Library</h2>
         <p>
-          Discover over 1000 free and premium AI prompts for ChatGPT, Midjourney, Claude, Gemini,
+          Discover {promptCount} free and premium AI prompts for ChatGPT, Midjourney, Claude, Gemini,
           and other leading AI tools. PromptKing is the ultimate AI prompts library for creators,
           developers, artists, writers, and businesses. Browse our extensive collection of carefully
           crafted prompts across categories including portrait photography, landscape art, business
@@ -77,12 +85,14 @@ export default async function Page() {
             </ul>
           </nav>
         )}
-        {/* Internal links to category pages */}
-        {categories && categories.length > 0 && (
+        {/* Internal links to category pages. Must use websiteCategories — the
+            legacy `categories` table is not what /category/[slug] resolves
+            against, so linking it here produced links to 404 pages. */}
+        {websiteCategories && websiteCategories.length > 0 && (
           <nav aria-label="Prompt Categories">
             <p>Browse prompts by category:</p>
             <ul>
-              {categories.map((cat) => (
+              {websiteCategories.map((cat) => (
                 <li key={cat.slug || cat.id}>
                   <a href={`/category/${cat.slug}`}>{cat.name}</a>
                 </li>

@@ -1,0 +1,474 @@
+{
+  "summary": {
+    "health_score": 59,
+    "business_type": "Content library / publisher (free AI prompt directory, AdSense-monetised)",
+    "domain": "promptking.in",
+    "audit_date": "2026-07-30",
+    "pages_crawled": 128,
+    "stack": "Next.js 16.2.9 / nginx (Ubuntu) / MySQL / Cloudinary",
+    "top_findings": [
+      "All 14 blog articles emit a canonical pointing at a /blog/<slug> URL that returns HTTP 404, blocking indexation of the entire blog",
+      "The category system is dead in production: /categories renders 'No categories found' and both /category/* pages return HTTP 200 soft 404s that are listed in the sitemap",
+      "First Contentful Paint measured at ~7.9s; the homepage ships 440KB of HTML, 177 inline scripts (338KB), 189 requests, and a 286KB /api/get_data payload containing all 102 prompts to render 16",
+      "/faq publishes FAQPage schema with 16 acceptedAnswer values while rendering 153 words and no answer text, risking loss of the rich result",
+      "Site-wide claims of '1,000+ prompts' and '50+ categories' are contradicted by the site's own API, which returns 102 prompts and 2 broken categories"
+    ],
+    "quick_wins": [
+      "Clear the stale canonical_url column in the blogs table (the code fallback is already correct) to unblock 14 articles",
+      "Add an <h1> to the homepage, which currently has zero",
+      "Trim 16 titles over 70 characters (longest 100) and 35 meta descriptions over 160 characters (longest 201)",
+      "Fix 19 pages rendering 2-3 <h1> tags, 11 of which repeat the same string three times",
+      "Convert three preloaded 55KB Outfit .ttf fonts to .woff2 (~20KB each) and remove the duplicated preload tags"
+    ]
+  },
+  "categories": [
+    {
+      "name": "Technical SEO",
+      "score": 58,
+      "weight": 0.22,
+      "what_works": [
+        "HTTPS with Strict-Transport-Security max-age=63072000, includeSubDomains, preload",
+        "X-Frame-Options, X-Content-Type-Options, Referrer-Policy and Permissions-Policy all set",
+        "Host normalisation correct: www -> 308 -> apex, http -> 301 -> https, /faq/ -> 308 -> /faq",
+        "Unknown URLs return a genuine 404 rather than a soft 200",
+        "robots.txt valid, admin paths disallowed, sitemap declared",
+        "Canonical tag, index-follow robots meta, lang=en and viewport present on 128/128 pages",
+        "TTFB 456ms median with Next.js ISR active"
+      ],
+      "findings": [
+        {
+          "title": "Canonical tags point to 404 URLs on all 14 blog articles",
+          "severity": "Critical",
+          "description": "Every /article/<slug> page emits <link rel=\"canonical\" href=\"https://promptking.in/blog/<slug>\">, and those /blog/ URLs return HTTP 404 (verified for 3 slugs). Root cause is data, not code: app/article/[slug]/page.jsx:32 has a correct /article/${slug} fallback, but the blogs.canonical_url column holds the stale /blog/ scheme and takes precedence. Confirmed via /api/blog/ai-image-prompt-engineering-guide. BlogPosting.mainEntityOfPage.@id and BreadcrumbList item 3 inherit the same broken URL.",
+          "recommendation": "Run UPDATE blogs SET canonical_url = NULL WHERE canonical_url LIKE '%/blog/%'; the existing fallback then produces the correct URL. Alternatively, if /blog/<slug> has inbound links, add a permanent /blog/:slug -> /article/:slug redirect in next.config.mjs. Do one or the other, not both, and regenerate the sitemap to match."
+        },
+        {
+          "title": "Indexable soft 404s submitted in the sitemap",
+          "severity": "Critical",
+          "description": "/category/chatgpt and /category/gemini-pro return HTTP 200 with the title 'Category Not Found - PromptKing', an <h2>Category Not Found</h2>, no <h1>, 81 words, robots index-follow, and both appear in sitemap.xml. They canonical to the homepage, which limits the damage.",
+          "recommendation": "Call notFound() from app/category/[slug]/page.jsx when a category has no prompts, and exclude empty categories from the sitemap generator."
+        },
+        {
+          "title": "581 crawlable ?search= parameter URLs",
+          "severity": "High",
+          "description": "Prompt-page tag chips link to /?search=<term>; 581 unique variants were discovered, a 4.5x inflation over the 128 real pages. Verified: /?search=ChatGPT%20prompt returns robots 'index, follow' with canonical to the homepage. Duplication is handled; crawl budget is not.",
+          "recommendation": "Add rel=\"nofollow\" to the search chips and Disallow: /*?search= to robots.txt."
+        },
+        {
+          "title": "Duplicate <loc> entry in sitemap",
+          "severity": "Medium",
+          "description": "https://promptking.in/article/ai-image-prompt-engineering-guide appears twice in sitemap.xml, which also produces one of the two duplicate-title pairs.",
+          "recommendation": "Deduplicate URLs in the sitemap generator."
+        },
+        {
+          "title": "lastmod is the sitemap generation timestamp",
+          "severity": "Medium",
+          "description": "All 128 entries carry an identical lastmod equal to the moment of the request (2026-07-30T07:33:23.968Z). Google discounts lastmod entirely when it behaves this way. Blocking prerequisite: the blogs table has no updated_at column, and published_at is NULL on all 14 rows.",
+          "recommendation": "Backfill real published_at/updated_at values, then emit each row's actual modification date."
+        },
+        {
+          "title": "X-Powered-By: Next.js header exposed",
+          "severity": "Low",
+          "description": "Minor stack fingerprinting on every response.",
+          "recommendation": "Set poweredByHeader: false in next.config.mjs."
+        }
+      ]
+    },
+    {
+      "name": "Content Quality",
+      "score": 55,
+      "weight": 0.23,
+      "what_works": [
+        "93 of 128 pages exceed 1,200 words; median 1,526 words, max 5,223",
+        "Average 10.4 <h2> per page and zero h3-before-h2 heading skips",
+        "Complete trust surface: About (786w), Contact (481w), Privacy, Terms, Disclaimer, AdSense Policy",
+        "83 prompt pages carry structured FAQ sections, giving good passage-level answerability",
+        "Content is server-rendered (is_spa: false), so crawlers see it without executing JavaScript"
+      ],
+      "findings": [
+        {
+          "title": "Category taxonomy non-functional in production",
+          "severity": "Critical",
+          "description": "/categories renders 'No categories found' (104 words) because /api/website_categories returns []. Separately, /api/categories returns 2 rows (chatgpt, gemini-pro) whose detail pages render 'Category Not Found'. Two disconnected category systems, neither working, and /categories contains zero href=\"/category/*\" links. A 102-prompt library with no browse taxonomy has no mid-funnel landing pages and no internal-link hub.",
+          "recommendation": "Pick one category system, populate it, and make /categories -> /category/<slug> -> prompt list work end to end. This is the largest structural win available and also resolves most of the internal-linking weakness."
+        },
+        {
+          "title": "Factual claims contradicted by the site's own API",
+          "severity": "High",
+          "description": "/api/get_data returns 102 prompts and 2 categories. The site claims '1,000+ free AI prompts' in the sitewide meta description (used on 3 pages), '1,000+ expert-engineered prompts across 50+ categories' in llms.txt, and 'Search 1,000+ prompts' in homepage body copy. llms.txt further enumerates ~50 categories (Poetry, Screenwriting, DevOps Scripts, Financial Analysis, Legal Documents, Machine Learning) that resolve to nothing.",
+          "recommendation": "Publish the real numbers ('100+ hand-tested prompts') or make the claim true before repeating it. Strip the fictional taxonomy from llms.txt."
+        },
+        {
+          "title": "/faq renders 153 words with no answer text",
+          "severity": "High",
+          "description": "16 questions render as collapsed headings; the answer text is absent from the DOM. The page simultaneously publishes FAQPage schema containing 16 acceptedAnswer values.",
+          "recommendation": "Render the answers in the HTML (a collapsed accordion is acceptable as long as the text exists in the DOM), or remove the FAQPage block."
+        },
+        {
+          "title": "No author entity, weak E-E-A-T",
+          "severity": "Medium",
+          "description": "BlogPosting.author is {\"@type\":\"Person\",\"name\":\"Darshan Patel\",\"url\":\"https://promptking.in\"} - the author URL points at the homepage. There is no author page, bio, credentials, sameAs links, or visible byline/date on articles. For a site positioned on 'expert prompt engineers', this is the largest E-E-A-T gap.",
+          "recommendation": "Create /author/<slug> pages with bios, credentials and sameAs links, point the schema at them, and add visible bylines and dates to articles."
+        },
+        {
+          "title": "Seven pages under 300 words",
+          "severity": "Medium",
+          "description": "/category/chatgpt (81w), /category/gemini-pro (81w), /categories (104w), /faq (153w), /adsense-policy (241w), /prompt/acoustic-guitar-in-a-magical-garden-ai-prompt (282w), /prompt/moody-pine-forest-cinematic-portrait-color-grade (295w). A further six pages sit in the 300-380 word range.",
+          "recommendation": "Expand the prompt pages with usage guidance and examples; the category pages resolve once the taxonomy is fixed."
+        },
+        {
+          "title": "Duplicate titles and descriptions",
+          "severity": "Medium",
+          "description": "Title 'Category Not Found - PromptKing' x2; title 'AI Image Prompt Engineering Guide for Better Results' x2 (from the duplicate sitemap entry); the generic 'Explore 1000+ free AI prompts...' description reused on 3 pages; a second article description duplicated across 2 pages.",
+          "recommendation": "Resolve the underlying soft-404 and duplicate-sitemap issues, then write page-specific descriptions for the three generic pages."
+        },
+        {
+          "title": "Ad unit occupies the entire above-the-fold slot",
+          "severity": "Medium",
+          "description": "On mobile (375px, verified by screenshot) the first viewport is logo, search bar, then a Google AdSense related-search unit. No headline, no description, no content. The first prompt card appears around 1,450px. Four ad slots on the homepage.",
+          "recommendation": "Move the related-search unit below the first row of prompt cards and add a real headline plus a one-line value proposition above the grid."
+        }
+      ]
+    },
+    {
+      "name": "On-Page SEO",
+      "score": 62,
+      "weight": 0.2,
+      "what_works": [
+        "Zero missing titles and zero missing meta descriptions across 128 pages",
+        "100% coverage of og:title, og:description, og:image, og:image:width/height/alt and twitter:card",
+        "101 of 128 titles fall in the ideal 30-60 character band",
+        "79 of 128 meta descriptions fall in the 120-160 character band",
+        "Average 24.9 internal links per page"
+      ],
+      "findings": [
+        {
+          "title": "Homepage has no <h1>",
+          "severity": "High",
+          "description": "H1 distribution across the crawl: 0 H1 on 3 pages, 1 on 106, 2 on 8, 3 on 11. The three pages with zero H1 are the homepage, /category/chatgpt and /category/gemini-pro. The homepage is the most important page on the site and offers no primary heading signal.",
+          "recommendation": "Add a single descriptive <h1> above the prompt grid."
+        },
+        {
+          "title": "Nineteen pages emit 2-3 <h1> tags",
+          "severity": "High",
+          "description": "Eleven pages repeat the same string three times (e.g. /prompt/romantic-low-key-studio-couple-portrait-ai-prompt). Others emit two different H1s, sending conflicting topic signals - /prompt/lego-world-selfie-photo-ai-prompt carries both 'Photorealistic LEGO World Selfie AI Prompt' and 'LEGO World Selfie Photo Ai Prompt'.",
+          "recommendation": "Demote the repeats to <h2>/<p> or dedupe the component rendering them; keep exactly one H1 per page."
+        },
+        {
+          "title": "Sixteen titles exceed 70 characters",
+          "severity": "Medium",
+          "description": "Longest is 100 characters (/prompt/3d-balloon-typography-fashion-portrait-gemini-ai-prompt), then 98, 96, 94, 93, 93, 89 and 81. The 96-character title ends '...Photo Edit by PromptKing - PromptKing', applying the brand suffix twice. Two titles also contain mojibake where an em-dash should be, suggesting an encoding issue on the meta_title column.",
+          "recommendation": "Add a length guard to the metadata builder, strip the double brand suffix, and fix the column encoding."
+        },
+        {
+          "title": "Thirty-five meta descriptions exceed 160 characters",
+          "severity": "Medium",
+          "description": "Longest is 201 characters (/prompt/chatgpt-peaceful-giant-landmark-travel-portrait-prompt), followed by 199, 197, 196, 194 and 194.",
+          "recommendation": "Truncate at 155-160 characters in the metadata builder so new rows cannot regress."
+        },
+        {
+          "title": "Duplicate og:image on every page",
+          "severity": "Medium",
+          "description": "Every page emits both og-image.jpg and og-image.png with identical 1200x630 dimensions and identical alt text. Crawlers take the first; the second is noise in the head of all 128 pages.",
+          "recommendation": "Ship a single og:image."
+        },
+        {
+          "title": "/categories is orphaned",
+          "severity": "Medium",
+          "description": "Zero internal inbound links across the entire crawl, and the page is non-functional anyway.",
+          "recommendation": "Link it from a header navigation menu once the taxonomy is restored."
+        },
+        {
+          "title": "112 of 128 pages have only 1-2 inbound internal links",
+          "severity": "Low",
+          "description": "Includes all 14 articles (one link each, from /blog) and nearly every prompt page. There is no header navigation menu and no working category hub, so link equity has nowhere to flow. The high average outbound count (24.9) is concentrated in ?search= chips rather than real navigation.",
+          "recommendation": "Add a persistent nav (Prompts / Categories / Blog / About) and related-prompt blocks on prompt pages."
+        },
+        {
+          "title": "Minimal external linking",
+          "severity": "Low",
+          "description": "Nine external hosts across 128 pages: chat.openai.com, gemini.google.com, ko-fi.com, plus Google ad and privacy policy links. No citations to authoritative sources.",
+          "recommendation": "Cite primary sources in blog articles - a low-cost trust signal."
+        },
+        {
+          "title": "meta name=keywords present on all pages",
+          "severity": "Low",
+          "description": "Ignored by every major search engine.",
+          "recommendation": "Remove; harmless but dead weight."
+        }
+      ]
+    },
+    {
+      "name": "Schema / Structured Data",
+      "score": 68,
+      "weight": 0.1,
+      "what_works": [
+        "Schema present on 128/128 pages with zero invalid JSON-LD blocks",
+        "Organization + ContactPoint + ImageObject and WebSite + SearchAction + EntryPoint sitewide",
+        "BreadcrumbList on 116 pages",
+        "CreativeWork + SoftwareSourceCode on all 102 prompt pages - a defensible modelling choice",
+        "WebSite + SearchAction makes the site eligible for the sitelinks search box"
+      ],
+      "findings": [
+        {
+          "title": "FAQPage schema on /faq without visible answers",
+          "severity": "High",
+          "description": "/faq emits mainEntity with 16 acceptedAnswer values while the rendered page is 153 words containing none of the answer text. Google's structured data policy requires marked-up content to be visible to users.",
+          "recommendation": "Render the answers in the DOM (a collapsed accordion is acceptable), or remove the FAQPage block. Risk otherwise is loss of the rich result and, at worst, a structured-data manual action."
+        },
+        {
+          "title": "author.url points at the homepage",
+          "severity": "Medium",
+          "description": "The Person entity resolves to https://promptking.in rather than a dedicated author page with a bio and sameAs links.",
+          "recommendation": "Create author pages and point the schema at them."
+        },
+        {
+          "title": "mainEntityOfPage.@id inherits the broken canonical",
+          "severity": "Medium",
+          "description": "app/article/[slug]/page.jsx:123 derives @id from the same canonicalUrl variable, so BlogPosting.mainEntityOfPage.@id and BreadcrumbList item 3 also point to the 404ing /blog/<slug> URL.",
+          "recommendation": "Fixing the canonical resolves all three simultaneously."
+        },
+        {
+          "title": "No ItemList or CollectionPage on listing pages",
+          "severity": "Medium",
+          "description": "/blog (14 articles), /categories and the homepage prompt grid carry only the global Organization/WebSite blocks.",
+          "recommendation": "Add ItemList to /blog and the homepage grid for carousel eligibility."
+        },
+        {
+          "title": "Missing page-type schema on static pages",
+          "severity": "Low",
+          "description": "/contact has no ContactPage, /about has no AboutPage or Organization.founder, and /privacy, /terms and /disclaimer are not typed as WebPage.",
+          "recommendation": "Add the appropriate page-type schema."
+        },
+        {
+          "title": "Prompt pages could carry HowTo markup",
+          "severity": "Low",
+          "description": "Prompt pages already contain step-like instructions and before/after imagery that would map naturally to HowTo.",
+          "recommendation": "Optional enhancement; not required for current rankings."
+        }
+      ]
+    },
+    {
+      "name": "Performance (CWV)",
+      "score": 35,
+      "weight": 0.1,
+      "what_works": [
+        "TTFB 456ms median, well inside the 800ms target",
+        "1,043 DOM nodes, comfortably under the 1,500 guideline",
+        "Next.js ISR active with s-maxage=60 and stale-while-revalidate",
+        "Cloudinary delivers WebP with near-zero repeat transfer (40 image requests, ~0KB)"
+      ],
+      "findings": [
+        {
+          "title": "/api/get_data returns 286KB and took 1.7s cold, 4,536ms in session",
+          "severity": "Critical",
+          "description": "The homepage fetches all 102 prompts client-side on every load to render the 16 shown in the first grid page. The payload contains prompts (102), likes (0) and categories (2).",
+          "recommendation": "Paginate the endpoint (?page=1&limit=16), or render the first page server-side in the RSC payload so the grid needs no client fetch."
+        },
+        {
+          "title": "First Contentful Paint measured at 7,928ms",
+          "severity": "Critical",
+          "description": "Measured in one automated Chromium session. TTFB was only 456ms, so the delay is entirely client-side. Load event fired at 3,035ms with 189 requests and 825KB transferred. Lab figure - no CrUX field data is available because no Google API key is configured.",
+          "recommendation": "Address the payload, ad-stack and font findings below; then re-measure against CrUX field data."
+        },
+        {
+          "title": "177 inline scripts totalling 338KB; homepage HTML is 440KB",
+          "severity": "High",
+          "description": "Site-wide median page HTML is 96KB, so the homepage is 4.6x that. The Next.js RSC flight payload dominates the document. Heaviest article pages reach 219KB.",
+          "recommendation": "Reduce the server-component payload; largely resolved by fixing /api/get_data and paginating server-side."
+        },
+        {
+          "title": "Ad stack blocks the critical path with 45 requests and ~270KB",
+          "severity": "High",
+          "description": "pagead2.googlesyndication.com (23 requests, 123KB), fundingchoicesmessages.google.com (15 requests, 76KB), googleads.g.doubleclick.net (3 requests, 57KB), ep1/ep2.adtrafficquality.google (4 requests). adsbygoogle.js alone took 1,467ms; the doubleclick ads call took a further 947ms starting at t=3,599ms.",
+          "recommendation": "Load AdSense via next/script with strategy=\"afterInteractive\" or \"lazyOnload\"."
+        },
+        {
+          "title": "Fonts served as uncompressed TTF",
+          "severity": "High",
+          "description": "Outfit-Black.ttf (55,372B), Outfit-Medium.ttf (54,820B) and Outfit-Regular.ttf (54,912B) are all preloaded, so all three sit on the critical path. No .woff2 exists anywhere in the repo.",
+          "recommendation": "Convert to WOFF2 (~20KB each) via fonttools, woff2_compress or next/font/local - roughly 105KB saved on the critical path."
+        },
+        {
+          "title": "Duplicate font preload tags",
+          "severity": "Medium",
+          "description": "app/layout.js:131-133 declares three preloads, but the served HTML contains six preload tags - each font twice.",
+          "recommendation": "Deduplicate the preload declarations."
+        },
+        {
+          "title": "Two render-blocking fonts.googleapis.com stylesheets",
+          "severity": "Medium",
+          "description": "Google Sans:400 and Google Sans:700, injected by the ad stack - cross-origin and render-blocking.",
+          "recommendation": "Resolved as a side effect of deferring the ad stack."
+        },
+        {
+          "title": "463 of 693 images lack width/height attributes",
+          "severity": "Medium",
+          "description": "Direct Cumulative Layout Shift exposure; only 101 of 693 images use loading=\"lazy\".",
+          "recommendation": "Migrate to next/image, which enforces dimensions and handles lazy-loading and responsive srcset."
+        },
+        {
+          "title": "Twelve JS chunks all start at t=972ms and take 1.3-2.0s",
+          "severity": "Medium",
+          "description": "A single request wave. The longest, 3rly_llnkow2u.js, took 2,044ms for 9KB - latency-bound rather than size-bound.",
+          "recommendation": "Consider fewer, larger chunks for the initial route."
+        },
+        {
+          "title": "One slow page at 2,866ms TTFB",
+          "severity": "Low",
+          "description": "/prompt/chatgpt-pink-couture-fashion-editorial-prompt versus a ~450ms median, consistent with a cold ISR cache rather than a page-specific defect.",
+          "recommendation": "No action; monitor."
+        }
+      ]
+    },
+    {
+      "name": "AI Search Readiness",
+      "score": 70,
+      "weight": 0.1,
+      "what_works": [
+        "/llms.txt and /llms-full.txt both present and returning 200",
+        "llms.txt opens with a 'Direct answer:' block and states an explicit citation policy",
+        "robots.txt explicitly allows GPTBot, ChatGPT-User, OAI-SearchBot, Google-Extended, anthropic-ai, ClaudeBot, Claude-Web, PerplexityBot, cohere-ai, meta-externalagent and Applebot",
+        "Server-rendered rather than an SPA, so non-JS-executing AI crawlers see full content",
+        "FAQPage schema on 83 pages and 10.4 <h2> sections per page give strong passage-level citability"
+      ],
+      "findings": [
+        {
+          "title": "llms.txt asserts claims the site cannot support",
+          "severity": "High",
+          "description": "The one file written specifically for AI consumption is the least accurate content on the site. It claims '1,000+ expert-engineered prompts' (actual: 102), '50+ categories' (actual: 2, both broken), 'world's leading' and 'Updated daily', and enumerates a ~50-item taxonomy - Poetry, Screenwriting, DevOps Scripts, Financial Analysis, Legal Documents, Machine Learning - none of which resolve to pages.",
+          "recommendation": "State the real numbers and remove the fictional taxonomy. An answer engine that verifies before citing currently finds a demonstrable inaccuracy in the file designed to build trust."
+        },
+        {
+          "title": "The blog is uncitable while canonicals point at 404s",
+          "severity": "High",
+          "description": "All 14 /article/* pages canonical to /blog/* URLs that return 404. Answer engines respecting canonicals will either drop the content or cite a dead URL. This is the only long-form, genuinely citable content on the site.",
+          "recommendation": "Fix the canonical (see Technical SEO)."
+        },
+        {
+          "title": "No author entity for attribution",
+          "severity": "Medium",
+          "description": "AI answer engines weight named, verifiable authorship. BlogPosting.author is a bare Person with url pointing at the homepage, no bio, no credentials and no sameAs to any external profile.",
+          "recommendation": "Build real author pages with sameAs links."
+        },
+        {
+          "title": "Brand-mention and citation footprint not assessed",
+          "severity": "Info",
+          "description": "backlinks_auth.py --check reports Tier 0 (Common Crawl and verification crawler only, 0 cached domains). No Moz or Bing Webmaster credentials are configured, so off-site authority signals are outside the scope of this audit.",
+          "recommendation": "Add a free Moz API key (2,500 rows/month) and a Bing Webmaster key, then re-run."
+        },
+        {
+          "title": "/ai-plugin.json allowed in robots.txt but not verified",
+          "severity": "Low",
+          "description": "robots.txt allows /ai-plugin.json and /.well-known/ai-plugin.json.",
+          "recommendation": "Confirm these return 200 with valid manifests, or remove the Allow lines if aspirational."
+        },
+        {
+          "title": "No visible dateModified for readers",
+          "severity": "Low",
+          "description": "Articles render no visible published or updated date. Freshness is a citation-selection signal, and the schema dates currently fall back to created_at because published_at is NULL on every row.",
+          "recommendation": "Backfill the dates and render a visible byline with published/updated timestamps."
+        }
+      ]
+    },
+    {
+      "name": "Images",
+      "score": 70,
+      "weight": 0.05,
+      "what_works": [
+        "Alt text on 693 of 693 images - zero missing, the strongest single result in this audit",
+        "Cloudinary delivers WebP with automatic format negotiation and CDN caching",
+        "Homepage image transfer is effectively zero on repeat visits (40 requests, ~0KB)"
+      ],
+      "findings": [
+        {
+          "title": "463 of 693 images have no width or height attributes",
+          "severity": "Medium",
+          "description": "Direct Cumulative Layout Shift exposure - the browser cannot reserve space before the image loads. The prompt grid and before/after sliders are the main offenders.",
+          "recommendation": "Migrate to next/image with a Cloudinary loader, which enforces dimensions and handles lazy-loading, responsive srcset and modern formats. Preserve the existing alt-text coverage."
+        },
+        {
+          "title": "Only 101 of 693 images are lazy-loaded",
+          "severity": "Medium",
+          "description": "15% coverage. Everything below the fold should be loading=\"lazy\".",
+          "recommendation": "Lazy-load below-fold images and mark the LCP candidate fetchpriority=\"high\" and explicitly not lazy."
+        },
+        {
+          "title": "Both og-image.jpg and og-image.png shipped on every page",
+          "severity": "Low",
+          "description": "Identical 1200x630 dimensions and alt text, duplicated in the head of all 128 pages.",
+          "recommendation": "Ship one."
+        },
+        {
+          "title": "No image sitemap",
+          "severity": "Low",
+          "description": "693 images across 102 prompt pages, where the imagery is the product. Google Images is a plausible traffic channel that is currently unaddressed.",
+          "recommendation": "Add <image:image> entries to the existing sitemap or publish a dedicated image sitemap."
+        }
+      ]
+    }
+  ],
+  "action_plan": {
+    "phases": [
+      {
+        "name": "Phase 1: Critical Fixes",
+        "timeframe": "Week 1",
+        "items": [
+          "Clear stale blogs.canonical_url values (or add /blog/:slug -> /article/:slug 301s) so 14 articles stop canonicalising to 404s - effort S",
+          "Return real 404s for empty categories and drop them plus the duplicate /article/ai-image-prompt-engineering-guide entry from the sitemap - effort S",
+          "Restore the category taxonomy end to end: populate one of the two systems and make /categories -> /category/<slug> -> prompt list work - effort M",
+          "Render FAQ answers in the DOM on /faq, or remove the FAQPage schema - effort S",
+          "Correct the '1,000+ prompts' and '50+ categories' claims in meta descriptions, homepage copy and llms.txt; remove the fictional taxonomy from llms.txt - effort S"
+        ]
+      },
+      {
+        "name": "Phase 2: High-Impact Improvements",
+        "timeframe": "Weeks 2-3",
+        "items": [
+          "Add an <h1> to the homepage and fix 19 pages emitting 2-3 H1 tags - effort S",
+          "Paginate /api/get_data or move the first grid page into the RSC payload, cutting a 286KB client fetch - effort M",
+          "Defer AdSense with next/script afterInteractive and move the related-search unit below the first row of prompt cards - effort M",
+          "Convert the three Outfit TTF fonts to WOFF2 and deduplicate the six preload tags - effort S",
+          "Trim 16 over-long titles and 35 over-long meta descriptions; add a length guard to the metadata builder - effort S",
+          "Add rel=nofollow to search chips and Disallow: /*?search= to robots.txt to contain 581 parameter URLs - effort S"
+        ]
+      },
+      {
+        "name": "Phase 3: Content & Authority",
+        "timeframe": "Month 2",
+        "items": [
+          "Build /author/<slug> pages with bios, credentials and sameAs; point BlogPosting.author at them and add visible bylines - effort M",
+          "Backfill published_at (14 NULL rows) and emit real lastmod values in the sitemap - effort S",
+          "Expand the 7 pages under 300 words - effort S",
+          "Add width/height to 463 images via next/image, preserving the perfect alt-text coverage - effort M",
+          "Schema polish: add ItemList to /blog and the homepage, add ContactPage/AboutPage, ship one og:image - effort S",
+          "Add header navigation and related-prompt blocks to fix internal linking on 112 pages - effort M"
+        ]
+      },
+      {
+        "name": "Phase 4: Monitoring & Iteration",
+        "timeframe": "Ongoing",
+        "items": [
+          "Configure Google API key, Search Console OAuth and GA4 to replace lab performance estimates with CrUX field data",
+          "Add a Moz or Bing Webmaster key to enable backlink profile analysis (currently Tier 0, unassessed)",
+          "Verify the canonical fix with URL Inspection on 3 article URLs and request re-indexing",
+          "Capture a drift baseline (drift_baseline.py) after Phase 2 so future deploys are diffed against a known-good snapshot"
+        ]
+      }
+    ]
+  },
+  "limitations": [
+    "No CrUX, Search Console or GA4 field data: no Google API credentials configured (all six services reported missing).",
+    "No backlink profile: Moz and Bing Webmaster keys absent, leaving Common Crawl Tier 0 with 0 cached domains. Referring domains, anchor text and toxic links were not assessed.",
+    "No rank tracking, keyword volume or competitor SERP comparison: no DataForSEO MCP available in this session.",
+    "Performance figures come from a single automated Chromium session. The 7.9s FCP is a lab measurement; treat the ordering of bottlenecks as reliable and the absolute number as indicative.",
+    "Tablet screenshot timed out at 30s and was not captured."
+  ],
+  "artifacts": {
+    "findings_dir": "findings/",
+    "screenshots_dir": "screenshots/",
+    "crawl_data": "crawl.json",
+    "sitemap": "sitemap.xml",
+    "homepage_render": "homepage-render.json"
+  }
+}

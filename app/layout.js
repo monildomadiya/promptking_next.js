@@ -8,7 +8,7 @@ import ClientLayout from "./ClientLayout";
 export const metadata = {
   metadataBase: new URL('https://promptking.in'),
   title: "PromptKing – Best AI Prompts for ChatGPT, Gemini & Midjourney",
-  description: "Explore 1000+ free AI prompts for ChatGPT, Gemini, and Midjourney. Copy ready-to-use prompts for writing, coding, design, and more — all in one place.",
+  description: "Explore 100+ free AI prompts for ChatGPT, Gemini, and Midjourney. Copy ready-to-use prompts for writing, coding, design, and more — all in one place.",
   keywords: [
     "AI prompts", "ChatGPT prompts", "Midjourney prompts", "Gemini prompts",
     "free AI prompts", "prompt engineering", "AI image generator prompts",
@@ -26,8 +26,10 @@ export const metadata = {
     locale: 'en_US',
     url: 'https://promptking.in',
     title: 'PromptKing – Best AI Prompts for ChatGPT, Gemini & Midjourney',
-    description: 'Explore 1000+ free AI prompts for ChatGPT, Gemini, and Midjourney. Copy ready-to-use prompts for writing, coding, design, and more — all in one place.',
+    description: 'Explore 100+ free AI prompts for ChatGPT, Gemini, and Midjourney. Copy ready-to-use prompts for writing, coding, design, and more — all in one place.',
     siteName: 'PromptKing',
+    // One og:image only. Shipping both a .jpg and a .png meant every page
+    // carried two og:image blocks; crawlers take the first and ignore the rest.
     images: [
       {
         url: 'https://promptking.in/og-image.jpg',
@@ -35,20 +37,13 @@ export const metadata = {
         height: 630,
         alt: 'PromptKing - Premium AI Prompts Library',
         type: 'image/jpeg',
-      },
-      {
-        url: 'https://promptking.in/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'PromptKing - Premium AI Prompts Library',
-        type: 'image/png',
       }
     ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'PromptKing – Best AI Prompts for ChatGPT, Gemini & Midjourney',
-    description: 'Explore 1000+ free AI prompts for ChatGPT, Gemini, and Midjourney. Copy ready-to-use prompts for writing, coding, design, and more — all in one place.',
+    description: 'Explore 100+ free AI prompts for ChatGPT, Gemini, and Midjourney. Copy ready-to-use prompts for writing, coding, design, and more — all in one place.',
     images: ['https://promptking.in/og-image.jpg'],
   },
   robots: {
@@ -77,12 +72,13 @@ export default function RootLayout({ children }) {
     '@type': 'WebSite',
     name: 'PromptKing',
     url: 'https://promptking.in',
-    description: 'The ultimate free AI prompt library with 1000+ expert-engineered prompts for ChatGPT, Gemini, Midjourney, Claude, and more.',
+    description: 'A free AI prompt library of hand-tested, expert-engineered prompts for ChatGPT, Gemini, Midjourney, Claude, and more.',
     potentialAction: {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: 'https://promptking.in/?q={search_term_string}'
+        // Must match the parameter the site actually reads (?search=), not ?q=.
+        urlTemplate: 'https://promptking.in/?search={search_term_string}'
       },
       'query-input': 'required name=search_term_string'
     }
@@ -99,7 +95,7 @@ export default function RootLayout({ children }) {
       width: 180,
       height: 60,
     },
-    description: 'PromptKing is the world\'s leading free AI prompt library, providing 1000+ expert-engineered prompts for ChatGPT, Gemini, Midjourney, and Claude.',
+    description: 'PromptKing is a free AI prompt library providing hand-tested, expert-engineered prompts for ChatGPT, Gemini, Midjourney, and Claude.',
     foundingDate: '2024',
     areaServed: 'Worldwide',
     knowsAbout: [
@@ -127,10 +123,11 @@ export default function RootLayout({ children }) {
       <head>
         {/* Preload above-the-fold font weights so Outfit is ready before first
             paint. Combined with font-display:optional this prevents the hero
-            title from re-wrapping (layout shift) when the font loads. */}
-        <link rel="preload" href="/assets/fonts/Outfit-Regular.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
-        <link rel="preload" href="/assets/fonts/Outfit-Medium.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
-        <link rel="preload" href="/assets/fonts/Outfit-Black.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
+            title from re-wrapping (layout shift) when the font loads.
+            WOFF2 only — preloading the TTF as well would double-download. */}
+        <link rel="preload" href="/assets/fonts/Outfit-Regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/assets/fonts/Outfit-Bold.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/assets/fonts/Outfit-Black.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <Script
           id="adsbygoogle-init"
           async
