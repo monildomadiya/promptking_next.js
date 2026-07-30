@@ -2205,8 +2205,13 @@ ins.adsbygoogle {
   background: transparent !important;
 }
 
-ins.adsbygoogle[data-adsbygoogle-status="unfilled"],
-ins.adsbygoogle[data-ad-status="unfilled"] {
+/* Collapse unfilled slots so they leave no empty gap.
+   `.adsbygoogle-noablate` marks Google's own overlay formats (anchor and
+   vignette). Google shows and hides those itself — a vignette sits at
+   display:none until it fires — so an !important rule here can permanently
+   suppress an ad Google has already filled. Never touch those. */
+ins.adsbygoogle:not(.adsbygoogle-noablate)[data-adsbygoogle-status="unfilled"],
+ins.adsbygoogle:not(.adsbygoogle-noablate)[data-ad-status="unfilled"] {
   display: none !important;
   height: 0 !important;
   min-height: 0 !important;
@@ -2241,12 +2246,48 @@ div:has(> .adsense-container:has(ins.adsbygoogle[data-ad-status="unfilled"])) {
 
 .adsense-container {
   max-width: 100% !important;
-  overflow: hidden !important;
+  /* clip, not hidden: `overflow: hidden` also creates a scroll container,
+     which can trap Google's position:fixed anchor bar inside this box. */
+  overflow-x: clip;
 }
 
-ins.adsbygoogle {
+/* Stretch only OUR OWN manual placements to the container width.
+   This used to be an unscoped `ins.adsbygoogle { width: 100% !important }`,
+   which also hit the slots Auto Ads injects. Google sizes those itself, so
+   forcing them to 100% left the creative sitting at the left edge of an
+   over-wide box — the "banner ads left side" and "half screen" symptoms. */
+.adsense-container ins.adsbygoogle {
   max-width: 100% !important;
   width: 100% !important;
+}
+
+/* Auto Ads slots: let Google keep its own width, just centre the slot and
+   the creative inside it, and stop it spilling past the viewport. */
+.google-auto-placed {
+  margin-inline: auto !important;
+  max-width: 100% !important;
+  text-align: center !important;
+}
+
+.google-auto-placed ins.adsbygoogle {
+  margin-inline: auto !important;
+  max-width: 100% !important;
+}
+
+/* Google's own overlay formats must keep the geometry Google gives them. */
+ins.adsbygoogle.adsbygoogle-noablate {
+  max-width: none !important;
+}
+
+/* `body` is a flex column, so anything Auto Ads injects as a direct child
+   becomes a flex item and is sized by flex rules rather than filling the
+   line. Pin it to the full width so an injected slot cannot end up narrower
+   than the page. */
+body > .google-auto-placed,
+body > ins.adsbygoogle {
+  width: 100%;
+  align-self: stretch;
+  flex: 0 0 auto;
 }
 
 .blog-content {
