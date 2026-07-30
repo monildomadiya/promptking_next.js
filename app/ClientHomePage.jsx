@@ -121,8 +121,6 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
             )}
           </div>
 
-          <div className="home-search-divider"></div>
-
           <div className="home-search-buttons-group">
             <button 
               onClick={() => setFilter(filter === 'premium' ? 'all' : 'premium')}
@@ -132,11 +130,18 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
                 background: filter === 'premium' ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' : '#f8fafc',
                 border: filter === 'premium' ? '1px solid #0f172a' : '1px solid rgba(15, 23, 42, 0.12)',
                 color: filter === 'premium' ? '#ffffff' : '#0f172a',
-                boxShadow: filter === 'premium' ? '0 8px 20px rgba(15, 23, 42, 0.25)' : 'none'
+                boxShadow: filter === 'premium' ? '0 8px 20px rgba(15, 23, 42, 0.25)' : 'none',
+                padding: '10px 20px',
+                borderRadius: '50px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontWeight: '600',
+                fontSize: '0.95rem'
               }}
             >
               <Crown 
-                size={17} 
+                size={18} 
                 fill={filter === 'premium' ? '#f59e0b' : 'rgba(245, 158, 11, 0.18)'} 
                 style={{ 
                   display: 'block', 
@@ -147,16 +152,6 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
               />
               Premium
             </button>
-
-            <a 
-              href="https://ko-fi.com/M5H720SAJV"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="coffee-btn-hover home-search-btn-coffee"
-            >
-              <Coffee size={17} style={{ display: 'block' }} />
-              Support Us
-            </a>
           </div>
         </div>
       </div>

@@ -309,15 +309,15 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
       {prompt.isPremium && (
         <div style={{
           position: 'absolute', 
-          top: '12px', 
-          right: '12px', 
+          top: '16px', 
+          right: '16px', 
           background: 'rgba(0, 0, 0, 0.4)',
           backdropFilter: 'blur(12px)', 
           WebkitBackdropFilter: 'blur(12px)',
           border: '1px solid rgba(255, 215, 0, 0.3)', 
           borderRadius: '50%',
-          width: '36px', 
-          height: '36px', 
+          width: '28px', 
+          height: '28px', 
           display: 'flex', 
           alignItems: 'center',
           justifyContent: 'center', 
@@ -325,7 +325,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
           boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
           pointerEvents: 'none'
         }}>
-          <Crown size={18} fill="#FFD700" color="#FFD700" />
+          <Crown size={14} fill="#FFD700" color="#FFD700" />
         </div>
       )}
 
@@ -333,15 +333,15 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
       {prompt.isFeatured && (
         <div style={{
           position: 'absolute', 
-          top: prompt.isPremium ? '56px' : '12px', 
-          right: '12px', 
+          top: prompt.isPremium ? '50px' : '16px', 
+          right: '16px', 
           background: 'rgba(0, 0, 0, 0.4)',
           backdropFilter: 'blur(12px)', 
           WebkitBackdropFilter: 'blur(12px)',
           border: '1px solid rgba(229, 9, 20, 0.5)', 
           borderRadius: '50%',
-          width: '36px', 
-          height: '36px', 
+          width: '28px', 
+          height: '28px', 
           display: 'flex', 
           alignItems: 'center',
           justifyContent: 'center', 
@@ -349,7 +349,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
           boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
           pointerEvents: 'none'
         }}>
-          <Star size={16} fill="var(--accent-main)" color="var(--accent-main)" />
+          <Star size={14} fill="var(--accent-main)" color="var(--accent-main)" />
         </div>
       )}
 
@@ -383,112 +383,126 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
         borderRadius: '16px'
       }}>
         {/* Image Section */}
-        {prompt.isImageSlider ? (
-          <div ref={sliderContainerRef} className="slider-container prompt-image-container" style={{ 
-            aspectRatio: ratio, width: '100%', margin: '0',
-            position: 'relative', overflow: 'hidden',
-            background: '#e8eaee',
-            borderRadius: '16px',
-            opacity: isSettingsLoaded ? 1 : 0,
-            transition: 'opacity 0.3s ease-in-out'
-          }}>
-            <img 
-              src={optimizeImage(prompt.thumbnail_url || prompt.imgAfter || prompt.img_after, isMobile ? 450 : 600)} 
-              alt={`${prompt.title} - ${prompt.aiType || 'AI'} Prompt Result (After)`} 
-              loading={isPriority ? "eager" : "lazy"} 
-              fetchPriority={isPriority ? "high" : "auto"}
-              decoding="async"
-              onLoad={() => setIsLoaded(true)}
-              width="400" 
-              height="225" 
-              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} 
-            />
-            <img 
-              src={optimizeImage(prompt.imgBefore, isMobile ? 450 : 600)} 
-              alt={`${prompt.title} - Original Input Image (Before)`} 
-              loading={isPriority ? "eager" : "lazy"}
-              fetchPriority={isPriority ? "high" : "auto"}
-              decoding="async"
-              width="400"
-              height="225"
-              style={{ 
-                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover',
-                clipPath: `inset(0 ${100 - sliderValue}% 0 0)`,
-                WebkitClipPath: `inset(0 ${100 - sliderValue}% 0 0)`,
-                zIndex: 2
-              }} 
-            />
-            {/* Clickable overlay — navigates to prompt page on image click */}
-            <Link 
-              href={`/prompt/${prompt.slug || prompt.prompt_key || prompt.key}`}
-              style={{ position: 'absolute', inset: 0, zIndex: 5, cursor: 'pointer' }}
-              aria-label={`View ${prompt.title}`}
-            />
-            {/* Divider line + draggable handle — only this triggers the slider, not clicking the image */}
-            <div 
-              onPointerDown={handleSliderDragStart}
-              onPointerMove={handleSliderDragMove}
-              onPointerUp={handleSliderDragEnd}
-              style={{ 
-                position: 'absolute', top: 0, bottom: 0, left: `${sliderValue}%`, width: '44px', 
-                zIndex: 10, transform: 'translateX(-50%)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'ew-resize',
-                touchAction: 'none'
+        <div className="glass-panel" style={{
+          background: '#ffffff',
+          backdropFilter: 'blur(30px)',
+          WebkitBackdropFilter: 'blur(30px)',
+          borderRadius: '24px',
+          padding: '8px',
+          border: '1px solid rgba(0, 0, 0, 0.08)',
+          boxShadow: '0 15px 30px rgba(17,24,39,0.08)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          <div style={{ borderRadius: '16px', overflow: 'hidden', position: 'relative' }}>
+            {prompt.isImageSlider ? (
+              <div ref={sliderContainerRef} className="slider-container prompt-image-container" style={{ 
+                aspectRatio: ratio, width: '100%', margin: '0',
+                position: 'relative', overflow: 'hidden',
+                background: '#e8eaee',
+                borderRadius: '16px',
+                opacity: isSettingsLoaded ? 1 : 0,
+                transition: 'opacity 0.3s ease-in-out'
               }}>
-              {/* Glowing divider line */}
-              <div style={{
-                position: 'absolute', top: 0, bottom: 0, left: '50%', width: '2px',
-                background: 'rgba(255, 255, 255, 0.8)', transform: 'translateX(-50%)', pointerEvents: 'none',
-                boxShadow: '0 0 8px rgba(255, 255, 255, 0.4), 0 0 20px rgba(255, 255, 255, 0.15)'
-              }} />
-              {/* Glass capsule handle */}
-              <div 
-                style={{ 
-                  background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.06))',
-                  borderRadius: '14px', 
-                  width: '28px', 
-                  height: '52px', 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  gap: '2px',
-                  backdropFilter: 'blur(20px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 12px rgba(255, 255, 255, 0.08)', 
-                  border: '1px solid rgba(255, 255, 255, 0.25)',
-                  flexShrink: 0,
-                  pointerEvents: 'none',
-                  position: 'relative',
-                  zIndex: 2
-                }}
-              >
-                <ChevronLeft size={14} color="rgba(255, 255, 255, 0.85)" strokeWidth={2.5} style={{ display: 'block' }} />
-                <div style={{ width: '12px', height: '1px', background: 'rgba(255, 255, 255, 0.2)', borderRadius: '1px' }} />
-                <ChevronRight size={14} color="rgba(255, 255, 255, 0.85)" strokeWidth={2.5} style={{ display: 'block' }} />
+                <img 
+                  src={optimizeImage(prompt.thumbnail_url || prompt.imgAfter || prompt.img_after, isMobile ? 450 : 600)} 
+                  alt={`${prompt.title} - ${prompt.aiType || 'AI'} Prompt Result (After)`} 
+                  loading={isPriority ? "eager" : "lazy"} 
+                  fetchPriority={isPriority ? "high" : "auto"}
+                  decoding="async"
+                  onLoad={() => setIsLoaded(true)}
+                  width="400" 
+                  height="225" 
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
+                <img 
+                  src={optimizeImage(prompt.imgBefore, isMobile ? 450 : 600)} 
+                  alt={`${prompt.title} - Original Input Image (Before)`} 
+                  loading={isPriority ? "eager" : "lazy"}
+                  fetchPriority={isPriority ? "high" : "auto"}
+                  decoding="async"
+                  width="400"
+                  height="225"
+                  style={{ 
+                    position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover',
+                    clipPath: `inset(0 ${100 - sliderValue}% 0 0)`,
+                    WebkitClipPath: `inset(0 ${100 - sliderValue}% 0 0)`,
+                    zIndex: 2
+                  }} 
+                />
+                {/* Clickable overlay — navigates to prompt page on image click */}
+                <Link 
+                  href={`/prompt/${prompt.slug || prompt.prompt_key || prompt.key}`}
+                  style={{ position: 'absolute', inset: 0, zIndex: 5, cursor: 'pointer' }}
+                  aria-label={`View ${prompt.title}`}
+                />
+                {/* Divider line + draggable handle — only this triggers the slider, not clicking the image */}
+                <div 
+                  onPointerDown={handleSliderDragStart}
+                  onPointerMove={handleSliderDragMove}
+                  onPointerUp={handleSliderDragEnd}
+                  style={{ 
+                    position: 'absolute', top: 0, bottom: 0, left: `${sliderValue}%`, width: '44px', 
+                    zIndex: 10, transform: 'translateX(-50%)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'ew-resize',
+                    touchAction: 'none'
+                  }}>
+                  {/* Glowing divider line */}
+                  <div style={{
+                    position: 'absolute', top: 0, bottom: 0, left: '50%', width: '2px',
+                    background: 'rgba(255, 255, 255, 0.8)', transform: 'translateX(-50%)', pointerEvents: 'none',
+                    boxShadow: '0 0 8px rgba(255, 255, 255, 0.4), 0 0 20px rgba(255, 255, 255, 0.15)'
+                  }} />
+                  {/* Glass capsule handle */}
+                  <div 
+                    style={{ 
+                      background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.06))',
+                      borderRadius: '14px', 
+                      width: '28px', 
+                      height: '52px', 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      gap: '2px',
+                      backdropFilter: 'blur(20px) saturate(180%)',
+                      WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 12px rgba(255, 255, 255, 0.08)', 
+                      border: '1px solid rgba(255, 255, 255, 0.25)',
+                      flexShrink: 0,
+                      pointerEvents: 'none',
+                      position: 'relative',
+                      zIndex: 2
+                    }}
+                  >
+                    <ChevronLeft size={14} color="rgba(255, 255, 255, 0.85)" strokeWidth={2.5} style={{ display: 'block' }} />
+                    <div style={{ width: '12px', height: '1px', background: 'rgba(255, 255, 255, 0.2)', borderRadius: '1px' }} />
+                    <ChevronRight size={14} color="rgba(255, 255, 255, 0.85)" strokeWidth={2.5} style={{ display: 'block' }} />
+                  </div>
+                </div>
+                
+
               </div>
-            </div>
-            
-
+            ) : (prompt.thumbnail_url || prompt.imgAfter || prompt.img_after || prompt.imgBefore || prompt.img_before) ? (
+              <div className="prompt-image-container" style={{ width: '100%', margin: '0', aspectRatio: ratio, background: '#e8eaee', overflow: 'hidden', position: 'relative', borderRadius: '16px' }}>
+                <img 
+                  src={optimizeImage(prompt.thumbnail_url || prompt.imgAfter || prompt.img_after || prompt.imgBefore || prompt.img_before, isMobile ? 450 : 600)} 
+                  alt={`${prompt.title} - ${prompt.aiType || 'AI'} Prompt Example`} 
+                  loading={isPriority ? "eager" : "lazy"} 
+                  fetchPriority={isPriority ? "high" : "auto"}
+                  decoding="async"
+                  onLoad={() => setIsLoaded(true)}
+                  width="400" 
+                  height="225" 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
+                
+    
+              </div>
+            ) : null}
           </div>
-        ) : (prompt.thumbnail_url || prompt.imgAfter || prompt.img_after || prompt.imgBefore || prompt.img_before) && (
-          <div className="prompt-image-container" style={{ width: '100%', margin: '0', aspectRatio: ratio, background: '#e8eaee', overflow: 'hidden', position: 'relative', borderRadius: '16px' }}>
-            <img 
-              src={optimizeImage(prompt.thumbnail_url || prompt.imgAfter || prompt.img_after || prompt.imgBefore || prompt.img_before, isMobile ? 450 : 600)} 
-              alt={`${prompt.title} - ${prompt.aiType || 'AI'} Prompt Example`} 
-              loading={isPriority ? "eager" : "lazy"} 
-              fetchPriority={isPriority ? "high" : "auto"}
-              decoding="async"
-              onLoad={() => setIsLoaded(true)}
-              width="400" 
-              height="225" 
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-            />
-            
-
-          </div>
-        )}
+        </div>
         {/* Header Info */}
         <Link href={`/prompt/${prompt.slug || prompt.prompt_key || prompt.key}`} style={{ color: 'inherit', textDecoration: 'none', display: 'block', padding: '0 4px' }}>
           <h3 style={{
