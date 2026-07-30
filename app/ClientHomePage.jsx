@@ -169,7 +169,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
       />
 
       {!categorySlug && (
-        <section style={{ maxWidth: 'var(--container-max)', width: '100%', margin: '80px auto 60px', padding: isMobile ? '0 10px' : '0 20px' }}>
+        <section style={{ maxWidth: 'var(--container-max)', width: '100%', margin: '80px auto 60px', padding: isMobile ? '0 28px' : '0 20px' }}>
           <style>{`
             @keyframes pkFloatOrb {
               0%, 100% { transform: translateY(0px); }

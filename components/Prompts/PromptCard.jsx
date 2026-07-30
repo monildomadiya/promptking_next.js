@@ -309,8 +309,8 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
       {prompt.isPremium && (
         <div style={{
           position: 'absolute', 
-          top: '16px', 
-          right: '16px', 
+          top: '20px', 
+          right: '20px', 
           background: 'rgba(0, 0, 0, 0.4)',
           backdropFilter: 'blur(12px)', 
           WebkitBackdropFilter: 'blur(12px)',
@@ -333,8 +333,8 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
       {prompt.isFeatured && (
         <div style={{
           position: 'absolute', 
-          top: prompt.isPremium ? '50px' : '16px', 
-          right: '16px', 
+          top: prompt.isPremium ? '54px' : '20px', 
+          right: '20px', 
           background: 'rgba(0, 0, 0, 0.4)',
           backdropFilter: 'blur(12px)', 
           WebkitBackdropFilter: 'blur(12px)',
@@ -388,7 +388,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
           backdropFilter: 'blur(30px)',
           WebkitBackdropFilter: 'blur(30px)',
           borderRadius: '24px',
-          padding: '8px',
+          padding: '14px',
           border: '1px solid rgba(0, 0, 0, 0.08)',
           boxShadow: '0 15px 30px rgba(17,24,39,0.08)',
           position: 'relative',
