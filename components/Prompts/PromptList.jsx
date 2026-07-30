@@ -192,7 +192,7 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
 
   // ── Main render ──────────────────────────────────────────────────────────────
   return (
-    <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: isMobile ? '10px' : '0 20px', width: '100%', marginTop: '40px' }}>
+    <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: isMobile ? '0 28px' : '0 20px', width: '100%', marginTop: '40px' }}>
 
       {/* Silent background revalidation indicator */}
       {isRevalidating && (

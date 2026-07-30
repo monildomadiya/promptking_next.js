@@ -58,7 +58,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
       />
 
       <div style={{
-        maxWidth: 'var(--container-max)', margin: '40px auto 40px', padding: '0 20px',
+        maxWidth: 'var(--container-max)', margin: '40px auto 40px', padding: isMobile ? '0 28px' : '0 20px',
       }}>
         {/* The homepage previously shipped no <h1> and no copy above the prompt
             grid — the first thing above the fold was an ad unit. */}
@@ -85,75 +85,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
           </p>
         </header>
 
-        <div className="home-search-wrapper">
-          <div className="home-search-input-container">
-            <Search 
-              size={22} 
-              className="home-search-icon" 
-            />
-            <input 
-              type="text" 
-              placeholder="Search AI prompts..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="home-search-input" 
-            />
-            {search && (
-              <div 
-                onPointerDown={(e) => {
-                  e.preventDefault(); 
-                  setSearch('');
-                }}
-                style={{ 
-                  position: 'absolute', 
-                  right: '10px', 
-                  padding: '10px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: 'rgba(0,0,0,0.08)',
-                  borderRadius: '50%'
-                }}
-              >
-                <X size={16} style={{ color: 'var(--text-secondary)' }} />
-              </div>
-            )}
-          </div>
 
-          <div className="home-search-buttons-group">
-            <button 
-              onClick={() => setFilter(filter === 'premium' ? 'all' : 'premium')}
-              className="pro-card-hover home-search-btn-pro"
-              title="Premium Prompts"
-              style={{ 
-                background: filter === 'premium' ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' : '#f8fafc',
-                border: filter === 'premium' ? '1px solid #0f172a' : '1px solid rgba(15, 23, 42, 0.12)',
-                color: filter === 'premium' ? '#ffffff' : '#0f172a',
-                boxShadow: filter === 'premium' ? '0 8px 20px rgba(15, 23, 42, 0.25)' : 'none',
-                padding: '10px 20px',
-                borderRadius: '50px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                fontWeight: '600',
-                fontSize: '0.95rem'
-              }}
-            >
-              <Crown 
-                size={18} 
-                fill={filter === 'premium' ? '#f59e0b' : 'rgba(245, 158, 11, 0.18)'} 
-                style={{ 
-                  display: 'block', 
-                  color: filter === 'premium' ? '#ffb703' : '#d97706',
-                  filter: 'drop-shadow(0 0 4px rgba(245, 158, 11, 0.35))',
-                  transition: 'all 0.25s ease'
-                }} 
-              />
-              Premium
-            </button>
-          </div>
-        </div>
       </div>
 
 

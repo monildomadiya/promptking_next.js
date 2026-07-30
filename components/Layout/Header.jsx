@@ -85,11 +85,12 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
         transform: isVisible ? 'translateY(0)' : 'translateY(-120%)',
         opacity: isVisible ? 1 : 0
       }}>
-        <div className="header-inner-flex">
+        <div className="header-inner-flex" style={{ justifyContent: 'flex-start' }}>
           <div className="header-logo-container" style={{ 
             display: (isMobile && isSearchExpanded) ? 'none' : 'flex',
             alignItems: 'center',
-            gap: isMobile ? '10px' : '30px'
+            gap: isMobile ? '10px' : '30px',
+            order: 1
           }}>
             <Link 
               href="/" 
@@ -104,7 +105,133 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
             </Link>
           </div>
 
-          <div className="header-actions">
+          {/* Collapsible Search */}
+          <div className="search-bar-hover" style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: isSearchExpanded ? (isMobile ? '#f8fafc' : 'rgba(0,0,0,0.04)') : 'rgba(0,0,0,0.03)',
+            borderRadius: '16px',
+            padding: isSearchExpanded ? (isMobile ? '4px 4px 4px 12px' : '6px 6px 6px 16px') : (isMobile ? '0 12px' : '0 16px'),
+            transition: 'all 0.3s ease',
+            flex: isSearchExpanded ? 1 : 0,
+            cursor: isSearchExpanded ? 'text' : 'pointer',
+            border: '1px solid rgba(0,0,0,0.08)',
+            margin: isMobile ? (isSearchExpanded ? '0' : '0 4px 0 auto') : '0 8px 0 auto',
+            width: isSearchExpanded ? '100%' : 'auto',
+            maxWidth: isSearchExpanded ? (isMobile ? '100%' : '260px') : 'none',
+            height: isMobile ? '42px' : '50px',
+            order: 2
+          }} onClick={() => {
+            if (!isSearchExpanded) {
+              setIsSearchExpanded(true);
+              if (!isHomePage) navigate.push('/');
+            }
+          }}>
+            <input 
+              type="text"
+              placeholder="Search prompts..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onBlur={(e) => {
+                if (!search) setIsSearchExpanded(false);
+              }}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                outline: 'none',
+                width: isSearchExpanded ? '100%' : '0px',
+                opacity: isSearchExpanded ? 1 : 0,
+                padding: '0',
+                transition: 'all 0.3s ease',
+                fontSize: isMobile ? '1rem' : '0.95rem',
+                color: 'var(--text-main)',
+                pointerEvents: isSearchExpanded ? 'auto' : 'none'
+              }}
+              ref={(input) => {
+                if (input && isSearchExpanded) input.focus();
+              }}
+            />
+            {isSearchExpanded && search && (
+              <div 
+                onPointerDown={(e) => { e.preventDefault(); setSearch(''); }} 
+                style={{
+                  padding: '6px 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  flexShrink: 0
+                }}
+              >
+                <X size={16} color="var(--text-secondary)" />
+              </div>
+            )}
+            {isMobile && isSearchExpanded && !search && (
+               <X 
+                 size={22} 
+                 color="var(--text-secondary)" 
+                 style={{ cursor: 'pointer', flexShrink: 0, marginRight: '12px' }} 
+                 onPointerDown={(e) => { e.preventDefault(); setIsSearchExpanded(false); }} 
+               />
+            )}
+            
+            {/* Search Icon inside a rounded container on the right */}
+            <div style={{
+               background: isSearchExpanded ? '#0f172a' : 'transparent',
+               borderRadius: '10px',
+               width: isSearchExpanded ? (isMobile ? '32px' : '36px') : 'auto',
+               height: isSearchExpanded ? (isMobile ? '32px' : '36px') : 'auto',
+               display: 'flex',
+               alignItems: 'center',
+               justifyContent: 'center',
+               flexShrink: 0,
+               transition: 'all 0.3s ease',
+               cursor: 'pointer'
+            }}>
+               <Search size={isMobile ? 20 : 18} color={isSearchExpanded ? '#fff' : 'var(--text-secondary)'} />
+            </div>
+          </div>
+
+          <div className="header-actions" style={{ display: (isMobile && isSearchExpanded) ? 'none' : 'flex', alignItems: 'center', gap: isMobile ? '8px' : '16px', order: 3 }}>
+            {/* Premium Button */}
+            <button 
+              onClick={() => {
+                setFilter(filter === 'premium' ? 'all' : 'premium');
+                if (!isHomePage) navigate.push('/');
+              }}
+              className="pro-card-hover"
+              title="Premium Prompts"
+              style={{ 
+                background: filter === 'premium' ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' : 'rgba(0,0,0,0.03)',
+                border: filter === 'premium' ? '1px solid #0f172a' : '1px solid rgba(0,0,0,0.08)',
+                color: filter === 'premium' ? '#ffffff' : 'rgba(20,22,26,0.8)',
+                boxShadow: filter === 'premium' ? '0 8px 20px rgba(15, 23, 42, 0.25)' : 'none',
+                height: isMobile ? '42px' : '50px',
+                padding: isMobile ? '0 12px' : '0 20px',
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontWeight: '600',
+                fontSize: isMobile ? '0.85rem' : '0.95rem',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <Crown 
+                size={isMobile ? 16 : 18} 
+                fill={filter === 'premium' ? '#f59e0b' : 'rgba(245, 158, 11, 0.18)'} 
+                style={{ 
+                  display: 'block', 
+                  color: filter === 'premium' ? '#ffb703' : '#d97706',
+                  filter: 'drop-shadow(0 0 4px rgba(245, 158, 11, 0.35))',
+                  transition: 'all 0.25s ease'
+                }} 
+              />
+              {!isMobile && "Premium"}
+            </button>
+
             {categories.length > 0 && (
               <div 
                 className="category-dropdown-wrapper"

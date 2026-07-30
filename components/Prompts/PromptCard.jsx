@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Copy, Check, Eye, Lock, Unlock, Youtube, ArrowRight, Crown, Code, Instagram, Layout, Zap, Sparkles, Image, MessageSquare, Laptop, ChevronLeft, ChevronRight, Star } from '../Common/Icons';
 import api, { SERVER_URL } from '@/lib/api';
 import YouTubeModal from '../Modals/YouTubeModal';
@@ -31,6 +32,8 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [isSnapping, setIsSnapping] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const pathname = usePathname();
+  const isHomePage = pathname === '/';
   // isMobile is now a prop from parent — no per-card resize listener needed
 
   const cardPadding = isMobile ? 10 : 18;
@@ -290,6 +293,33 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
     );
   }
 
+  // Define the title overlay for the home page
+  const titleOverlay = isHomePage && (
+    <div style={{
+      position: 'absolute', bottom: 0, left: 0, right: 0,
+      background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)',
+      padding: '40px 14px 14px 14px',
+      pointerEvents: 'none',
+      zIndex: 20
+    }}>
+      <h3 style={{
+        margin: 0,
+        color: '#fff',
+        fontSize: '1.15rem',
+        fontWeight: 600,
+        lineHeight: 1.4,
+        display: '-webkit-box',
+        WebkitLineClamp: 2,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+      }}>
+        <HighlightText text={prompt.title} highlight={searchTerm} />
+      </h3>
+    </div>
+  );
+
   return (
     <div ref={cardRef} className="masonry-grid-item" style={{
       background: 'transparent',
@@ -481,8 +511,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
                     <ChevronRight size={14} color="rgba(255, 255, 255, 0.85)" strokeWidth={2.5} style={{ display: 'block' }} />
                   </div>
                 </div>
-                
-
+                {titleOverlay}
               </div>
             ) : (prompt.thumbnail_url || prompt.imgAfter || prompt.img_after || prompt.imgBefore || prompt.img_before) ? (
               <div className="prompt-image-container" style={{ width: '100%', margin: '0', aspectRatio: ratio, background: '#e8eaee', overflow: 'hidden', position: 'relative', borderRadius: '16px' }}>
@@ -498,29 +527,32 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                 />
                 
+                {titleOverlay}
     
               </div>
             ) : null}
           </div>
         </div>
-        {/* Header Info */}
-        <Link href={`/prompt/${prompt.slug || prompt.prompt_key || prompt.key}`} style={{ color: 'inherit', textDecoration: 'none', display: 'block', padding: '0 4px' }}>
-          <h3 style={{
-            fontSize: '1rem',
-            fontWeight: 500,
-            marginTop: '4px',
-            marginBottom: '8px',
-            lineHeight: 1.4,
-            color: 'rgba(20, 22, 26, 0.92)',
-            display: '-webkit-box',
-            WebkitLineClamp: 1,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
-          }}>
-            <HighlightText text={prompt.title} highlight={searchTerm} />
-          </h3>
-        </Link>
+        {/* Header Info - Only show below image if not on home page */}
+        {!isHomePage && (
+          <Link href={`/prompt/${prompt.slug || prompt.prompt_key || prompt.key}`} style={{ color: 'inherit', textDecoration: 'none', display: 'block', padding: '0 4px' }}>
+            <h3 style={{
+              fontSize: '1rem',
+              fontWeight: 500,
+              marginTop: '4px',
+              marginBottom: '8px',
+              lineHeight: 1.4,
+              color: 'rgba(20, 22, 26, 0.92)',
+              display: '-webkit-box',
+              WebkitLineClamp: 1,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}>
+              <HighlightText text={prompt.title} highlight={searchTerm} />
+            </h3>
+          </Link>
+        )}
       </div>
 
 
