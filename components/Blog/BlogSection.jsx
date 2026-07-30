@@ -34,7 +34,7 @@ const BlogSection = () => {
   if (loading) {
     return (
       <section style={{ padding: '80px 20px', background: 'var(--surface-2)', borderTop: '1px solid var(--border-color)' }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+        <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}>
             <div>
               <Shimmer height="40px" width="100%" style={{ maxWidth: '300px', marginBottom: '10px' }} />
@@ -62,7 +62,7 @@ const BlogSection = () => {
 
   return (
     <section style={{ padding: '80px 20px', background: 'var(--surface-2)', borderTop: '1px solid var(--border-color)' }}>
-      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+      <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}>
           <div>
             <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '10px' }}>Latest from Blog</h2>

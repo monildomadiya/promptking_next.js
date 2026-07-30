@@ -135,7 +135,7 @@ export default function NotFound() {
         position: 'relative',
         zIndex: 2
       }}>
-        PromptKing — 1000+ AI Prompts Library
+        PromptKing — Free AI Prompts Library
       </p>
     </div>
   );

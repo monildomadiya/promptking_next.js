@@ -171,7 +171,7 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
   if (loading) {
     const skeletonCount = isMobile ? 4 : 12;
     return (
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px', width: '100%', marginTop: '40px' }}>
+      <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '20px', width: '100%', marginTop: '40px' }}>
         <div className="css-masonry-grid">
           {Array.from({ length: skeletonCount }).map((_, i) => (
             <div key={i} style={{
@@ -192,7 +192,7 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
 
   // ── Main render ──────────────────────────────────────────────────────────────
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: isMobile ? '10px' : '0 20px', width: '100%', marginTop: '40px' }}>
+    <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: isMobile ? '10px' : '0 20px', width: '100%', marginTop: '40px' }}>
 
       {/* Silent background revalidation indicator */}
       {isRevalidating && (

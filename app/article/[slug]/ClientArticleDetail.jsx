@@ -91,7 +91,7 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
   }, [slug, initialBlog, initialCategories, initialOtherBlogs]);
 
   if (loading) return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '60px 20px' }}>
+    <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '60px 20px' }}>
       <SEOMetadata title="Loading Article... | PromptKing Blog" />
       <Shimmer height="20px" width="120px" style={{ marginBottom: '40px' }} />
       <div className="article-layout">
@@ -191,7 +191,7 @@ const ClientArticleDetail = ({ initialBlog, initialOtherBlogs, initialCategories
 
 
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '60px 20px' }}>
+    <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '60px 20px' }}>
       <SEOMetadata 
         title={blog.meta_title || `${blog.title} | PromptKing Blog`}
         description={blog.meta_description || blog.excerpt || metaDescFallback}

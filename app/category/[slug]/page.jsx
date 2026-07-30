@@ -104,7 +104,7 @@ export default async function CategoryPage({ params }) {
   };
 
   return (
-    <main style={{ minHeight: '100vh', padding: '40px 20px', color: 'var(--text-main)', maxWidth: '1400px', margin: '0 auto' }}>
+    <main style={{ minHeight: '100vh', padding: '40px 20px', color: 'var(--text-main)', maxWidth: 'var(--container-max)', margin: '0 auto' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* Category Header */}

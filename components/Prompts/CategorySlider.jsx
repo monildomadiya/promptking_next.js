@@ -45,7 +45,7 @@ const CategorySlider = ({ initialCategories = [] }) => {
   if (categories.length === 0) return null;
 
   return (
-    <div style={{ padding: '0 20px', maxWidth: '1400px', margin: '40px auto 20px' }}>
+    <div style={{ padding: '0 20px', maxWidth: 'var(--container-max)', margin: '40px auto 20px' }}>
       <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '20px', letterSpacing: '-0.5px', color: 'var(--text-main)' }}>
         Browse by Category
       </h2>

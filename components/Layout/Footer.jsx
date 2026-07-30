@@ -44,13 +44,14 @@ const Footer = ({ onLogoClick }) => {
   return (
     <>
 
-      <footer style={{
+      {/* Width/gutter live in globals.css (.pk-footer-card) so they can mirror
+          the header's breakpoints exactly and keep both cards edge-aligned
+          with the prompt grid. */}
+      <footer className="pk-footer-card" style={{
         background: '#ffffff',
         position: 'relative',
         padding: isMobile ? '56px 24px 36px' : '75px 54px 44px',
         color: 'var(--text-main)',
-        maxWidth: '1360px',
-        margin: isMobile ? '0 14px 24px' : '0 auto 40px',
         borderRadius: '36px',
         border: '1px solid rgba(15, 23, 42, 0.08)',
         boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.05)',
@@ -79,7 +80,7 @@ const Footer = ({ onLogoClick }) => {
           zIndex: 0
         }} />
 
-        <div style={{ maxWidth: '1240px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
+        <div style={{ width: '100%', margin: '0 auto', position: 'relative', zIndex: 10 }}>
           <div style={{ 
             display: 'grid', 
             gridTemplateColumns: isMobile ? '1fr' : '2.2fr 1fr 1fr 1.3fr', 

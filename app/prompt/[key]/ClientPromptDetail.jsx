@@ -407,7 +407,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
   if (loading) return (
     <div className="detail-page-wrapper" style={{ background: 'var(--surface-0)', minHeight: '100vh', color: 'var(--text-main)' }}>
       <SEOMetadata title="Loading Prompt... | PromptKing" />
-      <div className="container" style={{ padding: '40px 20px', maxWidth: '1400px', margin: '0 auto' }}>
+      <div className="container" style={{ padding: '40px 20px', maxWidth: 'var(--container-max)', margin: '0 auto' }}>
         {/* Back Link Shimmer */}
         <Shimmer height="20px" width="180px" style={{ marginBottom: '30px' }} />
         
@@ -615,7 +615,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
           { name: prompt.title, url: `https://promptking.in/prompt/${prompt.key}` }
         ]}
       />
-      <div className="container" style={{ padding: '40px 20px', maxWidth: '1400px', margin: '0 auto' }}>
+      <div className="container" style={{ padding: '40px 20px', maxWidth: 'var(--container-max)', margin: '0 auto' }}>
         
         {/* Back Button */}
         <button onClick={handleBack} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', marginBottom: '30px', fontWeight: 600, textDecoration: 'none', cursor: 'pointer', background: 'none', border: 'none', padding: 0 }} className="back-link">

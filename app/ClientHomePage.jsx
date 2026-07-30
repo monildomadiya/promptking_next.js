@@ -32,7 +32,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
       const formattedCategory = categorySlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
       return `Explore our curated collection of high-quality ${formattedCategory} prompts. Copy and use these free AI prompts instantly to improve your workflow.`;
     }
-    return "Explore 1000+ free AI prompts for ChatGPT, Gemini, and Midjourney. Copy ready-to-use prompts for writing, coding, design, and more — all in one place.";
+    return "Explore 100+ free AI prompts for ChatGPT, Gemini, and Midjourney. Copy ready-to-use prompts for writing, coding, design, and more — all in one place.";
   };
 
   const schema = {
@@ -58,7 +58,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
       />
 
       <div style={{
-        maxWidth: '1000px', margin: '40px auto 40px', padding: '0 20px',
+        maxWidth: 'var(--container-max)', margin: '40px auto 40px', padding: '0 20px',
       }}>
         {/* The homepage previously shipped no <h1> and no copy above the prompt
             grid — the first thing above the fold was an ad unit. */}
@@ -174,7 +174,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
       />
 
       {!categorySlug && (
-        <section style={{ maxWidth: '1400px', width: '100%', margin: '80px auto 60px', padding: isMobile ? '0 10px' : '0 20px' }}>
+        <section style={{ maxWidth: 'var(--container-max)', width: '100%', margin: '80px auto 60px', padding: isMobile ? '0 10px' : '0 20px' }}>
           <style>{`
             @keyframes pkFloatOrb {
               0%, 100% { transform: translateY(0px); }
@@ -320,7 +320,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
                 Icon: Filter,
                 color: '#d97706', bg: 'rgba(217,119,6,0.09)', border: 'rgba(217,119,6,0.22)',
                 title: 'Search & Filter',
-                desc: 'Search 1,000+ prompts by keyword or filter by AI tool and category. Find your perfect prompt in under 10 seconds.',
+                desc: 'Search the full prompt library by keyword or filter by AI tool and category. Find your perfect prompt in under 10 seconds.',
               },
               {
                 Icon: Lock,
