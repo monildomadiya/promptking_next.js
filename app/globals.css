@@ -1915,20 +1915,20 @@ body.shorts-modal-open {
   max-width: var(--container-inner);
   z-index: 2000;
   background: linear-gradient(135deg,
-    rgba(59, 130, 246, 0.18) 0%,
-    rgba(96, 165, 250, 0.12) 50%,
-    rgba(37, 99, 235, 0.16) 100%
+    rgba(147, 197, 253, 0.45) 0%,
+    rgba(191, 219, 254, 0.35) 50%,
+    rgba(96, 165, 250, 0.4) 100%
   );
-  backdrop-filter: blur(32px) saturate(200%) brightness(1.05);
-  -webkit-backdrop-filter: blur(32px) saturate(200%) brightness(1.05);
-  border: 1px solid rgba(99, 179, 237, 0.5);
-  border-top: 1px solid rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 24px;
   box-shadow:
-    0 8px 32px rgba(37, 99, 235, 0.18),
-    0 2px 8px rgba(59, 130, 246, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75),
-    inset 0 -1px 0 rgba(99, 179, 237, 0.25);
+    0 10px 40px rgba(37, 99, 235, 0.15),
+    0 2px 10px rgba(59, 130, 246, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(59, 130, 246, 0.2);
   height: auto;
 
   /* Desktop */
