@@ -19,6 +19,13 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
   const location = usePathname();
   const isHomePage = location === '/';
   const headerRef = useRef(null);
+  const searchInputRef = useRef(null);
+
+  useEffect(() => {
+    if (isSearchExpanded && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isSearchExpanded]);
 
   const optimizeImage = (url, width = 600) => {
     if (!url) return url;
@@ -192,9 +199,7 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                   color: 'var(--text-main)',
                   pointerEvents: isSearchExpanded ? 'auto' : 'none'
                 }}
-                ref={(input) => {
-                  if (input && isSearchExpanded) input.focus();
-                }}
+                ref={searchInputRef}
               />
               {isSearchExpanded && search && (
                 <div
