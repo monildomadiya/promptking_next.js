@@ -13,6 +13,11 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
   const { search, setSearch, filter, setFilter, isMobile, settings } = useAppContext();
   const { categorySlug } = useParams();
 
+  // While a search is running the page strips down to header + results + footer.
+  // The hero and the marketing section otherwise push the one prompt the user
+  // asked for below the fold — which is exactly what a screen recording shows.
+  const isSearching = !!search.trim();
+
   useEffect(() => {
     if (categorySlug) {
       setFilter(categorySlug.toLowerCase());
@@ -57,6 +62,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
         schema={schema}
       />
 
+      {!isSearching && (
       <div style={{
         maxWidth: 'var(--container-max)', margin: '40px auto 40px', padding: isMobile ? '0 28px' : '0 20px',
       }}>
@@ -87,10 +93,9 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
 
 
       </div>
+      )}
 
-
-
-      <PromptList 
+      <PromptList
         search={search} 
         filter={filter} 
         setFilter={setFilter} 
@@ -100,7 +105,7 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
         settings={settings}
       />
 
-      {!categorySlug && (
+      {!categorySlug && !isSearching && (
         <section style={{ maxWidth: 'var(--container-max)', width: '100%', margin: '80px auto 60px', padding: isMobile ? '0 28px' : '0 20px' }}>
           <style>{`
             @keyframes pkFloatOrb {
