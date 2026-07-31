@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import Script from 'next/script';
 import { useAppContext } from '@/components/AppContext';
 import Header from '@/components/Layout/Header';
 import Footer from '@/components/Layout/Footer';
@@ -21,6 +22,19 @@ export default function ClientLayout({ children }) {
 
   return (
     <>
+      {/* The loader itself must be route-gated, not just <GoogleAdSense/>. Auto Ads
+          injects from this script alone, so loading it globally put ads inside the
+          admin dashboard — which is also an AdSense policy risk, since those pages
+          have no publisher content. */}
+      {!isAdminPath && (
+        <Script
+          id="adsbygoogle-init"
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2762946314678354"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+      )}
       {!isAdminPath && <GoogleAdSense settings={settings} />}
       {!isAdminPath && (
         <Header 

@@ -1,5 +1,4 @@
 import "./globals.css";
-import Script from "next/script";
 import { GoogleAnalytics } from '@next/third-parties/google';
 
 import { AppProvider } from "@/components/AppContext";
@@ -128,13 +127,12 @@ export default function RootLayout({ children }) {
         <link rel="preload" href="/assets/fonts/Outfit-Regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/assets/fonts/Outfit-Bold.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/assets/fonts/Outfit-Black.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-        <Script
-          id="adsbygoogle-init"
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2762946314678354"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
+        {/* RC Rocket drives the home-page prompt card titles. It is far narrower
+            than Outfit, so a late swap would visibly re-flow the overlay. */}
+        <link rel="preload" href="/assets/fonts/RcRocket.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        {/* adsbygoogle.js is loaded from ClientLayout, not here: this is a server
+            component with no route awareness, so loading it here put Auto Ads on
+            /admin-secure too. */}
       </head>
       <body>
         <script
