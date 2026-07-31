@@ -94,10 +94,17 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
       }}>
         <div className="header-inner-flex" style={{ justifyContent: 'flex-start' }}>
           <div className="header-logo-container" style={{ 
-            display: (isMobile && isSearchExpanded) ? 'none' : 'flex',
+            display: 'flex',
             alignItems: 'center',
             gap: isMobile ? '10px' : '30px',
-            order: 1
+            order: 1,
+            transition: 'opacity 0.3s ease, transform 0.3s ease, max-width 0.35s ease',
+            opacity: (isMobile && isSearchExpanded) ? 0 : 1,
+            transform: (isMobile && isSearchExpanded) ? 'translateX(-10px)' : 'translateX(0)',
+            maxWidth: (isMobile && isSearchExpanded) ? '0' : '200px',
+            overflow: 'hidden',
+            pointerEvents: (isMobile && isSearchExpanded) ? 'none' : 'auto',
+            flexShrink: 0
           }}>
             <Link 
               href="/" 
@@ -120,7 +127,9 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
             gap: '8px',
             marginLeft: 'auto',
             order: 2,
-            flexShrink: 0
+            flexShrink: 0,
+            flex: (isMobile && isSearchExpanded) ? '1' : 'none',
+            transition: 'flex 0.35s ease, width 0.35s ease'
           }}>
             {/* Premium Icon Button */}
             <button
@@ -137,12 +146,18 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                 width: isMobile ? '42px' : '50px',
                 height: isMobile ? '42px' : '50px',
                 borderRadius: '16px',
-                display: (isMobile && isSearchExpanded) ? 'none' : 'flex',
+                display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                flexShrink: 0
+                transition: 'all 0.3s ease, opacity 0.3s ease, transform 0.3s ease, max-width 0.35s ease',
+                flexShrink: 0,
+                opacity: (isMobile && isSearchExpanded) ? 0 : 1,
+                transform: (isMobile && isSearchExpanded) ? 'scale(0.7)' : 'scale(1)',
+                maxWidth: (isMobile && isSearchExpanded) ? '0' : '60px',
+                overflow: 'hidden',
+                padding: (isMobile && isSearchExpanded) ? '0' : undefined,
+                pointerEvents: (isMobile && isSearchExpanded) ? 'none' : 'auto',
               }}
             >
               <Crown
@@ -164,14 +179,15 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
               background: isSearchExpanded ? (isMobile ? '#f8fafc' : 'rgba(0,0,0,0.04)') : 'rgba(0,0,0,0.03)',
               borderRadius: '16px',
               padding: isSearchExpanded ? (isMobile ? '4px 4px 4px 12px' : '6px 6px 6px 16px') : (isMobile ? '5px' : '7px'),
-              transition: 'max-width 0.35s cubic-bezier(0.4,0,0.2,1), background 0.3s ease, padding 0.3s ease',
+              transition: 'width 0.4s cubic-bezier(0.4,0,0.2,1), background 0.3s ease, padding 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease',
               cursor: isSearchExpanded ? 'text' : 'pointer',
-              border: '1px solid rgba(0,0,0,0.08)',
+              border: isSearchExpanded ? '1px solid rgba(0,0,0,0.14)' : '1px solid rgba(0,0,0,0.08)',
               overflow: 'hidden',
-              maxWidth: isSearchExpanded ? (isMobile ? '100%' : '280px') : (isMobile ? '44px' : '50px'),
-              width: isSearchExpanded ? '100%' : 'auto',
+              width: isSearchExpanded ? (isMobile ? '100%' : '280px') : (isMobile ? '42px' : '50px'),
               flexShrink: 0,
-              height: isMobile ? '42px' : '50px'
+              flexGrow: (isMobile && isSearchExpanded) ? 1 : 0,
+              height: isMobile ? '42px' : '50px',
+              boxShadow: isSearchExpanded ? '0 0 0 3px rgba(15,23,42,0.06)' : 'none',
             }} onClick={() => {
               if (!isSearchExpanded) {
                 setIsSearchExpanded(true);
@@ -245,7 +261,19 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
             </div>
           </div>
 
-          <div className="header-actions" style={{ display: (isMobile && isSearchExpanded) ? 'none' : 'flex', alignItems: 'center', gap: isMobile ? '8px' : '10px', order: 3, flexShrink: 0 }}>
+          <div className="header-actions" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: isMobile ? '8px' : '10px',
+            order: 3,
+            flexShrink: 0,
+            transition: 'opacity 0.3s ease, transform 0.3s ease, max-width 0.35s ease',
+            opacity: (isMobile && isSearchExpanded) ? 0 : 1,
+            transform: (isMobile && isSearchExpanded) ? 'translateX(10px)' : 'translateX(0)',
+            maxWidth: (isMobile && isSearchExpanded) ? '0' : '300px',
+            overflow: 'hidden',
+            pointerEvents: (isMobile && isSearchExpanded) ? 'none' : 'auto',
+          }}>
 
             {categories.length > 0 && (
               <div 
