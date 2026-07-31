@@ -8,7 +8,8 @@ import React from 'react';
 const IconWrapper = ({ 
   children, 
   size = 24, 
-  color = 'currentColor', 
+  color = 'currentColor',
+  fill = 'none',
   strokeWidth = 2, 
   className = "",
   style = {}
@@ -18,7 +19,7 @@ const IconWrapper = ({
     width={size}
     height={size}
     viewBox="0 0 24 24"
-    fill="none"
+    fill={fill}
     stroke={color}
     strokeWidth={strokeWidth}
     strokeLinecap="round"
@@ -34,8 +35,12 @@ export const Search = (props) => (
   <IconWrapper {...props}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></IconWrapper>
 );
 
-export const Crown = (props) => (
-  <IconWrapper {...props}><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7z"/></IconWrapper>
+export const Crown = ({ size = 24, color = 'currentColor', fill = 'none', className = '', style = {} }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24"
+    fill={fill} stroke={fill !== 'none' ? fill : color} strokeWidth={fill !== 'none' ? 0 : 2}
+    strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0, ...style }}>
+    <path d="M2 20h20M5 20l-1.5-9L9 14l3-7 3 7 5.5-3L19 20H5z"/>
+  </svg>
 );
 
 export const Grid = (props) => (
@@ -133,8 +138,12 @@ export const Shield = (props) => (
   <IconWrapper {...props}><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1v7z"/></IconWrapper>
 );
 
-export const Star = (props) => (
-  <IconWrapper {...props}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></IconWrapper>
+export const Star = ({ size = 24, color = 'currentColor', fill = 'none', className = '', style = {} }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24"
+    fill={fill} stroke={fill !== 'none' ? fill : color} strokeWidth={fill !== 'none' ? 0 : 2}
+    strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0, ...style }}>
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+  </svg>
 );
 
 export const Layout = (props) => (

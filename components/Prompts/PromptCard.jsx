@@ -293,114 +293,132 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
     );
   }
 
-  // Define the title overlay for the home page
   const titleOverlay = isHomePage && (
     <div style={{
       position: 'absolute', bottom: 0, left: 0, right: 0,
-      background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)',
-      padding: '40px 14px 14px 14px',
+      background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.4) 55%, transparent 100%)',
+      padding: '44px 14px 14px 14px',
       pointerEvents: 'none',
       zIndex: 20
     }}>
-      <h3 style={{
+      <h3 className="prompt-title-rc" style={{
         margin: 0,
         color: '#fff',
-        fontSize: '1.15rem',
-        fontWeight: 600,
-        lineHeight: 1.4,
+        fontSize: '1.65rem',
+        fontWeight: 400,
+        lineHeight: 1.15,
         display: '-webkit-box',
         WebkitLineClamp: 2,
         WebkitBoxOrient: 'vertical',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
-        textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+        textShadow: '0 2px 14px rgba(0,0,0,0.7)',
+        letterSpacing: '0.02em',
+        textTransform: 'uppercase'
       }}>
-        <HighlightText text={prompt.title} highlight={searchTerm} />
+        <HighlightText text={prompt.title.toUpperCase()} highlight={searchTerm ? searchTerm.toUpperCase() : ''} />
       </h3>
     </div>
   );
 
   return (
-    <div ref={cardRef} className="masonry-grid-item" style={{
-      background: 'transparent',
-      padding: '0',
-      border: isHighlighted ? '2px solid var(--accent-main)' : 'none',
-      borderRadius: '16px',
-      zIndex: isHighlighted ? 10 : 1,
-      transform: isHighlighted ? 'scale(1.02)' : 'scale(1)',
-      transition: 'all 0.4s ease-in-out',
-      boxShadow: isHighlighted ? '0 0 25px rgba(229, 9, 20, 0.3)' : 'none',
-      position: 'relative',
-      overflow: isHighlighted ? 'visible' : 'hidden', // Only allow overflow for highlighted sticker
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
-      {/* Premium Badge - Top Right */}
-      {prompt.isPremium && (
-        <div style={{
-          position: 'absolute', 
-          top: '20px', 
-          right: '20px', 
-          background: 'rgba(0, 0, 0, 0.4)',
-          backdropFilter: 'blur(12px)', 
-          WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255, 215, 0, 0.3)', 
-          borderRadius: '50%',
-          width: '28px', 
-          height: '28px', 
-          display: 'flex', 
-          alignItems: 'center',
-          justifyContent: 'center', 
-          zIndex: 50, 
-          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-          pointerEvents: 'none'
-        }}>
-          <Crown size={14} fill="#FFD700" color="#FFD700" />
-        </div>
-      )}
-
-      {/* Featured Badge - Top Right (below premium if premium exists) */}
-      {prompt.isFeatured && (
-        <div style={{
-          position: 'absolute', 
-          top: prompt.isPremium ? '54px' : '20px', 
-          right: '20px', 
-          background: 'rgba(0, 0, 0, 0.4)',
-          backdropFilter: 'blur(12px)', 
-          WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(229, 9, 20, 0.5)', 
-          borderRadius: '50%',
-          width: '28px', 
-          height: '28px', 
-          display: 'flex', 
-          alignItems: 'center',
-          justifyContent: 'center', 
-          zIndex: 50, 
-          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-          pointerEvents: 'none'
-        }}>
-          <Star size={14} fill="var(--accent-main)" color="var(--accent-main)" />
-        </div>
-      )}
-
-
-
-      {isHighlighted && (
-        <div style={{
-          position: 'absolute', top: '-16px', left: '0', width: '100%', display: 'flex', justifyContent: 'center', pointerEvents: 'none', zIndex: 110
-        }}>
+    <div
+      ref={cardRef}
+      className="masonry-grid-item"
+      style={{
+        position: 'relative',
+        zIndex: isHighlighted ? 10 : 1,
+        borderRadius: '20px',
+        transition: 'box-shadow 0.3s ease',
+        /* Clean ring using box-shadow — no border radius mismatch */
+        boxShadow: isHighlighted
+          ? '0 0 0 2px var(--accent-main), 0 12px 40px rgba(0,0,0,0.12)'
+          : 'none',
+      }}
+    >
+        {/* Search match chip — top-left inside image area */}
+        {isHighlighted && (
           <div style={{
-            background: 'var(--accent-main)',
-            border: '3px solid #0a0a0f',
-            color: 'white', padding: '4px 16px', borderRadius: '50px', fontSize: '0.75rem',
-            fontWeight: 800, textTransform: 'uppercase', boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
-            animation: 'bounce 2s infinite',
-            whiteSpace: 'nowrap'
+            position: 'absolute',
+            top: '20px',
+            left: '20px',
+            zIndex: 60,
+            pointerEvents: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            background: '#0f172a',
+            color: '#fff',
+            padding: '4px 10px 4px 8px',
+            borderRadius: '50px',
+            fontSize: '0.67rem',
+            fontWeight: 600,
+            letterSpacing: '0.05em',
+            textTransform: 'uppercase',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.3)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            whiteSpace: 'nowrap',
           }}>
-            ✦ Search Match: {prompt.prompt_key}
+            <span style={{
+              width: '6px', height: '6px',
+              borderRadius: '50%',
+              background: 'var(--accent-main)',
+              display: 'inline-block',
+              flexShrink: 0,
+              boxShadow: '0 0 6px var(--accent-main)',
+            }} />
+            {prompt.prompt_key}
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Premium Badge - Top Right */}
+        {prompt.isPremium && (
+          <div style={{
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            background: 'rgba(0, 0, 0, 0.4)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255, 215, 0, 0.3)',
+            borderRadius: '50%',
+            width: '28px',
+            height: '28px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 50,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+            pointerEvents: 'none'
+          }}>
+            <Crown size={14} fill="#FFD700" color="#FFD700" />
+          </div>
+        )}
+
+        {/* Featured Badge - Top Right */}
+        {prompt.isFeatured && (
+          <div style={{
+            position: 'absolute',
+            top: prompt.isPremium ? '54px' : '20px',
+            right: '20px',
+            background: 'rgba(0, 0, 0, 0.4)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(229, 9, 20, 0.5)',
+            borderRadius: '50%',
+            width: '28px',
+            height: '28px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 50,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+            pointerEvents: 'none'
+          }}>
+            <Star size={14} fill="var(--accent-main)" color="var(--accent-main)" />
+          </div>
+        )}
+
       {/* Top Content Wrapper - Animate disappearance */}
       <div style={{
         maxHeight: (isUnlocked && prompt.isPremium) ? '0' : '2000px',
@@ -554,8 +572,6 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
           </Link>
         )}
       </div>
-
-
 
     </div>
   );

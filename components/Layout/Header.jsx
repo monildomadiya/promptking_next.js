@@ -105,132 +105,141 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
             </Link>
           </div>
 
-          {/* Collapsible Search */}
-          <div className="search-bar-hover" style={{
-            display: 'flex',
+          {/* Search + Premium group — pushed to right together */}
+          <div style={{
+            display: (isMobile && isSearchExpanded) ? 'none' : 'flex',
             alignItems: 'center',
-            background: isSearchExpanded ? (isMobile ? '#f8fafc' : 'rgba(0,0,0,0.04)') : 'rgba(0,0,0,0.03)',
-            borderRadius: '16px',
-            padding: isSearchExpanded ? (isMobile ? '4px 4px 4px 12px' : '6px 6px 6px 16px') : (isMobile ? '0 12px' : '0 16px'),
-            transition: 'all 0.3s ease',
-            flex: isSearchExpanded ? 1 : 0,
-            cursor: isSearchExpanded ? 'text' : 'pointer',
-            border: '1px solid rgba(0,0,0,0.08)',
-            margin: isMobile ? (isSearchExpanded ? '0' : '0 4px 0 auto') : '0 8px 0 auto',
-            width: isSearchExpanded ? '100%' : 'auto',
-            maxWidth: isSearchExpanded ? (isMobile ? '100%' : '260px') : 'none',
-            height: isMobile ? '42px' : '50px',
-            order: 2
-          }} onClick={() => {
-            if (!isSearchExpanded) {
-              setIsSearchExpanded(true);
-              if (!isHomePage) navigate.push('/');
-            }
+            gap: '8px',
+            marginLeft: 'auto',
+            order: 2,
+            flexShrink: 0
           }}>
-            <input 
-              type="text"
-              placeholder="Search prompts..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onBlur={(e) => {
-                if (!search) setIsSearchExpanded(false);
-              }}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                outline: 'none',
-                width: isSearchExpanded ? '100%' : '0px',
-                opacity: isSearchExpanded ? 1 : 0,
-                padding: '0',
-                transition: 'all 0.3s ease',
-                fontSize: isMobile ? '1rem' : '0.95rem',
-                color: 'var(--text-main)',
-                pointerEvents: isSearchExpanded ? 'auto' : 'none'
-              }}
-              ref={(input) => {
-                if (input && isSearchExpanded) input.focus();
-              }}
-            />
-            {isSearchExpanded && search && (
-              <div 
-                onPointerDown={(e) => { e.preventDefault(); setSearch(''); }} 
-                style={{
-                  padding: '6px 12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  flexShrink: 0
-                }}
-              >
-                <X size={16} color="var(--text-secondary)" />
-              </div>
-            )}
-            {isMobile && isSearchExpanded && !search && (
-               <X 
-                 size={22} 
-                 color="var(--text-secondary)" 
-                 style={{ cursor: 'pointer', flexShrink: 0, marginRight: '12px' }} 
-                 onPointerDown={(e) => { e.preventDefault(); setIsSearchExpanded(false); }} 
-               />
-            )}
-            
-            {/* Search Icon inside a rounded container on the right */}
-            <div style={{
-               background: isSearchExpanded ? '#0f172a' : 'transparent',
-               borderRadius: '10px',
-               width: isSearchExpanded ? (isMobile ? '32px' : '36px') : 'auto',
-               height: isSearchExpanded ? (isMobile ? '32px' : '36px') : 'auto',
-               display: 'flex',
-               alignItems: 'center',
-               justifyContent: 'center',
-               flexShrink: 0,
-               transition: 'all 0.3s ease',
-               cursor: 'pointer'
-            }}>
-               <Search size={isMobile ? 20 : 18} color={isSearchExpanded ? '#fff' : 'var(--text-secondary)'} />
-            </div>
-          </div>
-
-          <div className="header-actions" style={{ display: (isMobile && isSearchExpanded) ? 'none' : 'flex', alignItems: 'center', gap: isMobile ? '8px' : '16px', order: 3 }}>
-            {/* Premium Button */}
-            <button 
+            {/* Premium Icon Button */}
+            <button
               onClick={() => {
                 setFilter(filter === 'premium' ? 'all' : 'premium');
                 if (!isHomePage) navigate.push('/');
               }}
               className="pro-card-hover"
               title="Premium Prompts"
-              style={{ 
+              style={{
                 background: filter === 'premium' ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' : 'rgba(0,0,0,0.03)',
                 border: filter === 'premium' ? '1px solid #0f172a' : '1px solid rgba(0,0,0,0.08)',
-                color: filter === 'premium' ? '#ffffff' : 'rgba(20,22,26,0.8)',
                 boxShadow: filter === 'premium' ? '0 8px 20px rgba(15, 23, 42, 0.25)' : 'none',
+                width: isMobile ? '42px' : '50px',
                 height: isMobile ? '42px' : '50px',
-                padding: isMobile ? '0 12px' : '0 20px',
                 borderRadius: '16px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                fontWeight: '600',
-                fontSize: isMobile ? '0.85rem' : '0.95rem',
+                justifyContent: 'center',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
-                whiteSpace: 'nowrap'
+                flexShrink: 0
               }}
             >
-              <Crown 
-                size={isMobile ? 16 : 18} 
-                fill={filter === 'premium' ? '#f59e0b' : 'rgba(245, 158, 11, 0.18)'} 
-                style={{ 
-                  display: 'block', 
+              <Crown
+                size={isMobile ? 18 : 20}
+                fill={filter === 'premium' ? '#f59e0b' : 'rgba(245, 158, 11, 0.18)'}
+                style={{
+                  display: 'block',
                   color: filter === 'premium' ? '#ffb703' : '#d97706',
                   filter: 'drop-shadow(0 0 4px rgba(245, 158, 11, 0.35))',
                   transition: 'all 0.25s ease'
-                }} 
+                }}
               />
-              {!isMobile && "Premium"}
             </button>
+
+            {/* Collapsible Search */}
+            <div className="search-bar-hover" style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: isSearchExpanded ? (isMobile ? '#f8fafc' : 'rgba(0,0,0,0.04)') : 'rgba(0,0,0,0.03)',
+              borderRadius: '16px',
+              padding: isSearchExpanded ? (isMobile ? '4px 4px 4px 12px' : '6px 6px 6px 16px') : (isMobile ? '5px' : '7px'),
+              transition: 'max-width 0.35s cubic-bezier(0.4,0,0.2,1), background 0.3s ease, padding 0.3s ease',
+              cursor: isSearchExpanded ? 'text' : 'pointer',
+              border: '1px solid rgba(0,0,0,0.08)',
+              overflow: 'hidden',
+              maxWidth: isSearchExpanded ? (isMobile ? '100%' : '280px') : (isMobile ? '44px' : '50px'),
+              width: isSearchExpanded ? '100%' : 'auto',
+              flexShrink: 0,
+              height: isMobile ? '42px' : '50px'
+            }} onClick={() => {
+              if (!isSearchExpanded) {
+                setIsSearchExpanded(true);
+                if (!isHomePage) navigate.push('/');
+              }
+            }}>
+              <input
+                type="text"
+                placeholder="Search prompts..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onBlur={() => {
+                  if (!search) setIsSearchExpanded(false);
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  width: '100%',
+                  minWidth: 0,
+                  opacity: isSearchExpanded ? 1 : 0,
+                  padding: '0',
+                  transition: 'opacity 0.25s ease',
+                  fontSize: isMobile ? '1rem' : '0.95rem',
+                  color: 'var(--text-main)',
+                  pointerEvents: isSearchExpanded ? 'auto' : 'none'
+                }}
+                ref={(input) => {
+                  if (input && isSearchExpanded) input.focus();
+                }}
+              />
+              {isSearchExpanded && search && (
+                <div
+                  onPointerDown={(e) => { e.preventDefault(); setSearch(''); }}
+                  style={{
+                    padding: '6px 8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    flexShrink: 0
+                  }}
+                >
+                  <X size={16} color="var(--text-secondary)" />
+                </div>
+              )}
+              {isMobile && isSearchExpanded && !search && (
+                <X
+                  size={22}
+                  color="var(--text-secondary)"
+                  style={{ cursor: 'pointer', flexShrink: 0, marginRight: '8px' }}
+                  onPointerDown={(e) => { e.preventDefault(); setIsSearchExpanded(false); }}
+                />
+              )}
+              {/* Search Icon */}
+              <div
+                onPointerDown={(e) => e.preventDefault()}
+                style={{
+                  background: isSearchExpanded ? '#0f172a' : 'transparent',
+                  borderRadius: '10px',
+                  width: isMobile ? '32px' : '36px',
+                  height: isMobile ? '32px' : '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  transition: 'background 0.3s ease',
+                  cursor: 'pointer'
+                }}
+              >
+                <Search size={isMobile ? 20 : 18} color={isSearchExpanded ? '#fff' : 'var(--text-secondary)'} />
+              </div>
+            </div>
+          </div>
+
+          <div className="header-actions" style={{ display: (isMobile && isSearchExpanded) ? 'none' : 'flex', alignItems: 'center', gap: isMobile ? '8px' : '10px', order: 3, flexShrink: 0 }}>
 
             {categories.length > 0 && (
               <div 
@@ -283,34 +292,25 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                           onClick={() => setShowCategoryDropdown(false)}
                           style={{
                             color: 'rgba(20,22,26,0.9)', padding: '12px 16px', borderRadius: '16px',
-                            textDecoration: 'none', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                            textDecoration: 'none', transition: 'background 0.2s ease, border-color 0.2s ease',
                             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                             fontSize: '0.95rem', fontWeight: 500,
                             background: 'rgba(0,0,0,0.025)',
                             border: '1px solid rgba(0,0,0,0.04)'
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.background = 'rgba(0,0,0,0.05)';
+                            e.currentTarget.style.background = 'rgba(0,0,0,0.06)';
                             e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)';
-                            e.currentTarget.style.color = 'var(--text-main)';
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.querySelector('.menu-icon').style.transform = 'translateX(4px)';
-                            e.currentTarget.querySelector('.menu-icon').style.opacity = '1';
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.background = 'rgba(0,0,0,0.025)';
                             e.currentTarget.style.borderColor = 'rgba(0,0,0,0.04)';
-                            e.currentTarget.style.color = 'rgba(20,22,26,0.9)';
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.querySelector('.menu-icon').style.transform = 'translateX(0)';
-                            e.currentTarget.querySelector('.menu-icon').style.opacity = '0.5';
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                             <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-main)', opacity: 0.8, boxShadow: '0 0 10px var(--accent-main)' }}></div>
                             {c.name}
                           </div>
-                          <ChevronRight size={16} className="menu-icon" style={{ opacity: 0.5, transition: '0.3s', color: 'var(--text-secondary)' }} />
                         </Link>
                       ))}
                     </div>
