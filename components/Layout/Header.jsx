@@ -107,7 +107,8 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
 
           {/* Search + Premium group — pushed to right together */}
           <div style={{
-            display: (isMobile && isSearchExpanded) ? 'none' : 'flex',
+            display: 'flex',
+            width: (isMobile && isSearchExpanded) ? '100%' : 'auto',
             alignItems: 'center',
             gap: '8px',
             marginLeft: 'auto',
@@ -129,7 +130,7 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                 width: isMobile ? '42px' : '50px',
                 height: isMobile ? '42px' : '50px',
                 borderRadius: '16px',
-                display: 'flex',
+                display: (isMobile && isSearchExpanded) ? 'none' : 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
