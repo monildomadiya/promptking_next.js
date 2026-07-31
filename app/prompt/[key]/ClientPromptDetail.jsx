@@ -622,25 +622,25 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
           <ArrowLeft size={18} /> Back
         </button>
 
-        {/* Header Section: Title & Stats (Moved outside grid) */}
-        <div style={{ marginBottom: '35px' }}>
-          <h1 className="prompt-detail-title" style={{ 
-            fontSize: '2.4rem', 
-            fontWeight: 900, 
-            marginBottom: '15px', 
-            lineHeight: 1.1, 
-            letterSpacing: '-1px',
-            background: 'linear-gradient(to right, #14161a, #4a4e55)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
-          }}>{prompt.title}</h1>
-        </div>
-
         {/* Grid Layout for both normal prompts and listicles (with sidebar) */}
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: '40px', maxWidth: isListicle ? '1600px' : 'none', margin: isListicle ? '0 auto' : '0' }} className="detail-layout">
           
           {/* Main Content (Left) */}
           <article ref={contentRef} className="detail-main-content" style={{ width: '100%' }}>
+
+            {/* Header Section: Title & Stats (Moved inside grid to match content width) */}
+            <div style={{ marginBottom: '35px' }}>
+              <h1 className="prompt-detail-title" style={{ 
+                fontSize: '2.4rem', 
+                fontWeight: 900, 
+                marginBottom: '15px', 
+                lineHeight: 1.1, 
+                letterSpacing: '-1px',
+                background: 'linear-gradient(to right, #14161a, #4a4e55)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}>{prompt.title}</h1>
+            </div>
 
             {/* Media & Prompt Split Container */}
             <div className={`media-prompt-container ${isListicle ? 'listicle-mode' : ''}`} style={{ display: 'flex', gap: '40px', alignItems: 'stretch', flexDirection: isListicle ? 'column' : 'row' }}>
