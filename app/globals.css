@@ -691,6 +691,23 @@ button:active {
   overflow: hidden;
 }
 
+/* Inside .css-masonry-grid the spacing comes from the grid's own gap, so the
+   rules above leave 25px of margin plus the inline-block baseline gap as dead
+   space under every card. Invisible in a full grid; with a single search result
+   it showed up as a lopsided gap under the card. */
+.css-masonry-grid .masonry-grid-item {
+  display: block;
+  margin-bottom: 0;
+}
+
+/* The card's last block carries a trailing margin meant to separate it from the
+   premium/unlock section. When it is the last child that margin is just dead
+   space under the card — visible as a lopsided gap when a search leaves one
+   result. !important because the value is set inline by PromptCard. */
+.css-masonry-grid .masonry-grid-item > div:last-child {
+  margin-bottom: 0 !important;
+}
+
 /* Small Tablet / Mobile */
 @media (max-width: 1100px) {
   .prompt-image-container {
@@ -1611,25 +1628,25 @@ body.shorts-modal-open {
 
 /* ── Relock Animation Definitions ──────────────────────── */
 .lock-overlay-base {
-  background: rgba(16, 16, 22, 0.82);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 @keyframes lockOverlayDrop {
   0% {
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
-    background: rgba(229, 9, 20, 0.35);
+    background: rgba(229, 9, 20, 0.1);
     backdrop-filter: blur(0px);
     -webkit-backdrop-filter: blur(0px);
   }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
-    background: rgba(16, 16, 22, 0.82);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 }
 
@@ -1720,11 +1737,17 @@ body.shorts-modal-open {
 
 @media (hover: hover) {
   .back-link:hover { color: var(--text-main) !important; transform: translateX(-5px); }
+  .suggested-card-item {
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    padding: 4px;
+  }
   .suggested-card-item:hover {
-    transform: translateY(-3px) translateX(4px);
-    background: rgba(0,0,0,0.03) !important;
-    border-color: rgba(229, 9, 20, 0.2) !important;
-    box-shadow: 0 10px 20px rgba(17,24,39,0.08);
+    transform: translateY(-3px);
+    background: rgba(0,0,0,0.02) !important;
+    animation: border-pulse-red 1.5s infinite;
+    border-color: #e50914 !important;
   }
   .suggested-card-item:hover .suggestion-img { transform: scale(1.1); }
   .suggested-card-item:hover h4 { color: var(--accent-main) !important; }
@@ -2465,8 +2488,101 @@ ins.adsbygoogle[data-anchor-status] {
   box-shadow: none !important;
   text-shadow: none !important;
 }
+/* Search-hit ring for the matched prompt card. Deliberately built from outline
+   and filter rather than box-shadow: the blanket rule above strips box-shadow
+   site-wide with !important, so a shadow ring here would never paint. outline
+   follows border-radius and sits outside the layout box, so nothing shifts.
+
+   The ring goes on .glass-panel, not on the .masonry-grid-item wrapper: the
+   wrapper runs 8px taller than the visible card (trailing margin on its content
+   block), which left the ring's bottom edge floating below the card. */
+@keyframes pkSearchHitPulse {
+  0%, 100% {
+    outline-color: rgba(229, 9, 20, 0.6);
+    filter: drop-shadow(0 0 9px rgba(229, 9, 20, 0.16));
+  }
+  50% {
+    outline-color: rgba(229, 9, 20, 1);
+    filter: drop-shadow(0 0 24px rgba(229, 9, 20, 0.42));
+  }
+}
+
+/* The wrapper clips to its own box, which would cut the glow off at the sides. */
+.pk-search-hit {
+  overflow: visible;
+}
+
+.pk-search-hit .glass-panel {
+  /* Negative offset lays the ring over the card's own 1px border instead of
+     floating it outside. A positive offset drew a detached second rounded rect
+     whose corners bowed away from the card; at -2px the radii stay concentric,
+     the card reads as simply having an accent border, and nothing grows or
+     shifts. The halo comes from drop-shadow, since box-shadow is stripped
+     site-wide by the FLAT UI rule. */
+  outline: 2px solid var(--accent-main);
+  outline-offset: -2px;
+  animation: pkSearchHitPulse 1.9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pk-search-hit .glass-panel { animation: none; }
+}
 /* logo drop-shadow (set inline in MagicKingIntro) */
 img[alt="Prompt King"] {
   filter: none !important;
 }
 /* ============ END FLAT UI — SHADOWS OFF ============ */
+
+@keyframes border-pulse-red {
+  0% { border-color: rgba(229, 9, 20, 0.4); box-shadow: 0 0 5px rgba(229, 9, 20, 0.2); }
+  50% { border-color: rgba(229, 9, 20, 1); box-shadow: 0 0 20px rgba(229, 9, 20, 0.8); }
+  100% { border-color: rgba(229, 9, 20, 0.4); box-shadow: 0 0 5px rgba(229, 9, 20, 0.2); }
+}
+
+.animated-border-hover {
+  transition: all 0.3s ease;
+}
+
+.animated-border-hover:hover {
+  animation: border-pulse-red 1.5s infinite;
+  border-color: #e50914 !important;
+}
+
+/* Mobile Swiper Gallery */
+.gallery-grid-mobile-slider {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+@media (max-width: 768px) {
+  .gallery-grid-mobile-slider {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 12px;
+  }
+  .gallery-grid-mobile-slider::after {
+    content: '';
+    flex: 0 0 1px;
+  }
+  .gallery-grid-mobile-slider::-webkit-scrollbar {
+    display: none;
+  }
+  .gallery-grid-mobile-slider > div {
+    flex: 0 0 45%;
+    scroll-snap-align: start;
+  }
+}
+
+/* Premium Header Button Animation */
+.premium-header-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.25) !important;
+  border-color: rgba(245, 158, 11, 0.5) !important;
+}
+.premium-header-btn:active {
+  transform: scale(0.95);
+}
+

@@ -66,22 +66,29 @@ const OTPInput = ({ value, onChange, length = 4, showError }) => {
           onKeyDown={(e) => handleKeyDown(e, index)}
           onPaste={handlePaste}
           style={{
-            width: '50px',
-            height: '60px',
-            borderRadius: '16px',
-            border: showError ? '2px solid #ff4444' : '1px solid rgba(255,255,255,0.15)',
-            background: 'rgba(255,255,255,0.06)',
-            color: 'white',
+            width: '54px',
+            height: '64px',
+            borderRadius: '14px',
+            border: showError ? '2px solid #ff4444' : '1.5px solid rgba(0,0,0,0.15)',
+            background: '#ffffff',
+            color: '#1a1a1a',
             textAlign: 'center',
             outline: 'none',
             fontSize: '1.8rem',
-            fontWeight: 'bold',
-            transition: 'all 0.3s ease',
-            backdropFilter: 'blur(10px)',
-            boxShadow: value[index] && value[index] !== ' ' ? '0 0 15px rgba(255,215,0,0.2)' : 'none'
+            fontWeight: '800',
+            transition: 'all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            boxShadow: value[index] && value[index] !== ' ' ? '0 8px 24px rgba(229,9,20,0.15)' : '0 4px 12px rgba(0,0,0,0.06)'
           }}
-          onFocus={(e) => e.target.style.borderColor = 'var(--accent-main)'}
-          onBlur={(e) => e.target.style.borderColor = showError ? '#ff4444' : 'rgba(255,255,255,0.15)'}
+          onFocus={(e) => { 
+            e.target.style.borderColor = 'var(--accent-main)'; 
+            e.target.style.transform = 'translateY(-2px)';
+            e.target.style.boxShadow = '0 8px 20px rgba(229, 9, 20, 0.15)';
+          }}
+          onBlur={(e) => { 
+            e.target.style.borderColor = showError ? '#ff4444' : 'rgba(0,0,0,0.15)'; 
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = value[index] && value[index] !== ' ' ? '0 8px 24px rgba(229,9,20,0.15)' : '0 4px 12px rgba(0,0,0,0.06)';
+          }}
         />
       ))}
     </div>
@@ -924,19 +931,21 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
                 {prompt?.isPremium && (
                   <div style={{ position: 'absolute', top: '16px', right: '16px', zIndex: 100 }}>
                     <div style={{
-                      background: 'rgba(255,255,255,0.9)',
-                      backdropFilter: 'blur(10px)',
-                      WebkitBackdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 215, 0, 0.3)',
-                      borderRadius: '50%',
-                      width: '40px',
-                      height: '40px',
+                      background: 'linear-gradient(135deg, #FFD700 0%, #F59E0B 100%)',
+                      padding: '5px 12px',
+                      borderRadius: '50px',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+                      gap: '5px',
+                      boxShadow: '0 4px 12px rgba(245, 158, 11, 0.4)',
+                      color: '#451a03',
+                      fontWeight: 900,
+                      fontSize: '0.65rem',
+                      letterSpacing: '0.5px',
+                      textTransform: 'uppercase'
                     }}>
-                      <Crown size={20} fill="#FFD700" color="#FFD700" />
+                      <Crown size={14} fill="#451a03" color="#451a03" />
+                      Pro
                     </div>
                   </div>
                 )}
@@ -967,50 +976,6 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
               videoUrl={prompt.igLink} 
             />
 
-            {/* Premium Tip & Note UI */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginTop: '35px' }}>
-              <div style={{
-                background: 'linear-gradient(135deg, rgba(255,193,7,0.12) 0%, rgba(255,193,7,0.03) 100%)',
-                border: '1px solid rgba(255, 193, 7,0.3)',
-                borderRadius: '20px',
-                padding: '24px',
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '16px',
-                boxShadow: '0 10px 30px rgba(17,24,39,0.06)'
-              }}>
-                <div style={{ background: 'rgba(255, 193, 7, 0.16)', padding: '12px', borderRadius: '14px', color: '#c8991a', flexShrink: 0 }}>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 12 3a4.65 4.65 0 0 0-4.5 8.5c.76.76 1.23 1.52 1.41 2.5"></path></svg>
-                </div>
-                <div>
-                  <h4 style={{ margin: '0 0 6px 0', fontSize: '1.05rem', color: 'var(--text-main)', fontWeight: 800 }}>Pro Tip</h4>
-                  <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                    Use different AI tools like Midjourney or DALL-E to get varied, unique results.
-                  </p>
-                </div>
-              </div>
-              
-              <div style={{ 
-                background: 'linear-gradient(135deg, rgba(229,9,20,0.15) 0%, rgba(229,9,20,0.05) 100%)', 
-                border: '1px solid rgba(229, 9, 20,0.28)',
-                borderRadius: '20px',
-                padding: '24px',
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '16px',
-                boxShadow: '0 10px 30px rgba(229,9,20,0.08)'
-              }}>
-                <div style={{ background: 'rgba(229,9,20,0.15)', padding: '12px', borderRadius: '14px', color: 'var(--accent-main)', flexShrink: 0 }}>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                </div>
-                <div>
-                  <h4 style={{ margin: '0 0 6px 0', fontSize: '1.05rem', color: 'var(--text-main)', fontWeight: 800 }}>Important Note</h4>
-                  <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                    The final generated image may vary slightly based on the AI version and original photo.
-                  </p>
-                </div>
-              </div>
-            </div>
 
             {/* Gallery Section - Moved below Notes & Tips */}
             {(() => {
@@ -1026,7 +991,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
                     <div style={{ width: '4px', height: '24px', background: 'var(--accent-main)', borderRadius: '2px' }} />
                     <h3 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0 }}>Image Gallery</h3>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '12px' }}>
+                  <div className="gallery-grid-mobile-slider">
                     {galleryImages.map((imgUrl, idx) => (
                       <div
                         key={idx}
@@ -1451,6 +1416,7 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
                       borderRadius: '16px', 
                       overflow: 'hidden',
                       background: '#e8eaee',
+                      position: 'relative',
                     }}>
                       <img 
                         src={s.imgAfter || s.img_after || s.imgBefore || s.img_before || s.thumbnail_url} 
@@ -1465,102 +1431,36 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
                         }} 
                         className="suggestion-img" 
                       />
+                      <div style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: '65%',
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%)',
+                        pointerEvents: 'none',
+                        zIndex: 1,
+                      }} />
+                      <h4 style={{ 
+                        position: 'absolute',
+                        bottom: '12px',
+                        left: '12px',
+                        right: '12px',
+                        fontSize: '0.85rem', 
+                        fontWeight: 700, 
+                        lineHeight: 1.35, 
+                        margin: 0,
+                        display: '-webkit-box', 
+                        WebkitLineClamp: 2, 
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        color: '#ffffff',
+                        zIndex: 2,
+                        textShadow: '0 2px 4px rgba(0,0,0,0.6)'
+                      }}>{s.title}</h4>
                     </div>
-                    <h4 style={{ 
-                      fontSize: '0.8rem', 
-                      fontWeight: 600, 
-                      lineHeight: 1.3, 
-                      margin: '6px 2px 0',
-                      display: '-webkit-box', 
-                      WebkitLineClamp: 1, 
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                      color: 'var(--text-main)'
-                    }}>{s.title}</h4>
                   </Link>
                 ))}
-              </div>
-            </div>
-            
-            {/* Premium Author Box in Sidebar */}
-            <div style={{ marginTop: '40px' }}>
-              <div style={{ 
-                background: '#ffffff', 
-                borderRadius: '24px', 
-                padding: '24px', 
-                border: '1px solid rgba(0,0,0,0.06)',
-                boxShadow: '0 10px 40px rgba(0,0,0,0.03), 0 2px 10px rgba(0,0,0,0.02)',
-                position: 'relative',
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-              }}
-              className="premium-author-sidebar"
-              >
-                {/* Subtle gradient background accent */}
-                <div style={{
-                  position: 'absolute',
-                  top: 0, right: 0, left: 0, height: '80px',
-                  background: 'linear-gradient(135deg, rgba(229, 9, 20, 0.05) 0%, transparent 100%)',
-                  zIndex: 0
-                }} />
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', zIndex: 1, position: 'relative' }}>
-                  <div style={{
-                    width: '64px', height: '64px',
-                    borderRadius: '20px',
-                    padding: '3px',
-                    background: 'linear-gradient(135deg, #FF5F56, var(--accent-main))',
-                    flexShrink: 0,
-                    boxShadow: '0 8px 20px rgba(229, 9, 20, 0.2)'
-                  }}>
-                    <img 
-                      src={prompt.author_image ? optimizeImage(prompt.author_image, 150) : "https://github.com/monildomadiya.png"} 
-                      alt={prompt.author_name || 'PromptKing Admin'} 
-                      style={{
-                        width: '100%', height: '100%',
-                        borderRadius: '17px',
-                        objectFit: 'cover',
-                        background: '#fff'
-                      }}
-                      onError={(e) => { e.target.src = 'https://promptking.in/favicon.png' }}
-                    />
-                  </div>
-                  
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <div style={{ 
-                      fontSize: '0.7rem', 
-                      fontWeight: 800, 
-                      color: 'var(--accent-main)',
-                      textTransform: 'uppercase',
-                      letterSpacing: '1.5px'
-                    }}>
-                      Prompt Creator
-                    </div>
-                    <h4 style={{ 
-                      fontSize: '1.2rem', 
-                      fontWeight: 800, 
-                      color: 'var(--text-main)', 
-                      margin: 0,
-                      lineHeight: 1.2
-                    }}>
-                      {prompt.author_name || 'PromptKing Admin'}
-                    </h4>
-                  </div>
-                </div>
-
-                <p style={{ 
-                  fontSize: '0.9rem', 
-                  color: 'var(--text-secondary)', 
-                  lineHeight: 1.6, 
-                  margin: 0,
-                  zIndex: 1,
-                  position: 'relative'
-                }}>
-                  {prompt.author_description || 'Passionate about AI and creative workflows. Exploring the frontiers of prompt engineering to help you unlock the true potential of tools like ChatGPT, Midjourney, and Gemini.'}
-                </p>
               </div>
             </div>
             

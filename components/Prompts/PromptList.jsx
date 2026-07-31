@@ -192,7 +192,10 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
 
   // ── Main render ──────────────────────────────────────────────────────────────
   return (
-    <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: isMobile ? '0 28px' : '0 20px', width: '100%', marginTop: '40px' }}>
+    // marginBottom matches marginTop so the results sit evenly between whatever
+    // is above and below them. On the unfiltered home page it collapses into the
+    // features section's larger 80px top margin, so that spacing is unchanged.
+    <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: isMobile ? '0 28px' : '0 20px', width: '100%', marginTop: '40px', marginBottom: '40px' }}>
 
       {/* Silent background revalidation indicator */}
       {isRevalidating && (

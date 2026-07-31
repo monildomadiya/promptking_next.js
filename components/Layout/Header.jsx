@@ -140,30 +140,28 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
               color: 'var(--text-main)',
             }}
           />
-          {!!search && (
-            <div
-              onClick={() => { setSearch(''); searchInputRef.current?.focus(); }}
-              style={{
-                width: '30px', height: '30px', borderRadius: '9px',
-                background: 'rgba(0,0,0,0.06)', flexShrink: 0,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer',
-              }}
-            >
-              <X size={15} color="var(--text-secondary)" />
-            </div>
-          )}
-          <button
-            onClick={search.trim() ? dismissSearch : clearSearch}
+          {/* Single control instead of a Done/Cancel label: clears the term while
+              there is one, closes the bar once it is empty. Enter also closes and
+              keeps the results. */}
+          <div
+            onClick={() => {
+              if (search) {
+                setSearch('');
+                searchInputRef.current?.focus();
+              } else {
+                clearSearch();
+              }
+            }}
+            aria-label={search ? 'Clear search' : 'Close search'}
             style={{
-              background: 'none', border: 'none', padding: '0 2px',
-              fontSize: '0.92rem', fontWeight: 700,
-              color: search.trim() ? 'var(--accent-main)' : 'var(--text-secondary)',
-              cursor: 'pointer', flexShrink: 0,
+              width: '32px', height: '32px', borderRadius: '10px',
+              background: 'rgba(0,0,0,0.06)', flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer',
             }}
           >
-            {search.trim() ? 'Done' : 'Cancel'}
-          </button>
+            <X size={16} color="var(--text-secondary)" />
+          </div>
         </div>
       )}
 
@@ -180,6 +178,13 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
         transform: isVisible ? 'translateY(0)' : 'translateY(-120%)',
         opacity: isVisible ? 1 : 0,
         zIndex: 999,
+        // The mobile search bar lays its own bordered box over this one. Two
+        // hairlines a pixel apart read as a double border, so drop this one's
+        // outline and fill while it is covered.
+        ...(mobileSearchActive && {
+          borderColor: 'transparent',
+          background: 'transparent',
+        }),
       }}>
         <div className="header-inner-flex" style={{ justifyContent: 'flex-start', position: 'relative' }}>
 
@@ -215,11 +220,11 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                 setFilter(filter === 'premium' ? 'all' : 'premium');
                 if (!isHomePage) navigate.push('/');
               }}
-              className="pro-card-hover"
+              className="premium-header-btn"
               title="Premium Prompts"
               style={{
-                background: filter === 'premium' ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' : 'rgba(0,0,0,0.03)',
-                border: filter === 'premium' ? '1px solid #0f172a' : '1px solid rgba(0,0,0,0.08)',
+                background: filter === 'premium' ? 'linear-gradient(135deg, #FFD700 0%, #F59E0B 100%)' : 'rgba(245, 158, 11, 0.12)',
+                border: filter === 'premium' ? '1px solid #d97706' : '1px solid rgba(245, 158, 11, 0.3)',
                 width: isMobile ? '42px' : '50px',
                 height: isMobile ? '42px' : '50px',
                 borderRadius: '16px',
@@ -227,18 +232,18 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                transition: 'all 0.3s ease',
+                transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                 flexShrink: 0,
+                boxShadow: filter === 'premium' ? '0 4px 15px rgba(245, 158, 11, 0.4)' : 'none',
               }}
             >
               <Crown
                 size={isMobile ? 18 : 20}
-                fill={filter === 'premium' ? '#f59e0b' : 'rgba(245, 158, 11, 0.18)'}
+                fill={filter === 'premium' ? '#451a03' : '#F59E0B'}
                 style={{
                   display: 'block',
-                  color: filter === 'premium' ? '#ffb703' : '#d97706',
-                  filter: 'drop-shadow(0 0 4px rgba(245, 158, 11, 0.35))',
-                  transition: 'all 0.25s ease',
+                  color: filter === 'premium' ? '#451a03' : '#d97706',
+                  transition: 'all 0.3s ease',
                 }}
               />
             </button>

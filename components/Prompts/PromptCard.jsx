@@ -336,16 +336,11 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
   return (
     <div
       ref={cardRef}
-      className="masonry-grid-item"
+      className={`masonry-grid-item${isHighlighted ? ' pk-search-hit' : ''}`}
       style={{
         position: 'relative',
         zIndex: isHighlighted ? 10 : 1,
         borderRadius: '20px',
-        transition: 'box-shadow 0.3s ease',
-        /* Clean ring using box-shadow — no border radius mismatch */
-        boxShadow: isHighlighted
-          ? '0 0 0 2px var(--accent-main), 0 12px 40px rgba(0,0,0,0.12)'
-          : 'none',
       }}
     >
         {/* Search match chip — top-left inside image area */}
@@ -383,53 +378,60 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
           </div>
         )}
 
-        {/* Premium Badge - Top Right */}
-        {prompt.isPremium && (
-          <div style={{
-            position: 'absolute',
-            top: '20px',
-            right: '20px',
-            background: 'rgba(0, 0, 0, 0.4)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255, 215, 0, 0.3)',
-            borderRadius: '50%',
-            width: '28px',
-            height: '28px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 50,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-            pointerEvents: 'none'
-          }}>
-            <Crown size={14} fill="#FFD700" color="#FFD700" />
-          </div>
-        )}
+        {/* Badges Container - Top Right */}
+        <div style={{
+          position: 'absolute',
+          top: '24px',
+          right: '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          alignItems: 'flex-end',
+          zIndex: 50,
+          pointerEvents: 'none'
+        }}>
+          {/* Premium Badge */}
+          {prompt.isPremium && (
+            <div style={{
+              background: 'linear-gradient(135deg, #FFD700 0%, #F59E0B 100%)',
+              padding: '5px 12px',
+              borderRadius: '50px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              boxShadow: '0 4px 12px rgba(245, 158, 11, 0.4)',
+              color: '#451a03',
+              fontWeight: 900,
+              fontSize: '0.65rem',
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase'
+            }}>
+              <Crown size={12} fill="#451a03" color="#451a03" />
+              Pro
+            </div>
+          )}
 
-        {/* Featured Badge - Top Right */}
-        {prompt.isFeatured && (
-          <div style={{
-            position: 'absolute',
-            top: prompt.isPremium ? '54px' : '20px',
-            right: '20px',
-            background: 'rgba(0, 0, 0, 0.4)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(229, 9, 20, 0.5)',
-            borderRadius: '50%',
-            width: '28px',
-            height: '28px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 50,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-            pointerEvents: 'none'
-          }}>
-            <Star size={14} fill="var(--accent-main)" color="var(--accent-main)" />
-          </div>
-        )}
+          {/* Featured Badge */}
+          {prompt.isFeatured && (
+            <div style={{
+              background: 'linear-gradient(135deg, #FF2A54 0%, #E50914 100%)',
+              padding: '5px 12px',
+              borderRadius: '50px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              boxShadow: '0 4px 12px rgba(229, 9, 20, 0.4)',
+              color: '#ffffff',
+              fontWeight: 900,
+              fontSize: '0.65rem',
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase'
+            }}>
+              <Star size={12} fill="#ffffff" color="#ffffff" />
+              Hot
+            </div>
+          )}
+        </div>
 
       {/* Top Content Wrapper - Animate disappearance */}
       <div style={{
@@ -443,7 +445,7 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
         borderRadius: '16px'
       }}>
         {/* Image Section */}
-        <div className="glass-panel" style={{
+        <div className="glass-panel animated-border-hover" style={{
           background: '#ffffff',
           backdropFilter: 'blur(30px)',
           WebkitBackdropFilter: 'blur(30px)',
