@@ -2379,9 +2379,14 @@ div:has(> .adsense-container:has(ins.adsbygoogle[data-ad-status="unfilled"])) {
   text-align: center !important;
 }
 
+/* text-align is set explicitly rather than left to inherit from the wrapper:
+   any rule that matches the <ins> directly beats an inherited value, so relying
+   on inheritance here is what let the guard below knock the creative to the
+   left edge of a full-width box. */
 .google-auto-placed:not([style*="fixed"]) ins.adsbygoogle {
   margin-inline: auto !important;
   max-width: 100% !important;
+  text-align: center !important;
 }
 
 /* Google's own overlay formats must keep the geometry Google gives them. */
@@ -2406,11 +2411,18 @@ body > ins.adsbygoogle:not([style*="fixed"]) {
 }
 
 /* Belt-and-braces: whatever Google fixes to the viewport keeps its own geometry,
-   even if a broader rule above it changes later. */
+   even if a broader rule above it changes later.
+
+   `.adsbygoogle-noablate` must NOT be listed here. It reads like an overlay
+   marker but Google puts it on ordinary in-flow banners too, so including it
+   applied `text-align: initial` to every injected banner — and a direct match
+   beats the wrapper's inherited `text-align: center`, which left the creative
+   pinned to the left edge of a full-width box. The two selectors above already
+   cover the real overlays: they are the ones Google positions with inline
+   `position: fixed`, or tags with `data-anchor-status`. */
 body > .google-auto-placed[style*="fixed"],
 body > ins.adsbygoogle[style*="fixed"],
-ins.adsbygoogle[data-anchor-status],
-.adsbygoogle-noablate {
+ins.adsbygoogle[data-anchor-status] {
   width: auto !important;
   max-width: none !important;
   align-self: auto !important;
