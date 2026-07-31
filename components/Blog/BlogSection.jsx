@@ -102,7 +102,7 @@ const BlogSection = () => {
               <div style={{ padding: '30px' }}>
                 <h3 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '15px', lineHeight: 1.3 }}>{blog.title}</h3>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '20px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                  {blog.content ? blog.content.replace(/<[^>]*>?/gm, '') : ''}
+                  {blog.excerpt || (blog.content_fallback || '').replace(/<[^>]*>?/gm, '')}
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, color: 'var(--text-main)', fontSize: '0.9rem' }}>
                   Read More <ArrowRight size={16} />

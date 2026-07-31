@@ -1,7 +1,17 @@
-import React from 'react';
+import React, { cache } from 'react';
 import db from '@/lib/db';
 import { resolveCanonical, seoTitle, seoDescription, cleanSchema } from '@/lib/seo';
 import ClientArticleDetail from './ClientArticleDetail';
+
+/**
+ * generateMetadata and the page component both need the full row, and Next.js
+ * calls them separately — so this ran as two identical full-table-scan queries
+ * per article request. React's cache() dedupes them within a single render.
+ */
+const getBlogBySlug = cache(async (slug) => {
+  const rows = await db`SELECT * FROM blogs WHERE slug = ${slug}`;
+  return rows && rows.length > 0 ? rows[0] : null;
+});
 
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
@@ -9,10 +19,7 @@ export async function generateMetadata({ params }) {
   let blogData = null;
 
   try {
-    const rows = await db`SELECT * FROM blogs WHERE slug = ${slug}`;
-    if (rows && rows.length > 0) {
-      blogData = rows[0];
-    }
+    blogData = await getBlogBySlug(slug);
   } catch (err) {
     console.error('Failed to fetch blog metadata:', err);
   }
@@ -82,10 +89,8 @@ export default async function ArticlePage({ params }) {
   let categories = [];
 
   try {
-    const rows = await db`SELECT * FROM blogs WHERE slug = ${slug}`;
-    if (rows && rows.length > 0) {
-      const b = rows[0];
-      
+    const b = await getBlogBySlug(slug);
+    if (b) {
       let selectedAuthor = null;
       if (b.author_id) {
         const specificAuthor = await db`SELECT * FROM authors WHERE id = ${b.author_id}`;
@@ -106,8 +111,12 @@ export default async function ArticlePage({ params }) {
     }
 
     if (blog) {
-      const others = await db`SELECT * FROM blogs WHERE slug != ${slug} ORDER BY created_at DESC LIMIT 3`;
-      otherBlogs = others;
+      // The "More Articles" sidebar renders a thumbnail, title and date. SELECT *
+      // put three full article bodies into this page's RSC payload for nothing.
+      otherBlogs = await db`
+        SELECT id, title, slug, featured_image, featured_image_alt, read_time, published_at, created_at
+        FROM blogs WHERE slug != ${slug} ORDER BY created_at DESC LIMIT 3
+      `;
     }
 
     // website_categories is what /category/[slug] resolves against. The legacy

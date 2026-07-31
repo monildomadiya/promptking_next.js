@@ -6,7 +6,9 @@ export const revalidate = 3600;
 export default async function BlogPage() {
   let blogs = [];
   try {
-    blogs = await db`SELECT id, title, slug, excerpt, featured_image, featured_image_alt, read_time, published_at, created_at FROM blogs ORDER BY created_at DESC`;
+    // content_fallback mirrors /api/blogs so the card excerpt behaves the same
+    // whether it came from SSR or the client fetch.
+    blogs = await db`SELECT id, title, slug, excerpt, LEFT(content, 600) AS content_fallback, featured_image, featured_image_alt, read_time, published_at, created_at FROM blogs ORDER BY created_at DESC`;
   } catch (err) {
     console.error('Failed to fetch blogs for SSR:', err);
   }
