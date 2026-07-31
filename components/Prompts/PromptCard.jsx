@@ -293,32 +293,44 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
     );
   }
 
-  const titleOverlay = isHomePage && (
-    <div style={{
-      position: 'absolute', bottom: 0, left: 0, right: 0,
-      background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.4) 55%, transparent 100%)',
-      padding: '44px 14px 14px 14px',
-      pointerEvents: 'none',
-      zIndex: 20
-    }}>
-      <h3 className="prompt-title-rc" style={{
+  /**
+   * The title used to sit on the image under a dark scrim. The image is the thing
+   * a visitor is actually judging, so it now keeps its whole frame and the words
+   * live underneath, set in the site's own face rather than a display one.
+   */
+  const cardFooter = isHomePage && (
+    <Link
+      href={`/prompt/${prompt.slug || prompt.prompt_key || prompt.key}`}
+      style={{ textDecoration: 'none', color: 'inherit', display: 'block', padding: '13px 4px 3px' }}
+    >
+      {(aiType || prompt.copyCount > 0) && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '7px',
+          fontSize: '0.66rem', fontWeight: 600, letterSpacing: '0.1em',
+          textTransform: 'uppercase', color: 'rgba(20, 22, 26, 0.45)', marginBottom: '6px'
+        }}>
+          {aiType && <span>{aiType}</span>}
+          {aiType && prompt.copyCount > 0 && (
+            <span style={{ width: '3px', height: '3px', borderRadius: '50%', background: 'currentColor' }} />
+          )}
+          {prompt.copyCount > 0 && <span>{prompt.copyCount} copies</span>}
+        </div>
+      )}
+      <h3 style={{
         margin: 0,
-        color: '#fff',
-        fontSize: '1.65rem',
-        fontWeight: 400,
-        lineHeight: 1.15,
+        fontSize: '1rem',
+        fontWeight: 600,
+        lineHeight: 1.4,
+        letterSpacing: '-0.005em',
+        color: 'rgba(20, 22, 26, 0.92)',
         display: '-webkit-box',
         WebkitLineClamp: 2,
         WebkitBoxOrient: 'vertical',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        textShadow: '0 2px 14px rgba(0,0,0,0.7)',
-        letterSpacing: '0.02em',
-        textTransform: 'uppercase'
+        overflow: 'hidden'
       }}>
-        <HighlightText text={prompt.title.toUpperCase()} highlight={searchTerm ? searchTerm.toUpperCase() : ''} />
+        <HighlightText text={prompt.title} highlight={searchTerm} />
       </h3>
-    </div>
+    </Link>
   );
 
   return (
@@ -529,7 +541,6 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
                     <ChevronRight size={14} color="rgba(255, 255, 255, 0.85)" strokeWidth={2.5} style={{ display: 'block' }} />
                   </div>
                 </div>
-                {titleOverlay}
               </div>
             ) : (prompt.thumbnail_url || prompt.imgAfter || prompt.img_after || prompt.imgBefore || prompt.img_before) ? (
               <div className="prompt-image-container" style={{ width: '100%', margin: '0', aspectRatio: ratio, background: '#e8eaee', overflow: 'hidden', position: 'relative', borderRadius: '16px' }}>
@@ -544,12 +555,10 @@ const PromptCard = ({ prompt, isUnlocked, onUnlock, onLock, isHighlighted, searc
                   height="225" 
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                 />
-                
-                {titleOverlay}
-    
               </div>
             ) : null}
           </div>
+          {cardFooter}
         </div>
         {/* Header Info - Only show below image if not on home page */}
         {!isHomePage && (

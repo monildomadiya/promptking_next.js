@@ -127,9 +127,6 @@ export default function RootLayout({ children }) {
         <link rel="preload" href="/assets/fonts/Outfit-Regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/assets/fonts/Outfit-Bold.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/assets/fonts/Outfit-Black.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-        {/* RC Rocket drives the home-page prompt card titles. It is far narrower
-            than Outfit, so a late swap would visibly re-flow the overlay. */}
-        <link rel="preload" href="/assets/fonts/RcRocket.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         {/* adsbygoogle.js is loaded from ClientLayout, not here: this is a server
             component with no route awareness, so loading it here put Auto Ads on
             /admin-secure too. */}

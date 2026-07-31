@@ -8,22 +8,12 @@
 @font-face { font-family: 'Outfit'; src: url('/assets/fonts/Outfit-ExtraBold.woff2') format('woff2'), url('/assets/fonts/Outfit-ExtraBold.ttf') format('truetype'); font-weight: 800; font-style: normal; font-display: optional; }
 @font-face { font-family: 'Outfit'; src: url('/assets/fonts/Outfit-Black.woff2') format('woff2'), url('/assets/fonts/Outfit-Black.ttf') format('truetype'); font-weight: 900; font-style: normal; font-display: optional; }
 
-/* Display face for the home-page prompt card titles. Preloaded in layout.js. */
-@font-face {
-  font-family: 'RcRocketWeb';
-  src: url('/assets/fonts/RcRocket.woff2') format('woff2'), url('/assets/fonts/RcRocket.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* The descendant selector is required, not redundant: the global `* { font-family: Outfit }`
-   reset below matches the <span>/<mark> that HighlightText wraps the title in, and a
-   directly-matched declaration always beats an inherited one. */
-.prompt-title-rc,
-.prompt-title-rc * {
-  font-family: 'RcRocketWeb', 'Outfit', sans-serif;
-}
+/* RC Rocket used to set the home-page card titles. Those now use Outfit, so the
+   @font-face and its .prompt-title-rc rule are gone along with the preload in
+   layout.js. The files are still in public/assets/fonts if it is ever wanted:
+   re-adding it means an @font-face here plus a rule that also targets
+   descendants, because the `* { font-family: Outfit }` reset below matches the
+   <span> HighlightText wraps titles in and a direct match beats inheritance. */
 
 :root {
   color-scheme: light;
