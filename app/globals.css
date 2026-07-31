@@ -2021,27 +2021,7 @@ body.shorts-modal-open {
 }
 
 /* Responsive Header Fixes */
-.responsive-header {
-  position: fixed;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  max-width: var(--container-inner);
-  z-index: 2000;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 24px;
-  box-shadow: 0 6px 24px rgba(17, 24, 39, 0.06);
-  height: auto;
-  
-  /* Desktop */
-  top: 20px;
-  width: calc(100% - 40px);
-  padding: 12px 20px;
-  min-height: auto;
-}
+
 
 .header-inner-flex {
   margin: 0 auto;
