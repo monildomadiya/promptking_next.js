@@ -64,16 +64,16 @@ const glassPanelStyle = {
 };
 
 const glassCardStyle = {
-  background: 'rgba(255, 255, 255, 0.02)',
-  border: '1px solid rgba(255, 255, 255, 0.05)',
+  background: 'var(--surface-1)',
+  border: '1px solid var(--border-color)',
   borderRadius: '20px',
 };
 
 const inputStyle = {
   width: '100%',
   padding: '14px 18px',
-  background: 'rgba(255, 255, 255, 0.03)',
-  border: '1px solid rgba(255, 255, 255, 0.08)',
+  background: 'var(--surface-1)',
+  border: '1px solid var(--border-color)',
   borderRadius: '12px',
   color: 'white',
   fontSize: '0.95rem',
@@ -143,8 +143,8 @@ const AdminOtpInput = ({ value, onChange, length = 10 }) => {
               fontSize: '1.5rem',
               fontWeight: 'bold',
               borderRadius: '10px',
-              border: '1px solid rgba(255,255,255,0.1)',
-              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid var(--border-color)',
+              background: 'var(--surface-2)',
               color: 'white',
               outline: 'none',
               transition: '0.2s',
@@ -184,8 +184,8 @@ const AdminOtpInput = ({ value, onChange, length = 10 }) => {
                   fontSize: '1.5rem',
                   fontWeight: 'bold',
                   borderRadius: '10px',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid var(--border-color)',
+                  background: 'var(--surface-2)',
                   color: 'white',
                   outline: 'none',
                   transition: '0.2s',
@@ -337,13 +337,13 @@ const SectionTitle = ({ title }) => (
 );
 
 const Label = ({ text, icon }) => (
-  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontSize: '0.75rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>
+  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
     {icon} {text}
   </label>
 );
 
 const Hint = ({ text }) => (
-  <small style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.7rem', marginTop: '6px', display: 'block', fontWeight: 500 }}>{text}</small>
+  <small style={{ color: 'var(--text-muted)', fontSize: '0.7rem', marginTop: '6px', display: 'block', fontWeight: 500 }}>{text}</small>
 );
 
 // --- DRAG HANDLE ICON ---
@@ -367,7 +367,7 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.4 : 1,
-    borderBottom: '1px solid rgba(255,255,255,0.03)',
+    borderBottom: '1px solid var(--border-color)',
     background: isDragging
       ? 'rgba(229,9,20,0.08)'
       : isSelected
@@ -420,7 +420,7 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
       </td>
       <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.is_premium ? 'PRO' : 'FREE'}</span>
+          <span style={{ padding: '4px 8px', background: 'var(--surface-1)', color: 'var(--text-secondary)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.is_premium ? 'PRO' : 'FREE'}</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Opened (Views)">
             <Eye size={12} /> {item.view_count || 0}
           </div>
@@ -437,7 +437,7 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
             style={{
               width: '32px', height: '32px', borderRadius: '8px',
               background: item.is_featured ? 'rgba(255, 215, 0, 0.15)' : 'rgba(255,255,255,0.03)',
-              border: item.is_featured ? '1px solid rgba(255,215,0,0.4)' : '1px solid rgba(255,255,255,0.06)',
+              border: item.is_featured ? '1px solid rgba(255,215,0,0.4)' : '1px solid var(--border-color)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
               transition: 'all 0.2s ease',
               boxShadow: item.is_featured ? '0 0 10px rgba(255,215,0,0.2)' : 'none'
@@ -445,7 +445,7 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
           >
             <StarIcon filled={item.is_featured} size={14} />
           </div>
-          <div onClick={() => onEdit(item)} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Edit size={14} color="var(--text-dim)" /></div>
+          <div onClick={() => onEdit(item)} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--surface-1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Edit size={14} color="var(--text-dim)" /></div>
           <div onClick={() => onDelete(item)} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(229, 9, 20, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Trash size={14} color="var(--accent-main)" /></div>
         </div>
       </td>
@@ -992,7 +992,7 @@ const AdminDashboard = () => {
                   <div style={{ paddingLeft: '16px', marginBottom: '16px', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '1.5px' }}>{group.title}</div>
                 )}
                 {sidebarCollapsed && idx > 0 && (
-                  <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', margin: '8px 0 16px' }} />
+                  <div style={{ height: '1px', background: 'var(--surface-2)', margin: '8px 0 16px' }} />
                 )}
                 {group.items.map(item => (
                   <NavItem key={item.id} item={item} active={view === item.id} collapsed={sidebarCollapsed} onClick={switchView} isMobileView={false} />
@@ -1001,20 +1001,20 @@ const AdminDashboard = () => {
             ))}
           </motion.nav>
 
-          <div onClick={handleLogout} title={sidebarCollapsed ? 'Sign Out' : ''} style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: sidebarCollapsed ? 'center' : 'flex-start', gap: '12px', padding: sidebarCollapsed ? '14px' : '14px 16px', borderRadius: '12px', color: 'var(--text-dim)', cursor: 'pointer', background: 'rgba(255,255,255,0.02)' }}>
+          <div onClick={handleLogout} title={sidebarCollapsed ? 'Sign Out' : ''} style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: sidebarCollapsed ? 'center' : 'flex-start', gap: '12px', padding: sidebarCollapsed ? '14px' : '14px 16px', borderRadius: '12px', color: 'var(--text-dim)', cursor: 'pointer', background: 'var(--surface-1)' }}>
             <LogOut size={20} />
             {!sidebarCollapsed && <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>Sign Out</span>}
           </div>
 
           {/* Keyboard Shortcuts Hint */}
           {!sidebarCollapsed && (
-            <div style={{ marginTop: '12px', padding: '10px 12px', borderRadius: '10px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.25)', fontWeight: 700, letterSpacing: '1px', marginBottom: '6px' }}>SHORTCUTS</div>
-              <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.2)', lineHeight: '1.8' }}>
-                <span style={{ fontFamily: 'monospace', background: 'rgba(255,255,255,0.07)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>N</span>New item<br/>
-                <span style={{ fontFamily: 'monospace', background: 'rgba(255,255,255,0.07)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>1-5</span>Switch view<br/>
-                <span style={{ fontFamily: 'monospace', background: 'rgba(255,255,255,0.07)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>[</span>Toggle sidebar<br/>
-                <span style={{ fontFamily: 'monospace', background: 'rgba(255,255,255,0.07)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>Esc</span>Close modal
+            <div style={{ marginTop: '12px', padding: '10px 12px', borderRadius: '10px', background: 'var(--surface-1)', border: '1px solid var(--border-color)' }}>
+              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '1px', marginBottom: '6px' }}>SHORTCUTS</div>
+              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', lineHeight: '1.8' }}>
+                <span style={{ fontFamily: 'monospace', background: 'var(--surface-2)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>N</span>New item<br/>
+                <span style={{ fontFamily: 'monospace', background: 'var(--surface-2)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>1-5</span>Switch view<br/>
+                <span style={{ fontFamily: 'monospace', background: 'var(--surface-2)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>[</span>Toggle sidebar<br/>
+                <span style={{ fontFamily: 'monospace', background: 'var(--surface-2)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>Esc</span>Close modal
               </div>
             </div>
           )}
@@ -1026,7 +1026,7 @@ const AdminDashboard = () => {
         <div style={{ 
           position: 'sticky', top: 0, zIndex: 1000, 
           background: 'rgba(10,10,12,0.85)', backdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          borderBottom: '1px solid var(--border-color)',
           width: '100%'
         }}>
           <div style={{ padding: '15px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1098,8 +1098,8 @@ const AdminDashboard = () => {
                       ...inputStyle,
                       padding: '10px 16px',
                       fontSize: '0.85rem',
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      background: 'var(--surface-2)',
+                      border: '1px solid var(--border-color)',
                       borderRadius: '10px'
                     }}
                   />
@@ -1112,8 +1112,8 @@ const AdminDashboard = () => {
                   style={{
                     padding: '10px 16px',
                     fontSize: '0.85rem',
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    background: 'var(--surface-2)',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '10px',
                     color: 'white',
                     outline: 'none',
@@ -1173,8 +1173,8 @@ const AdminDashboard = () => {
                       onChange={(e) => setAnalyticsDays(e.target.value)}
                       style={{
                         padding: '8px 12px',
-                        background: 'rgba(255,255,255,0.05)',
-                        border: '1px solid rgba(255,255,255,0.1)',
+                        background: 'var(--surface-2)',
+                        border: '1px solid var(--border-color)',
                         borderRadius: '8px',
                         color: 'white',
                         outline: 'none',
@@ -1222,15 +1222,15 @@ const AdminDashboard = () => {
                           <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
-                      <XAxis dataKey="date" stroke="rgba(255,255,255,0.3)" tick={{fill: 'rgba(255,255,255,0.5)', fontSize: 12}} />
-                      <YAxis stroke="rgba(255,255,255,0.3)" tick={{fill: 'rgba(255,255,255,0.5)', fontSize: 12}} />
+                      <XAxis dataKey="date" stroke="rgba(255,255,255,0.3)" tick={{fill: 'var(--text-secondary)', fontSize: 12}} />
+                      <YAxis stroke="rgba(255,255,255,0.3)" tick={{fill: 'var(--text-secondary)', fontSize: 12}} />
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                       <Tooltip 
-                        contentStyle={{ backgroundColor: 'rgba(10, 10, 10, 0.95)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}
+                        contentStyle={{ backgroundColor: 'rgba(10, 10, 10, 0.95)', border: '1px solid var(--border-color)', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}
                         itemStyle={{ color: 'white', fontWeight: 700 }}
                         labelStyle={{ color: '#10b981', fontWeight: 900, marginBottom: '8px', fontSize: '1.1rem' }}
                       />
-                      <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontWeight: 600, color: 'rgba(255,255,255,0.7)' }} />
+                      <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontWeight: 600, color: 'var(--text-main)' }} />
                       <Area type="monotone" dataKey="view" name="Views" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorView)" dot={{ r: 4, strokeWidth: 2, fill: '#000', stroke: '#10b981' }} activeDot={{ r: 6, strokeWidth: 0, fill: '#10b981' }} />
                       <Area type="monotone" dataKey="copy" name="Copies" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorCopy)" dot={{ r: 4, strokeWidth: 2, fill: '#000', stroke: '#3b82f6' }} activeDot={{ r: 6, strokeWidth: 0, fill: '#3b82f6' }} />
                       <Area type="monotone" dataKey="unlock" name="Unlocks" stroke="#fbbf24" strokeWidth={3} fillOpacity={1} fill="url(#colorUnlock)" dot={{ r: 4, strokeWidth: 2, fill: '#000', stroke: '#fbbf24' }} activeDot={{ r: 6, strokeWidth: 0, fill: '#fbbf24' }} />
@@ -1259,13 +1259,13 @@ const AdminDashboard = () => {
               {!isDataLoading && isDragMode && view === 'prompts' && (
                 <div style={{ padding: '12px 24px', background: 'rgba(59,130,246,0.08)', borderBottom: '1px solid rgba(59,130,246,0.2)', display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <span style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 700 }}>⠿ DRAG MODE ACTIVE</span>
-                  <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)' }}>— Drag the handle icons to reorder prompts, then click SAVE ORDER</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>— Drag the handle icons to reorder prompts, then click SAVE ORDER</span>
                 </div>
               )}
               {!isDataLoading && <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                 <table style={{ minWidth: isMobile ? '600px' : '100%', borderCollapse: 'collapse' }}>
                   <thead>
-                    <tr style={{ borderBottom: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.01)' }}>
+                    <tr style={{ borderBottom: '1px solid var(--glass-border)', background: 'var(--surface-1)' }}>
                       {view === 'prompts' && (
                         <th style={{ padding: isMobile ? '16px' : '24px', width: '50px' }}>
                           {!isDragMode && (
@@ -1297,7 +1297,7 @@ const AdminDashboard = () => {
                       </SortableContext>
                     ) : (
                       filteredData.map((item, idx) => (
-                        <motion.tr key={idx} variants={itemVariants} initial="hidden" animate="visible" exit="hidden" custom={idx} onContextMenu={(e) => handleContextMenu(e, item)} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', background: selectedKeys.includes(item.prompt_key || item.id) ? 'rgba(229, 9, 20, 0.03)' : 'transparent' }}>
+                        <motion.tr key={idx} variants={itemVariants} initial="hidden" animate="visible" exit="hidden" custom={idx} onContextMenu={(e) => handleContextMenu(e, item)} style={{ borderBottom: '1px solid var(--border-color)', background: selectedKeys.includes(item.prompt_key || item.id) ? 'rgba(229, 9, 20, 0.03)' : 'transparent' }}>
                           {view === 'prompts' && (
                             <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
                               <input type="checkbox" checked={selectedKeys.includes(item.prompt_key || item.id)} onChange={() => toggleSelect(item.prompt_key || item.id)} style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: 'var(--accent-main)' }} />
@@ -1354,7 +1354,7 @@ const AdminDashboard = () => {
                             <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
                               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 {view === 'prompts' && (
-                                  <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.is_premium ? 'PRO' : 'FREE'}</span>
+                                  <span style={{ padding: '4px 8px', background: 'var(--surface-1)', color: 'var(--text-secondary)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.is_premium ? 'PRO' : 'FREE'}</span>
                                 )}
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Opened (Views)">
                                   <Eye size={12} /> {item.view_count || 0}
@@ -1376,7 +1376,7 @@ const AdminDashboard = () => {
                                   style={{
                                     width: '32px', height: '32px', borderRadius: '8px',
                                     background: item.is_featured ? 'rgba(255, 215, 0, 0.15)' : 'rgba(255,255,255,0.03)',
-                                    border: item.is_featured ? '1px solid rgba(255,215,0,0.4)' : '1px solid rgba(255,255,255,0.06)',
+                                    border: item.is_featured ? '1px solid rgba(255,215,0,0.4)' : '1px solid var(--border-color)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
                                     transition: 'all 0.2s ease',
                                     boxShadow: item.is_featured ? '0 0 10px rgba(255,215,0,0.2)' : 'none'
@@ -1385,7 +1385,7 @@ const AdminDashboard = () => {
                                   <StarIcon filled={item.is_featured} size={14} />
                                 </div>
                               )}
-                              <div onClick={() => { setEditingItem(item); setIsModalOpen(true); }} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Edit size={14} color="var(--text-dim)" /></div>
+                              <div onClick={() => { setEditingItem(item); setIsModalOpen(true); }} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--surface-1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Edit size={14} color="var(--text-dim)" /></div>
                               <div onClick={() => handleDelete(item)} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(229, 9, 20, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Trash size={14} color="var(--accent-main)" /></div>
                             </div>
                           </td>

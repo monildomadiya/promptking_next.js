@@ -8,6 +8,23 @@
 @font-face { font-family: 'Outfit'; src: url('/assets/fonts/Outfit-ExtraBold.woff2') format('woff2'), url('/assets/fonts/Outfit-ExtraBold.ttf') format('truetype'); font-weight: 800; font-style: normal; font-display: optional; }
 @font-face { font-family: 'Outfit'; src: url('/assets/fonts/Outfit-Black.woff2') format('woff2'), url('/assets/fonts/Outfit-Black.ttf') format('truetype'); font-weight: 900; font-style: normal; font-display: optional; }
 
+/* Display face for the home-page prompt card titles. Preloaded in layout.js. */
+@font-face {
+  font-family: 'RcRocketWeb';
+  src: url('/assets/fonts/RcRocket.woff2') format('woff2'), url('/assets/fonts/RcRocket.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* The descendant selector is required, not redundant: the global `* { font-family: Outfit }`
+   reset below matches the <span>/<mark> that HighlightText wraps the title in, and a
+   directly-matched declaration always beats an inherited one. */
+.prompt-title-rc,
+.prompt-title-rc * {
+  font-family: 'RcRocketWeb', 'Outfit', sans-serif;
+}
+
 :root {
   color-scheme: light;
   /* Modern HSL Color System */
@@ -91,6 +108,22 @@
 
 @media (max-width: 768px) {
   :root { --container-pad: 14px; }
+}
+
+/* ── Room for AdSense side rails ──────────────────────────────────────────
+   Auto Ads only serves a side rail when there is ~160px of clear space beside
+   the content. At a flat 1320px the gutter was 96px on a 1512px screen and
+   140px at 1600px, so the rail either did not serve or docked on top of the
+   content and got clipped.
+
+   Reserving 180px a side (160px rail + 20px gap) makes it fit. The floor is
+   1500px on purpose: below that, buying rail space would cost more content
+   width than the rail is worth, so those laptops keep the full layout and
+   simply do not get rails. Past ~1680px the min() hands the whole 1320px back,
+   so large monitors are unchanged.
+   To undo the desktop narrowing, delete this one block. */
+@media (min-width: 1500px) {
+  :root { --container-max: min(1320px, calc(100vw - 360px)); }
 }
 
 * {
@@ -287,6 +320,34 @@ html {
   color: var(--text-main);
 }
 
+/* The admin modals hardcode `gridTemplateColumns: '1fr 1fr'` inline in eleven
+   places (PromptModal, ListicleModal, BlogModal, the dashboard panels). Those
+   never collapsed, so on a 375px screen the field pairs measured 405px and
+   overflowed the modal. Targeting the inline value keeps the fix in one place
+   instead of threading an isMobile prop through every form section. */
+@media (max-width: 640px) {
+  .admin-light [style*="1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* PromptModal, ListicleModal and BlogModal lay their form out as a flex row with
+   a hardcoded 340px sidebar (the SEO checklist / social preview panel). Nothing
+   made it wrap, so on a 375px screen that column started at x=395 — entirely off
+   the viewport and unreachable. Stack it instead, and drop the 40px padding that
+   leaves little room for the fields themselves. */
+@media (max-width: 900px) {
+  .admin-light form[style*="gap: 40px"] {
+    flex-direction: column !important;
+    padding: 20px !important;
+    gap: 24px !important;
+  }
+  .admin-light form[style*="gap: 40px"] > div[style*="width: 340px"] {
+    width: 100% !important;
+    position: static !important;
+  }
+}
+
 /* Admin-dark overrides for glass utilities */
 .admin-dark .glass-panel {
   background: var(--glass-bg);
@@ -366,10 +427,13 @@ html {
   --text-main:      #0f172a;
   --text-primary:   #0f172a;
   --text-secondary: rgba(15, 23, 42, 0.68);
-  --text-dim:       rgba(15, 23, 42, 0.52);
-  --text-muted:     rgba(15, 23, 42, 0.38);
+  --text-dim:       rgba(15, 23, 42, 0.60);
+  /* 0.38 was carried over from the dark theme, where it sat on near-black. On the
+     white admin surface it measured 2.4:1 — below WCAG AA — and this token colours
+     the list-row subtitles and sidebar group headings, 205 elements in all. */
+  --text-muted:     rgba(15, 23, 42, 0.60);
 
-  --border-color:   rgba(15, 23, 42, 0.08);
+  --border-color:   rgba(15, 23, 42, 0.12);
   --surface-color:  #ffffff;
   --bg-color:       #ffffff;
 
@@ -2305,14 +2369,17 @@ div:has(> .adsense-container:has(ins.adsbygoogle[data-ad-status="unfilled"])) {
 }
 
 /* Auto Ads slots: let Google keep its own width, just centre the slot and
-   the creative inside it, and stop it spilling past the viewport. */
-.google-auto-placed {
+   the creative inside it, and stop it spilling past the viewport.
+   `:not([style*="fixed"])` excludes the overlay formats — side rails and the
+   anchor bar are position:fixed and Google positions them against the viewport,
+   so centring them or capping them at 100% of a flex parent breaks them. */
+.google-auto-placed:not([style*="fixed"]) {
   margin-inline: auto !important;
   max-width: 100% !important;
   text-align: center !important;
 }
 
-.google-auto-placed ins.adsbygoogle {
+.google-auto-placed:not([style*="fixed"]) ins.adsbygoogle {
   margin-inline: auto !important;
   max-width: 100% !important;
 }
@@ -2325,12 +2392,31 @@ ins.adsbygoogle.adsbygoogle-noablate {
 /* `body` is a flex column, so anything Auto Ads injects as a direct child
    becomes a flex item and is sized by flex rules rather than filling the
    line. Pin it to the full width so an injected slot cannot end up narrower
-   than the page. */
-body > .google-auto-placed,
-body > ins.adsbygoogle {
+   than the page.
+
+   Only in-flow slots. Side rails and the anchor bar are position:fixed, are NOT
+   flex items, and Google gives them their own width — stretching those to the
+   full viewport is what made the desktop side rail render full-bleed with the
+   creative centred and clipped instead of docked to the edge. */
+body > .google-auto-placed:not([style*="fixed"]),
+body > ins.adsbygoogle:not([style*="fixed"]) {
   width: 100%;
   align-self: stretch;
   flex: 0 0 auto;
+}
+
+/* Belt-and-braces: whatever Google fixes to the viewport keeps its own geometry,
+   even if a broader rule above it changes later. */
+body > .google-auto-placed[style*="fixed"],
+body > ins.adsbygoogle[style*="fixed"],
+ins.adsbygoogle[data-anchor-status],
+.adsbygoogle-noablate {
+  width: auto !important;
+  max-width: none !important;
+  align-self: auto !important;
+  flex: none !important;
+  margin-inline: 0 !important;
+  text-align: initial !important;
 }
 
 .blog-content {
@@ -2383,7 +2469,13 @@ body > ins.adsbygoogle {
    To bring shadows back, DELETE this whole block (and, if you
    want the elevation tokens back, restore --shadow-sm/md/lg above).
    ============================================================ */
-*, *::before, *::after {
+/* Scoped away from the admin portal on purpose. Flat reads fine on the public
+   site, but the dashboard stacks modals, dropdowns, the command palette and a
+   sticky sidebar — with every shadow stripped those overlays sat on the page
+   with nothing separating them from the content behind. */
+*:not(.admin-light):not(.admin-light *),
+*:not(.admin-light):not(.admin-light *)::before,
+*:not(.admin-light):not(.admin-light *)::after {
   box-shadow: none !important;
   text-shadow: none !important;
 }

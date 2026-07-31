@@ -194,7 +194,7 @@ const BlogModal = ({ blog, onClose, onSave }) => {
       }}>
         {/* Modal Header */}
         <div style={{ 
-          padding: '30px 40px', borderBottom: '1px solid rgba(255,255,255,0.08)',
+          padding: '30px 40px', borderBottom: '1px solid var(--border-color)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           position: 'sticky', top: 0, background: 'rgba(10,10,12,0.8)', backdropFilter: 'blur(20px)', zIndex: 10
         }}>
@@ -209,8 +209,8 @@ const BlogModal = ({ blog, onClose, onSave }) => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <div style={{ 
               display: 'flex', alignItems: 'center', gap: '8px', 
-              background: 'rgba(255,255,255,0.05)', padding: '8px 16px', borderRadius: '20px',
-              border: '1px solid rgba(255,255,255,0.1)'
+              background: 'var(--surface-2)', padding: '8px 16px', borderRadius: '20px',
+              border: '1px solid var(--border-color)'
             }}>
               <CheckCircle size={16} color={getSeoScore() >= 6 ? '#4CAF50' : '#FF9800'} />
               <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>SEO Score: {getSeoScore()}/8</span>
@@ -414,7 +414,7 @@ const BlogModal = ({ blog, onClose, onSave }) => {
               <div style={{ marginBottom: '15px' }}>
                 <Label text="Article Content" required />
               </div>
-              <div className={`glass-input ${errors.content ? 'has-error' : ''}`} style={{ borderRadius: '20px', overflow: 'hidden', border: errors.content ? '1px solid #ff4444' : '1px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column' }}>
+              <div className={`glass-input ${errors.content ? 'has-error' : ''}`} style={{ borderRadius: '20px', overflow: 'hidden', border: errors.content ? '1px solid #ff4444' : '1px solid var(--border-color)', display: 'flex', flexDirection: 'column' }}>
                 <CustomEditor
                   value={formData.content}
                   onChange={(content) => {
@@ -430,7 +430,7 @@ const BlogModal = ({ blog, onClose, onSave }) => {
               <SectionTitle title="6. FAQ Section" />
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 {formData.faqs.map((faq, index) => (
-                  <div key={index} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '20px', borderRadius: '15px', position: 'relative' }}>
+                  <div key={index} style={{ background: 'var(--surface-1)', border: '1px solid var(--border-color)', padding: '20px', borderRadius: '15px', position: 'relative' }}>
                     <button 
                       type="button" 
                       onClick={() => removeFaq(index)}
@@ -460,7 +460,7 @@ const BlogModal = ({ blog, onClose, onSave }) => {
                 <button 
                   type="button" 
                   onClick={addFaq}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: 600, alignSelf: 'flex-start' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', borderRadius: '12px', background: 'var(--surface-2)', border: '1px solid var(--border-color)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 600, alignSelf: 'flex-start' }}
                 >
                   <PlusCircle size={16} /> Add FAQ
                 </button>
@@ -496,7 +496,7 @@ const BlogModal = ({ blog, onClose, onSave }) => {
           <div style={{ width: '340px', display: 'flex', flexDirection: 'column', gap: '30px', position: 'sticky', top: '100px' }}>
             
             {/* 7. Publishing Settings */}
-            <div style={{ background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ background: 'var(--surface-1)', padding: '24px', borderRadius: '20px', border: '1px solid var(--border-color)' }}>
               <SectionTitle title="7. Publishing Settings" />
               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                 <div>
@@ -506,8 +506,8 @@ const BlogModal = ({ blog, onClose, onSave }) => {
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                     className="glass-input"
                   >
-                    <option value="draft" style={{ background: '#1a1a1f' }}>Draft</option>
-                    <option value="published" style={{ background: '#1a1a1f' }}>Published</option>
+                    <option value="draft">Draft</option>
+                    <option value="published">Published</option>
                   </select>
                 </div>
                 <div>
@@ -524,7 +524,7 @@ const BlogModal = ({ blog, onClose, onSave }) => {
             </div>
 
             {/* 4. Social Sharing */}
-            <div style={{ background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ background: 'var(--surface-1)', padding: '24px', borderRadius: '20px', border: '1px solid var(--border-color)' }}>
               <SectionTitle title="4. Social Sharing" />
               
               <div style={{ marginBottom: '20px' }}>
@@ -547,7 +547,7 @@ const BlogModal = ({ blog, onClose, onSave }) => {
             </div>
 
             {/* SEO Checklist Panel */}
-            <div style={{ background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ background: 'var(--surface-1)', padding: '24px', borderRadius: '20px', border: '1px solid var(--border-color)' }}>
               <SectionTitle title="SEO Checklist" />
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
                 <CheckItem checked={!!formData.meta_title} text="Meta title exists" />
@@ -577,14 +577,14 @@ const SectionTitle = ({ title }) => (
 );
 
 const Label = ({ text, icon, required }) => (
-  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', fontSize: '0.85rem', fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>
-    {icon} {text} {required ? <span style={{ color: '#ff4444', marginLeft: '4px' }}>*</span> : <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.7rem', marginLeft: '4px', textTransform: 'none' }}>(Optional)</span>}
+  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)', textTransform: 'uppercase' }}>
+    {icon} {text} {required ? <span style={{ color: '#ff4444', marginLeft: '4px' }}>*</span> : <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem', marginLeft: '4px', textTransform: 'none' }}>(Optional)</span>}
   </label>
 );
 
 const CheckItem = ({ checked, text }) => (
-  <li style={{ display: 'flex', alignItems: 'center', gap: '10px', color: checked ? '#4CAF50' : 'rgba(255,255,255,0.4)', fontWeight: checked ? 600 : 400 }}>
-    <CheckCircle size={14} color={checked ? '#4CAF50' : 'rgba(255,255,255,0.2)'} />
+  <li style={{ display: 'flex', alignItems: 'center', gap: '10px', color: checked ? '#4CAF50' : 'var(--text-secondary)', fontWeight: checked ? 600 : 400 }}>
+    <CheckCircle size={14} color={checked ? '#4CAF50' : 'var(--text-muted)'} />
     {text}
   </li>
 );
@@ -653,7 +653,7 @@ const ImageUpload = ({ url, onUpload }) => {
           onChange={(e) => setLocalUrl(e.target.value)}
           onBlur={handleUrlBlur}
           className="glass-input"
-          style={{ flex: 1, padding: '14px 18px', borderRadius: '14px', fontSize: '0.9rem', color: 'white', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }}
+          style={{ flex: 1, padding: '14px 18px', borderRadius: '14px', fontSize: '0.9rem', color: 'white', background: 'var(--surface-1)', border: '1px solid var(--border-color)', outline: 'none' }}
         />
         <input 
           type="file" 
@@ -676,14 +676,14 @@ const ImageUpload = ({ url, onUpload }) => {
         </button>
       </div>
       <div style={{ 
-        height: '240px', borderRadius: '20px', border: '2px dashed rgba(255,255,255,0.1)',
+        height: '240px', borderRadius: '20px', border: '2px dashed var(--border-color)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: 'rgba(255,255,255,0.02)', overflow: 'hidden'
+        background: 'var(--surface-1)', overflow: 'hidden'
       }}>
         {url ? (
           <img src={url} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
-          <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.2)' }}>
+          <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
             <Camera size={32} style={{ marginBottom: '10px', opacity: 0.5 }} />
             <p style={{ fontSize: '0.85rem', fontWeight: 600 }}>Image Preview</p>
           </div>

@@ -34,7 +34,7 @@ const ContextMenu = ({ x, y, isOpen, onClose, actions }) => {
             width: '200px',
             background: 'rgba(20, 20, 25, 0.95)',
             backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.1)',
+            border: '1px solid var(--border-color)',
             borderRadius: '12px',
             boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
             padding: '8px',
@@ -48,7 +48,7 @@ const ContextMenu = ({ x, y, isOpen, onClose, actions }) => {
         >
           {actions.map((action, idx) => {
             if (action.type === 'divider') {
-              return <div key={`div-${idx}`} style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '4px 0' }} />;
+              return <div key={`div-${idx}`} style={{ height: '1px', background: 'var(--surface-3)', margin: '4px 0' }} />;
             }
             return (
               <div
@@ -67,7 +67,7 @@ const ContextMenu = ({ x, y, isOpen, onClose, actions }) => {
                   background: 'transparent'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = action.danger ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255,255,255,0.05)';
+                  e.currentTarget.style.background = action.danger ? 'rgba(239, 68, 68, 0.1)' : 'var(--surface-2)';
                   e.currentTarget.style.color = action.danger ? '#ef4444' : 'white';
                 }}
                 onMouseLeave={(e) => {

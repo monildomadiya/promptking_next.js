@@ -57,7 +57,7 @@ const FAQModal = ({ faq, onClose, onSave }) => {
       }}>
         {/* Modal Header */}
         <div style={{ 
-          padding: '25px 35px', borderBottom: '1px solid rgba(255,255,255,0.08)',
+          padding: '25px 35px', borderBottom: '1px solid var(--border-color)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           background: 'rgba(10,10,12,0.5)', backdropFilter: 'blur(10px)'
         }}>
@@ -134,7 +134,7 @@ const FAQModal = ({ faq, onClose, onSave }) => {
 
 const labelStyle = {
   display: 'block', marginBottom: '10px', fontSize: '0.8rem',
-  color: 'rgba(255,255,255,0.4)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px'
+  color: 'var(--text-secondary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px'
 };
 
 export default FAQModal;

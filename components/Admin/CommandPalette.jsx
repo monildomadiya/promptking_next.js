@@ -93,13 +93,13 @@ const CommandPalette = ({ isOpen, onClose, onAction, data, activeView }) => {
               width: '100%', maxWidth: '600px', 
               background: 'rgba(15, 15, 20, 0.85)', 
               backdropFilter: 'blur(30px)', WebkitBackdropFilter: 'blur(30px)',
-              border: '1px solid rgba(255,255,255,0.1)',
+              border: '1px solid var(--border-color)',
               borderRadius: '20px', overflow: 'hidden',
               boxShadow: '0 30px 60px rgba(0,0,0,0.5)'
             }}
           >
             {/* Search Input */}
-            <div style={{ display: 'flex', alignItems: 'center', padding: '16px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', padding: '16px 24px', borderBottom: '1px solid var(--border-color)' }}>
               <Search size={20} color="var(--text-dim)" />
               <input 
                 ref={inputRef}
@@ -112,7 +112,7 @@ const CommandPalette = ({ isOpen, onClose, onAction, data, activeView }) => {
                   fontSize: '1.1rem', padding: '0 16px', outline: 'none'
                 }}
               />
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', border: '1px solid rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px' }}>ESC</div>
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', border: '1px solid var(--border-color)', padding: '2px 6px', borderRadius: '4px' }}>ESC</div>
             </div>
 
             {/* Results List */}
@@ -126,12 +126,12 @@ const CommandPalette = ({ isOpen, onClose, onAction, data, activeView }) => {
                     style={{
                       display: 'flex', alignItems: 'center', gap: '16px',
                       padding: '12px 16px', borderRadius: '12px', cursor: 'pointer',
-                      background: selectedIndex === idx ? 'rgba(255,255,255,0.05)' : 'transparent',
+                      background: selectedIndex === idx ? 'var(--surface-2)' : 'transparent',
                       borderLeft: selectedIndex === idx ? '3px solid var(--accent-main)' : '3px solid transparent',
                       transition: 'all 0.1s ease'
                     }}
                   >
-                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-dim)' }}>
+                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--surface-2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-dim)' }}>
                       {item.icon}
                     </div>
                     <div style={{ flex: 1 }}>
@@ -152,10 +152,10 @@ const CommandPalette = ({ isOpen, onClose, onAction, data, activeView }) => {
             </div>
             
             {/* Footer */}
-            <div style={{ padding: '12px 24px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)' }}>
+            <div style={{ padding: '12px 24px', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)' }}>
               <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', display: 'flex', gap: '10px' }}>
-                <span><span style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px' }}>↑</span> <span style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px' }}>↓</span> Navigate</span>
-                <span><span style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px' }}>↵</span> Select</span>
+                <span><span style={{ background: 'var(--surface-3)', padding: '2px 6px', borderRadius: '4px' }}>↑</span> <span style={{ background: 'var(--surface-3)', padding: '2px 6px', borderRadius: '4px' }}>↓</span> Navigate</span>
+                <span><span style={{ background: 'var(--surface-3)', padding: '2px 6px', borderRadius: '4px' }}>↵</span> Select</span>
               </div>
             </div>
           </motion.div>

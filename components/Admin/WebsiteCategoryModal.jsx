@@ -44,18 +44,18 @@ const ImageUpload = ({ url, onUpload }) => {
       <div style={{ display: 'flex', gap: '10px' }}>
         <input type="text" placeholder="https://..." value={localUrl} onChange={(e) => setLocalUrl(e.target.value)} onBlur={handleUrlBlur}
           className="glass-input"
-          style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', fontSize: '0.85rem', color: 'white', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }}
+          style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', fontSize: '0.85rem', color: 'white', background: 'var(--surface-1)', border: '1px solid var(--border-color)', outline: 'none' }}
         />
         <input type="file" accept="image/*" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
         <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isUploading}
           style={{ padding: '0 20px', borderRadius: '12px', background: 'var(--accent-main)', color: 'white', border: 'none', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', opacity: isUploading ? 0.7 : 1, whiteSpace: 'nowrap' }}
         >{isUploading ? 'Uploading...' : 'Upload'}</button>
       </div>
-      <div style={{ height: '140px', borderRadius: '16px', border: '2px dashed rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.02)', overflow: 'hidden' }}>
+      <div style={{ height: '140px', borderRadius: '16px', border: '2px dashed var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface-1)', overflow: 'hidden' }}>
         {url ? (
           <img src={url} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
-          <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.2)' }}>
+          <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
             <Image size={24} style={{ marginBottom: '8px' }} />
             <p style={{ fontSize: '0.75rem', fontWeight: 600 }}>Image Preview</p>
           </div>
@@ -128,7 +128,7 @@ const WebsiteCategoryModal = ({ category, onClose, onSave }) => {
       }}>
         {/* Modal Header */}
         <div style={{ 
-          padding: '25px 35px', borderBottom: '1px solid rgba(255,255,255,0.08)',
+          padding: '25px 35px', borderBottom: '1px solid var(--border-color)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           background: 'rgba(10,10,12,0.5)', backdropFilter: 'blur(10px)'
         }}>
@@ -147,14 +147,16 @@ const WebsiteCategoryModal = ({ category, onClose, onSave }) => {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
+        <div style={{ display: 'flex', borderBottom: '1px solid var(--border-color)', background: 'var(--surface-1)' }}>
           {['general', 'seo'].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               style={{
                 flex: 1, padding: '15px', background: 'none', border: 'none',
-                color: activeTab === tab ? 'white' : 'rgba(255,255,255,0.5)',
+                /* The active tab sits on a transparent background over --surface-1,
+                   so white was invisible; the accent underline already marks it. */
+                color: activeTab === tab ? 'var(--text-main)' : 'var(--text-secondary)',
                 fontWeight: activeTab === tab ? 800 : 600,
                 borderBottom: activeTab === tab ? '2px solid var(--accent-main)' : '2px solid transparent',
                 cursor: 'pointer', textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '1px'
@@ -172,7 +174,7 @@ const WebsiteCategoryModal = ({ category, onClose, onSave }) => {
               <>
                 <div style={{ display: 'flex', gap: '20px', marginBottom: '25px' }}>
                   <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                    <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                       Category Name
                     </label>
                     <input 
@@ -191,7 +193,7 @@ const WebsiteCategoryModal = ({ category, onClose, onSave }) => {
                   </div>
 
                   <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                    <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                       URL Identity (Slug)
                     </label>
                     <input 
@@ -207,7 +209,7 @@ const WebsiteCategoryModal = ({ category, onClose, onSave }) => {
                 </div>
 
                 <div style={{ marginBottom: '25px' }}>
-                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                     Category Tag (e.g. "Trending Prompt")
                   </label>
                   <input 
@@ -221,7 +223,7 @@ const WebsiteCategoryModal = ({ category, onClose, onSave }) => {
                 </div>
 
                 <div style={{ marginBottom: '25px' }}>
-                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                     Description
                   </label>
                   <textarea 
@@ -234,7 +236,7 @@ const WebsiteCategoryModal = ({ category, onClose, onSave }) => {
                 </div>
 
                 <div style={{ marginBottom: '25px' }}>
-                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                     Category Thumbnail (Vertical Image Recommended)
                   </label>
                   <ImageUpload url={formData.image_url} onUpload={(url) => setFormData({ ...formData, image_url: url })} />
@@ -245,7 +247,7 @@ const WebsiteCategoryModal = ({ category, onClose, onSave }) => {
             {activeTab === 'seo' && (
               <>
                 <div style={{ marginBottom: '25px' }}>
-                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                     Meta Title (SEO)
                   </label>
                   <input 
@@ -258,7 +260,7 @@ const WebsiteCategoryModal = ({ category, onClose, onSave }) => {
                   />
                 </div>
                 <div style={{ marginBottom: '25px' }}>
-                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                     Focus Keyword (SEO)
                   </label>
                   <input 
@@ -271,7 +273,7 @@ const WebsiteCategoryModal = ({ category, onClose, onSave }) => {
                   />
                 </div>
                 <div style={{ marginBottom: '25px' }}>
-                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                     Meta Description (SEO)
                   </label>
                   <textarea 
@@ -288,7 +290,7 @@ const WebsiteCategoryModal = ({ category, onClose, onSave }) => {
           </form>
         </div>
 
-        <div style={{ padding: '25px 35px', borderTop: '1px solid rgba(255,255,255,0.08)', background: 'rgba(10,10,12,0.5)', backdropFilter: 'blur(10px)', display: 'flex', gap: '15px' }}>
+        <div style={{ padding: '25px 35px', borderTop: '1px solid var(--border-color)', background: 'rgba(10,10,12,0.5)', backdropFilter: 'blur(10px)', display: 'flex', gap: '15px' }}>
           <button 
             type="button" 
             onClick={onClose}

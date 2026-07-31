@@ -133,10 +133,10 @@ const CustomEditor = ({ value, onChange }) => {
 
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', borderRadius: '18px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', borderRadius: '18px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
 
       {/* === TOOLBAR === */}
-      <div style={{ background: 'rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '8px 12px', display: 'flex', flexWrap: 'wrap', gap: '5px', alignItems: 'center' }}>
+      <div style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--border-color)', padding: '8px 12px', display: 'flex', flexWrap: 'wrap', gap: '5px', alignItems: 'center' }}>
 
         {/* Undo / Redo */}
         <Btn onClick={() => exec('undo')} title="Undo (Ctrl+Z)">↩</Btn>
@@ -175,7 +175,7 @@ const CustomEditor = ({ value, onChange }) => {
         <Divider />
 
         {/* Text Color */}
-        <label title="Text Color" style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>
+        <label title="Text Color" style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--text-main)', fontWeight: 600 }}>
           A
           <input type="color" defaultValue="#ffffff" onChange={(e) => exec('foreColor', e.target.value)}
             style={{ width: '22px', height: '22px', border: 'none', padding: 0, background: 'none', cursor: 'pointer', borderRadius: '4px' }} />
@@ -231,33 +231,33 @@ const CustomEditor = ({ value, onChange }) => {
         onKeyDown={handleKeyDown}
         className="custom-editor-content"
         data-placeholder="Start writing..."
-        style={{ minHeight: '420px', padding: '20px 24px', outline: 'none', color: 'white', fontSize: '1rem', lineHeight: '1.8', background: 'rgba(255,255,255,0.01)', overflowY: 'auto' }}
+        style={{ minHeight: '420px', padding: '20px 24px', outline: 'none', color: 'var(--text-main)', fontSize: '1rem', lineHeight: '1.8', background: 'var(--surface-1)', overflowY: 'auto' }}
       />
 
       {/* === STYLES === */}
       <style>{`
-        .custom-editor-content:empty:before { content: attr(data-placeholder); color: rgba(255,255,255,0.25); pointer-events: none; display: block; }
+        .custom-editor-content:empty:before { content: attr(data-placeholder); color: var(--text-muted); pointer-events: none; display: block; }
         .custom-editor-content p { margin-bottom: 0.9em; }
         .custom-editor-content h2 { font-size: 1.6rem; font-weight: 800; color: var(--accent-main); margin: 1.4em 0 0.5em; }
         .custom-editor-content h3 { font-size: 1.3rem; font-weight: 700; color: #fff; margin: 1.2em 0 0.4em; }
-        .custom-editor-content h4 { font-size: 1.1rem; font-weight: 700; color: rgba(255,255,255,0.85); margin: 1em 0 0.4em; }
+        .custom-editor-content h4 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin: 1em 0 0.4em; }
         .custom-editor-content ul { list-style: disc; margin-left: 2em; margin-bottom: 1em; }
         .custom-editor-content ol { list-style: decimal; margin-left: 2em; margin-bottom: 1em; }
         .custom-editor-content li { margin-bottom: 0.4em; }
         .custom-editor-content a { color: var(--accent-main); text-decoration: underline; }
-        .custom-editor-content blockquote { border-left: 4px solid var(--accent-main); margin: 1em 0; padding: 10px 20px; background: rgba(229,9,20,0.06); border-radius: 0 10px 10px 0; color: rgba(255,255,255,0.75); font-style: italic; }
-        .custom-editor-content .editor-codeblock { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 16px 20px; font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 0.9rem; color: #a8ff78; margin: 1em 0; overflow-x: auto; white-space: pre; }
+        .custom-editor-content blockquote { border-left: 4px solid var(--accent-main); margin: 1em 0; padding: 10px 20px; background: rgba(229,9,20,0.06); border-radius: 0 10px 10px 0; color: var(--text-main); font-style: italic; }
+        .custom-editor-content .editor-codeblock { background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px 20px; font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 0.9rem; color: #a8ff78; margin: 1em 0; overflow-x: auto; white-space: pre; }
         .custom-editor-content .editor-table { width: 100%; border-collapse: collapse; margin: 1em 0; border-radius: 10px; overflow: hidden; }
-        .custom-editor-content .editor-table th { background: rgba(229,9,20,0.15); color: white; font-weight: 700; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.1); text-align: left; }
-        .custom-editor-content .editor-table td { padding: 9px 14px; border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); }
-        .custom-editor-content .editor-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+        .custom-editor-content .editor-table th { background: rgba(229,9,20,0.15); color: white; font-weight: 700; padding: 10px 14px; border: 1px solid var(--border-color); text-align: left; }
+        .custom-editor-content .editor-table td { padding: 9px 14px; border: 1px solid var(--border-color); color: var(--text-main); }
+        .custom-editor-content .editor-table tr:nth-child(even) td { background: var(--surface-1); }
         .custom-editor-content img { max-width: 100%; height: auto; border-radius: 12px; margin: 12px 0; display: block; }
         .custom-editor-content .yt-embed-wrap iframe { border-radius: 12px; }
         
         .editor-select {
           padding: 5px 12px;
-          background: rgba(255, 255, 255, 0.05) !important;
-          border: 1px solid rgba(255, 255, 255, 0.1) !important;
+          background: var(--surface-2) !important;
+          border: 1px solid var(--border-color) !important;
           border-radius: 10px;
           color: white !important;
           font-size: 0.82rem;
@@ -267,8 +267,8 @@ const CustomEditor = ({ value, onChange }) => {
         }
         
         .editor-select:hover {
-          background: rgba(255, 255, 255, 0.1) !important;
-          border-color: rgba(255, 255, 255, 0.2) !important;
+          background: var(--surface-3) !important;
+          border-color: var(--text-muted) !important;
         }
 
         .editor-select option {
@@ -281,7 +281,7 @@ const CustomEditor = ({ value, onChange }) => {
       {/* === YOUTUBE MODAL === */}
       {showYoutubeModal && (
         <EditorModal title="▶ Embed YouTube Video" onClose={() => setShowYoutubeModal(false)}>
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', marginBottom: '12px' }}>Paste a YouTube video URL below.</p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '12px' }}>Paste a YouTube video URL below.</p>
           <input
             autoFocus
             type="text"
@@ -325,12 +325,12 @@ const CustomEditor = ({ value, onChange }) => {
         <EditorModal title="⊞ Insert Table" onClose={() => setShowTableModal(false)}>
           <div style={{ display: 'flex', gap: '14px', marginBottom: '14px' }}>
             <div style={{ flex: 1 }}>
-              <label style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: '6px' }}>Rows</label>
+              <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>Rows</label>
               <input type="number" min="1" max="20" value={tableRows} onChange={e => setTableRows(e.target.value)}
                 className="glass-input" style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', fontSize: '0.9rem' }} />
             </div>
             <div style={{ flex: 1 }}>
-              <label style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: '6px' }}>Columns</label>
+              <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>Columns</label>
               <input type="number" min="1" max="10" value={tableCols} onChange={e => setTableCols(e.target.value)}
                 className="glass-input" style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', fontSize: '0.9rem' }} />
             </div>
@@ -348,17 +348,17 @@ const CustomEditor = ({ value, onChange }) => {
 // Toolbar Button
 const Btn = ({ children, onClick, title }) => (
   <button type="button" title={title} onClick={(e) => { e.preventDefault(); onClick(); }}
-    style={{ padding: '5px 11px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600, transition: '0.15s', display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}
+    style={{ padding: '5px 11px', background: 'var(--surface-2)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600, transition: '0.15s', display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}
     onMouseEnter={e => { e.currentTarget.style.background = 'rgba(229,9,20,0.2)'; e.currentTarget.style.borderColor = 'rgba(229,9,20,0.4)'; }}
-    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
+    onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.borderColor = 'var(--border-color)'; }}
   >{children}</button>
 );
 
 // Modal Wrapper
 const EditorModal = ({ title, children, onClose }) => (
   <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={onClose}>
-    <div style={{ background: 'rgba(12,12,16,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '28px 32px', width: '100%', maxWidth: '480px', boxShadow: '0 30px 60px rgba(0,0,0,0.6)' }} onClick={e => e.stopPropagation()}>
-      <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '18px', color: 'white' }}>{title}</h3>
+    <div style={{ background: 'rgba(12,12,16,0.95)', border: '1px solid var(--border-color)', borderRadius: '20px', padding: '28px 32px', width: '100%', maxWidth: '480px', boxShadow: '0 30px 60px rgba(0,0,0,0.6)' }} onClick={e => e.stopPropagation()}>
+      <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '18px', color: 'var(--text-main)' }}>{title}</h3>
       {children}
     </div>
   </div>
@@ -367,11 +367,11 @@ const EditorModal = ({ title, children, onClose }) => (
 // Modal Button
 const ModalBtn = ({ children, onClick, secondary }) => (
   <button type="button" onClick={onClick}
-    style={{ padding: '10px 22px', borderRadius: '10px', border: secondary ? '1px solid rgba(255,255,255,0.1)' : 'none', background: secondary ? 'rgba(255,255,255,0.05)' : 'var(--accent-main)', color: 'white', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', transition: '0.2s' }}
+    style={{ padding: '10px 22px', borderRadius: '10px', border: secondary ? '1px solid var(--border-color)' : 'none', background: secondary ? 'var(--surface-2)' : 'var(--accent-main)', color: secondary ? 'var(--text-main)' : 'white', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', transition: '0.2s' }}
   >{children}</button>
 );
 
 // Divider
-const Divider = () => <div style={{ width: '1px', height: '22px', background: 'rgba(255,255,255,0.1)', margin: '0 4px' }} />;
+const Divider = () => <div style={{ width: '1px', height: '22px', background: 'var(--surface-3)', margin: '0 4px' }} />;
 
 export default CustomEditor;

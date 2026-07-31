@@ -44,18 +44,18 @@ const ImageUpload = ({ url, onUpload }) => {
       <div style={{ display: 'flex', gap: '10px' }}>
         <input type="text" placeholder="https://..." value={localUrl} onChange={(e) => setLocalUrl(e.target.value)} onBlur={handleUrlBlur}
           className="glass-input"
-          style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', fontSize: '0.85rem', color: 'white', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }}
+          style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', fontSize: '0.85rem', color: 'white', background: 'var(--surface-1)', border: '1px solid var(--border-color)', outline: 'none' }}
         />
         <input type="file" accept="image/*" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
         <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isUploading}
           style={{ padding: '0 20px', borderRadius: '12px', background: 'var(--accent-main)', color: 'white', border: 'none', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', opacity: isUploading ? 0.7 : 1, whiteSpace: 'nowrap' }}
         >{isUploading ? 'Uploading...' : 'Upload'}</button>
       </div>
-      <div style={{ height: '140px', borderRadius: '16px', border: '2px dashed rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.02)', overflow: 'hidden' }}>
+      <div style={{ height: '140px', borderRadius: '16px', border: '2px dashed var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface-1)', overflow: 'hidden' }}>
         {url ? (
           <img src={url} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
-          <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.2)' }}>
+          <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
             <Image size={24} style={{ marginBottom: '8px' }} />
             <p style={{ fontSize: '0.75rem', fontWeight: 600 }}>Image Preview</p>
           </div>
@@ -108,11 +108,11 @@ const CategoryModal = ({ category, onClose, onSave }) => {
     }}>
       <div className="glass-modal" style={{ 
         width: '100%', maxWidth: '500px', position: 'relative',
-        display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--surface-1)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.08)'
+        display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--surface-1)', borderRadius: '24px', border: '1px solid var(--border-color)'
       }}>
         {/* Modal Header */}
         <div style={{ 
-          padding: '25px 35px', borderBottom: '1px solid rgba(255,255,255,0.08)',
+          padding: '25px 35px', borderBottom: '1px solid var(--border-color)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           background: 'rgba(10,10,12,0.5)', backdropFilter: 'blur(10px)'
         }}>
@@ -122,7 +122,7 @@ const CategoryModal = ({ category, onClose, onSave }) => {
           <button 
             onClick={onClose}
             style={{ 
-              background: 'rgba(255,255,255,0.05)', border: 'none', color: 'rgba(255,255,255,0.6)', 
+              background: 'var(--surface-2)', border: 'none', color: 'var(--text-main)', 
               width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer', transition: 'all 0.3s ease'
             }}
@@ -134,7 +134,7 @@ const CategoryModal = ({ category, onClose, onSave }) => {
         <div style={{ padding: '35px' }}>
           <form id="aiTypeForm" onSubmit={handleSubmit}>
             <div style={{ marginBottom: '25px' }}>
-              <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                 AI Name
               </label>
               <input 
@@ -153,7 +153,7 @@ const CategoryModal = ({ category, onClose, onSave }) => {
             </div>
 
             <div style={{ marginBottom: '25px' }}>
-              <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                 URL Slug
               </label>
               <input 
@@ -168,7 +168,7 @@ const CategoryModal = ({ category, onClose, onSave }) => {
             </div>
 
             <div style={{ marginBottom: '25px' }}>
-              <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                 Icon / Image
               </label>
               <ImageUpload url={formData.image_url} onUpload={(url) => setFormData({ ...formData, image_url: url })} />
@@ -176,7 +176,7 @@ const CategoryModal = ({ category, onClose, onSave }) => {
           </form>
         </div>
 
-        <div style={{ padding: '25px 35px', borderTop: '1px solid rgba(255,255,255,0.08)', background: 'rgba(10,10,12,0.5)', backdropFilter: 'blur(10px)', display: 'flex', gap: '15px' }}>
+        <div style={{ padding: '25px 35px', borderTop: '1px solid var(--border-color)', background: 'rgba(10,10,12,0.5)', backdropFilter: 'blur(10px)', display: 'flex', gap: '15px' }}>
           <button 
             type="button" 
             onClick={onClose}

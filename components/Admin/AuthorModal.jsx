@@ -74,7 +74,7 @@ const AuthorModal = ({ author, onClose, onSave }) => {
       }}>
         {/* Modal Header */}
         <div style={{ 
-          padding: '25px 35px', borderBottom: '1px solid rgba(255,255,255,0.08)',
+          padding: '25px 35px', borderBottom: '1px solid var(--border-color)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           background: 'rgba(10,10,12,0.5)', backdropFilter: 'blur(10px)'
         }}>
@@ -94,7 +94,7 @@ const AuthorModal = ({ author, onClose, onSave }) => {
         
         <form onSubmit={handleSubmit} style={{ padding: '35px' }}>
           <div style={{ marginBottom: '25px' }}>
-            <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
               Author Name
             </label>
             <input 
@@ -109,7 +109,7 @@ const AuthorModal = ({ author, onClose, onSave }) => {
           </div>
 
           <div style={{ marginBottom: '25px' }}>
-            <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
               Image URL
             </label>
             <div style={{ display: 'flex', gap: '10px' }}>
@@ -153,7 +153,7 @@ const AuthorModal = ({ author, onClose, onSave }) => {
                 <img 
                   src={formData.image} 
                   alt="Preview" 
-                  style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '1px solid rgba(255, 255, 255,0.1)' }}
+                  style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--border-color)' }}
                   onError={(e) => e.target.style.display = 'none'}
                 />
               </div>
@@ -161,7 +161,7 @@ const AuthorModal = ({ author, onClose, onSave }) => {
           </div>
 
           <div style={{ marginBottom: '35px' }}>
-            <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
               Bio Description
             </label>
             <textarea 

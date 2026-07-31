@@ -337,14 +337,16 @@ const SectionTitle = ({ title }) => (
   </div>
 );
 
+/* Theme tokens, not white literals: the panel renders under .admin-light, where
+   translucent white text was invisible against the white surface. */
 const Label = ({ text, icon }) => (
-  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontSize: '0.75rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>
+  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
     {icon} {text}
   </label>
 );
 
 const Hint = ({ text }) => (
-  <small style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.7rem', marginTop: '6px', display: 'block', fontWeight: 500 }}>{text}</small>
+  <small style={{ color: 'var(--text-muted)', fontSize: '0.7rem', marginTop: '6px', display: 'block', fontWeight: 500 }}>{text}</small>
 );
 
 // --- DRAG HANDLE ICON ---
@@ -357,7 +359,7 @@ const DragHandleIcon = () => (
 
 // --- SORTABLE ROW for DnD ---
 const StarIcon = ({ filled, size = 16 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? '#FFD700' : 'none'} stroke={filled ? '#FFD700' : 'rgba(255,255,255,0.3)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? '#FFD700' : 'none'} stroke={filled ? '#FFD700' : 'var(--text-muted)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
   </svg>
 );
@@ -368,7 +370,7 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.4 : 1,
-    borderBottom: '1px solid rgba(255,255,255,0.03)',
+    borderBottom: '1px solid var(--border-color)',
     background: isDragging
       ? 'rgba(229,9,20,0.08)'
       : isSelected
@@ -419,18 +421,18 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
       </td>
       <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.is_premium ? 'PRO' : 'FREE'}</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Opened (Views)">
+          <span style={{ padding: '4px 8px', background: 'var(--surface-1)', color: 'var(--text-secondary)', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }}>{item.is_premium ? 'PRO' : 'FREE'}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(59,130,246,0.1)', color: '#2563eb', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Opened (Views)">
             <Eye size={12} /> {item.view_count || 0}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(16,163,127,0.1)', color: '#10a37f', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Copied">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(16,163,127,0.1)', color: '#0a7d61', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Copied">
             <Copy size={12} /> {item.copy_count || 0}
           </div>
         </div>
       </td>
       <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
         {item.is_premium ? (
-          <span style={{ fontFamily: 'monospace', fontSize: '0.85rem', color: '#fbbf24', letterSpacing: '2px', background: 'rgba(251,191,36,0.1)', padding: '4px 8px', borderRadius: '4px' }}>
+          <span style={{ fontFamily: 'monospace', fontSize: '0.85rem', color: '#a16207', letterSpacing: '2px', background: 'rgba(251,191,36,0.1)', padding: '4px 8px', borderRadius: '4px' }}>
             {item.password || '----'}
           </span>
         ) : (
@@ -444,8 +446,8 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
             title={item.is_featured ? 'Unfeature this prompt' : 'Feature this prompt'}
             style={{
               width: '32px', height: '32px', borderRadius: '8px',
-              background: item.is_featured ? 'rgba(255, 215, 0, 0.15)' : 'rgba(255,255,255,0.03)',
-              border: item.is_featured ? '1px solid rgba(255,215,0,0.4)' : '1px solid rgba(255,255,255,0.06)',
+              background: item.is_featured ? 'rgba(255, 215, 0, 0.15)' : 'var(--surface-2)',
+              border: item.is_featured ? '1px solid rgba(255,215,0,0.4)' : '1px solid var(--border-color)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
               transition: 'all 0.2s ease',
               boxShadow: item.is_featured ? '0 0 10px rgba(255,215,0,0.2)' : 'none'
@@ -453,7 +455,7 @@ const SortableRow = ({ item, isSelected, onToggleSelect, onEdit, onDelete, onTog
           >
             <StarIcon filled={item.is_featured} size={14} />
           </div>
-          <div onClick={() => onEdit(item)} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Edit size={14} color="var(--text-dim)" /></div>
+          <div onClick={() => onEdit(item)} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--surface-1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Edit size={14} color="var(--text-dim)" /></div>
           <div onClick={() => onDelete(item)} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(229, 9, 20, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Trash size={14} color="var(--accent-main)" /></div>
         </div>
       </td>
@@ -514,7 +516,7 @@ const BrandingPanel = ({ onSave, isMobile }) => {
             <SectionTitle title="Logo Preview" />
             <div style={{ 
               aspectRatio: '1', borderRadius: '20px', background: 'rgba(0,0,0,0.4)', 
-              border: '2px dashed rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', 
+              border: '2px dashed var(--border-color)', display: 'flex', alignItems: 'center', 
               justifyContent: 'center', padding: '20px', position: 'relative', overflow: 'hidden'
             }}>
               {settings.logo_url ? (
@@ -717,7 +719,7 @@ const SocialPanel = ({ onSave }) => {
             
             <div style={{ position: 'relative', zIndex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'var(--surface-1)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border-color)' }}>
                   {group.icon}
                 </div>
                 <div>
@@ -805,7 +807,7 @@ const SliderPreview = ({ position, samplePrompt }) => {
         flexDirection: 'column', gap: '8px'
       }}>
         <Eye size={24} color="rgba(168,85,247,0.4)" />
-        <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.25)', fontWeight: 600 }}>
+        <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
           No before/after prompts found for preview
         </span>
       </div>
@@ -819,7 +821,7 @@ const SliderPreview = ({ position, samplePrompt }) => {
         style={{ 
           width: '100%', aspectRatio: '16/9', borderRadius: '16px',
           position: 'relative', overflow: 'hidden',
-          border: '1px solid rgba(255,255,255,0.06)',
+          border: '1px solid var(--border-color)',
           boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)',
           background: '#111',
           cursor: 'default'
@@ -848,9 +850,9 @@ const SliderPreview = ({ position, samplePrompt }) => {
           position: 'absolute', top: '10px', left: '10px', zIndex: 15,
           background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)',
           borderRadius: '8px', padding: '4px 10px',
-          fontSize: '0.6rem', fontWeight: 700, color: 'rgba(255,255,255,0.8)',
+          fontSize: '0.6rem', fontWeight: 700, color: 'var(--text-main)',
           textTransform: 'uppercase', letterSpacing: '0.5px',
-          border: '1px solid rgba(255,255,255,0.1)',
+          border: '1px solid var(--border-color)',
           opacity: localValue > 8 ? 1 : 0,
           transition: 'opacity 0.2s ease'
         }}>Before</div>
@@ -858,9 +860,9 @@ const SliderPreview = ({ position, samplePrompt }) => {
           position: 'absolute', top: '10px', right: '10px', zIndex: 15,
           background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)',
           borderRadius: '8px', padding: '4px 10px',
-          fontSize: '0.6rem', fontWeight: 700, color: 'rgba(255,255,255,0.8)',
+          fontSize: '0.6rem', fontWeight: 700, color: 'var(--text-main)',
           textTransform: 'uppercase', letterSpacing: '0.5px',
-          border: '1px solid rgba(255,255,255,0.1)',
+          border: '1px solid var(--border-color)',
           opacity: localValue < 92 ? 1 : 0,
           transition: 'opacity 0.2s ease'
         }}>After</div>
@@ -882,7 +884,7 @@ const SliderPreview = ({ position, samplePrompt }) => {
           {/* Glowing divider line */}
           <div style={{
             position: 'absolute', top: 0, bottom: 0, left: '50%', width: '2px',
-            background: 'rgba(255, 255, 255, 0.8)', transform: 'translateX(-50%)', pointerEvents: 'none',
+            background: 'var(--surface-3)', transform: 'translateX(-50%)', pointerEvents: 'none',
             boxShadow: '0 0 8px rgba(168, 85, 247, 0.5), 0 0 20px rgba(168, 85, 247, 0.2)'
           }} />
           {/* Glass capsule handle */}
@@ -899,13 +901,13 @@ const SliderPreview = ({ position, samplePrompt }) => {
             }}
           >
             <ChevronLeft size={14} color="rgba(255, 255, 255, 0.85)" strokeWidth={2.5} style={{ display: 'block' }} />
-            <div style={{ width: '12px', height: '1px', background: 'rgba(255, 255, 255, 0.2)', borderRadius: '1px' }} />
+            <div style={{ width: '12px', height: '1px', background: 'var(--surface-3)', borderRadius: '1px' }} />
             <ChevronRight size={14} color="rgba(255, 255, 255, 0.85)" strokeWidth={2.5} style={{ display: 'block' }} />
           </div>
         </div>
       </div>
       {samplePrompt?.title && (
-        <div style={{ marginTop: '8px', fontSize: '0.65rem', color: 'rgba(255,255,255,0.2)', fontWeight: 500, textAlign: 'center' }}>
+        <div style={{ marginTop: '8px', fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 500, textAlign: 'center' }}>
           Preview using: {samplePrompt.title}
         </div>
       )}
@@ -1074,7 +1076,7 @@ const AdsPanel = ({ onSave }) => {
             />
             <Hint text="Your unique Google AdSense publisher ID." />
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', background: 'var(--surface-1)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
             <div>
               <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>Enable All Ads</div>
               <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>Global toggle for ad visibility</div>
@@ -1740,7 +1742,7 @@ const AdminDashboard = () => {
                   <div style={{ paddingLeft: '16px', marginBottom: '16px', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '1.5px' }}>{group.title}</div>
                 )}
                 {sidebarCollapsed && idx > 0 && (
-                  <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', margin: '8px 0 16px' }} />
+                  <div style={{ height: '1px', background: 'var(--surface-2)', margin: '8px 0 16px' }} />
                 )}
                 {group.items.map(item => (
                   <NavItem key={item.id} item={item} active={view === item.id} collapsed={sidebarCollapsed} onClick={switchView} isMobileView={false} />
@@ -1749,20 +1751,22 @@ const AdminDashboard = () => {
             ))}
           </motion.nav>
 
-          <div onClick={handleLogout} title={sidebarCollapsed ? 'Sign Out' : ''} style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: sidebarCollapsed ? 'center' : 'flex-start', gap: '12px', padding: sidebarCollapsed ? '14px' : '14px 16px', borderRadius: '12px', color: 'var(--text-dim)', cursor: 'pointer', background: 'rgba(255,255,255,0.02)' }}>
+          <div onClick={handleLogout} title={sidebarCollapsed ? 'Sign Out' : ''} style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: sidebarCollapsed ? 'center' : 'flex-start', gap: '12px', padding: sidebarCollapsed ? '14px' : '14px 16px', borderRadius: '12px', color: 'var(--text-dim)', cursor: 'pointer', background: 'var(--surface-1)' }}>
             <LogOut size={20} />
             {!sidebarCollapsed && <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>Sign Out</span>}
           </div>
 
           {/* Keyboard Shortcuts Hint */}
           {!sidebarCollapsed && (
-            <div style={{ marginTop: '12px', padding: '10px 12px', borderRadius: '10px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.25)', fontWeight: 700, letterSpacing: '1px', marginBottom: '6px' }}>SHORTCUTS</div>
-              <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.2)', lineHeight: '1.8' }}>
-                <span style={{ fontFamily: 'monospace', background: 'rgba(255,255,255,0.07)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>N</span>New item<br/>
-                <span style={{ fontFamily: 'monospace', background: 'rgba(255,255,255,0.07)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>1-5</span>Switch view<br/>
-                <span style={{ fontFamily: 'monospace', background: 'rgba(255,255,255,0.07)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>[</span>Toggle sidebar<br/>
-                <span style={{ fontFamily: 'monospace', background: 'rgba(255,255,255,0.07)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>Esc</span>Close modal
+            /* Every colour here was white-on-white under .admin-light — the whole
+               panel measured a 1.0 contrast ratio, i.e. completely invisible. */
+            <div style={{ marginTop: '12px', padding: '10px 12px', borderRadius: '10px', background: 'var(--surface-2)', border: '1px solid var(--border-color)' }}>
+              <div style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: 700, letterSpacing: '1px', marginBottom: '6px' }}>SHORTCUTS</div>
+              <div style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', lineHeight: '1.8' }}>
+                <span style={{ fontFamily: 'monospace', background: 'var(--surface-3)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>N</span>New item<br/>
+                <span style={{ fontFamily: 'monospace', background: 'var(--surface-3)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>1-5</span>Switch view<br/>
+                <span style={{ fontFamily: 'monospace', background: 'var(--surface-3)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>[</span>Toggle sidebar<br/>
+                <span style={{ fontFamily: 'monospace', background: 'var(--surface-3)', padding: '1px 5px', borderRadius: '4px', marginRight: '6px' }}>Esc</span>Close modal
               </div>
             </div>
           )}
@@ -1772,9 +1776,11 @@ const AdminDashboard = () => {
       {/* Mobile Top Navigation */}
       {isMobile && (
         <div style={{ 
-          position: 'sticky', top: 0, zIndex: 1000, 
-          background: 'rgba(10,10,12,0.85)', backdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          position: 'sticky', top: 0, zIndex: 1000,
+          /* Was a near-black bar left over from the old .admin-dark theme, so the
+             "KING ADMIN" wordmark rendered dark-on-dark and vanished. */
+          background: 'var(--glass-bg)', backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid var(--border-color)',
           width: '100%'
         }}>
           <div style={{ padding: '15px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1844,8 +1850,8 @@ const AdminDashboard = () => {
                       ...inputStyle,
                       padding: '10px 16px',
                       fontSize: '0.85rem',
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      background: 'var(--surface-2)',
+                      border: '1px solid var(--border-color)',
                       borderRadius: '10px'
                     }}
                   />
@@ -1858,17 +1864,17 @@ const AdminDashboard = () => {
                   style={{
                     padding: '10px 16px',
                     fontSize: '0.85rem',
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    background: 'var(--surface-1)',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '10px',
-                    color: 'white',
+                    color: 'var(--text-main)',
                     outline: 'none',
                     cursor: 'pointer'
                   }}
                 >
-                  <option style={{background: '#111'}} value="default">Default Order</option>
-                  <option style={{background: '#111'}} value="views_desc">Most Views</option>
-                  <option style={{background: '#111'}} value="copies_desc">Most Copies</option>
+                  <option value="default">Default Order</option>
+                  <option value="views_desc">Most Views</option>
+                  <option value="copies_desc">Most Copies</option>
                 </select>
               )}
               {view === 'prompts' && (
@@ -1876,13 +1882,13 @@ const AdminDashboard = () => {
                   <>
                     <ActionButton
                       label={isSavingOrder ? 'SAVING...' : 'SAVE ORDER'}
-                      color="#10a37f"
+                      color="#0a7d61"
                       icon={<ChevronRight size={18} />}
                       onClick={handleSaveOrder}
                     />
                     <ActionButton
                       label="CANCEL"
-                      color="rgba(255,255,255,0.1)"
+                      color="#475569"
                       icon={<Crown size={18} />}
                       onClick={() => { setIsDragMode(false); fetchData('prompts'); }}
                     />
@@ -1890,7 +1896,7 @@ const AdminDashboard = () => {
                 ) : (
                   <ActionButton
                     label="REORDER"
-                    color="rgba(59,130,246,0.8)"
+                    color="#2563eb"
                     icon={<Layers size={18} />}
                     onClick={() => { setIsDragMode(true); setSelectedKeys([]); setAdminSearch(''); }}
                   />
@@ -1920,8 +1926,8 @@ const AdminDashboard = () => {
                       onChange={(e) => setAnalyticsDays(e.target.value)}
                       style={{
                         padding: '8px 12px',
-                        background: 'rgba(255,255,255,0.05)',
-                        border: '1px solid rgba(255,255,255,0.1)',
+                        background: 'var(--surface-2)',
+                        border: '1px solid var(--border-color)',
                         borderRadius: '8px',
                         color: 'white',
                         outline: 'none',
@@ -1959,13 +1965,13 @@ const AdminDashboard = () => {
                       display: 'flex', flexDirection: 'column',
                       alignItems: 'center', justifyContent: 'center',
                       gap: '16px',
-                      background: 'rgba(255,255,255,0.02)',
+                      background: 'var(--surface-1)',
                       borderRadius: '16px',
-                      border: '1px dashed rgba(255,255,255,0.1)'
+                      border: '1px dashed var(--border-color)'
                     }}>
-                      <div style={{ display: 'flex', justifyContent: 'center' }}><PieChart size={48} color="rgba(255,255,255,0.3)" /></div>
-                      <div style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 700, fontSize: '1.1rem' }}>No analytics data yet</div>
-                      <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.85rem', textAlign: 'center', maxWidth: '320px', lineHeight: 1.6 }}>
+                      <div style={{ display: 'flex', justifyContent: 'center' }}><PieChart size={48} color="var(--text-muted)" /></div>
+                      <div style={{ color: 'var(--text-main)', fontWeight: 700, fontSize: '1.1rem' }}>No analytics data yet</div>
+                      <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', maxWidth: '320px', lineHeight: 1.6 }}>
                         Data will appear here once users start viewing, copying, and unlocking prompts on your site.
                       </div>
                     </div>
@@ -1986,19 +1992,30 @@ const AdminDashboard = () => {
                             <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
                           </linearGradient>
                         </defs>
-                        <XAxis dataKey="date" stroke="rgba(255,255,255,0.3)" tick={{fill: 'rgba(255,255,255,0.5)', fontSize: 12}} />
-                        <YAxis stroke="rgba(255,255,255,0.3)" tick={{fill: 'rgba(255,255,255,0.5)', fontSize: 12}} />
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                        <XAxis dataKey="date" stroke="rgba(15,23,42,0.25)" tick={{fill: 'var(--text-secondary)', fontSize: 12}} />
+                        <YAxis stroke="rgba(15,23,42,0.25)" tick={{fill: 'var(--text-secondary)', fontSize: 12}} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(15,23,42,0.08)" />
                         <Tooltip 
-                          contentStyle={{ backgroundColor: 'rgba(10, 10, 10, 0.95)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}
+                          contentStyle={{ backgroundColor: 'rgba(10, 10, 10, 0.95)', border: '1px solid var(--border-color)', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}
                           itemStyle={{ color: 'white', fontWeight: 700 }}
                           labelStyle={{ color: '#10b981', fontWeight: 900, marginBottom: '8px', fontSize: '1.1rem' }}
                         />
-                        <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontWeight: 600, color: 'rgba(255,255,255,0.7)' }} />
+                        {/* Recharts colours legend labels with the series stroke, which left
+                            "Views" and "Unlocks" at 2.5 and 1.7 against the white card. The
+                            formatter keeps the coloured swatch and makes the text readable. */}
+                        <Legend
+                          verticalAlign="top"
+                          height={36}
+                          iconType="circle"
+                          wrapperStyle={{ fontWeight: 600 }}
+                          formatter={(value) => <span style={{ color: 'var(--text-main)' }}>{value}</span>}
+                        />
                         <Area type="monotone" dataKey="view" name="Views" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorView)" dot={{ r: 4, strokeWidth: 2, fill: '#000', stroke: '#10b981' }} activeDot={{ r: 6, strokeWidth: 0, fill: '#10b981' }} />
                         <Area type="monotone" dataKey="copy" name="Copies" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorCopy)" dot={{ r: 4, strokeWidth: 2, fill: '#000', stroke: '#3b82f6' }} activeDot={{ r: 6, strokeWidth: 0, fill: '#3b82f6' }} />
                         <Area type="monotone" dataKey="unlock" name="Unlocks" stroke="#fbbf24" strokeWidth={3} fillOpacity={1} fill="url(#colorUnlock)" dot={{ r: 4, strokeWidth: 2, fill: '#000', stroke: '#fbbf24' }} activeDot={{ r: 6, strokeWidth: 0, fill: '#fbbf24' }} />
-                        <Brush dataKey="date" height={30} stroke="rgba(255,255,255,0.2)" fill="rgba(0,0,0,0.5)" tickFormatter={(tick) => tick} />
+                        {/* Was a near-black bar with a translucent-white outline — another
+                            .admin-dark leftover sitting on the white analytics card. */}
+                        <Brush dataKey="date" height={30} stroke="rgba(15,23,42,0.25)" fill="rgba(15,23,42,0.04)" tickFormatter={(tick) => tick} />
                       </AreaChart>
                     </ResponsiveContainer>
                   )}
@@ -2031,13 +2048,13 @@ const AdminDashboard = () => {
               {!isDataLoading && isDragMode && view === 'prompts' && (
                 <div style={{ padding: '12px 24px', background: 'rgba(59,130,246,0.08)', borderBottom: '1px solid rgba(59,130,246,0.2)', display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <span style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 700 }}>⠿ DRAG MODE ACTIVE</span>
-                  <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)' }}>— Drag the handle icons to reorder prompts, then click SAVE ORDER</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>— Drag the handle icons to reorder prompts, then click SAVE ORDER</span>
                 </div>
               )}
               {!isDataLoading && <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                 <table style={{ minWidth: isMobile ? '600px' : '100%', borderCollapse: 'collapse' }}>
                   <thead>
-                    <tr style={{ borderBottom: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.01)' }}>
+                    <tr style={{ borderBottom: '1px solid var(--border-color)', background: 'var(--surface-2)' }}>
                       {view === 'prompts' && (
                         <th style={{ padding: isMobile ? '16px' : '24px', width: '50px' }}>
                           {!isDragMode && (
@@ -2070,7 +2087,7 @@ const AdminDashboard = () => {
                       </SortableContext>
                     ) : (
                       filteredData.map((item, idx) => (
-                        <motion.tr key={idx} variants={itemVariants} initial="hidden" animate="visible" exit="hidden" custom={idx} onContextMenu={(e) => handleContextMenu(e, item)} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', background: selectedKeys.includes(item.prompt_key || item.id) ? 'rgba(229, 9, 20, 0.03)' : 'transparent' }}>
+                        <motion.tr key={idx} variants={itemVariants} initial="hidden" animate="visible" exit="hidden" custom={idx} onContextMenu={(e) => handleContextMenu(e, item)} style={{ borderBottom: '1px solid var(--border-color)', background: selectedKeys.includes(item.prompt_key || item.id) ? 'rgba(229, 9, 20, 0.03)' : 'transparent' }}>
                           {view === 'prompts' && (
                             <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
                               <input type="checkbox" checked={selectedKeys.includes(item.prompt_key || item.id)} onChange={() => toggleSelect(item.prompt_key || item.id)} style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: 'var(--accent-main)' }} />
@@ -2133,19 +2150,19 @@ const AdminDashboard = () => {
                                     title="Click to toggle PRO / FREE"
                                     style={{
                                       padding: '4px 8px',
-                                      background: item.is_premium ? 'rgba(251,191,36,0.15)' : 'rgba(255,255,255,0.04)',
-                                      color: item.is_premium ? '#fbbf24' : 'var(--text-secondary)',
-                                      border: item.is_premium ? '1px solid rgba(251,191,36,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                                      background: item.is_premium ? 'rgba(251,191,36,0.15)' : 'var(--surface-2)',
+                                      color: item.is_premium ? '#a16207' : 'var(--text-secondary)',
+                                      border: item.is_premium ? '1px solid rgba(251,191,36,0.4)' : '1px solid var(--border-color)',
                                       borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700,
                                       cursor: 'pointer', userSelect: 'none', transition: 'all 0.2s'
                                     }}
                                   >{item.is_premium ? 'PRO' : 'FREE'}</span>
                                 )}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Opened (Views)">
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(59,130,246,0.1)', color: '#2563eb', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Opened (Views)">
                                   <Eye size={12} /> {item.view_count || 0}
                                 </div>
                                 {view === 'prompts' && (
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(16,163,127,0.1)', color: '#10a37f', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Copied">
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(16,163,127,0.1)', color: '#0a7d61', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700 }} title="Times Copied">
                                     <Copy size={12} /> {item.copy_count || 0}
                                   </div>
                                 )}
@@ -2155,7 +2172,7 @@ const AdminDashboard = () => {
                           {view === 'prompts' && (
                             <td style={{ padding: isMobile ? '16px' : '20px 24px' }}>
                               {item.is_premium ? (
-                                <span style={{ fontFamily: 'monospace', fontSize: '0.85rem', color: '#fbbf24', letterSpacing: '2px', background: 'rgba(251,191,36,0.1)', padding: '4px 8px', borderRadius: '4px' }}>
+                                <span style={{ fontFamily: 'monospace', fontSize: '0.85rem', color: '#a16207', letterSpacing: '2px', background: 'rgba(251,191,36,0.1)', padding: '4px 8px', borderRadius: '4px' }}>
                                   {item.password || '----'}
                                 </span>
                               ) : (
@@ -2171,8 +2188,8 @@ const AdminDashboard = () => {
                                   title={item.is_featured ? 'Unfeature this prompt' : 'Feature this prompt'}
                                   style={{
                                     width: '32px', height: '32px', borderRadius: '8px',
-                                    background: item.is_featured ? 'rgba(255, 215, 0, 0.15)' : 'rgba(255,255,255,0.03)',
-                                    border: item.is_featured ? '1px solid rgba(255,215,0,0.4)' : '1px solid rgba(255,255,255,0.06)',
+                                    background: item.is_featured ? 'rgba(255, 215, 0, 0.15)' : 'var(--surface-2)',
+                                    border: item.is_featured ? '1px solid rgba(255,215,0,0.4)' : '1px solid var(--border-color)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
                                     transition: 'all 0.2s ease',
                                     boxShadow: item.is_featured ? '0 0 10px rgba(255,215,0,0.2)' : 'none'
@@ -2181,7 +2198,7 @@ const AdminDashboard = () => {
                                   <StarIcon filled={item.is_featured} size={14} />
                                 </div>
                               )}
-                              <div onClick={() => { setEditingItem(item); setIsModalOpen(true); }} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Edit size={14} color="var(--text-dim)" /></div>
+                              <div onClick={() => { setEditingItem(item); setIsModalOpen(true); }} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--surface-1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Edit size={14} color="var(--text-dim)" /></div>
                               <div onClick={() => handleDelete(item)} style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(229, 9, 20, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Trash size={14} color="var(--accent-main)" /></div>
                             </div>
                           </td>

@@ -255,7 +255,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
       }}>
         {/* Modal Header */}
         <div style={{ 
-          padding: '30px 0 30px', borderBottom: '1px solid rgba(255,255,255,0.08)',
+          padding: '30px 0 30px', borderBottom: '1px solid var(--border-color)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           marginBottom: '10px'
         }}>
@@ -270,8 +270,8 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <div style={{ 
               display: 'flex', alignItems: 'center', gap: '8px', 
-              background: 'rgba(255,255,255,0.05)', padding: '8px 16px', borderRadius: '20px',
-              border: '1px solid rgba(255,255,255,0.1)'
+              background: 'var(--surface-2)', padding: '8px 16px', borderRadius: '20px',
+              border: '1px solid var(--border-color)'
             }}>
               <CheckCircle size={16} color={getSeoScore() >= 5 ? '#4CAF50' : '#FF9800'} />
               <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>SEO Score: {getSeoScore()}/6</span>
@@ -454,7 +454,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 <div>
                   <Label text="Detailed Description" />
-                  <div style={{ borderRadius: '18px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <div style={{ borderRadius: '18px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
                     <CustomEditor
                       value={formData.description}
                       onChange={(content) => setFormData({ ...formData, description: content })}
@@ -483,7 +483,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
               <SectionTitle title="4. FAQ Section (Boosts SEO)" />
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 {formData.faqs.map((faq, index) => (
-                  <div key={index} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '20px', borderRadius: '15px', position: 'relative' }}>
+                  <div key={index} style={{ background: 'var(--surface-1)', border: '1px solid var(--border-color)', padding: '20px', borderRadius: '15px', position: 'relative' }}>
                     <button 
                       type="button" 
                       onClick={() => removeFaq(index)}
@@ -513,7 +513,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                 <button 
                   type="button" 
                   onClick={addFaq}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', fontWeight: 600, alignSelf: 'flex-start' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', borderRadius: '12px', background: 'var(--surface-2)', border: '1px solid var(--border-color)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 600, alignSelf: 'flex-start' }}
                 >
                   <PlusCircle size={16} /> Add FAQ
                 </button>
@@ -580,7 +580,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                     >+ Add URL</button>
                     <input type="file" accept="image/*" ref={galleryFileInputRef} style={{ display: 'none' }} onChange={handleGalleryUpload} />
                     <button type="button" onClick={() => galleryFileInputRef.current?.click()} disabled={isUploadingGallery}
-                      style={{ padding: '12px 20px', borderRadius: '12px', background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', whiteSpace: 'nowrap', opacity: isUploadingGallery ? 0.7 : 1 }}
+                      style={{ padding: '12px 20px', borderRadius: '12px', background: 'var(--surface-3)', color: 'var(--text-main)', border: '1px solid var(--border-color)', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', whiteSpace: 'nowrap', opacity: isUploadingGallery ? 0.7 : 1 }}
                     >{isUploadingGallery ? 'Uploading...' : 'Upload Image'}</button>
                   </div>
                   {(() => {
@@ -590,9 +590,9 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                     return (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {imgs.map((url, idx) => (
-                          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)', padding: '8px 12px' }}>
+                          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--surface-1)', borderRadius: '10px', border: '1px solid var(--border-color)', padding: '8px 12px' }}>
                             <img src={url} alt={`img ${idx+1}`} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', flexShrink: 0, background: '#111' }} onError={e => e.target.style.display='none'} />
-                            <span style={{ flex: 1, fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{url}</span>
+                            <span style={{ flex: 1, fontSize: '0.8rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{url}</span>
                             <button type="button"
                               onClick={() => { const updated = imgs.filter((_, i) => i !== idx); setFormData({ ...formData, gallery_urls: JSON.stringify(updated) }); }}
                               style={{ background: 'rgba(229,9,20,0.15)', border: '1px solid rgba(229,9,20,0.3)', color: 'var(--accent-main)', width: '26px', height: '26px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', flexShrink: 0 }}
@@ -670,7 +670,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
           <div style={{ width: '340px', display: 'flex', flexDirection: 'column', gap: '30px' }}>
 
             {/* Social Sharing — OG */}
-            <div style={{ background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ background: 'var(--surface-1)', padding: '24px', borderRadius: '20px', border: '1px solid var(--border-color)' }}>
               <SectionTitle title="Social Sharing" />
 
               <div style={{ marginBottom: '20px' }}>
@@ -693,7 +693,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
             </div>
 
             {/* SEO Checklist */}
-            <div style={{ background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ background: 'var(--surface-1)', padding: '24px', borderRadius: '20px', border: '1px solid var(--border-color)' }}>
               <SectionTitle title="SEO Checklist" />
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
                 <CheckItem checked={!!formData.meta_title} text="Meta title exists" />
@@ -712,7 +712,7 @@ const PromptModal = ({ prompt, onClose, onSave }) => {
                     {getSeoScore() >= 5 ? 'Strong' : getSeoScore() >= 3 ? 'Fair' : 'Weak'}
                   </span>
                 </div>
-                <div style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
+                <div style={{ height: '6px', background: 'var(--surface-2)', borderRadius: '10px', overflow: 'hidden' }}>
                   <div style={{ 
                     height: '100%', 
                     width: `${(getSeoScore() / 6) * 100}%`, 
@@ -740,18 +740,18 @@ const SectionTitle = ({ title }) => (
 );
 
 const Label = ({ text, icon, required }) => (
-  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontSize: '0.85rem', fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>
-    {icon} {text} {required ? <span style={{ color: '#ff4444', marginLeft: '4px' }}>*</span> : <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.7rem', marginLeft: '4px', textTransform: 'none' }}>(Optional)</span>}
+  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
+    {icon} {text} {required ? <span style={{ color: '#ff4444', marginLeft: '4px' }}>*</span> : <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem', marginLeft: '4px', textTransform: 'none' }}>(Optional)</span>}
   </label>
 );
 
 const Hint = ({ text }) => (
-  <small style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.75rem', marginTop: '6px', display: 'block' }}>{text}</small>
+  <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '6px', display: 'block' }}>{text}</small>
 );
 
 const CheckItem = ({ checked, text }) => (
-  <li style={{ display: 'flex', alignItems: 'center', gap: '10px', color: checked ? '#4CAF50' : 'rgba(255,255,255,0.4)', fontWeight: checked ? 600 : 400 }}>
-    <CheckCircle size={14} color={checked ? '#4CAF50' : 'rgba(255,255,255,0.2)'} />
+  <li style={{ display: 'flex', alignItems: 'center', gap: '10px', color: checked ? '#4CAF50' : 'var(--text-secondary)', fontWeight: checked ? 600 : 400 }}>
+    <CheckCircle size={14} color={checked ? '#4CAF50' : 'var(--text-muted)'} />
     {text}
   </li>
 );
@@ -759,9 +759,9 @@ const CheckItem = ({ checked, text }) => (
 const Checkbox = ({ label, checked, onChange, premium }) => (
   <label
     onClick={(e) => { e.preventDefault(); onChange(!checked); }}
-    style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 600, color: premium ? '#FFC107' : 'white', userSelect: 'none' }}
+    style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 600, color: premium ? '#b45309' : 'var(--text-main)', userSelect: 'none' }}
   >
-    <div style={{ position: 'relative', width: '22px', height: '22px', borderRadius: '6px', border: `2px solid ${checked ? (premium ? '#FFC107' : 'var(--accent-main)') : 'rgba(255,255,255,0.2)'}`, background: checked ? (premium ? 'rgba(255,193,7,0.1)' : 'rgba(229,9,20,0.1)') : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.2s', flexShrink: 0 }}>
+    <div style={{ position: 'relative', width: '22px', height: '22px', borderRadius: '6px', border: `2px solid ${checked ? (premium ? '#FFC107' : 'var(--accent-main)') : 'var(--border-color)'}`, background: checked ? (premium ? 'rgba(255,193,7,0.1)' : 'rgba(229,9,20,0.1)') : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.2s', flexShrink: 0 }}>
       {checked && <div style={{ width: '10px', height: '10px', borderRadius: '2px', background: premium ? '#FFC107' : 'var(--accent-main)' }} />}
     </div>
     <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} style={{ position: 'absolute', opacity: 0, width: 0, height: 0, pointerEvents: 'none' }} readOnly />
@@ -771,7 +771,7 @@ const Checkbox = ({ label, checked, onChange, premium }) => (
 
 const RatioButton = ({ ratio, active, onClick }) => (
   <button type="button" onClick={onClick}
-    style={{ padding: '8px 16px', borderRadius: '10px', border: '1px solid', borderColor: active ? 'var(--accent-main)' : 'rgba(255,255,255,0.1)', background: active ? 'rgba(229, 9, 20, 0.15)' : 'rgba(255,255,255,0.02)', color: active ? 'var(--accent-main)' : 'rgba(255,255,255,0.6)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700, transition: '0.2s' }}
+    style={{ padding: '8px 16px', borderRadius: '10px', border: '1px solid', borderColor: active ? 'var(--accent-main)' : 'var(--border-color)', background: active ? 'rgba(229, 9, 20, 0.15)' : 'var(--surface-1)', color: active ? 'var(--accent-main)' : 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700, transition: '0.2s' }}
   >{ratio}</button>
 );
 
@@ -815,18 +815,18 @@ const ImageUpload = ({ url, onUpload }) => {
       <div style={{ display: 'flex', gap: '10px' }}>
         <input type="text" placeholder="https://..." value={localUrl} onChange={(e) => setLocalUrl(e.target.value)} onBlur={handleUrlBlur}
           className="glass-input"
-          style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', fontSize: '0.85rem', color: 'white', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', outline: 'none' }}
+          style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', fontSize: '0.85rem', color: 'white', background: 'var(--surface-1)', border: '1px solid var(--border-color)', outline: 'none' }}
         />
         <input type="file" accept="image/*" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
         <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isUploading}
           style={{ padding: '0 20px', borderRadius: '12px', background: 'var(--accent-main)', color: 'white', border: 'none', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', opacity: isUploading ? 0.7 : 1, whiteSpace: 'nowrap' }}
         >{isUploading ? 'Uploading...' : 'Upload'}</button>
       </div>
-      <div style={{ height: '140px', borderRadius: '16px', border: '2px dashed rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.02)', overflow: 'hidden' }}>
+      <div style={{ height: '140px', borderRadius: '16px', border: '2px dashed var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface-1)', overflow: 'hidden' }}>
         {url ? (
           <img src={url} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         ) : (
-          <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.2)' }}>
+          <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
             <Image size={24} style={{ marginBottom: '8px' }} />
             <p style={{ fontSize: '0.75rem', fontWeight: 600 }}>Image Preview</p>
           </div>
