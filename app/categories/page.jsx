@@ -1,6 +1,6 @@
 import ClientCategoriesPage from './ClientCategoriesPage';
 import db from '@/lib/db';
-import { cacheGet, cacheSet } from '@/lib/cache';
+import { cacheGet, cacheSet, CACHE_KEYS } from '@/lib/cache';
 
 // ISR: page is cached for 60 seconds, then regenerated on next request
 export const revalidate = 60;
@@ -33,14 +33,13 @@ export const metadata = {
 };
 
 async function fetchAllCategories() {
-  const CACHE_KEY = 'all_website_categories_page';
-  const cached = cacheGet(CACHE_KEY);
+  const cached = cacheGet(CACHE_KEYS.websiteCategoriesPage);
   if (cached) return cached;
 
   try {
     // Fetch website_categories (not AI-type categories)
     const rows = await db`SELECT id, name, slug, image_url, tag FROM website_categories ORDER BY created_at DESC`;
-    cacheSet(CACHE_KEY, rows, 10 * 60 * 1000); // 10 minutes cache
+    cacheSet(CACHE_KEYS.websiteCategoriesPage, rows, 10 * 60 * 1000); // admin saves clear it
     return rows;
   } catch (error) {
     console.error("Error fetching website categories:", error);

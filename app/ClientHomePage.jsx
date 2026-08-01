@@ -1,6 +1,7 @@
 "use client";
 import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 
 import PromptList from '@/components/Prompts/PromptList';
 import SEOMetadata from '@/components/SEO/SEOMetadata';
@@ -8,6 +9,35 @@ import { Search, X, Crown, Coffee, Copy, Image, FileText, HelpCircle, Lock, Filt
 
 
 import { useAppContext } from '@/components/AppContext';
+
+// The pages worth being found as a section of the site. Google builds sitelinks
+// out of pages it can see are important, and importance is judged largely from
+// internal links: their anchor text, and how prominently they are placed. The
+// homepage previously linked these only from the footer, and the category pages
+// not at all — the header's Explore menu only put them in the DOM on hover, and
+// a crawler never hovers.
+const SITE_SECTIONS = [
+  { href: '/categories', label: 'Categories', blurb: 'Every prompt collection, grouped by topic and AI tool.' },
+  { href: '/blog', label: 'Blog', blurb: 'Prompt engineering guides, tips and tutorials.' },
+  { href: '/faq', label: 'FAQ', blurb: 'How prompts, premium unlocks and copying work.' },
+  { href: '/about', label: 'About', blurb: 'Who builds and tests these prompts.' },
+  { href: '/contact', label: 'Contact', blurb: 'Request a prompt or report a problem.' },
+];
+
+// Inline rather than a class: the stylesheet these would otherwise borrow from
+// lives inside a conditionally rendered <style> block further down the page.
+const categoryPillStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  padding: '9px 16px',
+  borderRadius: '50px',
+  background: 'rgba(0,0,0,0.04)',
+  border: '1px solid rgba(0,0,0,0.1)',
+  fontSize: '0.82rem',
+  fontWeight: 700,
+  color: 'rgba(20,22,26,0.7)',
+  textDecoration: 'none',
+};
 
 const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteCategories = [] }) => {
   const { search, setSearch, filter, setFilter, isMobile, settings } = useAppContext();
@@ -91,6 +121,23 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
           </p>
         </header>
 
+        {/* Category links, server-rendered from the same data the page already
+            fetched. Empty until categories exist in the admin panel, which is
+            also why the header's Explore button is currently invisible. */}
+        {initialWebsiteCategories.length > 0 && (
+          <nav aria-label="Prompt categories" style={{
+            display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center',
+          }}>
+            {initialWebsiteCategories.map((cat) => (
+              <Link key={cat.slug || cat.id} href={`/category/${cat.slug}`} style={categoryPillStyle}>
+                {cat.name}
+              </Link>
+            ))}
+            <Link href="/categories" style={{ ...categoryPillStyle, color: 'var(--accent-main)', borderColor: 'rgba(229,9,20,0.25)' }}>
+              All categories →
+            </Link>
+          </nav>
+        )}
 
       </div>
       )}
@@ -104,6 +151,50 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
         initialCategories={initialCategories}
         settings={settings}
       />
+
+      {/* Descriptive links to the handful of pages that are actually sections of
+          the site. Both the anchor text and the position matter: this is the
+          shortlist Google picks sitelinks from. */}
+      {!isSearching && (
+        <nav aria-label="Browse PromptKing" style={{
+          maxWidth: 'var(--container-max)', width: '100%', margin: '56px auto 0',
+          padding: isMobile ? '0 28px' : '0 20px',
+        }}>
+          <h2 style={{
+            fontSize: '1.1rem', fontWeight: 800, letterSpacing: '-0.3px',
+            color: 'var(--text-main)', margin: '0 0 16px',
+          }}>
+            Explore PromptKing
+          </h2>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+            gap: '12px',
+          }}>
+            {SITE_SECTIONS.map(({ href, label, blurb }) => (
+              <Link
+                key={href}
+                href={href}
+                style={{
+                  display: 'block',
+                  padding: '16px 18px',
+                  borderRadius: '16px',
+                  background: '#f8fafc',
+                  border: '1px solid rgba(15,23,42,0.08)',
+                  textDecoration: 'none',
+                }}
+              >
+                <span style={{ display: 'block', fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '4px' }}>
+                  {label}
+                </span>
+                <span style={{ display: 'block', fontSize: '0.82rem', lineHeight: 1.55, color: 'var(--text-secondary)' }}>
+                  {blurb}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </nav>
+      )}
 
       {!categorySlug && !isSearching && (
         <section style={{ maxWidth: 'var(--container-max)', width: '100%', margin: '80px auto 60px', padding: isMobile ? '0 28px' : '0 20px' }}>
@@ -186,7 +277,10 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
           `}</style>
 
           {/* ─── Header ─── */}
-          <div style={{ textAlign: 'center', marginBottom: '56px', position: 'relative' }}>
+          {/* overflow:hidden because the glow below is a fixed 480px wide and
+              was pushing the page 53px past the viewport on a 375px phone —
+              pointer-events:none stops it catching taps, not scroll width. */}
+          <div style={{ textAlign: 'center', marginBottom: '56px', position: 'relative', overflow: 'hidden' }}>
             <div style={{
               position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
               width: '480px', height: '180px', pointerEvents: 'none',

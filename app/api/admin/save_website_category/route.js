@@ -18,7 +18,7 @@ export async function POST(req) {
     }
 
     // Invalidate caches so live site reflects changes immediately
-    publishChanges('websiteCategories', 'websiteCategoriesSsr');
+    publishChanges('websiteCategories', 'websiteCategoriesSsr', 'websiteCategoriesPage');
 
     return NextResponse.json({ success: true });
   } catch (error) {

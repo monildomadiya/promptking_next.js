@@ -454,7 +454,10 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                 onClick={() => isMobile && setShowCategoryDropdown(!showCategoryDropdown)}
                 style={{ position: 'relative' }}
               >
-                <div
+                {/* A link, not a div: "Explore" was the most prominent word in
+                    the header and pointed nowhere a crawler could follow. */}
+                <Link
+                  href="/categories"
                   className="explore-btn-hover"
                   style={{
                     color: 'rgba(20,22,26,0.8)',
@@ -471,13 +474,24 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                     border: '1px solid',
                     borderColor: showCategoryDropdown ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.08)',
                     whiteSpace: 'nowrap',
+                    textDecoration: 'none',
+                  }}
+                  onClick={(e) => {
+                    // On touch the first tap opens the menu instead of leaving
+                    // the page; the "View All Categories" row below still goes.
+                    if (isMobile && !showCategoryDropdown) e.preventDefault();
                   }}
                 >
                   <Compass size={18} style={{ display: 'block', color: 'var(--text-secondary)' }} />
                   Explore
-                </div>
-                {showCategoryDropdown && (
-                  <div className="category-dropdown-menu" style={{
+                </Link>
+                {/* Rendered always, shown on hover. Mounting it on hover meant
+                    the category links existed only for visitors who hovered —
+                    Googlebot doesn't, so it never saw a single category link. */}
+                <div
+                  className="category-dropdown-menu"
+                  aria-hidden={!showCategoryDropdown}
+                  style={{
                     position: 'absolute', top: 'calc(100% + 15px)', right: 0,
                     background: 'rgba(255, 255, 255, 0.98)', backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)',
                     border: '1px solid rgba(0,0,0,0.08)', borderRadius: '24px',
@@ -485,6 +499,11 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                     boxShadow: '0 30px 60px rgba(17,24,39,0.16), 0 0 0 1px rgba(0,0,0,0.03)',
                     display: 'flex', flexDirection: 'column', gap: '16px',
                     transformOrigin: 'top right',
+                    opacity: showCategoryDropdown ? 1 : 0,
+                    visibility: showCategoryDropdown ? 'visible' : 'hidden',
+                    pointerEvents: showCategoryDropdown ? 'auto' : 'none',
+                    transform: showCategoryDropdown ? 'translateY(0)' : 'translateY(-6px)',
+                    transition: 'opacity 0.18s ease, transform 0.18s ease, visibility 0.18s',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
                       <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)', fontWeight: 600 }}>Discover Categories</span>
@@ -536,7 +555,6 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                       </Link>
                     </div>
                   </div>
-                )}
               </div>
             )}
           </div>
