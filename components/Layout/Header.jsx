@@ -1,9 +1,10 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { Search, X, Crown, Compass, ChevronRight } from '../Common/Icons';
 import api from '@/lib/api';
+import { isPromptGridPath } from '@/lib/searchScope';
 
 // ─── Main Header ──────────────────────────────────────────────────────────────
 const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilters, onLogoClick, settings, isAdmin, onHeightChange }) => {
@@ -18,9 +19,10 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
   const [numericMode, setNumericMode] = useState(true);
 
   const lastScrollY = useRef(0);
-  const navigate = useRouter();
   const location = usePathname();
-  const isHomePage = location === '/';
+  // Both controls only filter the home grid, so they only exist there — see
+  // lib/searchScope.js. Elsewhere the header is logo + Explore.
+  const canFilterPrompts = isPromptGridPath(location);
   const headerRef = useRef(null);
   const searchInputRef = useRef(null);
 
@@ -101,13 +103,11 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
     setIsSearchExpanded(false);
   };
 
-  // Typing filters the grid behind the overlay, so send the user somewhere that
-  // actually renders a grid before they start — and back to the top, since
-  // that is where the filtered results render.
+  // The grid filters live behind the overlay, so start from the top — that is
+  // where the results render.
   const openSearch = () => {
     setIsSearchExpanded(true);
     setNumericMode(true);
-    if (!isHomePage) navigate.push('/');
     // Smooth scrolling races the keyboard animation on phones and reads as jank.
     window.scrollTo({ top: 0, behavior: isMobile ? 'auto' : 'smooth' });
 
@@ -134,6 +134,12 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
 
   // A complete prompt code is the whole query, so stop asking for more input:
   // the number pad has no Enter key to dismiss itself with.
+  // Leaving the grid takes the bar's reason to be open with it. AppContext
+  // clears the term on the same transition.
+  useEffect(() => {
+    if (!canFilterPrompts) setIsSearchExpanded(false);
+  }, [canFilterPrompts]);
+
   const isPromptCode = (v) => /^(pk)?\d{4}$/i.test((v || '').trim());
   const prevSearch = useRef(search);
   useEffect(() => {
@@ -157,7 +163,7 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
           ran, so focus had to be deferred — and iOS only opens the keyboard for
           a focus() in the same task as the gesture. Keeping it mounted also
           gives the bar a real exit transition rather than popping out. */}
-      {isMobile && (
+      {isMobile && canFilterPrompts && (
         <div
           aria-hidden={!isSearchExpanded}
           style={{
@@ -253,7 +259,9 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
           background: 'transparent',
         }),
       }}>
-        <div className="header-inner-flex" style={{ justifyContent: 'flex-start', position: 'relative' }}>
+        {/* The search group carries the marginLeft:auto that pushes Explore to the
+            right edge. Without it in the row, space-between does that job. */}
+        <div className="header-inner-flex" style={{ justifyContent: canFilterPrompts ? 'flex-start' : 'space-between', position: 'relative' }}>
 
           {/* ── Logo ─────────────────────────────────────── */}
           <div className="header-logo-container" style={{
@@ -270,7 +278,10 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
             </Link>
           </div>
 
-          {/* ── Search + Premium group ───────────────────── */}
+          {/* ── Search + Premium group ─────────────────────
+              Home only: both controls filter the grid that lives on that route
+              and nothing else, so off it they'd be inert chrome. */}
+          {canFilterPrompts && (
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -283,10 +294,7 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
 
             {/* Premium Icon */}
             <button
-              onClick={() => {
-                setFilter(filter === 'premium' ? 'all' : 'premium');
-                if (!isHomePage) navigate.push('/');
-              }}
+              onClick={() => setFilter(filter === 'premium' ? 'all' : 'premium')}
               className="premium-header-btn"
               title="Premium Prompts"
               style={{
@@ -425,6 +433,7 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
               </div>
             )}
           </div>
+          )}
 
 
           {/* ── Explore / Actions ─────────────────────────── */}

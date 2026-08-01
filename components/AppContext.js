@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import api from '@/lib/api';
+import { isPromptGridPath } from '@/lib/searchScope';
 
 const AppContext = createContext();
 
@@ -20,6 +21,17 @@ export function AppProvider({ children }) {
   
   const pathname = usePathname();
   const isAdminPath = /^\/admin-secure(\/|$)/i.test(pathname || '');
+  // Whether the prompt grid these two pieces of state filter is on screen.
+  const canFilterPrompts = isPromptGridPath(pathname);
+
+  // This provider outlives navigation, so a term typed on the home page would
+  // otherwise still be filtering the grid on the way back from a prompt page —
+  // with no visible search bar to explain why. Drop it on the way out instead.
+  useEffect(() => {
+    if (canFilterPrompts) return;
+    setSearch('');
+    setFilter('all');
+  }, [canFilterPrompts]);
 
   useEffect(() => {
     setIsMobile(window.innerWidth <= 1100);
@@ -99,7 +111,7 @@ export function AppProvider({ children }) {
       isAdmin, setIsAdmin,
       settings, setSettings, isSettingsLoaded,
       isMobile, headerHeight, setHeaderHeight,
-      isAdminPath
+      isAdminPath, canFilterPrompts
     }}>
       {children}
     </AppContext.Provider>
