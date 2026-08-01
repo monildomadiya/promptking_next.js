@@ -1,8 +1,17 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
+import { cacheGet, cacheSet, CACHE_KEYS } from '@/lib/cache';
+import { liveJson } from '@/lib/httpCache';
+
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes; admin saves clear it immediately
 
 export async function GET(req) {
   try {
+    // save_blog has been calling cacheInvalidate('api_blogs') since it was
+    // written — this is the cache it was clearing.
+    const cached = cacheGet(CACHE_KEYS.blogs);
+    if (cached) return liveJson(req, cached, { headers: { 'X-Cache': 'HIT' } });
+
     let blogs = [];
     try {
       // This is a LIST endpoint — every caller renders cards (blog index, the
@@ -45,9 +54,9 @@ export async function GET(req) {
         };
     });
 
-    const response = NextResponse.json(processedBlogs);
-    response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
-    return response;
+    cacheSet(CACHE_KEYS.blogs, processedBlogs, CACHE_TTL);
+
+    return liveJson(req, processedBlogs, { headers: { 'X-Cache': 'MISS' } });
   } catch (error) {
     console.error('DATABASE ERROR (blogs):', error.message);
     return NextResponse.json({ error: "Failed to fetch blogs" }, { status: 500 });

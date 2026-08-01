@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
+import { liveJson } from '@/lib/httpCache';
 
 export async function GET(req, { params }) {
   try {
@@ -32,9 +33,7 @@ export async function GET(req, { params }) {
         enable_table_of_contents: parseDbBool(blogs[0].enable_table_of_contents)
     };
 
-    const response = NextResponse.json(blog);
-    response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
-    return response;
+    return liveJson(req, blog);
   } catch (error) {
     console.error('DATABASE ERROR (blog details):', error.message);
     return NextResponse.json({ error: "Failed to fetch blog" }, { status: 500 });

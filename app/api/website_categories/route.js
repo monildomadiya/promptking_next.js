@@ -1,28 +1,20 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { cacheGet, cacheSet } from '@/lib/cache';
+import { cacheGet, cacheSet, CACHE_KEYS } from '@/lib/cache';
+import { liveJson } from '@/lib/httpCache';
 
-const CACHE_KEY = 'api_website_categories';
-const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes; admin saves clear it immediately
 
 export async function GET(req) {
   try {
     // Serve from cache if available
-    const cached = cacheGet(CACHE_KEY);
-    if (cached) {
-      const res = NextResponse.json(cached);
-      res.headers.set('Cache-Control', 'public, max-age=600, stale-while-revalidate=1800');
-      res.headers.set('X-Cache', 'HIT');
-      return res;
-    }
+    const cached = cacheGet(CACHE_KEYS.websiteCategories);
+    if (cached) return liveJson(req, cached, { headers: { 'X-Cache': 'HIT' } });
 
     const rows = await db`SELECT id, name, slug, image_url, tag FROM website_categories ORDER BY created_at DESC`;
-    cacheSet(CACHE_KEY, rows, CACHE_TTL);
+    cacheSet(CACHE_KEYS.websiteCategories, rows, CACHE_TTL);
 
-    const res = NextResponse.json(rows);
-    res.headers.set('Cache-Control', 'public, max-age=600, stale-while-revalidate=1800');
-    res.headers.set('X-Cache', 'MISS');
-    return res;
+    return liveJson(req, rows, { headers: { 'X-Cache': 'MISS' } });
   } catch (error) {
     console.error('Fetch website categories error:', error.message);
     return NextResponse.json([]);

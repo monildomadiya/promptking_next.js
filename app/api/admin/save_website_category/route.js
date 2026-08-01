@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { cacheInvalidate } from '@/lib/cache';
+import { publishChanges } from '@/lib/publish';
+import { requireAdmin } from '@/lib/auth';
 
 export async function POST(req) {
+  const denied = await requireAdmin(req);
+  if (denied) return denied;
+
   try {
     const body = await req.json();
     const { id, name, slug, description, image_url, tag, meta_title, meta_description, focus_keyword } = body;
@@ -14,8 +18,7 @@ export async function POST(req) {
     }
 
     // Invalidate caches so live site reflects changes immediately
-    cacheInvalidate('api_website_categories');
-    cacheInvalidate('website_categories_ssr');
+    publishChanges('websiteCategories', 'websiteCategoriesSsr');
 
     return NextResponse.json({ success: true });
   } catch (error) {

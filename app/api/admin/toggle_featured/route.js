@@ -2,8 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getAdminAuth } from '@/lib/auth';
-import { revalidatePath } from 'next/cache';
-import { cacheInvalidate } from '@/lib/cache';
+import { publishChanges } from '@/lib/publish';
 
 export async function POST(req) {
   const isAdmin = await getAdminAuth(req);
@@ -17,7 +16,9 @@ export async function POST(req) {
       UPDATE prompts SET is_featured = ${is_featured ? 1 : 0} WHERE prompt_key = ${key}
     `;
 
-    try { revalidatePath('/', 'layout'); } catch (e) {}
+    // The cacheInvalidate import here was never actually called, so featuring a
+    // prompt rebuilt the pages around a prompt list that hadn't changed.
+    publishChanges('prompts');
 
     return NextResponse.json({ success: true });
   } catch (error) {

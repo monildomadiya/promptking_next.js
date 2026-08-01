@@ -2,9 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getAdminAuth } from '@/lib/auth';
-import { cacheInvalidate } from '@/lib/cache';
-
-import { revalidatePath } from 'next/cache';
+import { publishChanges } from '@/lib/publish';
 
 export async function POST(req) {
   const isAdmin = await getAdminAuth(req);
@@ -30,9 +28,9 @@ export async function POST(req) {
       await db`UPDATE prompts SET is_featured = ${value ? 1 : 0} WHERE prompt_key = ${key}`;
     }
 
-    try {
-      revalidatePath('/', 'layout');
-    } catch (e) {}
+    // Same as toggle_featured: the cache import was here, the call was not, so
+    // a premium/free flip kept serving the old flag until the TTL ran out.
+    publishChanges('prompts');
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('toggle_status error:', error);

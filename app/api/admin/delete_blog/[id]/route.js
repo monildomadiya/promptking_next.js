@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getAdminAuth } from '@/lib/auth';
+import { publishChanges } from '@/lib/publish';
 
 export async function DELETE(req, { params }) {
   const isAdmin = await getAdminAuth(req);
@@ -10,6 +11,7 @@ export async function DELETE(req, { params }) {
   const id = resolvedParams.id;
   try {
     await db`DELETE FROM blogs WHERE id=${id}`;
+    publishChanges('blogs');
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Delete blog error:', error);

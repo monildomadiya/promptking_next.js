@@ -6,9 +6,10 @@ import { isPromptGridPath } from '@/lib/searchScope';
 
 const AppContext = createContext();
 
+// Kept only to paint the previous values instantly on load; freshness comes
+// from the request that follows, never from the age of this copy.
 const SETTINGS_CACHE_KEY = 'siteSettings';
 const SETTINGS_CACHE_TS_KEY = 'siteSettings_ts';
-const SETTINGS_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
 export function AppProvider({ children }) {
   const [search, setSearch] = useState('');
@@ -45,24 +46,26 @@ export function AppProvider({ children }) {
     };
 
     const fetchSettings = async () => {
+      // Paint from the last known settings so the header and ad slots don't
+      // flash, then always ask the server anyway.
+      //
+      // This used to skip the request entirely whenever the cached copy was
+      // under ten minutes old, which is the other half of why admin changes
+      // "took some time": the server could have the new values instantly and a
+      // returning visitor still wouldn't ask for them. The request is now
+      // conditional (/api/settings sends an ETag), so the common case is a 304
+      // with no body — cheaper than the timestamp check it replaces.
       try {
-        // Check if we have a fresh cached version (within TTL)
         const cached = localStorage.getItem(SETTINGS_CACHE_KEY);
-        const cachedTs = localStorage.getItem(SETTINGS_CACHE_TS_KEY);
-        
-        if (cached && cachedTs) {
-          const age = Date.now() - parseInt(cachedTs, 10);
-          if (age < SETTINGS_CACHE_TTL) {
-            // Cache is fresh — use it and skip the API call entirely
-            setSettings(JSON.parse(cached));
-            setIsSettingsLoaded(true);
-            return;
-          }
+        if (cached) {
+          setSettings(JSON.parse(cached));
+          setIsSettingsLoaded(true);
         }
-        
-        // Cache is stale or missing — show stale data immediately while fetching fresh
-        if (cached) setSettings(JSON.parse(cached));
-        
+      } catch (error) {
+        // Corrupt cache entry — fall through to the network.
+      }
+
+      try {
         const response = await api.get('/settings');
         if (response.data) {
           setSettings(response.data);

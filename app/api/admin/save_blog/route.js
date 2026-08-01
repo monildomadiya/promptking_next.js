@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { cacheInvalidate } from '@/lib/cache';
+import { publishChanges } from '@/lib/publish';
+import { requireAdmin } from '@/lib/auth';
 
 export async function POST(req) {
+  const denied = await requireAdmin(req);
+  if (denied) return denied;
+
   try {
     const body = await req.json();
     
@@ -88,7 +92,7 @@ export async function POST(req) {
       `;
     }
     
-    cacheInvalidate('api_blogs');
+    publishChanges('blogs');
 
     return NextResponse.json({ success: true });
   } catch (error) {

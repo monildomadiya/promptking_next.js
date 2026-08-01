@@ -2,8 +2,11 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getAdminAuth } from '@/lib/auth';
-import { revalidatePath } from 'next/cache';
-import { cacheInvalidate } from '@/lib/cache';
+import { publishChanges } from '@/lib/publish';
+
+// The migration below only has to succeed once. It was firing on every reorder,
+// which means every drag-and-drop paid for a failed ALTER TABLE round trip.
+let sortOrderColumnChecked = false;
 
 export async function POST(req) {
   const isAdmin = await getAdminAuth(req);
@@ -16,10 +19,13 @@ export async function POST(req) {
     }
 
     // Ensure sort_order column exists (auto-migrate)
-    try {
-      await db`ALTER TABLE prompts ADD COLUMN sort_order INT DEFAULT 0`;
-    } catch (e) {
-      // Column already exists — that's fine
+    if (!sortOrderColumnChecked) {
+      try {
+        await db`ALTER TABLE prompts ADD COLUMN sort_order INT DEFAULT 0`;
+      } catch (e) {
+        // Column already exists — that's fine
+      }
+      sortOrderColumnChecked = true;
     }
 
     // Update each prompt's sort_order in a loop
@@ -28,8 +34,7 @@ export async function POST(req) {
     }
 
     // Invalidate caches so live site reflects new order
-    cacheInvalidate('all_prompts_listing');
-    try { revalidatePath('/', 'layout'); } catch (e) {}
+    publishChanges('prompts');
 
     return NextResponse.json({ success: true, updated: orderedKeys.length });
   } catch (error) {

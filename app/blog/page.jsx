@@ -1,7 +1,10 @@
 import db from '@/lib/db';
 import ClientBlogPage from './ClientBlogPage';
 
-export const revalidate = 3600;
+// Matches the home, prompt and category pages. An hour meant a published post
+// could sit invisible for an hour; publishChanges('blogs') now marks this path
+// on save, so this is only the ceiling for edits made outside the admin panel.
+export const revalidate = 60;
 
 export default async function BlogPage() {
   let blogs = [];

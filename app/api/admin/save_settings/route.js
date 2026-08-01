@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { cacheInvalidate } from '@/lib/cache';
+import { publishChanges } from '@/lib/publish';
+import { requireAdmin } from '@/lib/auth';
 
 export async function POST(req) {
+  const denied = await requireAdmin(req);
+  if (denied) return denied;
+
   try {
     const body = await req.json();
     for (const [key, value] of Object.entries(body)) {
@@ -13,8 +17,10 @@ export async function POST(req) {
       `;
     }
 
-    // Invalidate settings cache so live site reflects changes immediately
-    cacheInvalidate('api_settings');
+    // Settings feed the header, footer, ad slots and social links, so the
+    // rendered pages have to go too — clearing only the data cache left every
+    // already-built page showing the old values.
+    publishChanges('settings');
 
     return NextResponse.json({ success: true });
   } catch (error) {

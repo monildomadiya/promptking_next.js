@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import { fetchAllData } from '@/lib/data';
+import { liveJson } from '@/lib/httpCache';
 
 export async function GET(req) {
   // ?light=1 omits prompt_text, which is ~82% of this payload (206 KB of 252 KB
@@ -7,7 +7,8 @@ export async function GET(req) {
   // grids — should use it; only full-text search needs the bodies.
   const light = new URL(req.url).searchParams.get('light') === '1';
   const { prompts, categories } = await fetchAllData({ includePromptText: !light });
-  const response = NextResponse.json({ prompts, likes: {}, categories });
-  response.headers.set('Cache-Control', 'no-store, max-age=0');
-  return response;
+  // Was `no-store`: correct about freshness, but it meant re-downloading the
+  // whole library on every load. The conditional request costs one round trip
+  // and returns 304 until something actually changes.
+  return liveJson(req, { prompts, likes: {}, categories });
 }
