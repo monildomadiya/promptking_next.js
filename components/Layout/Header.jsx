@@ -13,6 +13,9 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
   const [isVisible, setIsVisible] = useState(true);
   const [categories, setCategories] = useState([]);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  // Prompt codes are PK + 4 digits, so the code path is the common one: open on
+  // the number pad and let the user switch to letters for a name search.
+  const [numericMode, setNumericMode] = useState(true);
 
   const lastScrollY = useRef(0);
   const navigate = useRouter();
@@ -21,6 +24,8 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
   const headerRef = useRef(null);
   const searchInputRef = useRef(null);
 
+  // Backstop for expansions that don't come from openSearch (which focuses
+  // inside the tap itself — iOS ignores a focus() that lands in a later task).
   useEffect(() => {
     if (isSearchExpanded && searchInputRef.current) {
       setTimeout(() => searchInputRef.current?.focus(), 50);
@@ -82,9 +87,16 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
 
   // Results live in the page grid now, so dismissing the search UI must keep the
   // term — clearing it here would wipe the very results the user just asked for.
-  const dismissSearch = () => setIsSearchExpanded(false);
+  const dismissSearch = () => {
+    searchInputRef.current?.blur();
+    setIsSearchExpanded(false);
+  };
 
+  // The X is a cancel, not a two-step clear-then-close: one tap always puts the
+  // page back the way it was. Blur explicitly — the input stays mounted while
+  // collapsed (see below), so dropping the bar alone won't dismiss the keyboard.
   const clearSearch = () => {
+    searchInputRef.current?.blur();
     setSearch('');
     setIsSearchExpanded(false);
   };
@@ -94,9 +106,42 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
   // that is where the filtered results render.
   const openSearch = () => {
     setIsSearchExpanded(true);
+    setNumericMode(true);
     if (!isHomePage) navigate.push('/');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Smooth scrolling races the keyboard animation on phones and reads as jank.
+    window.scrollTo({ top: 0, behavior: isMobile ? 'auto' : 'smooth' });
+
+    const el = searchInputRef.current;
+    if (el) {
+      // React hasn't re-rendered yet and the keyboard only reads inputmode at
+      // focus time, so set the attribute before focusing rather than after.
+      el.setAttribute('inputmode', 'numeric');
+      el.focus();
+    }
   };
+
+  const toggleKeyboardMode = () => {
+    const next = !numericMode;
+    setNumericMode(next);
+    const el = searchInputRef.current;
+    if (!el) return;
+    el.setAttribute('inputmode', next ? 'numeric' : 'text');
+    // Bounce focus so the soft keyboard re-reads the mode — still inside the
+    // tap, which is the only time iOS will reopen it.
+    el.blur();
+    el.focus();
+  };
+
+  // A complete prompt code is the whole query, so stop asking for more input:
+  // the number pad has no Enter key to dismiss itself with.
+  const isPromptCode = (v) => /^(pk)?\d{4}$/i.test((v || '').trim());
+  const prevSearch = useRef(search);
+  useEffect(() => {
+    const was = prevSearch.current;
+    prevSearch.current = search;
+    if (!isSearchExpanded) return;
+    if (isPromptCode(search) && !isPromptCode(was)) searchInputRef.current?.blur();
+  }, [search, isSearchExpanded]);
 
   const mobileSearchActive = isMobile && isSearchExpanded;
 
@@ -105,9 +150,16 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
       {/* ── Mobile search bar ───────────────────────────────────────────────
           Sits exactly on top of the header rather than covering the screen: the
           grid underneath has to stay visible so results filter live as you type.
-          No backdrop for the same reason. */}
-      {mobileSearchActive && (
+          No backdrop for the same reason.
+
+          Stays mounted while collapsed instead of being conditionally rendered.
+          Mounting on tap meant the input didn't exist yet when the tap handler
+          ran, so focus had to be deferred — and iOS only opens the keyboard for
+          a focus() in the same task as the gesture. Keeping it mounted also
+          gives the bar a real exit transition rather than popping out. */}
+      {isMobile && (
         <div
+          aria-hidden={!isSearchExpanded}
           style={{
             position: 'fixed',
             top: '10px', left: '28px', right: '28px',
@@ -120,15 +172,21 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
             WebkitBackdropFilter: 'blur(20px) saturate(180%)',
             border: '1px solid rgba(0,0,0,0.16)',
             borderRadius: '24px',
-            animation: 'fadeInBackdrop 0.18s ease',
+            opacity: isSearchExpanded ? 1 : 0,
+            transform: isSearchExpanded ? 'translateY(0)' : 'translateY(-6px)',
+            pointerEvents: isSearchExpanded ? 'auto' : 'none',
+            transition: 'opacity 0.2s ease, transform 0.2s ease',
           }}
         >
           <Search size={20} color="var(--accent-main)" style={{ flexShrink: 0 }} />
           <input
             ref={searchInputRef}
             type="text"
-            inputMode="search"
-            placeholder="Prompt code or name…"
+            inputMode={numericMode ? 'numeric' : 'text'}
+            enterKeyHint="search"
+            autoComplete="off"
+            tabIndex={isSearchExpanded ? 0 : -1}
+            placeholder={numericMode ? 'Prompt code — e.g. 1234' : 'Prompt name…'}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') dismissSearch(); }}
@@ -140,19 +198,25 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
               color: 'var(--text-main)',
             }}
           />
-          {/* Single control instead of a Done/Cancel label: clears the term while
-              there is one, closes the bar once it is empty. Enter also closes and
-              keeps the results. */}
-          <div
-            onClick={() => {
-              if (search) {
-                setSearch('');
-                searchInputRef.current?.focus();
-              } else {
-                clearSearch();
-              }
+          {/* The number pad has no letter keys, so name search needs a way back. */}
+          <button
+            type="button"
+            onPointerDown={(e) => { e.preventDefault(); toggleKeyboardMode(); }}
+            aria-label={numericMode ? 'Search by name' : 'Search by prompt code'}
+            style={{
+              height: '32px', padding: '0 10px', borderRadius: '10px',
+              background: 'rgba(0,0,0,0.06)', border: 'none', flexShrink: 0,
+              fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.5px',
+              color: 'var(--text-secondary)', cursor: 'pointer',
             }}
-            aria-label={search ? 'Clear search' : 'Close search'}
+          >
+            {numericMode ? 'ABC' : '123'}
+          </button>
+          {/* Close means close — one tap drops the bar and the filter together,
+              so the grid can never stay filtered by a bar that isn't showing. */}
+          <div
+            onClick={clearSearch}
+            aria-label="Close search"
             style={{
               width: '32px', height: '32px', borderRadius: '10px',
               background: 'rgba(0,0,0,0.06)', flexShrink: 0,
@@ -174,7 +238,10 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
 
       <header ref={headerRef} className="responsive-header" style={{
         boxShadow: isScrolled ? '0 20px 40px rgba(17, 24, 39, 0.1)' : 'none',
-        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+        // Fill and outline fade on the search bar's 0.2s clock, not the 0.4s
+        // show/hide one — mismatched timings made the bar underneath visibly
+        // dissolve before the new one arrived.
+        transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s ease, border-color 0.2s ease',
         transform: isVisible ? 'translateY(0)' : 'translateY(-120%)',
         opacity: isVisible ? 1 : 0,
         zIndex: 999,
@@ -288,6 +355,16 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                     transition: 'width 0.4s cubic-bezier(0.4,0,0.2,1), background 0.25s ease, padding 0.3s ease, border-color 0.25s ease',
                   }}
                   onClick={() => { if (!isSearchExpanded) openSearch(); }}
+                  // The input is untabbable while collapsed — it is invisible, and
+                  // tabbing into it meant typing into nothing. The closed pill takes
+                  // the focus instead and opens on Enter.
+                  role={isSearchExpanded ? undefined : 'button'}
+                  aria-label={isSearchExpanded ? undefined : 'Search prompts'}
+                  tabIndex={isSearchExpanded ? -1 : 0}
+                  onKeyDown={(e) => {
+                    if (isSearchExpanded) return;
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSearch(); }
+                  }}
                 >
                   <div style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -302,6 +379,8 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                   <input
                     ref={searchInputRef}
                     type="text"
+                    autoComplete="off"
+                    tabIndex={isSearchExpanded ? 0 : -1}
                     placeholder="Search prompts or code…"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -329,7 +408,8 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
 
                   {isSearchExpanded && (
                     <div
-                      onPointerDown={(e) => { e.preventDefault(); search ? setSearch('') : setIsSearchExpanded(false); }}
+                      onPointerDown={(e) => { e.preventDefault(); clearSearch(); }}
+                      aria-label="Close search"
                       style={{
                         width: '32px', height: '32px',
                         borderRadius: '10px',
