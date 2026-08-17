@@ -539,7 +539,7 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                       ))}
                     </div>
 
-                    <div style={{ marginTop: '8px', paddingTop: '16px', borderTop: '1px solid rgba(0,0,0,0.07)', textAlign: 'center' }}>
+                    <div style={{ marginTop: '8px', paddingTop: '16px', borderTop: '1px solid rgba(0,0,0,0.07)', textAlign: 'center', display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
                       <Link
                         href="/categories"
                         onClick={() => setShowCategoryDropdown(false)}
@@ -552,6 +552,22 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                         onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255, 193, 7, 0.1)'; e.currentTarget.style.transform = 'scale(1)'; }}
                       >
                         View All Categories <ChevronRight size={14} />
+                      </Link>
+                      {/* The games are the one section of the site the header
+                          otherwise never mentions, and they only work if people
+                          find out they exist. */}
+                      <Link
+                        href="/games"
+                        onClick={() => setShowCategoryDropdown(false)}
+                        style={{
+                          color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none',
+                          display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '20px',
+                          background: 'rgba(0,0,0,0.04)', transition: '0.3s',
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.08)'; e.currentTarget.style.transform = 'scale(1.05)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.04)'; e.currentTarget.style.transform = 'scale(1)'; }}
+                      >
+                        Play Games <ChevronRight size={14} />
                       </Link>
                     </div>
                   </div>

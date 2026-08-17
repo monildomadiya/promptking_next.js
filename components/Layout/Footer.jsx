@@ -143,6 +143,7 @@ const Footer = ({ onLogoClick }) => {
               {( !isMobile || openSections.platform ) && (
                 <ul style={listStyle}>
                   <FooterLink to="/categories" text="Prompt Categories" />
+                  <FooterLink to="/games" text="Prompt Games" />
                   <FooterLink to="/blog" text="Our Blog" />
                   <FooterLink to="/faq" text="FAQ & Help" />
                   <FooterLink to="/about" text="About Us" />

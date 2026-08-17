@@ -1,7 +1,9 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, ChevronLeft, ChevronRight, CheckCircle, Tag, X } from '@/components/Common/Icons';
+import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, ChevronLeft, ChevronRight, CheckCircle, Tag, X, Puzzle } from '@/components/Common/Icons';
+import PuzzleBoard from '@/components/Games/PuzzleBoard';
+import BonusChallenge from '@/components/Games/BonusChallenge';
 import confetti from 'canvas-confetti';
 import api from '@/lib/api';
 import Shimmer from '@/components/Common/Shimmer';
@@ -115,6 +117,10 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
   const [isCopied, setIsCopied] = useState(false);
   const [showCopyModal, setShowCopyModal] = useState(false);
   const [isRelocking, setIsRelocking] = useState(false);
+  // The puzzle is the second door into a locked prompt, for visitors who never
+  // saw the Reel the PIN comes from. Closed by default so the PIN — and the
+  // link to the Reel — stays the first thing offered.
+  const [showPuzzle, setShowPuzzle] = useState(false);
   const [suggestedPrompts, setSuggestedPrompts] = useState(initialSuggestedPrompts || []);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(null);
@@ -274,26 +280,37 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
     setSliderValue(e.target.value);
   };
 
+  /**
+   * Everything that happens once the vault opens, however it was opened.
+   * The PIN and the puzzle are two doors into the same room, and an unlock
+   * that skipped the confetti or the record_unlock call would read as a
+   * different, lesser event to both the visitor and the dashboard.
+   */
+  const completeUnlock = () => {
+    setIsUnlocked(true);
+    setShowPuzzle(false);
+    triggerConfetti();
+    api.post('/record_unlock', { key: prompt.prompt_key || prompt.key || key }).catch(err => console.warn("Failed to record unlock:", err));
+
+    // Auto-center the box so the user sees the unlocked content
+    setTimeout(() => {
+      const box = document.getElementById('box-detail');
+      if (box) {
+        const yOffset = -window.innerHeight / 2 + box.clientHeight / 2;
+        const y = box.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }, 100);
+  };
+
   const checkAutoUnlock = async (value) => {
     setPin(value);
     setShowError(false);
     const targetPass = String(prompt?.password || '1234').trim();
     const inputPass = String(value || '').trim();
-    
+
     if (inputPass === targetPass) {
-      setIsUnlocked(true);
-      triggerConfetti();
-      api.post('/record_unlock', { key: prompt.prompt_key || prompt.key || key }).catch(err => console.warn("Failed to record unlock:", err));
-      
-      // Auto-center the box so the user sees the unlocked content
-      setTimeout(() => {
-        const box = document.getElementById('box-detail');
-        if (box) {
-          const yOffset = -window.innerHeight / 2 + box.clientHeight / 2;
-          const y = box.getBoundingClientRect().top + window.pageYOffset + yOffset;
-          window.scrollTo({ top: y, behavior: 'smooth' });
-        }
-      }, 100);
+      completeUnlock();
     } else if (inputPass.length >= targetPass.length) {
       setShowError(true);
       setTimeout(() => {
@@ -877,11 +894,25 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
                 {(!isUnlocked || isRelocking) && (
                   <div className={`lock-overlay-base ${isRelocking ? 'lock-overlay-animate' : ''}`} style={{ 
                     position: 'absolute', inset: 0,
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '30px', zIndex: 10, gap: '20px'
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 10,
+                    // The puzzle is a lot taller than a four-box PIN row, and
+                    // the vault clips its overflow — so give it back the
+                    // padding and let it scroll rather than lose its bottom row.
+                    padding: showPuzzle ? '16px' : '30px',
+                    gap: showPuzzle ? '0' : '20px',
+                    overflowY: 'auto',
                   }}>
+                    {showPuzzle ? (
+                      <PuzzleBoard
+                        image={prompt.imgAfter || prompt.imgBefore || prompt.thumbnail_url}
+                        onSolved={completeUnlock}
+                        onCancel={() => setShowPuzzle(false)}
+                      />
+                    ) : (
+                    <>
                     <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
                       <form onSubmit={(e) => e.preventDefault()}>
-                        <OTPInput 
+                        <OTPInput
                           value={pin} 
                           onChange={(newPin) => checkAutoUnlock(newPin)} 
                           showError={showError} 
@@ -925,6 +956,26 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
                         Get PIN from {prompt.igLink.includes('instagram') ? 'Reel' : 'Short'}
                       </button>
                     )}
+
+                    {/* Only offered where there is a picture to cut up — a
+                        puzzle made of nine blank squares can't be solved. */}
+                    {(prompt.imgAfter || prompt.imgBefore || prompt.thumbnail_url) && (
+                      <button
+                        onClick={() => setShowPuzzle(true)}
+                        style={{
+                          background: 'transparent', border: 'none', cursor: 'pointer',
+                          fontSize: '0.78rem', fontWeight: 700, color: 'var(--accent-main)',
+                          display: 'flex', alignItems: 'center', gap: '6px',
+                          padding: '4px 8px', borderRadius: '8px', textDecoration: 'underline',
+                          textUnderlineOffset: '3px',
+                        }}
+                      >
+                        <Puzzle size={14} />
+                        No PIN? Solve a puzzle instead
+                      </button>
+                    )}
+                    </>
+                    )}
                   </div>
                 )}
                 
@@ -952,8 +1003,16 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
               </div>
             </div>
 
+            {/* Free prompts are never locked, so this sits *below* the open
+                vault rather than over it: the text and the copy button are
+                already there and stay there. Premium prompts get the puzzle as
+                a way in instead, inside the lock overlay above. */}
+            {!prompt.isPremium && (prompt.imgAfter || prompt.imgBefore || prompt.thumbnail_url) && (
+              <BonusChallenge image={prompt.imgAfter || prompt.imgBefore || prompt.thumbnail_url} />
+            )}
+
             {(!isUnlocked && !prompt.isPremium) && (
-              <button 
+              <button
                 onClick={handleCopy}
                 className="copy-btn-mobile-margin"
                 style={{

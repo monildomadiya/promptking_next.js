@@ -367,3 +367,11 @@ export const Coffee = (props) => (
 export const Tag = (props) => (
   <IconWrapper {...props}><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></IconWrapper>
 );
+
+export const RotateCcw = (props) => (
+  <IconWrapper {...props}><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></IconWrapper>
+);
+
+export const Puzzle = (props) => (
+  <IconWrapper {...props}><path d="M15.4 3.2a2 2 0 0 0-3.4 1.4V6H9.6a1.6 1.6 0 0 0-1.6 1.6V10H6.6a2 2 0 1 0 0 4H8v2.4A1.6 1.6 0 0 0 9.6 18H12v1.4a2 2 0 1 0 4 0V18h2.4a1.6 1.6 0 0 0 1.6-1.6V14h-1.4a2 2 0 1 1 0-4H20V7.6A1.6 1.6 0 0 0 18.4 6H16V4.6a2 2 0 0 0-.6-1.4Z"/></IconWrapper>
+);

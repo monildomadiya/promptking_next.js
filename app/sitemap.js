@@ -83,6 +83,11 @@ export default async function sitemap() {
     { url: `${BASE_URL}/about`, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${BASE_URL}/blog`, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${BASE_URL}/categories`, changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${BASE_URL}/games`, changeFrequency: 'weekly', priority: 0.6 },
+    { url: `${BASE_URL}/games/guess-the-prompt`, changeFrequency: 'weekly', priority: 0.5 },
+    { url: `${BASE_URL}/games/prompt-battle`, changeFrequency: 'weekly', priority: 0.5 },
+    // Its content changes with the date, but the page itself is one URL.
+    { url: `${BASE_URL}/games/daily-spin`, changeFrequency: 'daily', priority: 0.5 },
     { url: `${BASE_URL}/contact`, changeFrequency: 'monthly', priority: 0.4 },
     { url: `${BASE_URL}/faq`, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${BASE_URL}/privacy`, changeFrequency: 'yearly', priority: 0.3 },
