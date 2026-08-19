@@ -71,13 +71,27 @@ const WallpaperUpload = ({ url, onUpload, onDimensions }) => {
     if (!file) return;
     const formData = new FormData();
     formData.append('image', file);
+    const mb = (file.size / (1024 * 1024)).toFixed(1);
     try {
       setIsUploading(true);
       const res = await api.post('/admin/upload_image', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
       if (res.data?.status === 'success') accept(res.data.imageUrl);
       else toast.error(res.data?.error || 'Server rejected the image.');
     } catch (error) {
-      toast.error('Upload failed: ' + error.message);
+      // A 413 never reached the application — nginx refused the body at the
+      // proxy. Worth naming explicitly, because it is invisible from inside
+      // the app and it only ever bites the largest files, which on this screen
+      // means every real wallpaper. Pasting a URL is unaffected: that request
+      // carries a link, not the file, and the server fetches it itself.
+      if (/413|too large/i.test(error.message || '')) {
+        toast.error(
+          `The server refused this ${mb} MB file — its upload limit is smaller than that. ` +
+          'Paste an image URL in the field above instead, or raise nginx client_max_body_size.',
+          { duration: 9000 }
+        );
+      } else {
+        toast.error(`Upload failed (${mb} MB): ${error.message}`);
+      }
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
