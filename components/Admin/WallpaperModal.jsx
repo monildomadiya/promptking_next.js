@@ -66,32 +66,54 @@ const WallpaperUpload = ({ url, onUpload, onDimensions }) => {
     } finally { setIsUploading(false); }
   };
 
+  /**
+   * Uploads straight from the browser to Cloudinary.
+   *
+   * The origin only signs the request — a few hundred bytes — so nginx's
+   * client_max_body_size never applies to the file itself. That limit is what
+   * made every wallpaper-sized upload fail with a bare 413 that left no trace
+   * in the application's logs.
+   *
+   * Cloudinary's response carries the stored width and height, so the
+   * dimensions come back measured rather than probed with a second download.
+   */
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const formData = new FormData();
-    formData.append('image', file);
     const mb = (file.size / (1024 * 1024)).toFixed(1);
+
     try {
       setIsUploading(true);
-      const res = await api.post('/admin/upload_image', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-      if (res.data?.status === 'success') accept(res.data.imageUrl);
-      else toast.error(res.data?.error || 'Server rejected the image.');
-    } catch (error) {
-      // A 413 never reached the application — nginx refused the body at the
-      // proxy. Worth naming explicitly, because it is invisible from inside
-      // the app and it only ever bites the largest files, which on this screen
-      // means every real wallpaper. Pasting a URL is unaffected: that request
-      // carries a link, not the file, and the server fetches it itself.
-      if (/413|too large/i.test(error.message || '')) {
-        toast.error(
-          `The server refused this ${mb} MB file — its upload limit is smaller than that. ` +
-          'Paste an image URL in the field above instead, or raise nginx client_max_body_size.',
-          { duration: 9000 }
-        );
-      } else {
-        toast.error(`Upload failed (${mb} MB): ${error.message}`);
+
+      const signed = await api.post('/admin/upload_signature', {});
+      const { cloudName, apiKey, timestamp, folder, signature } = signed.data || {};
+      if (!cloudName || !signature) throw new Error('Could not authorise the upload');
+
+      const body = new FormData();
+      body.append('file', file);
+      body.append('api_key', apiKey);
+      body.append('timestamp', timestamp);
+      body.append('folder', folder);
+      body.append('signature', signature);
+
+      // Deliberately fetch, not the api client: this request goes to
+      // Cloudinary, and the api client would prefix the site's own origin and
+      // attach its admin token to a third party.
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: 'POST',
+        body,
+      });
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || !data?.secure_url) {
+        throw new Error(data?.error?.message || `Cloudinary rejected the file (HTTP ${res.status})`);
       }
+
+      onUpload(data.secure_url);
+      onDimensions?.({ width: data.width, height: data.height });
+      toast.success(`Uploaded ${mb} MB — ${data.width} x ${data.height}`);
+    } catch (error) {
+      toast.error(`Upload failed (${mb} MB): ${error.message}`, { duration: 8000 });
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
