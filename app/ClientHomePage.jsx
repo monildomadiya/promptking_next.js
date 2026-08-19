@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 
 import PromptList from '@/components/Prompts/PromptList';
+import WallpaperStrip from '@/components/Wallpapers/WallpaperStrip';
 import SEOMetadata from '@/components/SEO/SEOMetadata';
 import { Search, X, Crown, Coffee, Copy, Image, FileText, HelpCircle, Lock, Filter, Shield, ArrowRight } from '@/components/Common/Icons';
 
@@ -41,7 +42,7 @@ const categoryPillStyle = {
   textDecoration: 'none',
 };
 
-const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteCategories = [] }) => {
+const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteCategories = [], initialWallpapers = [] }) => {
   const { search, setSearch, filter, setFilter, isMobile, settings } = useAppContext();
   const { categorySlug } = useParams();
 
@@ -143,6 +144,12 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
 
       </div>
       )}
+
+      {/* Above the prompt grid on purpose: this is the one section of the site
+          a visitor has no reason to guess exists, and the images explain it
+          faster than a nav link can. Hidden while searching — someone typing a
+          query is not browsing. */}
+      {!isSearching && <WallpaperStrip wallpapers={initialWallpapers} />}
 
       <PromptList
         search={search} 

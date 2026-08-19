@@ -1,5 +1,6 @@
 import ClientHomePage from './ClientHomePage';
 import { fetchAllData } from '@/lib/data';
+import { fetchWallpapers } from '@/lib/wallpapers';
 import db from '@/lib/db';
 import { cacheGet, cacheSet } from '@/lib/cache';
 
@@ -25,9 +26,10 @@ export default async function Page() {
   // Omit prompt_text from the server-rendered payload: it was ~82% of the data
   // (206 KB of 252 KB) and is only needed when someone copies a card. PromptList
   // fetches the full set in the background once hydrated.
-  const [{ prompts, categories }, websiteCategories] = await Promise.all([
+  const [{ prompts, categories }, websiteCategories, wallpapers] = await Promise.all([
     fetchAllData({ includePromptText: false }),
     fetchWebsiteCategories(),
+    fetchWallpapers(),
   ]);
 
   // What used to sit above this component: an h2, a keyword paragraph and links
@@ -40,6 +42,9 @@ export default async function Page() {
       initialPrompts={prompts}
       initialCategories={categories}
       initialWebsiteCategories={websiteCategories}
+      // Capped rather than passed whole: this is a teaser above a grid of
+      // thirty prompts, and the library behind it only grows.
+      initialWallpapers={wallpapers.slice(0, 14)}
     />
   );
 }
