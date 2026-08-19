@@ -60,7 +60,7 @@ export async function POST(req) {
           slug=${slug}, title=${w.title.trim()}, description=${w.description || null},
           image_url=${w.image_url.trim()}, orientation=${orientation},
           width=${w.width || null}, height=${w.height || null}, tags=${tags},
-          prompt_key=${w.prompt_key || null},
+          prompt_key=${w.prompt_key || null}, category_id=${w.category_id || null},
           is_featured=${w.is_featured ? 1 : 0}, is_draft=${w.is_draft ? 1 : 0},
           sort_order=${Number(w.sort_order) || 0},
           meta_title=${w.meta_title || null}, meta_description=${w.meta_description || null},
@@ -71,17 +71,22 @@ export async function POST(req) {
       await db`
         INSERT INTO wallpapers
           (slug, title, description, image_url, orientation, width, height, tags,
-           prompt_key, is_featured, is_draft, sort_order, meta_title, meta_description, publish_date)
+           prompt_key, category_id, is_featured, is_draft, sort_order, meta_title,
+           meta_description, publish_date)
         VALUES
           (${slug}, ${w.title.trim()}, ${w.description || null}, ${w.image_url.trim()},
            ${orientation}, ${w.width || null}, ${w.height || null}, ${tags},
-           ${w.prompt_key || null}, ${w.is_featured ? 1 : 0}, ${w.is_draft ? 1 : 0},
-           ${Number(w.sort_order) || 0}, ${w.meta_title || null},
+           ${w.prompt_key || null}, ${w.category_id || null}, ${w.is_featured ? 1 : 0},
+           ${w.is_draft ? 1 : 0}, ${Number(w.sort_order) || 0}, ${w.meta_title || null},
            ${w.meta_description || null}, ${w.publish_date || null})
       `;
     }
 
-    publishChanges('wallpapers');
+    // The category pills and their counts are built from a separate cache, and
+    // assigning a wallpaper to a category changes those counts — clearing only
+    // the wallpaper listing would leave a category that has just gained its
+    // first item still hidden from the row.
+    publishChanges('wallpapers', 'wallpaperCategories');
     return NextResponse.json({ success: true, slug });
   } catch (error) {
     console.error('save_wallpaper error:', error.message);

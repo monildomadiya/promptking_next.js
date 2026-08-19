@@ -12,7 +12,9 @@ export async function DELETE(req, { params }) {
 
   try {
     await db`DELETE FROM wallpapers WHERE id=${id}`;
-    publishChanges('wallpapers');
+    // Also the category cache: deleting the last wallpaper in a category has
+    // to drop that pill, and its counts live separately from the listing.
+    publishChanges('wallpapers', 'wallpaperCategories');
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Delete wallpaper error:', error.message);
