@@ -375,3 +375,7 @@ export const RotateCcw = (props) => (
 export const Puzzle = (props) => (
   <IconWrapper {...props}><path d="M15.4 3.2a2 2 0 0 0-3.4 1.4V6H9.6a1.6 1.6 0 0 0-1.6 1.6V10H6.6a2 2 0 1 0 0 4H8v2.4A1.6 1.6 0 0 0 9.6 18H12v1.4a2 2 0 1 0 4 0V18h2.4a1.6 1.6 0 0 0 1.6-1.6V14h-1.4a2 2 0 1 1 0-4H20V7.6A1.6 1.6 0 0 0 18.4 6H16V4.6a2 2 0 0 0-.6-1.4Z"/></IconWrapper>
 );
+
+export const Download = (props) => (
+  <IconWrapper {...props}><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></IconWrapper>
+);

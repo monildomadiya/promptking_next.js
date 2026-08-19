@@ -22,6 +22,7 @@ export default async function sitemap() {
   let prompts = [];
   let categories = [];
   let blogs = [];
+  let wallpapers = [];
 
   try {
     prompts = await db`SELECT slug, prompt_key, created_at, publish_date FROM prompts WHERE is_draft = 0 OR is_draft IS NULL`;
@@ -48,6 +49,19 @@ export default async function sitemap() {
     blogs = await db`SELECT slug, created_at, published_at FROM blogs`;
   } catch (error) {
     console.error('Error fetching blogs for sitemap:', error.message);
+  }
+
+  try {
+    // Same draft/schedule rules as the /wallpapers listing, so the sitemap can
+    // never advertise a page the site itself refuses to render.
+    wallpapers = await db`
+      SELECT slug, created_at, updated_at, publish_date
+      FROM wallpapers
+      WHERE (is_draft = 0 OR is_draft IS NULL)
+        AND (publish_date IS NULL OR publish_date <= NOW())
+    `;
+  } catch (error) {
+    console.error('Error fetching wallpapers for sitemap:', error.message);
   }
 
   const promptUrls = prompts
@@ -77,12 +91,22 @@ export default async function sitemap() {
       priority: 0.8,
     }));
 
+  const wallpaperUrls = wallpapers
+    .filter((wallpaper) => wallpaper.slug)
+    .map((wallpaper) => ({
+      url: `${BASE_URL}/wallpapers/${wallpaper.slug}`,
+      lastModified: modified(wallpaper.updated_at, wallpaper.publish_date, wallpaper.created_at),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    }));
+
   const entries = [
     { url: BASE_URL, changeFrequency: 'daily', priority: 1.0 },
     // Static pages
     { url: `${BASE_URL}/about`, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${BASE_URL}/blog`, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${BASE_URL}/categories`, changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${BASE_URL}/wallpapers`, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${BASE_URL}/games`, changeFrequency: 'weekly', priority: 0.6 },
     { url: `${BASE_URL}/games/guess-the-prompt`, changeFrequency: 'weekly', priority: 0.5 },
     { url: `${BASE_URL}/games/prompt-battle`, changeFrequency: 'weekly', priority: 0.5 },
@@ -98,6 +122,7 @@ export default async function sitemap() {
     ...promptUrls,
     ...categoryUrls,
     ...blogUrls,
+    ...wallpaperUrls,
   ];
 
   // A slug can appear in more than one source query; a duplicate <loc> is a

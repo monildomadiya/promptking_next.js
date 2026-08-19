@@ -14,7 +14,7 @@ import {
   Table, Edit, Trash, Plus, Settings, FileText, 
   TableProperties, LogOut, ChevronRight, ChevronLeft, Layout, 
   Share2, Palette, Activity, Users, Layers, Crown,
-  Eye, Copy, ExternalLink, PieChart
+  Eye, Copy, ExternalLink, PieChart, Image
 } from '@/components/Common/Icons';
 import PromptModal from '@/components/Admin/PromptModal';
 import ListicleModal from '@/components/Admin/ListicleModal';
@@ -22,6 +22,8 @@ import BlogModal from '@/components/Admin/BlogModal';
 import FAQModal from '@/components/Admin/FAQModal';
 import CategoryModal from '@/components/Admin/CategoryModal';
 import WebsiteCategoryModal from '@/components/Admin/WebsiteCategoryModal';
+import WallpaperModal from '@/components/Admin/WallpaperModal';
+import WallpaperCategoryModal from '@/components/Admin/WallpaperCategoryModal';
 import AuthorModal from '@/components/Admin/AuthorModal';
 import KingDialog from '@/components/Modals/KingDialog';
 import toast, { Toaster } from 'react-hot-toast';
@@ -1224,7 +1226,7 @@ const AdminDashboard = () => {
           break;
         case 'n':
         case 'N':
-          if (['prompts', 'listicles', 'blogs', 'categories', 'website_categories', 'authors', 'faqs'].includes(view)) {
+          if (['prompts', 'listicles', 'blogs', 'categories', 'website_categories', 'authors', 'faqs', 'wallpapers', 'wallpaper_categories'].includes(view)) {
             setEditingItem(null);
             setIsModalOpen(true);
           }
@@ -1442,7 +1444,7 @@ const AdminDashboard = () => {
 
     if (!window.confirm("Permanent delete? This cannot be undone.")) return;
     const id = item.prompt_key || item.id;
-    const type = view === 'prompts' ? 'prompt' : (view === 'listicles' ? 'listicle' : (view === 'blogs' ? 'blog' : (view === 'categories' ? 'category' : (view === 'website_categories' ? 'website_category' : (view === 'authors' ? 'author' : 'faq')))));
+    const type = view === 'prompts' ? 'prompt' : (view === 'listicles' ? 'listicle' : (view === 'blogs' ? 'blog' : (view === 'categories' ? 'category' : (view === 'website_categories' ? 'website_category' : (view === 'wallpaper_categories' ? 'wallpaper_category' : (view === 'wallpapers' ? 'wallpaper' : (view === 'authors' ? 'author' : 'faq')))))));
     try {
       await api.delete(`/admin/delete_${type}/${id}`);
       fetchData(view);
@@ -1632,6 +1634,8 @@ const AdminDashboard = () => {
       { id: 'authors', label: 'Authors', icon: <Users size={20} /> },
       { id: 'categories', label: 'AI Types', icon: <Layers size={20} /> },
       { id: 'website_categories', label: 'Website Categories', icon: <Layers size={20} /> },
+      { id: 'wallpapers', label: 'Wallpapers', icon: <Image size={20} /> },
+      { id: 'wallpaper_categories', label: 'Wallpaper Categories', icon: <Layers size={20} /> },
       { id: 'faqs', label: 'Help Desk', icon: <Activity size={20} /> },
     ]},
     { title: 'SYSTEM CONFIG', items: [
@@ -1832,14 +1836,14 @@ const AdminDashboard = () => {
             </h1>
             <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem' }}>Management control panel for PK PROMPT KING systems.</p>
           </div>
-          {['prompts', 'listicles', 'blogs', 'categories', 'website_categories', 'authors', 'faqs'].includes(view) && (
+          {['prompts', 'listicles', 'blogs', 'categories', 'website_categories', 'authors', 'faqs', 'wallpapers', 'wallpaper_categories'].includes(view) && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
               {selectedKeys.length > 0 && (view === 'prompts' || view === 'listicles') && (
                 <>
                   <ActionButton label={`DELETE (${selectedKeys.length})`} color="var(--accent-main)" icon={<Trash size={18} />} onClick={handleBulkDelete} />
                 </>
               )}
-              {['prompts', 'listicles', 'blogs', 'categories', 'website_categories', 'authors', 'faqs'].includes(view) && !isDragMode && (
+              {['prompts', 'listicles', 'blogs', 'categories', 'website_categories', 'authors', 'faqs', 'wallpapers', 'wallpaper_categories'].includes(view) && !isDragMode && (
                 <div style={{ position: 'relative', flex: 1, minWidth: isMobile ? '100%' : '200px' }}>
                   <input
                     type="text"
@@ -2031,7 +2035,7 @@ const AdminDashboard = () => {
 
 
 
-          {['prompts', 'listicles', 'blogs', 'authors', 'categories', 'website_categories', 'faqs'].includes(view) && (
+          {['prompts', 'listicles', 'blogs', 'authors', 'categories', 'website_categories', 'faqs', 'wallpapers', 'wallpaper_categories'].includes(view) && (
             <motion.div key="list" {...pageTransition} style={{ ...glassPanelStyle, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
               {/* Loading skeleton — shown while fetching new tab data */}
               {isDataLoading && (
@@ -2218,6 +2222,8 @@ const AdminDashboard = () => {
       {isModalOpen && view === 'authors' && <AuthorModal author={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
       {isModalOpen && view === 'categories' && <CategoryModal category={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
       {isModalOpen && view === 'website_categories' && <WebsiteCategoryModal category={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
+      {isModalOpen && view === 'wallpapers' && <WallpaperModal wallpaper={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
+      {isModalOpen && view === 'wallpaper_categories' && <WallpaperCategoryModal category={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
       {isModalOpen && view === 'faqs' && <FAQModal faq={editingItem} onClose={() => setIsModalOpen(false)} onSave={() => { setIsModalOpen(false); fetchData(view); }} />}
 
       <KingDialog 

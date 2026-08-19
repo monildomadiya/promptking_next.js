@@ -18,6 +18,7 @@ import { useAppContext } from '@/components/AppContext';
 // a crawler never hovers.
 const SITE_SECTIONS = [
   { href: '/categories', label: 'Categories', blurb: 'Every prompt collection, grouped by topic and AI tool.' },
+  { href: '/wallpapers', label: 'Wallpapers', blurb: 'Free AI wallpapers for phone and desktop, no sign-up.' },
   { href: '/games', label: 'Games', blurb: 'Guess the prompt, battle the best images, spin for a free unlock.' },
   { href: '/blog', label: 'Blog', blurb: 'Prompt engineering guides, tips and tutorials.' },
   { href: '/faq', label: 'FAQ', blurb: 'How prompts, premium unlocks and copying work.' },
