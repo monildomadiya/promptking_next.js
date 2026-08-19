@@ -792,8 +792,16 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
                 ? (prompt.isPremium ? '0 10px 40px rgba(255, 215, 0, 0.12)' : (isCopied ? '0 10px 40px rgba(39, 201, 63, 0.15)' : '0 10px 40px rgba(229, 9, 20, 0.1)')) 
                 : '0 4px 20px rgba(0,0,0,0.04)',
               transform: 'none',
-              minHeight: '350px',
-              transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+              // A square board in a 350px-tall vault is width-starved on a
+              // phone, where the box is narrow enough that height is what runs
+              // out first. Give the puzzle a taller vault so the board is
+              // limited by the box's width instead of its chrome.
+              minHeight: showPuzzle ? '470px' : '350px',
+              // Name the properties instead of `all`: the vault only ever
+              // wanted to animate its glow on unlock, but `all` also caught
+              // min-height, so opening the puzzle left a half-second layout
+              // transition permanently in flight and the box never grew.
+              transition: 'box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), background 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
               height: '100%',
               flex: 1
             }}>
@@ -894,16 +902,22 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
                 {(!isUnlocked || isRelocking) && (
                   <div className={`lock-overlay-base ${isRelocking ? 'lock-overlay-animate' : ''}`} style={{ 
                     position: 'absolute', inset: 0,
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 10,
-                    // The puzzle is a lot taller than a four-box PIN row, and
-                    // the vault clips its overflow — so give it back the
-                    // padding and let it scroll rather than lose its bottom row.
-                    padding: showPuzzle ? '16px' : '30px',
+                    display: 'flex', flexDirection: 'column',
+                    // The puzzle owns the whole vault, so it stretches instead
+                    // of sitting centred as a small square. The PIN row is the
+                    // opposite — it stays a centred object in open space.
+                    alignItems: showPuzzle ? 'stretch' : 'center',
+                    justifyContent: 'center', zIndex: 10,
+                    padding: showPuzzle ? '14px' : '30px',
                     gap: showPuzzle ? '0' : '20px',
-                    overflowY: 'auto',
+                    // A stretched board is sized to the box and has nothing to
+                    // scroll; scrolling here would only let it be dragged out
+                    // of frame mid-solve.
+                    overflowY: showPuzzle ? 'hidden' : 'auto',
                   }}>
                     {showPuzzle ? (
                       <PuzzleBoard
+                        fill
                         image={prompt.imgAfter || prompt.imgBefore || prompt.thumbnail_url}
                         onSolved={completeUnlock}
                         onCancel={() => setShowPuzzle(false)}

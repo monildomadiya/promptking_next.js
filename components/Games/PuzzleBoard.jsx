@@ -41,6 +41,7 @@ export default function PuzzleBoard({
   image,
   onSolved,
   onCancel,
+  fill = false,
   cancelLabel = 'Use PIN instead',
   solvedTitle = 'Solved — unlocking…',
 }) {
@@ -91,7 +92,7 @@ export default function PuzzleBoard({
   const src = optimizeImage(image, 600);
 
   return (
-    <div className="pk-puzzle">
+    <div className={`pk-puzzle ${fill ? 'is-fill' : ''}`}>
       <style>{puzzleStyles}</style>
 
       <div className="pk-puzzle-top">
@@ -103,18 +104,20 @@ export default function PuzzleBoard({
         <span className="pk-puzzle-moves">{moves}</span>
       </div>
 
-      <div className={`pk-puzzle-grid ${won ? 'is-won' : ''}`} role="group" aria-label="Picture puzzle">
-        {(order || Array.from({ length: TILES }, (_, i) => i)).map((tile, slot) => (
-          <button
-            key={slot}
-            type="button"
-            className={`pk-tile ${selected === slot ? 'is-picked' : ''} ${won ? 'is-done' : ''}`}
-            style={{ backgroundImage: `url(${src})`, ...tileBackground(tile) }}
-            onClick={() => tap(slot)}
-            disabled={won || !order}
-            aria-label={`Puzzle tile ${slot + 1}`}
-          />
-        ))}
+      <div className="pk-puzzle-stage">
+        <div className={`pk-puzzle-grid ${won ? 'is-won' : ''}`} role="group" aria-label="Picture puzzle">
+          {(order || Array.from({ length: TILES }, (_, i) => i)).map((tile, slot) => (
+            <button
+              key={slot}
+              type="button"
+              className={`pk-tile ${selected === slot ? 'is-picked' : ''} ${won ? 'is-done' : ''}`}
+              style={{ backgroundImage: `url(${src})`, ...tileBackground(tile) }}
+              onClick={() => tap(slot)}
+              disabled={won || !order}
+              aria-label={`Puzzle tile ${slot + 1}`}
+            />
+          ))}
+        </div>
       </div>
 
       {!won && (
@@ -187,6 +190,34 @@ const puzzleStyles = `
 .pk-puzzle-actions button:hover { background: rgba(0,0,0,0.09); color: #333; }
 
 @media (max-width: 560px) {
-  .pk-puzzle { max-width: 194px; }
+  .pk-puzzle:not(.is-fill) { max-width: 194px; }
 }
+
+/* Fill mode: the board is the panel, not an object floating in it.
+   The grid stays square and is sized by whichever of the two axes runs out
+   first, so the tiles never distort and the bottom row never gets clipped. */
+.pk-puzzle.is-fill {
+  max-width: none; width: 100%; height: 100%;
+  display: flex; flex-direction: column; min-height: 0;
+}
+/* The stage is inert unless the board is filling, so the compact layout is
+   unchanged. When filling it becomes a size container, which is what lets the
+   board be min(width, height) — the one thing plain flex + aspect-ratio can't
+   express, and the reason the board came out 290x315 without it. */
+.pk-puzzle-stage { display: contents; }
+.pk-puzzle.is-fill .pk-puzzle-stage {
+  display: flex; flex: 1 1 auto; min-height: 0; min-width: 0;
+  container-type: size;
+}
+.pk-puzzle.is-fill .pk-puzzle-grid {
+  width: min(100%, 100cqh); height: auto;
+  aspect-ratio: 1 / 1; margin: auto;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 6px; padding: 7px; border-radius: 18px;
+}
+.pk-puzzle.is-fill .pk-puzzle-grid.is-won { gap: 0; }
+.pk-puzzle.is-fill .pk-tile { aspect-ratio: auto; height: 100%; border-radius: 11px; }
+.pk-puzzle.is-fill .pk-tile.is-done { border-radius: 0; }
+.pk-puzzle.is-fill .pk-puzzle-top { flex-shrink: 0; }
+.pk-puzzle.is-fill .pk-puzzle-actions { flex-shrink: 0; }
 `;
