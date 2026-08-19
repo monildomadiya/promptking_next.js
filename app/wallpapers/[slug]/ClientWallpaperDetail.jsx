@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Download, Smartphone, Monitor, Image as ImageIcon, ArrowLeft, Check } from '@/components/Common/Icons';
-import { buildDownloadUrl, previewUrl, DOWNLOAD_SIZES } from '@/lib/wallpaperUrls';
+import { buildDownloadUrl, cropUrl, cropSrcSet, DOWNLOAD_SIZES } from '@/lib/wallpaperUrls';
+import WallpaperImage from '@/components/Wallpapers/WallpaperImage';
 import api from '@/lib/api';
 
 const SIZE_ORDER = [
@@ -47,12 +48,25 @@ export default function ClientWallpaperDetail({ wallpaper, more = [] }) {
 
       <div className="pk-wpd-layout">
         <figure className="pk-wpd-stage">
-          <img
-            src={previewUrl(wallpaper.image, 1000)}
-            alt={wallpaper.title}
-            fetchPriority="high"
-            decoding="async"
-          />
+          {/* Uncropped and at `good` rather than `eco`: on this page the
+              image is the thing being judged, not a link target. It is also
+              the LCP element, so it loads eagerly with a srcset that lets a
+              phone take the 640 instead of a desktop-sized file. */}
+          <picture>
+            <source
+              type="image/avif"
+              srcSet={cropSrcSet(wallpaper.image, [480, 640, 900, 1200, 1600], { ratio: null, quality: 'good', format: 'avif' })}
+              sizes="(max-width: 900px) 94vw, 52vw"
+            />
+            <img
+              src={cropUrl(wallpaper.image, { width: 900, ratio: null, quality: 'good' })}
+              srcSet={cropSrcSet(wallpaper.image, [480, 640, 900, 1200, 1600], { ratio: null, quality: 'good' })}
+              sizes="(max-width: 900px) 94vw, 52vw"
+              alt={wallpaper.title}
+              fetchPriority="high"
+              decoding="async"
+            />
+          </picture>
         </figure>
 
         <div className="pk-wpd-panel">
@@ -117,7 +131,12 @@ export default function ClientWallpaperDetail({ wallpaper, more = [] }) {
           <div className="pk-wpd-more-grid">
             {more.map((w) => (
               <Link key={w.slug} href={`/wallpapers/${w.slug}`}>
-                <img src={previewUrl(w.image, 300)} alt={w.title} loading="lazy" decoding="async" />
+                <WallpaperImage
+                  image={w.image}
+                  alt={w.title}
+                  widths={[150, 300, 450]}
+                  sizes="(max-width: 560px) 45vw, 160px"
+                />
                 <span>{w.title}</span>
               </Link>
             ))}
@@ -144,6 +163,7 @@ const styles = `
   background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.09);
   box-shadow: 0 12px 40px rgba(0,0,0,0.08);
 }
+.pk-wpd-stage picture { display: contents; }
 .pk-wpd-stage img { width: 100%; height: auto; display: block; }
 
 .pk-wpd-panel { display: flex; flex-direction: column; gap: 15px; }
@@ -200,6 +220,7 @@ const styles = `
 .pk-wpd-more h2 { margin: 0 0 16px; font-size: 1.1rem; font-weight: 800; color: var(--text-main); }
 .pk-wpd-more-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
 .pk-wpd-more-grid a { text-decoration: none; display: flex; flex-direction: column; gap: 7px; }
+.pk-wpd-more-grid picture { display: contents; }
 .pk-wpd-more-grid img {
   width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block;
   border-radius: 14px; border: 1px solid rgba(0,0,0,0.08);

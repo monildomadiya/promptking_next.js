@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Image as ImageIcon, Smartphone, Monitor, Download, ArrowRight } from '@/components/Common/Icons';
-import { previewUrl } from '@/lib/wallpaperUrls';
+import WallpaperImage from '@/components/Wallpapers/WallpaperImage';
 
 const FILTERS = [
   { id: 'all', label: 'All', Icon: ImageIcon },
@@ -129,11 +129,14 @@ export default function ClientWallpapers({ wallpapers = [], categories = [] }) {
           {shown.map((w) => (
             <Link key={w.slug} href={`/wallpapers/${w.slug}`} className="pk-wp-card">
               <span className="pk-wp-thumb">
-                <img
-                  src={previewUrl(w.image, 500)}
+                <WallpaperImage
+                  image={w.image}
                   alt={w.title}
-                  loading="lazy"
-                  decoding="async"
+                  // Two columns on a phone, a ~240px cell on desktop. The
+                  // browser multiplies these by its own pixel ratio, which is
+                  // why the ladder runs past the largest CSS size here.
+                  widths={[200, 300, 400, 600, 800]}
+                  sizes="(max-width: 560px) 45vw, 240px"
                 />
                 <span className="pk-wp-badge">
                   <Download size={13} /> Download
@@ -218,6 +221,9 @@ const styles = `
   border-radius: 18px; aspect-ratio: 3 / 4;
   background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.08);
 }
+/* <picture> is inline by default; without this the img's percentage height
+   resolves against an auto-height wrapper and the card collapses. */
+.pk-wp-thumb picture { display: contents; }
 .pk-wp-thumb img {
   width: 100%; height: 100%; object-fit: cover; display: block;
   transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
