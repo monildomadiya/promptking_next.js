@@ -10,10 +10,10 @@ const TILES = GRID * GRID;
 /**
  * A 3x3 picture puzzle cut from a prompt's own image.
  *
- * Two callers, two jobs: on a locked premium prompt it is a second way in for
- * people who don't have the PIN, and on a free prompt it is an optional bonus
- * that gates nothing. The board doesn't know which — it reports a solve and
- * lets the caller decide what that is worth.
+ * It is the second way into a locked premium prompt, for people who don't have
+ * the PIN. The board itself stays agnostic — it reports a solve and lets the
+ * caller decide what that is worth — which is what let it also serve as a free
+ * prompt's optional bonus until that was removed.
  *
  * Tile-swap rather than the classic sliding puzzle on purpose: any permutation
  * of a swap puzzle is solvable, and it takes well under a minute. A 3x3 slider

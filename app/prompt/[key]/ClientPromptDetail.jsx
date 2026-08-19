@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Copy, Check, Youtube, ArrowLeft, ArrowRight, Crown, Instagram, ChevronLeft, ChevronRight, CheckCircle, Tag, X, Puzzle } from '@/components/Common/Icons';
 import PuzzleBoard from '@/components/Games/PuzzleBoard';
-import BonusChallenge from '@/components/Games/BonusChallenge';
 import confetti from 'canvas-confetti';
 import api from '@/lib/api';
 import Shimmer from '@/components/Common/Shimmer';
@@ -1016,14 +1015,6 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
                 )}
               </div>
             </div>
-
-            {/* Free prompts are never locked, so this sits *below* the open
-                vault rather than over it: the text and the copy button are
-                already there and stay there. Premium prompts get the puzzle as
-                a way in instead, inside the lock overlay above. */}
-            {!prompt.isPremium && (prompt.imgAfter || prompt.imgBefore || prompt.thumbnail_url) && (
-              <BonusChallenge image={prompt.imgAfter || prompt.imgBefore || prompt.thumbnail_url} />
-            )}
 
             {(!isUnlocked && !prompt.isPremium) && (
               <button
