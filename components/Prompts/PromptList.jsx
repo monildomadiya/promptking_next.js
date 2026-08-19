@@ -59,7 +59,12 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
   const prevSearch = useRef(search);
   const prevFilter = useRef(filter);
 
-  const itemsPerPage = isMobile ? 12 : 16;
+  // Mobile deliberately carries more than desktop, which reads like a typo but
+  // isn't: the phone grid is two columns of short cards, so 30 is fifteen rows
+  // of thumb-scroll, while desktop's four-wide grid turns 28 into seven rows
+  // that already overflow a screen. Both are multiples of their column count,
+  // so neither leaves a ragged last row.
+  const itemsPerPage = isMobile ? 30 : 28;
 
   // ── Fetch data from API ──────────────────────────────────────────────────────
   const fetchData = useCallback(async (silent = false) => {
