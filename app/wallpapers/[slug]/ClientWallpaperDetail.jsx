@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Download, Smartphone, Monitor, Image as ImageIcon, ArrowLeft, Check } from '@/components/Common/Icons';
 import { buildDownloadUrl, DOWNLOAD_SIZES } from '@/lib/wallpaperUrls';
 import WallpaperImage from '@/components/Wallpapers/WallpaperImage';
-import DevicePreview from '@/components/Wallpapers/DevicePreview';
 import api from '@/lib/api';
 
 const SIZE_ORDER = [
@@ -16,11 +15,6 @@ const SIZE_ORDER = [
 
 export default function ClientWallpaperDetail({ wallpaper, more = [] }) {
   const [taken, setTaken] = useState(null);
-
-  // Open on the device the wallpaper was made for. 'both' has to pick one, and
-  // phone wins: it is the smaller crop, so it is the one that loses the most
-  // of the image and therefore the one worth showing first.
-  const [device, setDevice] = useState(wallpaper.orientation === 'desktop' ? 'desktop' : 'phone');
 
   // Cloudinary sets Content-Disposition, so the browser saves the file instead
   // of navigating away — which is why this can be a plain link and why the
@@ -54,30 +48,27 @@ export default function ClientWallpaperDetail({ wallpaper, more = [] }) {
 
       <div className="pk-wpd-layout">
         <figure className="pk-wpd-stage">
-          <DevicePreview image={wallpaper.image} title={wallpaper.title} mode={device} />
-
-          {/* Only offered when the wallpaper is marked for both. A phone-only
-              wallpaper shown in a monitor is a crop nobody will download. */}
-          {wallpaper.orientation === 'both' && (
-            <div className="pk-wpd-device" role="group" aria-label="Preview device">
-              <button
-                type="button"
-                className={device === 'phone' ? 'is-on' : ''}
-                onClick={() => setDevice('phone')}
-                aria-pressed={device === 'phone'}
-              >
-                <Smartphone size={14} /> Phone
-              </button>
-              <button
-                type="button"
-                className={device === 'desktop' ? 'is-on' : ''}
-                onClick={() => setDevice('desktop')}
-                aria-pressed={device === 'desktop'}
-              >
-                <Monitor size={14} /> Desktop
-              </button>
-            </div>
-          )}
+          {/* The upload itself, whole and uncropped. A device frame answered a
+              question nobody was asking and cost the visitor the top third of
+              the image to a mock clock; what they came to judge is the picture,
+              and every crop on offer is spelled out on the buttons beside it. */}
+          <WallpaperImage
+            image={wallpaper.image}
+            alt={wallpaper.title}
+            ratio={null}
+            quality="good"
+            widths={[400, 700, 1000, 1400]}
+            sizes="(max-width: 900px) 90vw, 560px"
+            priority
+            className="pk-wpd-img"
+            // Reserving the box from the known dimensions keeps the panel
+            // beside it from jumping when the image lands.
+            style={
+              wallpaper.width && wallpaper.height
+                ? { aspectRatio: `${wallpaper.width} / ${wallpaper.height}` }
+                : undefined
+            }
+          />
         </figure>
 
         <div className="pk-wpd-panel">
@@ -169,10 +160,9 @@ const styles = `
 
 .pk-wpd-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr); gap: 34px; align-items: center; }
 
-/* The frame carries its own depth, so the old card chrome around it would be
-   a box inside a box. This is now just a centred holder with room to breathe. */
+/* A centred holder with room to breathe; the image carries its own depth. */
 .pk-wpd-stage {
-  margin: 0; display: flex; flex-direction: column; align-items: center; gap: 16px;
+  margin: 0; display: flex; flex-direction: column; align-items: center;
   padding: 26px 16px;
   border-radius: 24px;
   background:
@@ -180,16 +170,19 @@ const styles = `
     rgba(0,0,0,0.028);
   border: 1px solid rgba(0,0,0,0.07);
 }
+.pk-wpd-stage picture { display: contents; }
 
-.pk-wpd-device { display: inline-flex; gap: 6px; padding: 4px; border-radius: 30px; background: rgba(0,0,0,0.05); }
-.pk-wpd-device button {
-  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
-  padding: 7px 15px; border-radius: 30px; border: none; background: transparent;
-  font-size: 0.78rem; font-weight: 700; color: var(--text-secondary);
-  transition: background 0.2s ease, color 0.2s ease;
+/* Height-capped rather than width-led: a 9:16 upload rendered at column width
+   runs off the bottom of the screen and pushes the download buttons past the
+   fold. object-fit: contain and width: auto keep a portrait file whole in
+   cap, so nothing is cropped away in the one view meant to show the file. */
+.pk-wpd-img {
+  display: block; max-width: 100%; width: auto;
+  max-height: min(70vh, 620px);
+  object-fit: contain;
+  border-radius: 16px;
+  box-shadow: 0 18px 44px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.12);
 }
-.pk-wpd-device button:hover { color: var(--text-main); }
-.pk-wpd-device button.is-on { background: #fff; color: var(--text-main); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
 
 .pk-wpd-panel { display: flex; flex-direction: column; gap: 15px; }
 .pk-wpd-panel h1 {
@@ -260,6 +253,8 @@ const styles = `
 }
 @media (max-width: 560px) {
   .pk-wpd { padding: 20px 16px 50px; }
+  .pk-wpd-stage { padding: 16px 12px; border-radius: 18px; }
+  .pk-wpd-img { max-height: min(62vh, 520px); }
   .pk-wpd-more-grid { grid-template-columns: repeat(2, 1fr); }
 }
 `;
