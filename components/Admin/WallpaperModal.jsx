@@ -11,6 +11,17 @@ import { X, Save, Image as ImageIcon, AlertTriangle, Smartphone, Monitor } from 
 const RECOMMENDED_MIN_WIDTH = 1440;
 const RECOMMENDED_MIN_HEIGHT = 1920;
 
+/**
+ * Where a new wallpaper goes.
+ *
+ * Set, and uploads land in Cloudflare R2 — which is where they belong: these
+ * are the biggest files the site handles and R2 charges nothing to serve them
+ * again. Unset, this falls back to the Cloudinary path the modal has always
+ * used, so a machine without R2 credentials is not a machine that cannot
+ * publish. Wallpapers already stored in Cloudinary keep working either way.
+ */
+const R2_BASE = (process.env.NEXT_PUBLIC_R2_PUBLIC_BASE || '').replace(/\/+$/, '');
+
 const inputStyle = {
   width: '100%', padding: '12px 16px', borderRadius: '12px', fontSize: '0.85rem',
   color: 'white', background: 'var(--surface-1)', border: '1px solid var(--border-color)',
@@ -30,8 +41,12 @@ const labelStyle = {
  * public page can state a real size and the ImageObject schema is honest) and
  * they drive the low-resolution warning.
  */
-const WallpaperUpload = ({ url, onUpload, onDimensions }) => {
+const WallpaperUpload = ({ url, title, onUpload, onDimensions }) => {
   const [isUploading, setIsUploading] = useState(false);
+  // null while idle. A 30 MB wallpaper on a domestic uplink is a minute of
+  // apparently nothing happening, and a spinner that never moves reads as a
+  // hang — so the R2 path reports real bytes.
+  const [progress, setProgress] = useState(null);
   const [localUrl, setLocalUrl] = useState(url || '');
   const fileInputRef = useRef(null);
 
@@ -52,12 +67,22 @@ const WallpaperUpload = ({ url, onUpload, onDimensions }) => {
   const handleUrlBlur = async () => {
     const currentUrl = localUrl.trim();
     if (!currentUrl || currentUrl === url) return;
-    if (currentUrl.includes('res.cloudinary.com') || currentUrl.startsWith('/uploads/')) {
+    if (
+      currentUrl.includes('res.cloudinary.com')
+      || (R2_BASE && currentUrl.startsWith(`${R2_BASE}/`))
+      || currentUrl.startsWith('/uploads/')
+    ) {
       accept(currentUrl); return;
     }
     setIsUploading(true);
     try {
-      const res = await api.post('/admin/upload_image_url', { url: currentUrl });
+      // Wallpapers follow the same destination as an uploaded file: the bucket
+      // when there is one, Cloudinary otherwise. A wallpaper that lands in a
+      // different place depending on how it was added is a wallpaper whose
+      // download button behaves differently for no reason a visitor can see.
+      const res = R2_BASE
+        ? await api.post('/admin/r2_import_url', { url: currentUrl, title })
+        : await api.post('/admin/upload_image_url', { url: currentUrl });
       if (res.data?.status === 'success') accept(res.data.imageUrl);
       else { toast.error(res.data?.error || 'Failed to upload from URL'); accept(currentUrl); }
     } catch (e) {
@@ -67,16 +92,100 @@ const WallpaperUpload = ({ url, onUpload, onDimensions }) => {
   };
 
   /**
-   * Uploads straight from the browser to Cloudinary.
+   * The picked file's true pixel size, read locally.
    *
-   * The origin only signs the request — a few hundred bytes — so nginx's
-   * client_max_body_size never applies to the file itself. That limit is what
-   * made every wallpaper-sized upload fail with a bare 413 that left no trace
-   * in the application's logs.
-   *
-   * Cloudinary's response carries the stored width and height, so the
-   * dimensions come back measured rather than probed with a second download.
+   * Cloudinary reports dimensions in its upload response; R2 answers a PUT with
+   * an empty 200, so for that path they have to be measured — and measuring the
+   * file the admin chose is better than measuring the copy that comes back,
+   * because it costs no second download of a file that may be 30 MB.
    */
+  const measureFile = (file) =>
+    new Promise((resolve) => {
+      const objectUrl = URL.createObjectURL(file);
+      const img = new window.Image();
+      img.onload = () => {
+        resolve({ width: img.naturalWidth, height: img.naturalHeight });
+        URL.revokeObjectURL(objectUrl);
+      };
+      img.onerror = () => { resolve(null); URL.revokeObjectURL(objectUrl); };
+      img.src = objectUrl;
+    });
+
+  /**
+   * Browser → Cloudflare R2, one presigned PUT.
+   *
+   * XHR rather than fetch for one reason: upload progress. Fetch still has no
+   * way to report how much of a request body has gone out, and this is the one
+   * upload on the site where that matters.
+   *
+   * The Content-Type header is signed into the URL, so it has to be sent back
+   * exactly as the server signed it — a mismatch is a 403 from R2 that reads
+   * like a credentials problem and is not one.
+   */
+  const uploadToR2 = async (file) => {
+    const signed = await api.post('/admin/r2_upload_url', {
+      filename: file.name,
+      contentType: file.type,
+      size: file.size,
+      title,
+    });
+
+    const { uploadUrl, publicUrl, headers } = signed.data || {};
+    if (!uploadUrl || !publicUrl) throw new Error('Could not authorise the upload');
+
+    await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('PUT', uploadUrl, true);
+      Object.entries(headers || {}).forEach(([k, v]) => xhr.setRequestHeader(k, v));
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) setProgress(Math.round((event.loaded / event.total) * 100));
+      };
+      xhr.onload = () => (xhr.status >= 200 && xhr.status < 300
+        ? resolve()
+        : reject(new Error(`R2 rejected the file (HTTP ${xhr.status})`)));
+      xhr.onerror = () => reject(new Error('Network error while uploading to R2'));
+      xhr.send(file);
+    });
+
+    return publicUrl;
+  };
+
+  /**
+   * Browser → Cloudinary, the original path.
+   *
+   * Either way the origin only signs the request — a few hundred bytes — so
+   * nginx's client_max_body_size never applies to the file itself. That limit
+   * is what made every wallpaper-sized upload fail with a bare 413 that left no
+   * trace in the application's logs.
+   */
+  const uploadToCloudinary = async (file) => {
+    const signed = await api.post('/admin/upload_signature', {});
+    const { cloudName, apiKey, timestamp, folder, signature } = signed.data || {};
+    if (!cloudName || !signature) throw new Error('Could not authorise the upload');
+
+    const body = new FormData();
+    body.append('file', file);
+    body.append('api_key', apiKey);
+    body.append('timestamp', timestamp);
+    body.append('folder', folder);
+    body.append('signature', signature);
+
+    // Deliberately fetch, not the api client: this request goes to
+    // Cloudinary, and the api client would prefix the site's own origin and
+    // attach its admin token to a third party.
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+      method: 'POST',
+      body,
+    });
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok || !data?.secure_url) {
+      throw new Error(data?.error?.message || `Cloudinary rejected the file (HTTP ${res.status})`);
+    }
+
+    return data.secure_url;
+  };
+
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -84,38 +193,26 @@ const WallpaperUpload = ({ url, onUpload, onDimensions }) => {
 
     try {
       setIsUploading(true);
+      setProgress(R2_BASE ? 0 : null);
 
-      const signed = await api.post('/admin/upload_signature', {});
-      const { cloudName, apiKey, timestamp, folder, signature } = signed.data || {};
-      if (!cloudName || !signature) throw new Error('Could not authorise the upload');
+      // Measured first: if the file is not an image the browser can decode,
+      // there is no point spending a minute uploading it.
+      const dimensions = await measureFile(file);
 
-      const body = new FormData();
-      body.append('file', file);
-      body.append('api_key', apiKey);
-      body.append('timestamp', timestamp);
-      body.append('folder', folder);
-      body.append('signature', signature);
+      const imageUrl = R2_BASE ? await uploadToR2(file) : await uploadToCloudinary(file);
 
-      // Deliberately fetch, not the api client: this request goes to
-      // Cloudinary, and the api client would prefix the site's own origin and
-      // attach its admin token to a third party.
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-        method: 'POST',
-        body,
-      });
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok || !data?.secure_url) {
-        throw new Error(data?.error?.message || `Cloudinary rejected the file (HTTP ${res.status})`);
-      }
-
-      onUpload(data.secure_url);
-      onDimensions?.({ width: data.width, height: data.height });
-      toast.success(`Uploaded ${mb} MB — ${data.width} x ${data.height}`);
+      onUpload(imageUrl);
+      onDimensions?.(dimensions);
+      toast.success(
+        dimensions
+          ? `Uploaded ${mb} MB — ${dimensions.width} x ${dimensions.height}`
+          : `Uploaded ${mb} MB`,
+      );
     } catch (error) {
       toast.error(`Upload failed (${mb} MB): ${error.message}`, { duration: 8000 });
     } finally {
       setIsUploading(false);
+      setProgress(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
@@ -136,7 +233,7 @@ const WallpaperUpload = ({ url, onUpload, onDimensions }) => {
             color: 'white', border: 'none', fontWeight: 700, fontSize: '0.85rem',
             cursor: 'pointer', opacity: isUploading ? 0.7 : 1, whiteSpace: 'nowrap',
           }}
-        >{isUploading ? 'Uploading...' : 'Upload'}</button>
+        >{isUploading ? (progress === null ? 'Uploading...' : `${progress}%`) : 'Upload'}</button>
       </div>
 
       <div style={{
@@ -229,6 +326,7 @@ const WallpaperModal = ({ wallpaper, onClose, onSave }) => {
             <label style={labelStyle}>Image</label>
             <WallpaperUpload
               url={formData.image_url}
+              title={formData.title}
               onUpload={(image_url) => set({ image_url })}
               onDimensions={(d) => set({ width: d?.width || null, height: d?.height || null })}
             />
