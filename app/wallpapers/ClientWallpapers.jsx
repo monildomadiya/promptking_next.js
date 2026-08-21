@@ -13,7 +13,7 @@ import {
 } from '@/components/Common/Icons';
 import CategoryRail from '@/components/Wallpapers/CategoryRail';
 import WallpaperImage from '@/components/Wallpapers/WallpaperImage';
-import { previewUrl } from '@/lib/wallpaperUrls';
+import { NO_CATEGORY, previewUrl } from '@/lib/wallpaperUrls';
 
 const FILTERS = [
   { id: 'all', label: 'All', Icon: ImageIcon },
@@ -129,8 +129,28 @@ export default function ClientWallpapers({ wallpapers = [], categories = [] }) {
   // the right collection; it just arrives a frame later.
   useEffect(() => {
     const fromUrl = new URLSearchParams(window.location.search).get('category') || 'all';
-    if (categories.some((c) => c.slug === fromUrl)) setCategory(fromUrl);
+    if (fromUrl === NO_CATEGORY || categories.some((c) => c.slug === fromUrl)) setCategory(fromUrl);
   }, [categories]);
+
+  /*
+   * Where to come back to.
+   *
+   * The category lives in the URL, but a wallpaper's page is a different route
+   * and cannot see it - so its back link was a hardcoded /wallpapers, which
+   * quietly dumped anyone who had filtered the wall back into the unfiltered
+   * one. The listing leaves its query here on the way out instead.
+   *
+   * sessionStorage rather than a ?from= on every card link: the detail page is
+   * the one indexed, shared and linked to, and it has no business carrying a
+   * record of how each visitor happened to arrive at it.
+   */
+  useEffect(() => {
+    try {
+      window.sessionStorage.setItem('pk-wallpapers-return', window.location.search);
+    } catch {
+      /* Private mode, or storage disabled. The back link falls back to /wallpapers. */
+    }
+  }, [category]);
 
   const pickCategory = (slug) => {
     setCategory(slug);
@@ -143,9 +163,23 @@ export default function ClientWallpapers({ wallpapers = [], categories = [] }) {
     window.history.replaceState(null, '', query ? `/wallpapers?${query}` : '/wallpapers');
   };
 
+  /*
+   * The chips: every real category, and - only when there are any - one more
+   * for the wallpapers that were saved without one. Computed from the list
+   * already in hand rather than stored, so it is never stale and cannot
+   * survive the last uncategorised wallpaper being filed.
+   */
+  const loose = useMemo(() => wallpapers.filter((w) => !w.categorySlug).length, [wallpapers]);
+  const chips = useMemo(() => {
+    if (!loose || categories.some((c) => c.slug === NO_CATEGORY)) return categories;
+    return [...categories, { slug: NO_CATEGORY, name: 'Others', count: loose }];
+  }, [categories, loose]);
+
   const shown = useMemo(() => {
     return wallpapers.filter((w) => {
-      if (category !== 'all' && w.categorySlug !== category) return false;
+      if (category === NO_CATEGORY) {
+        if (w.categorySlug) return false;
+      } else if (category !== 'all' && w.categorySlug !== category) return false;
       if (filter === 'all') return true;
       // `both` belongs in either column — it is the answer to "does this crop
       // sensibly for that screen", not an exclusive category.
@@ -257,9 +291,9 @@ export default function ClientWallpapers({ wallpapers = [], categories = [] }) {
 
       {total > 0 && (
         <div className="pk-wl-bar">
-          {categories.length > 0 && (
+          {chips.length > 0 && (
             <CategoryRail
-              categories={categories}
+              categories={chips}
               total={total}
               active={category}
               onPick={pickCategory}

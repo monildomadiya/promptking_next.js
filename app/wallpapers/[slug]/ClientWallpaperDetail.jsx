@@ -14,7 +14,7 @@ import {
   Square,
   Tablet,
 } from '@/components/Common/Icons';
-import { buildDownloadUrl, DOWNLOAD_SIZES, previewUrl, sizeRatio } from '@/lib/wallpaperUrls';
+import { buildDownloadUrl, DOWNLOAD_SIZES, NO_CATEGORY, previewUrl, sizeRatio } from '@/lib/wallpaperUrls';
 import CropStage, { CropPreview, coverCrop } from '@/components/Wallpapers/CropStage';
 import WallpaperImage from '@/components/Wallpapers/WallpaperImage';
 import api from '@/lib/api';
@@ -72,6 +72,30 @@ export default function ClientWallpaperDetail({ wallpaper, more = [] }) {
   }, [shape, aspect, ratio]);
 
   const src = useMemo(() => previewUrl(wallpaper.image, 1400), [wallpaper.image]);
+
+  /*
+   * Back to the collection this visitor came from, not to the whole wall.
+   *
+   * Guarded on the wallpaper actually belonging to that category, which makes
+   * the link self-correcting: arrive here straight from a search result with a
+   * stale filter still in storage and the guard fails, so the link is the
+   * plain listing rather than a collection this wallpaper is not even in.
+   *
+   * Starts at /wallpapers so the server and the first client render agree.
+   */
+  const [backHref, setBackHref] = useState('/wallpapers');
+  useEffect(() => {
+    let search = '';
+    try {
+      search = window.sessionStorage.getItem('pk-wallpapers-return') || '';
+    } catch {
+      return;
+    }
+    const from = new URLSearchParams(search).get('category');
+    // The bucket counts as this wallpaper's collection when it has no other.
+    const belongs = from === NO_CATEGORY ? !wallpaper.categorySlug : from === wallpaper.categorySlug;
+    if (from && belongs) setBackHref(`/wallpapers?category=${encodeURIComponent(from)}`);
+  }, [wallpaper.categorySlug]);
 
   const href = buildDownloadUrl(wallpaper.image, {
     size: fit,
@@ -132,8 +156,9 @@ export default function ClientWallpaperDetail({ wallpaper, more = [] }) {
     <main className="pk-wp">
       <style>{styles}</style>
 
-      <Link href="/wallpapers" className="pk-wp-back">
-        <ArrowLeft size={15} /> All wallpapers
+      <Link href={backHref} className="pk-wp-back">
+        <ArrowLeft size={15} />
+        {backHref === '/wallpapers' ? 'All wallpapers' : `Back to ${wallpaper.categoryName || 'Others'}`}
       </Link>
 
       <div className="pk-wp-grid">
