@@ -118,9 +118,8 @@ const styles = `
   padding: 9px 17px; border-radius: 30px; text-decoration: none;
   background: var(--accent-main); color: #fff;
   font-size: 0.82rem; font-weight: 800;
-  transition: filter 0.18s ease, transform 0.18s ease;
+  transition: filter 0.18s ease;
 }
-.pk-wcat-all:hover { filter: brightness(1.08); transform: translateY(-1px); }
 
 /* Start-aligned, always. Centring a scrolling row is the trap: the moment it
    overflows, the first items are pushed into space the scrollbar cannot
@@ -148,15 +147,10 @@ const styles = `
   border-radius: 999px;
   border: 1px solid var(--border-color);
   background: linear-gradient(160deg, var(--surface-2), var(--surface-3));
-  transition: transform 0.3s cubic-bezier(0.2,0.8,0.25,1), border-color 0.25s ease;
+  transition: border-color 0.2s ease;
 }
 .pk-wcat-pill picture { display: contents; }
-.pk-wcat-pill img {
-  width: 100%; height: 100%; object-fit: cover; display: block;
-  transition: transform 0.45s cubic-bezier(0.2,0.8,0.25,1);
-}
-.pk-wcat-item:hover .pk-wcat-pill { transform: translateY(-5px); border-color: rgba(229,9,20,0.5); }
-.pk-wcat-item:hover .pk-wcat-pill img { transform: scale(1.07); }
+.pk-wcat-pill img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* The last capsule has no wallpaper to show, so it says what it is instead. */
 .pk-wcat-pill.is-more {
@@ -176,16 +170,32 @@ const styles = `
   max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   transition: color 0.2s ease;
 }
-.pk-wcat-item:hover .pk-wcat-name { color: var(--accent-main); }
+
 .pk-wcat-count {
   margin-top: -6px;
   font-size: 0.68rem; font-weight: 600; color: var(--text-secondary); text-align: center;
 }
 
+/*
+ * Hover states, and only where hovering is a thing that happens.
+ *
+ * A touch device has no hover: tapping a link leaves :hover stuck on it until
+ * something else is tapped, so an effect written without this query is not an
+ * effect a phone user never sees - it is one that latches on after every tap
+ * and stays. pointer: fine keeps it to a real cursor rather than a stylus.
+ *
+ * Nothing here moves. A row of capsules that lift and zoom under the cursor
+ * draws the eye to the mouse instead of to the pictures, and the pictures are
+ * the reason the row exists; the border and the label carry the state instead.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .pk-wcat-all:hover { filter: brightness(1.08); }
+  .pk-wcat-item:hover .pk-wcat-pill { border-color: rgba(229,9,20,0.55); }
+  .pk-wcat-item:hover .pk-wcat-name { color: var(--accent-main); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .pk-wcat-pill, .pk-wcat-pill img, .pk-wcat-all { transition: none; }
-  .pk-wcat-item:hover .pk-wcat-pill { transform: none; }
-  .pk-wcat-item:hover .pk-wcat-pill img { transform: none; }
+  .pk-wcat-pill, .pk-wcat-all, .pk-wcat-name { transition: none; }
 }
 
 @media (min-width: 1101px) { .pk-wcat { margin-top: 32px; } }
