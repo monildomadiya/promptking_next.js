@@ -492,7 +492,14 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     checkAuth(); 
-    api.get('/admin/settings').then(res => setSettings(res.data));
+    api.get('/admin/settings')
+      .then(res => setSettings(res.data))
+      // Swallowed on purpose: this fires before the session exists on the
+      // login screen, and a 401 there is the expected answer rather than a
+      // fault. Without a catch it surfaced as an uncaught rejection and the
+      // dev overlay counted it as an error on every visit. The panels all
+      // default to an empty settings object, so there is nothing to repair.
+      .catch(() => {});
   }, []);
 
   // --- KEYBOARD SHORTCUTS ---
