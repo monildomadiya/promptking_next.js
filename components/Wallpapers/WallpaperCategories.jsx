@@ -88,7 +88,11 @@ const styles = `
 .pk-wcat {
   width: calc(100% - 2 * var(--gutter));
   max-width: var(--container-inner);
-  margin: 0 auto 40px;
+  /* Top margin because this is now the page's first section. The layout pads
+     the page by however tall the fixed header measures, which clears it and
+     leaves nothing over — so all of the air under the header is this margin,
+     and the removed heading block is what used to supply it. */
+  margin: 18px auto 40px;
   padding: clamp(18px, 2.4vw, 26px) clamp(14px, 2vw, 24px);
   border-radius: 26px;
   border: 1px solid var(--border-color);
@@ -183,6 +187,8 @@ const styles = `
   .pk-wcat-item:hover .pk-wcat-pill { transform: none; }
   .pk-wcat-item:hover .pk-wcat-pill img { transform: none; }
 }
+
+@media (min-width: 1101px) { .pk-wcat { margin-top: 32px; } }
 
 @media (max-width: 620px) {
   /* The heading stacks and the button drops to its own line rather than

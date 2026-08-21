@@ -87,7 +87,11 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
   };
 
   return (
-    <main>
+    // flow-root so the first section's top margin stays inside main instead of
+    // collapsing out through it. The layout wrapper above has a flat padding-top
+    // sized for the fixed header, which leaves almost nothing under the tall
+    // desktop one — and an escaped margin cannot add the air back.
+    <main style={{ display: 'flow-root' }}>
       <SEOMetadata 
         title={getPageTitle()}
         description={getPageDescription()}
@@ -95,53 +99,26 @@ const HomePage = ({ initialPrompts = [], initialCategories = [], initialWebsiteC
         schema={schema}
       />
 
-      {!isSearching && (
+      {/* Category links, server-rendered from the same data the page already
+          fetched. The band is conditional on having any: it used to hold the
+          page heading as well, and with that gone an empty wrapper would leave
+          80px of margin above the wallpapers and nothing inside it. */}
+      {!isSearching && initialWebsiteCategories.length > 0 && (
       <div style={{
         maxWidth: 'var(--container-max)', margin: '40px auto 40px', padding: isMobile ? '0 28px' : '0 20px',
       }}>
-        {/* The homepage previously shipped no <h1> and no copy above the prompt
-            grid — the first thing above the fold was an ad unit. */}
-        <header style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <h1 style={{
-            fontSize: 'clamp(1.75rem, 5vw, 2.75rem)',
-            fontWeight: 900,
-            letterSpacing: '-1px',
-            lineHeight: 1.15,
-            margin: '0 0 12px',
-            color: 'var(--text-main)',
-          }}>
-            Free AI Prompts for ChatGPT, Gemini &amp; Midjourney
-          </h1>
-          <p style={{
-            fontSize: '1.05rem',
-            lineHeight: 1.6,
-            color: 'var(--text-secondary)',
-            maxWidth: '640px',
-            margin: '0 auto',
-          }}>
-            Hand-tested, copy-ready prompts for AI image generation, portraits and
-            creative work. Copy any prompt with one click — no sign-up required.
-          </p>
-        </header>
-
-        {/* Category links, server-rendered from the same data the page already
-            fetched. Empty until categories exist in the admin panel, which is
-            also why the header's Explore button is currently invisible. */}
-        {initialWebsiteCategories.length > 0 && (
-          <nav aria-label="Prompt categories" style={{
-            display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center',
-          }}>
-            {initialWebsiteCategories.map((cat) => (
-              <Link key={cat.slug || cat.id} href={`/category/${cat.slug}`} style={categoryPillStyle}>
-                {cat.name}
-              </Link>
-            ))}
-            <Link href="/categories" style={{ ...categoryPillStyle, color: 'var(--accent-main)', borderColor: 'rgba(229,9,20,0.25)' }}>
-              All categories →
+        <nav aria-label="Prompt categories" style={{
+          display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center',
+        }}>
+          {initialWebsiteCategories.map((cat) => (
+            <Link key={cat.slug || cat.id} href={`/category/${cat.slug}`} style={categoryPillStyle}>
+              {cat.name}
             </Link>
-          </nav>
-        )}
-
+          ))}
+          <Link href="/categories" style={{ ...categoryPillStyle, color: 'var(--accent-main)', borderColor: 'rgba(229,9,20,0.25)' }}>
+            All categories →
+          </Link>
+        </nav>
       </div>
       )}
 
