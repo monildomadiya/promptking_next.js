@@ -62,7 +62,15 @@
      footer sat at 1360/1240 and the search bar at 1000, which read as
      misaligned on desktop. */
   --container-max: 1320px;
-  --container-pad: 20px;
+
+  /* The space either side of everything: the header bar, the footer panel and
+     every page's content all read this one number, which is the only way the
+     three stay on the same vertical line. It used to be three separate
+     literals — 20px here, calc(100% - 40px) on the header, 14px on phones —
+     and below 1100px they disagreed by 14px, so the header sat visibly inset
+     from the content beneath it. */
+  --gutter: 20px;
+  --container-pad: var(--gutter);
   /* Edge of the *content* inside the container. Card-style surfaces (the
      header bar, the footer panel) sit flush to this so their borders line up
      with the prompt grid rather than sitting 20px proud of it. */
@@ -81,23 +89,21 @@
    breakpoint so the header bar, prompt grid and footer card all share the
    same left and right edges. */
 .pk-footer-card {
-  width: calc(100% - 40px);
+  width: calc(100% - 2 * var(--gutter));
   max-width: var(--container-inner);
   margin: 0 auto 40px;
 }
 
+/* Wider gutter once the viewport stops being a desktop: the header is a
+   floating card, and a card needs visible air around it to read as one. */
 @media (max-width: 1100px) {
-  .pk-footer-card { width: calc(100% - 56px); }
+  :root { --gutter: 28px; }
 }
 
 @media (max-width: 768px) {
   /* Keep the 10px gutter the header uses below 1100px; only the bottom
      spacing tightens on phones. */
   .pk-footer-card { margin: 0 auto 24px; }
-}
-
-@media (max-width: 768px) {
-  :root { --container-pad: 14px; }
 }
 
 /* ── Room for AdSense side rails ──────────────────────────────────────────
@@ -1194,7 +1200,7 @@ mark {
 .blog-container {
   max-width: var(--container-max);
   margin: 0 auto;
-  padding: 80px 20px;
+  padding: 80px var(--container-pad);
 }
 
 .blog-hero {
@@ -1539,7 +1545,7 @@ mark {
   gap: 40px;
   max-width: var(--container-max);
   margin: 0 auto;
-  padding: 40px 20px 20px 20px;
+  padding: 40px var(--container-pad) 20px;
   width: 100%;
 }
 
@@ -1553,7 +1559,7 @@ mark {
   .layout-with-sidebar {
     grid-template-columns: 1fr;
     gap: 30px;
-    padding: 30px 20px 20px 20px;
+    padding: 30px var(--container-pad) 20px;
   }
 }
 @media (max-width: 1250px) {
@@ -1950,7 +1956,7 @@ body.shorts-modal-open {
 
   /* Desktop */
   top: 20px;
-  width: calc(100% - 40px);
+  width: calc(100% - 2 * var(--gutter));
   padding: 12px 20px;
   min-height: auto;
 }
@@ -2081,7 +2087,6 @@ body.shorts-modal-open {
 @media (max-width: 1100px) {
   .responsive-header {
     top: 10px;
-    width: calc(100% - 56px);
     padding: 10px 15px;
     min-height: 75px;
   }

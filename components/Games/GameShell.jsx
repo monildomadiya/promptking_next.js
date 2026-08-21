@@ -39,7 +39,7 @@ export default function GameShell({ eyebrow, title, accentWord, subtitle, childr
 }
 
 const gameStyles = `
-.pk-game-page { padding: 40px 20px 80px; min-height: 80vh; }
+.pk-game-page { padding: 40px var(--container-pad) 80px; min-height: 80vh; }
 .pk-game-wrap { max-width: 1000px; margin: 0 auto; }
 
 .pk-game-back {
