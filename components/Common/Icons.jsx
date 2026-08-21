@@ -379,3 +379,23 @@ export const Puzzle = (props) => (
 export const Download = (props) => (
   <IconWrapper {...props}><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></IconWrapper>
 );
+
+export const Minus = (props) => (
+  <IconWrapper {...props}><path d="M5 12h14"/></IconWrapper>
+);
+
+export const Crop = (props) => (
+  <IconWrapper {...props}><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></IconWrapper>
+);
+
+export const Tablet = (props) => (
+  <IconWrapper {...props}><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><line x1="12" x2="12.01" y1="18" y2="18"/></IconWrapper>
+);
+
+export const Square = (props) => (
+  <IconWrapper {...props}><rect width="18" height="18" x="3" y="3" rx="2"/></IconWrapper>
+);
+
+export const RectangleHorizontal = (props) => (
+  <IconWrapper {...props}><rect width="20" height="12" x="2" y="6" rx="2"/></IconWrapper>
+);
