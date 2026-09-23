@@ -40,7 +40,35 @@ flutter build apk --release
 It lands in `build\app\outputs\flutter-apk\app-release.apk`.
 
 Requires Flutter 3.27 or newer (the theme uses `CardThemeData` and
-`Color.withValues`).
+`Color.withValues`). Built and verified against Flutter 3.47.5 / Dart 3.13.4,
+Android SDK 36, JDK 17.
+
+### If the Gradle build dies on `sdkmanager`
+
+On a fresh SDK the first build fails like this:
+
+```
+Package ndk not found.
+Package 28.2.13676358 not found.
+> Process 'command '...\cmdline-tools\latest\bin\sdkmanager.bat'' finished with
+  non-zero exit value -1073740791 (NTSTATUS 0xC0000409)
+```
+
+`android/app/build.gradle.kts` pins `ndkVersion = flutter.ndkVersion`, so AGP
+insists that exact NDK is present even though this app has no native code of
+its own. AGP tries to fetch it through `sdkmanager`, which is now a deprecated
+shim over Google's new `android` CLI — and the shim crashes instead of
+installing anything.
+
+Install the NDK directly with the tool that works, then build again:
+
+```powershell
+android sdk install --sdk $env:ANDROID_HOME --no-metrics "ndk;28.2.13676358"
+```
+
+The `android` CLI also exits with `0xC0000409` after it finishes, but by then
+the files are all written — check `%ANDROID_HOME%\ndk\<version>\source.properties`
+rather than trusting its exit code.
 
 ## What is in it
 

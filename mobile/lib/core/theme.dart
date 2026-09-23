@@ -21,7 +21,7 @@ class AppTheme {
   static const Color info = Color(0xFF3B82F6);
 
   static ThemeData build() {
-    final ColorScheme scheme = const ColorScheme.dark(
+    const ColorScheme scheme = ColorScheme.dark(
       primary: gold,
       onPrimary: Color(0xFF1A1206),
       secondary: info,

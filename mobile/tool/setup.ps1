@@ -55,6 +55,24 @@ if ($xml -match 'android:label="[^"]*"') {
 
 Set-Content -Path $manifest -Value $xml -Encoding utf8
 
+Write-Host "`n==> Patching gradle.properties" -ForegroundColor Cyan
+
+$gradleProps = Join-Path $root 'android\gradle.properties'
+$props = Get-Content $gradleProps -Raw
+
+# Kotlin's incremental compiler memory-maps .tab files under build/ and on some
+# Windows setups cannot close them again — :image_picker_android:compileDebugKotlin
+# then dies with "Could not close incremental caches" before producing anything,
+# and a clean does not help because the caches are recreated each run. Turning
+# incremental compilation off avoids that code path entirely. Rebuilds are
+# slower; they also finish.
+if ($props -notmatch 'kotlin\.incremental') {
+    Add-Content -Path $gradleProps -Value "`n# Kotlin's incremental caches cannot be closed on some Windows setups.`nkotlin.incremental=false" -Encoding utf8
+    Write-Host "  disabled Kotlin incremental compilation"
+} else {
+    Write-Host "  kotlin.incremental already set"
+}
+
 Write-Host "`n==> Fetching packages" -ForegroundColor Cyan
 flutter pub get
 

@@ -491,9 +491,11 @@ class _PromptsScreenState extends State<PromptsScreen> {
       return ReorderableListView.builder(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
         itemCount: _rows.length,
-        onReorder: (int oldIndex, int newIndex) {
+        // onReorderItem, not onReorder: the framework already subtracts one
+        // from newIndex to account for the removed row, so doing it again here
+        // would drop every item one place short of where it was let go.
+        onReorderItem: (int oldIndex, int newIndex) {
           setState(() {
-            if (newIndex > oldIndex) newIndex -= 1;
             final Map<String, dynamic> moved = _rows.removeAt(oldIndex);
             _rows.insert(newIndex, moved);
           });

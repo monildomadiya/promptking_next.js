@@ -9,11 +9,13 @@ build/
 pubspec.lock
 
 # Android
-android/.gradle/
-android/local.properties
-android/key.properties
-android/app/*.jks
-android/app/*.keystore
+#
+# The whole folder is generated — `tool/setup.ps1` runs `flutter create` against
+# whatever Flutter is installed and then applies the two patches this app needs
+# (the INTERNET permission, and kotlin.incremental=false). Committing it would
+# pin AGP and Gradle plugin versions that match one Flutter release and break on
+# the next, which is the failure this arrangement exists to avoid. See README.
+android/
 *.apk
 *.aab
 
