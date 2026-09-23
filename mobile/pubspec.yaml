@@ -1,0 +1,23 @@
+name: promptking_admin
+description: Admin panel for promptking.in — manage prompts, blogs, wallpapers and settings from an Android phone.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  # CardThemeData, DialogThemeData and Color.withValues all landed in 3.27.
+  flutter: '>=3.27.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  shared_preferences: ^2.2.2
+  flutter_secure_storage: ^9.2.2
+  image_picker: ^1.1.2
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
