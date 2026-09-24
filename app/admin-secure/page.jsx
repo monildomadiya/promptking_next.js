@@ -1479,12 +1479,36 @@ const AdminDashboard = () => {
 
     if (!window.confirm("Permanent delete? This cannot be undone.")) return;
     const id = item.prompt_key || item.id;
-    const type = view === 'prompts' ? 'prompt' : (view === 'listicles' ? 'listicle' : (view === 'blogs' ? 'blog' : (view === 'categories' ? 'category' : (view === 'website_categories' ? 'website_category' : (view === 'wallpaper_categories' ? 'wallpaper_category' : (view === 'wallpapers' ? 'wallpaper' : (view === 'authors' ? 'author' : 'faq')))))));
+    // 'listicles' deletes through delete_prompt, not a delete_listicle that has
+    // never existed: a listicle is a row in `prompts` with website_category_id
+    // set, and delete_prompt keys off prompt_key, which is what `id` above
+    // already resolves to for both views.
+    const DELETE_ROUTE_BY_VIEW = {
+      prompts: 'prompt',
+      listicles: 'prompt',
+      blogs: 'blog',
+      categories: 'category',
+      website_categories: 'website_category',
+      wallpaper_categories: 'wallpaper_category',
+      wallpapers: 'wallpaper',
+      authors: 'author',
+      faqs: 'faq'
+    };
+    const type = DELETE_ROUTE_BY_VIEW[view];
+    if (!type) {
+      toast.error("Nothing can be deleted from this section.");
+      return;
+    }
     try {
       await api.delete(`/admin/delete_${type}/${id}`);
       fetchData(view);
     } catch (err) {
-      toast.error("Deletion failed. See console for details.");
+      // A refusal here is usually a reason, not a fault — deleting a website
+      // category that still holds listicles answers 409 with what is in the
+      // way. api.delete puts the server's `error` string on err.message, so
+      // that reason is already here; swallowing it behind "see console" is how
+      // it reads as a bug instead.
+      toast.error(err?.message || "Deletion failed. See console for details.");
       console.error(err);
     }
   };

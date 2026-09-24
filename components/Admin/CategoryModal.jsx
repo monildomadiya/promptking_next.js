@@ -66,10 +66,23 @@ const ImageUpload = ({ url, onUpload }) => {
 };
 
 const CategoryModal = ({ category, onClose, onSave }) => {
+  // `image`, not `image_url`. The categories table has image and icon columns
+  // and save_category destructures `image` — this form posted image_url, a key
+  // the route ignores, so the picked URL was dropped on every save and the
+  // column written NULL. The field has therefore never round-tripped: it always
+  // reopened empty. (website_categories genuinely does use image_url, which is
+  // where the mix-up came from; that is WebsiteCategoryModal's business.)
+  //
+  // `icon` and `description` are carried through untouched for the same reason
+  // in reverse: save_category writes both on every UPDATE, so a form that never
+  // sent them nulled those columns each time a category was edited. This form
+  // has no input for either — it just has to stop destroying them.
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
-    image_url: ''
+    image: '',
+    icon: null,
+    description: null
   });
 
   useEffect(() => {
@@ -77,7 +90,9 @@ const CategoryModal = ({ category, onClose, onSave }) => {
       setFormData({
         name: category.name || '',
         slug: category.slug || '',
-        image_url: category.image_url || ''
+        image: category.image || '',
+        icon: category.icon ?? null,
+        description: category.description ?? null
       });
     }
 
@@ -171,7 +186,7 @@ const CategoryModal = ({ category, onClose, onSave }) => {
               <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                 Icon / Image
               </label>
-              <ImageUpload url={formData.image_url} onUpload={(url) => setFormData({ ...formData, image_url: url })} />
+              <ImageUpload url={formData.image} onUpload={(url) => setFormData({ ...formData, image: url })} />
             </div>
           </form>
         </div>

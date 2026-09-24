@@ -334,9 +334,6 @@ class _ShellScreenState extends State<ShellScreen> {
             icon: Icons.help_outline_rounded,
             createLabel: 'New FAQ',
             searchFields: const <String>['question', 'answer'],
-            // The server has no delete_faq route, so offering the action here
-            // would only ever produce a 404 toast.
-            canDelete: false,
             titleOf: (Map<String, dynamic> row) => V.asString(row['question']),
             subtitleOf: (Map<String, dynamic> row) => V.asString(row['answer']),
             pillsOf: (Map<String, dynamic> row) => <Widget>[
@@ -360,13 +357,9 @@ class _ShellScreenState extends State<ShellScreen> {
             icon: Icons.category_outlined,
             createLabel: 'New category',
             searchFields: const <String>['name', 'slug'],
-            canDelete: false,
             titleOf: (Map<String, dynamic> row) => V.asString(row['name']),
             subtitleOf: (Map<String, dynamic> row) => V.asString(row['slug']),
-            thumbOf: (Map<String, dynamic> row) =>
-                V.asString(row['image_url']).isNotEmpty
-                    ? V.asString(row['image_url'])
-                    : V.asString(row['image']),
+            thumbOf: (Map<String, dynamic> row) => V.asString(row['image']),
             openEditor: (BuildContext context, Map<String, dynamic>? row) {
               return Navigator.of(context).push<bool>(
                 MaterialPageRoute<bool>(builder: (_) => CategoryEditor(category: row)),
@@ -384,7 +377,6 @@ class _ShellScreenState extends State<ShellScreen> {
             icon: Icons.layers_outlined,
             createLabel: 'New category',
             searchFields: const <String>['name', 'slug', 'tag'],
-            canDelete: false,
             titleOf: (Map<String, dynamic> row) => V.asString(row['name']),
             subtitleOf: (Map<String, dynamic> row) => V.asString(row['description']),
             thumbOf: (Map<String, dynamic> row) => V.asString(row['image_url']),

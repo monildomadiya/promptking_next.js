@@ -77,9 +77,8 @@ class _CategoryEditorState extends State<CategoryEditor> {
   late final TextEditingController _description =
       TextEditingController(text: V.asString(_row['description']));
 
-  late String? _image = V.asString(_row['image_url']).isEmpty
-      ? (V.asString(_row['image']).isEmpty ? null : V.asString(_row['image']))
-      : V.asString(_row['image_url']);
+  late String? _image =
+      V.asString(_row['image']).isEmpty ? null : V.asString(_row['image']);
 
   bool _saving = false;
 
@@ -105,10 +104,11 @@ class _CategoryEditorState extends State<CategoryEditor> {
         'name': _name.text.trim(),
         'slug': _slug.text.trim().isEmpty ? slugify(_name.text) : _slug.text.trim(),
         'description': V.emptyToNull(_description.text),
-        // The route writes `image`; the site renders `image_url`. Sending both
-        // keeps this form correct whichever column the row actually uses.
+        // `image` is the column and the only key save_category reads. This used
+        // to send image_url alongside it, because the web modal posted that name
+        // and nothing round-tripped; the modal now posts `image` too, so there
+        // is one spelling again.
         'image': _image,
-        'image_url': _image,
       });
       if (!mounted) return;
       showToast(context, 'Saved');

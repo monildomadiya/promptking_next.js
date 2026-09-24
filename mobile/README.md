@@ -1,7 +1,9 @@
 # PromptKing Admin — Android app
 
 A Flutter app that manages promptking.in from a phone. It talks to the
-**existing** `/api/admin` routes; nothing on the server had to change for it.
+**existing** `/api/admin` routes — nothing on the server had to change to make
+it work, only to finish it: three delete routes the web panel had always called
+and never had are now implemented, for both clients. See *Two gaps* below.
 
 ## How it signs in
 
@@ -17,8 +19,6 @@ address*). Production is `https://promptking.in`. To point at a laptop running
 `localhost` on a phone means the phone.
 
 ## Getting it running
-
-Flutter is not installed on this machine. Once it is:
 
 ```powershell
 cd mobile
@@ -81,8 +81,8 @@ rather than trusting its exit code.
 | Wallpaper categories | Create, edit, delete, sort order |
 | Blogs | List and edit, including the HTML body, featured image, author and status |
 | Authors | Create, edit, delete, photo |
-| FAQs | Create, edit, ordering, active flag |
-| Categories / Website categories | Create and edit |
+| FAQs | Create, edit, delete, ordering, active flag |
+| Categories / Website categories | Create, edit, delete |
 | Users | Read-only listing |
 | Settings | Logo and sizes, social links, AdSense client and all seven slots, slider default |
 
@@ -91,32 +91,40 @@ the camera, or import by URL through `/api/admin/upload_image_url`, which makes
 the **server** fetch the file — worth using on mobile data, since it avoids
 pulling a large image down only to push it back up.
 
-## Two things the server does not support yet
+## Two gaps that used to be here, and one rule that stayed
 
-These are pre-existing gaps in the web panel, not app bugs. The app does not
-pretend otherwise — the affected actions are hidden rather than offered and
-then failing.
+Both of these were server-side gaps in the web panel that this app documented
+and worked around. They are fixed now, in the same change that turned these
+sections back on.
 
-1. **No delete route for categories, website categories or FAQs.** There is a
-   `delete_author`, `delete_blog`, `delete_prompt`, `delete_wallpaper` and
-   `delete_wallpaper_category`, but no `delete_category`,
-   `delete_website_category` or `delete_faq`. The web panel calls them anyway
-   and gets a 404. Delete is switched off for those three sections here.
+1. **The three missing delete routes exist.** There was no `delete_category`,
+   `delete_website_category` or `delete_faq` — the web panel called them anyway
+   and got a 404, and this app hid the action rather than offer it and fail.
+   All three are implemented, so delete is live in every section that has it.
 
-2. **The web panel's category image field never round-trips.** The
-   `categories` table has `image` and `icon` columns — `save_category` inserts
-   into them — but `CategoryModal.jsx` posts the picked URL as `image_url` and
-   reads `category.image_url` back. The route ignores a key by that name, so
-   the column is written NULL and the form always reopens empty.
+   `delete_category` nulls `prompts.category_id` on the way out, the same way
+   `delete_wallpaper_category` already did, so prompts fall back to
+   uncategorised instead of keeping an id that points at nothing.
 
-   The app sends `image` *and* `image_url`, and reads `image_url` with a
-   fallback to `image`, so category images do save and reload correctly here.
-   The web panel will still show the field empty until `CategoryModal.jsx` is
-   changed to use `image`.
+   `delete_website_category` is the exception: it **refuses** with a 409 while
+   any listicle still references it, and says how many. Nulling that column
+   would not orphan those rows, it would convert them — a listicle *is* a
+   prompt with `website_category_id` set, so they would reappear on the home
+   page rendered by a template that knows nothing about `sub_prompts`. The
+   toast shows the server's reason, so that reads as an instruction rather than
+   a failure.
 
-Also worth knowing: a listicle deletes through `delete_prompt`, not
+2. **The category image field round-trips.** `save_category` reads `image`, but
+   `CategoryModal.jsx` posted `image_url` — a key the route ignores — so the
+   column was written NULL and the web form always reopened empty. The modal
+   now posts `image` (and carries `icon` through untouched, which it was also
+   nulling on every edit). This app sends and reads plain `image`; the
+   belt-and-braces `image_url` it used to send alongside is gone.
+
+Still true: a listicle deletes through `delete_prompt`, not a
 `delete_listicle` (which does not exist) — a listicle is just a row in
-`prompts` with `website_category_id` set.
+`prompts` with `website_category_id` set. The web panel now does this too,
+instead of calling a route that was never there.
 
 ## Layout
 
