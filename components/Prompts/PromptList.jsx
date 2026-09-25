@@ -3,7 +3,51 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 
 import PromptCard from './PromptCard';
 import Shimmer from '../Common/Shimmer';
+import AffiliateProductCard, { productCardStyles } from '../Affiliate/ProductCard';
 import api from '@/lib/api';
+
+// ─── Affiliate products in the grid ───────────────────────────────────────────
+// A small seeded generator, so a page's product spots are random per visit but
+// stay put while the visitor is on it — Math.random() in render would move the
+// cards on every keystroke of an unrelated state change.
+const seeded = (seed) => () => {
+  seed = (seed + 0x6d2b79f5) | 0;
+  let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+
+/**
+ * Where the products go on one page, as { afterIndex: product }.
+ *
+ * The page is cut into `count` equal stretches and each gets one product at a
+ * random spot inside it — random, but never two side by side and never a page
+ * where they all bunch at the top. The first one waits until after the first
+ * row: products arrive a moment after the prompts, and a card appearing above
+ * everything would shove the whole grid down under the reader.
+ *
+ * 28 prompts + 4 or 8 products fills whole rows of 4 (and 30 + 4/8 of 2), so
+ * the last row stays as even as it was.
+ */
+const placeProducts = (pool, count, pageSize, shown, page, seed) => {
+  if (!pool?.length || !count || !shown) return {};
+  const rand = seeded(seed + page * 7919);
+  const stretch = pageSize / count;
+  const spots = {};
+  let previous = 1; // so the first spot is at least index 3: after the first row
+  for (let i = 0; i < count; i += 1) {
+    // At least one prompt between two products, even when a stretch is short.
+    const from = Math.max(Math.floor(i * stretch), previous + 2);
+    const to = Math.max(from, Math.floor((i + 1) * stretch) - 1);
+    const at = from + Math.floor(rand() * (to - from + 1));
+    if (at >= shown) break;
+    previous = at;
+    // Continue through the shuffled pool page after page, so page 2 does not
+    // simply repeat page 1's products.
+    spots[at] = pool[((page - 1) * count + i) % pool.length];
+  }
+  return spots;
+};
 
 // ─── Module-level memory cache ────────────────────────────────────────────────
 // Persists for the entire browser session (survives component unmount/remount).
@@ -54,6 +98,28 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
 
   const [activeUnlockedKey, setActiveUnlockedKey] = useState(null);
   const [currentPage, setCurrentPage] = useState(() => _savedPage);
+
+  // Affiliate products for the grid. Fetched after mount on purpose: the grid is
+  // server-rendered, and a random placement there could never match the
+  // browser's, so the products join once the page is already interactive.
+  const [affiliate, setAffiliate] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    api.get('/affiliate_products')
+      .then(({ data }) => {
+        if (!alive || !data?.enabled || !data.gridCount || !data.products?.length) return;
+        // Featured products go into the pool twice, so they turn up more often
+        // without crowding everything else out.
+        const pool = [...data.products, ...data.products.filter((x) => x.isFeatured)];
+        for (let i = pool.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+        setAffiliate({ pool, count: data.gridCount, seed: Math.floor(Math.random() * 1e9) });
+      })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
 
   const hasFetched = useRef(false);
   const prevSearch = useRef(search);
@@ -167,6 +233,15 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
   const totalPages = Math.ceil(filteredPrompts.length / itemsPerPage);
   const pagedPrompts = filteredPrompts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
+  // Not while searching: someone looking for a prompt wants results, and a
+  // product among four matches reads as a wrong answer, not a suggestion.
+  const productSpots = useMemo(
+    () => (debouncedSearch
+      ? {}
+      : placeProducts(affiliate?.pool, affiliate?.count, itemsPerPage, pagedPrompts.length, currentPage, affiliate?.seed || 0)),
+    [affiliate, debouncedSearch, itemsPerPage, pagedPrompts.length, currentPage]
+  );
+
   const goToPage = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -239,10 +314,15 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
                 isMobile={isMobile}
               />
             </div>
-
+            {productSpots[idx] && (
+              <div className="pk-grid-product">
+                <AffiliateProductCard product={productSpots[idx]} compact sponsored />
+              </div>
+            )}
           </React.Fragment>
         ))}
       </div>
+      {Object.keys(productSpots).length > 0 && <style>{productCardStyles}</style>}
 
       {/* Pagination */}
       {totalPages > 1 && (

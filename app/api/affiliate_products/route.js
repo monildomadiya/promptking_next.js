@@ -13,6 +13,8 @@ export async function GET(req) {
     return liveJson(req, {
       enabled: true,
       showOnPrompts: settings.affiliate_show_on_prompts === '1',
+      // Products mixed into each page of the home-page prompt grid; 0 is off.
+      gridCount: [0, 4, 8].includes(Number(settings.affiliate_grid_count)) ? Number(settings.affiliate_grid_count) : 4,
       heading: settings.affiliate_prompt_heading,
       disclosure: settings.affiliate_disclosure,
       products,
