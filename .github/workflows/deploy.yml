@@ -13,10 +13,10 @@ jobs:
       - name: Deploy to Azure VM
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.PORT || 22 }}
+          host: ${{ secrets.AZURE_HOST }}
+          username: ${{ secrets.AZURE_USERNAME }}
+          key: ${{ secrets.AZURE_SSH_KEY }}
+          port: ${{ secrets.AZURE_PORT || 22 }}
           script: |
             # Stop at the first failure: a build that fails must not be
             # followed by a pm2 restart onto a half-written .next folder.
