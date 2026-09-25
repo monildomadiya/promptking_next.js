@@ -31,6 +31,7 @@ const SETTING_DEFAULTS = {
   affiliate_show_on_prompts: '1',
   affiliate_prompt_heading: 'Recommended for this prompt',
   affiliate_show_in_nav: '1',
+  affiliate_grid_count: '4',
 };
 const SETTING_KEYS = Object.keys(SETTING_DEFAULTS);
 
@@ -527,6 +528,13 @@ function SetupTab({ settings, setSettings, dirty, onSaved }) {
         <div className="pk-am-panel pk-am-pad pk-am-fields">
           <div className="pk-am-sechead"><h3>Where products appear</h3></div>
           <Toggle checked={settings.affiliate_show_in_nav === '1'} onChange={set('affiliate_show_in_nav')} title="Show “Deals” in the header menu and footer" />
+          <Field label="Products in the home-page prompt grid" hint="Mixed in among the prompt cards at random spots on every page, labelled “Sponsored”. A different mix on every visit and every page; hidden while someone is searching.">
+            <select value={settings.affiliate_grid_count} onChange={set('affiliate_grid_count')}>
+              <option value="0">Off</option>
+              <option value="4">4 per page (recommended)</option>
+              <option value="8">8 per page</option>
+            </select>
+          </Field>
           <Toggle checked={settings.affiliate_show_on_prompts === '1'} onChange={set('affiliate_show_on_prompts')} title="Show matching products on prompt pages" sub="Matched by each product’s tags; featured products fill the gaps." />
           <Field label="Prompt-page heading">
             <input value={settings.affiliate_prompt_heading} onChange={set('affiliate_prompt_heading')} />
@@ -706,7 +714,7 @@ const styles = `
 .pk-am-toggle strong { font-size: 0.86rem; }
 .pk-am-fields { display: flex; flex-direction: column; gap: 16px; }
 .pk-am-label { margin-bottom: 7px; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-secondary); }
-.pk-am-field input, .pk-am-field textarea, .pk-am-tester input {
+.pk-am-field input, .pk-am-field textarea, .pk-am-field select, .pk-am-tester input {
   width: 100%; padding: 11px 14px; border-radius: 12px; font-size: 0.88rem; font-family: inherit; color: var(--text-main);
   background: var(--surface-1); border: 1px solid var(--border-color); outline: none; resize: vertical;
 }

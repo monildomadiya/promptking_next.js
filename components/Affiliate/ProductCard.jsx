@@ -23,7 +23,7 @@ const endsIn = (iso) => {
  * the stores' programme terms expect — the link is an advertisement, and the
  * markup says so.
  */
-export default function AffiliateProductCard({ product, compact = false }) {
+export default function AffiliateProductCard({ product, compact = false, sponsored = false }) {
   const store = storeInfo(product.store);
   const deadline = endsIn(product.dealEndsAt);
   // Store CDNs retire image URLs; a dead one falls back to the store's name
@@ -50,8 +50,11 @@ export default function AffiliateProductCard({ product, compact = false }) {
       </span>
 
       <span className="pk-aff-body">
-        {(product.badge || deadline) && (
+        {(sponsored || product.badge || deadline) && (
           <span className="pk-aff-flags">
+            {/* Among prompt cards a product has to say it is an ad — ASCI asks
+                for it, and a visitor who feels tricked does not buy. */}
+            {sponsored && <span className="pk-aff-sponsored">Sponsored</span>}
             {product.badge && <span className="pk-aff-badge">{product.badge}</span>}
             {/* Relative to "now", which the cached server render and the
                 browser disagree on by up to a minute — or an hour. */}
@@ -118,6 +121,11 @@ export const productCardStyles = `
   padding: 3px 8px; border-radius: 6px; font-size: 0.64rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px;
 }
 .pk-aff-badge { background: rgba(229,9,20,0.09); color: var(--accent-main); }
+.pk-aff-sponsored {
+  display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 6px;
+  background: var(--surface-2); color: var(--text-dim);
+  font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px;
+}
 .pk-aff-deadline { background: rgba(245,158,11,0.13); color: #b45309; }
 .pk-aff-title {
   font-size: 0.88rem; font-weight: 700; line-height: 1.4;
