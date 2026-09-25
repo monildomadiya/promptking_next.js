@@ -144,6 +144,9 @@ const Footer = ({ onLogoClick }) => {
                 <ul style={listStyle}>
                   <FooterLink to="/categories" text="Prompt Categories" />
                   <FooterLink to="/games" text="Prompt Games" />
+                  {settings.affiliate_enabled === '1' && settings.affiliate_show_in_nav !== '0' && (
+                    <FooterLink to="/deals" text="Deals & Gear" />
+                  )}
                   <FooterLink to="/blog" text="Our Blog" />
                   <FooterLink to="/faq" text="FAQ & Help" />
                   <FooterLink to="/about" text="About Us" />

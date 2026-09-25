@@ -14,7 +14,7 @@ import {
   Table, Edit, Trash, Plus, Settings, FileText, 
   TableProperties, LogOut, ChevronRight, ChevronLeft, Layout, 
   Share2, Palette, Activity, Users, Layers, Crown,
-  Eye, Copy, ExternalLink, PieChart, Image
+  Eye, Copy, ExternalLink, PieChart, Image, Tag
 } from '@/components/Common/Icons';
 import PromptModal from '@/components/Admin/PromptModal';
 import ListicleModal from '@/components/Admin/ListicleModal';
@@ -25,6 +25,7 @@ import WebsiteCategoryModal from '@/components/Admin/WebsiteCategoryModal';
 import WallpaperModal from '@/components/Admin/WallpaperModal';
 import WallpaperCategoryModal from '@/components/Admin/WallpaperCategoryModal';
 import AuthorModal from '@/components/Admin/AuthorModal';
+import AffiliateManager from '@/components/Admin/AffiliateManager';
 import KingDialog from '@/components/Modals/KingDialog';
 import toast, { Toaster } from 'react-hot-toast';
 import CommandPalette from '@/components/Admin/CommandPalette';
@@ -1385,7 +1386,8 @@ const AdminDashboard = () => {
   };
 
   const fetchData = async (currentView) => {
-    if (currentView === 'settings') return;
+    // The affiliate section loads its own products, settings and stats.
+    if (currentView === 'settings' || currentView === 'affiliate') return;
     setIsDataLoading(true);
     try {
       const endpoint = currentView === 'settings' ? 'settings' : currentView;
@@ -1673,6 +1675,9 @@ const AdminDashboard = () => {
       { id: 'wallpaper_categories', label: 'Wallpaper Categories', icon: <Layers size={20} /> },
       { id: 'faqs', label: 'Help Desk', icon: <Activity size={20} /> },
     ]},
+    { title: 'MONETIZATION', items: [
+      { id: 'affiliate', label: 'Affiliate Store', icon: <Tag size={20} /> },
+    ]},
     { title: 'SYSTEM CONFIG', items: [
       { id: 'settings-branding', label: 'Branding', icon: <Palette size={20} /> },
       { id: 'settings-ui', label: 'UI Settings', icon: <Layout size={20} /> },
@@ -1866,7 +1871,7 @@ const AdminDashboard = () => {
         }}>
           <div>
             <h1 style={{ fontSize: isMobile ? '1.5rem' : '2rem', fontWeight: 900, marginBottom: '8px', fontFamily: 'var(--font-heading)', display: 'flex', alignItems: 'center', gap: '12px' }}>
-              {view.replace('settings-', '').toUpperCase()}
+              {view === 'affiliate' ? 'AFFILIATE STORE' : view.replace('settings-', '').toUpperCase()}
               <div className="live-pulse-dot" title="Live Connection" />
             </h1>
             <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem' }}>Management control panel for PK PROMPT KING systems.</p>
@@ -2067,6 +2072,11 @@ const AdminDashboard = () => {
           {view === 'settings-ui' && <UIPanel key="ui" onSave={() => fetchData('settings')} isMobile={isMobile} />}
           {view === 'settings-social' && <SocialPanel key="social" onSave={() => fetchData('settings')} />}
           {view === 'settings-ads' && <AdsPanel key="ads" onSave={() => fetchData('settings')} />}
+          {view === 'affiliate' && (
+            <motion.div key="affiliate" {...pageTransition}>
+              <AffiliateManager isMobile={isMobile} />
+            </motion.div>
+          )}
 
 
 

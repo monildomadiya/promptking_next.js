@@ -585,6 +585,21 @@ const Header = ({ search, setSearch, filter, setFilter, showFilters, setShowFilt
                       >
                         Wallpapers <ChevronRight size={14} />
                       </Link>
+                      {settings?.affiliate_enabled === '1' && settings?.affiliate_show_in_nav !== '0' && (
+                        <Link
+                          href="/deals"
+                          onClick={() => setShowCategoryDropdown(false)}
+                          style={{
+                            color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none',
+                            display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '20px',
+                            background: 'rgba(0,0,0,0.04)', transition: '0.3s',
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.08)'; e.currentTarget.style.transform = 'scale(1.05)'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.04)'; e.currentTarget.style.transform = 'scale(1)'; }}
+                        >
+                          Deals <ChevronRight size={14} />
+                        </Link>
+                      )}
                     </div>
                   </div>
               </div>
