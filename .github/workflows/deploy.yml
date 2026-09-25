@@ -10,13 +10,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to DigitalOcean
+      - name: Deploy to Azure VM
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.PORT || 22 }}
           script: |
+            # Stop at the first failure: a build that fails must not be
+            # followed by a pm2 restart onto a half-written .next folder.
+            set -e
+            # A non-interactive SSH session skips ~/.bashrc, so Node installed
+            # through nvm (the usual way on a fresh VM) is not on PATH here.
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
             cd /var/www/promptking
             git pull origin main
             npm install
