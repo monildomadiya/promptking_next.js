@@ -8,6 +8,7 @@ import api from '@/lib/api';
 import Shimmer from '@/components/Common/Shimmer';
 import Link from 'next/link';
 import YouTubeModal from '@/components/Modals/YouTubeModal';
+import AffiliateShelf from '@/components/Affiliate/AffiliateShelf';
 import SEOMetadata from '@/components/SEO/SEOMetadata';
 import { demoteHeadings } from '@/lib/seo';
 
@@ -1375,6 +1376,9 @@ const ClientPromptDetail = ({ initialPrompt, initialSuggestedPrompts, initialErr
 
 
 
+
+            {/* Affiliate picks — renders nothing unless enabled in the admin */}
+            <AffiliateShelf tags={parsedTags} title={prompt.title} aiType={prompt.aiType || prompt.ai_type} />
 
             {/* FAQ Section */}
             {parsedFaqs && parsedFaqs.length > 0 && (

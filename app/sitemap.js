@@ -1,4 +1,5 @@
 import db from '@/lib/db';
+import { fetchAffiliateProducts, getAffiliateSettings } from '@/lib/affiliate';
 
 export const revalidate = 3600; // Revalidate sitemap every hour
 
@@ -64,6 +65,18 @@ export default async function sitemap() {
     console.error('Error fetching wallpapers for sitemap:', error.message);
   }
 
+  // Only when the admin has switched the shop on and there is something in it:
+  // /deals is a 404 while it is off, and an empty one is not worth a crawl.
+  let dealsUrls = [];
+  try {
+    const affiliate = await getAffiliateSettings();
+    if (affiliate.affiliate_enabled === '1' && (await fetchAffiliateProducts()).length > 0) {
+      dealsUrls = [{ url: `${BASE_URL}/deals`, changeFrequency: 'daily', priority: 0.6 }];
+    }
+  } catch (error) {
+    console.error('Error checking deals for sitemap:', error.message);
+  }
+
   const promptUrls = prompts
     .filter((prompt) => prompt.slug || prompt.prompt_key)
     .map((prompt) => ({
@@ -123,6 +136,7 @@ export default async function sitemap() {
     ...categoryUrls,
     ...blogUrls,
     ...wallpaperUrls,
+    ...dealsUrls,
   ];
 
   // A slug can appear in more than one source query; a duplicate <loc> is a
