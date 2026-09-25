@@ -115,7 +115,7 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
           const j = Math.floor(Math.random() * (i + 1));
           [pool[i], pool[j]] = [pool[j], pool[i]];
         }
-        setAffiliate({ pool, count: data.gridCount, seed: Math.floor(Math.random() * 1e9) });
+        setAffiliate({ pool, count: data.gridCount, seed: Math.floor(Math.random() * 1e9), disclosure: data.disclosure });
       })
       .catch(() => {});
     return () => { alive = false; };
@@ -322,7 +322,18 @@ const PromptList = ({ search, filter, setFilter, isMobile, initialPrompts = [], 
           </React.Fragment>
         ))}
       </div>
-      {Object.keys(productSpots).length > 0 && <style>{productCardStyles}</style>}
+      {Object.keys(productSpots).length > 0 && (
+        <>
+          <style>{productCardStyles}</style>
+          {/* The page with affiliate links on it has to say so, near the links —
+              Amazon's agreement and ASCI both ask for it, not just /deals. */}
+          {affiliate?.disclosure && (
+            <p className="pk-aff-disclosure" style={{ margin: '18px 0 0', justifyContent: 'center', textAlign: 'center' }}>
+              {affiliate.disclosure}
+            </p>
+          )}
+        </>
+      )}
 
       {/* Pagination */}
       {totalPages > 1 && (

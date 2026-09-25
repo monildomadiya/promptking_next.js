@@ -117,7 +117,6 @@ const AffiliateProductModal = ({ product, initialUrl = '', settings = {}, catego
       });
       if (data.price) setPriceChecked(true);
       setLookup({ state: data.fetched ? 'done' : 'partial', note: data.note });
-      if (data.fetched) toast.success('Details fetched from ' + (STORES[data.store]?.label || 'the store'));
     } catch (e) {
       setLookup({ state: 'error', note: e.message });
     }
@@ -166,19 +165,21 @@ const AffiliateProductModal = ({ product, initialUrl = '', settings = {}, catego
     }
   };
 
-  const discount = discountPercent(form.price, form.mrp);
+  // Mirrors shapeProduct in lib/affiliate.js: Amazon cards never show these.
+  const isAmazon = form.store === 'amazon';
+  const discount = isAmazon ? 0 : discountPercent(form.price, form.mrp);
   const preview = {
     id: 0,
     slug: form.slug || 'preview',
     title: form.title || 'Product title appears here',
     store: form.store,
     image: form.image_url || null,
-    price: Number(form.price) || null,
-    mrp: Number(form.mrp) || null,
+    price: isAmazon ? null : Number(form.price) || null,
+    mrp: isAmazon ? null : Number(form.mrp) || null,
     currency: form.currency || 'INR',
     discount,
-    rating: Number(form.rating) || null,
-    reviewCount: Number(form.review_count) || null,
+    rating: isAmazon ? null : Number(form.rating) || null,
+    reviewCount: isAmazon ? null : Number(form.review_count) || null,
     badge: form.badge || null,
     dealEndsAt: form.deal_ends_at ? new Date(form.deal_ends_at).toISOString() : null,
     tags: [],
@@ -195,7 +196,7 @@ const AffiliateProductModal = ({ product, initialUrl = '', settings = {}, catego
         <header className="pk-apm-head">
           <div>
             <h2>{product ? 'Edit affiliate product' : 'Add affiliate product'}</h2>
-            <p>Paste an Amazon or Flipkart link — the details and your affiliate tag are filled in for you.</p>
+            <p>Paste an Amazon or Flipkart link — the store, product ID and your affiliate tag are set for you.</p>
           </div>
           <button type="button" className="pk-apm-x" onClick={onClose} aria-label="Close"><X size={22} /></button>
         </header>
@@ -217,7 +218,7 @@ const AffiliateProductModal = ({ product, initialUrl = '', settings = {}, catego
                   autoFocus={!product}
                 />
                 <button type="button" className="pk-apm-fetch" onClick={() => runLookup()} disabled={lookup.state === 'loading'}>
-                  <Zap size={15} /> {lookup.state === 'loading' ? 'Fetching…' : 'Fetch details'}
+                  <Zap size={15} /> {lookup.state === 'loading' ? 'Checking…' : 'Check link'}
                 </button>
               </div>
 
@@ -271,6 +272,16 @@ const AffiliateProductModal = ({ product, initialUrl = '', settings = {}, catego
                 </div>
               </div>
 
+              {isAmazon ? (
+                <div className="pk-apm-span2 pk-apm-policy">
+                  <AlertCircle size={15} />
+                  <span>
+                    <b>Amazon rule:</b> prices, discounts and star ratings may only come live from Amazon&apos;s
+                    Product Advertising API, so the site shows <i>“See price on Amazon”</i> instead. Use the
+                    image link from Amazon&apos;s <b>SiteStripe</b> bar (Get Link → Image).
+                  </span>
+                </div>
+              ) : (<>
               <div>
                 <label className="pk-apm-label">Price (₹)</label>
                 <input className="pk-apm-input" inputMode="decimal" value={form.price} onChange={(e) => { set({ price: e.target.value }); setPriceChecked(true); }} placeholder="1499" />
@@ -288,6 +299,7 @@ const AffiliateProductModal = ({ product, initialUrl = '', settings = {}, catego
                 <label className="pk-apm-label">Ratings count</label>
                 <input className="pk-apm-input" inputMode="numeric" value={form.review_count} onChange={(e) => set({ review_count: e.target.value })} placeholder="12840" />
               </div>
+              </>)}
 
               <div>
                 <label className="pk-apm-label">Store</label>
@@ -428,6 +440,12 @@ textarea.pk-apm-input { resize: vertical; }
 .pk-apm-imgrow { display: flex; gap: 10px; align-items: center; }
 .pk-apm-imgrow img, .pk-apm-imgph { width: 44px; height: 44px; flex-shrink: 0; border-radius: 10px; object-fit: contain; background: #fff; border: 1px solid var(--border-color); }
 .pk-apm-off { font-style: normal; color: #0f9d58; text-transform: none; letter-spacing: 0; }
+.pk-apm-policy {
+  display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px;
+  background: rgba(255,153,0,0.09); border: 1px solid rgba(255,153,0,0.3);
+  font-size: 0.78rem; line-height: 1.55; color: #7c4a03;
+}
+.pk-apm-policy svg { flex-shrink: 0; margin-top: 2px; }
 .pk-apm-adv summary { cursor: pointer; font-size: 0.78rem; font-weight: 800; color: var(--text-secondary); }
 
 .pk-apm-side { display: flex; flex-direction: column; gap: 14px; }
