@@ -1,6 +1,27 @@
 import "./globals.css";
 import { GoogleAnalytics } from '@next/third-parties/google';
 
+// Plain inline script: it has to run before the Google tags load, which rules
+// out anything that waits for React. The storage key and shape are the ones
+// CookieConsentBanner writes.
+const CONSENT_DEFAULTS_SCRIPT = `
+window.dataLayer = window.dataLayer || [];
+window.gtag = window.gtag || function(){ window.dataLayer.push(arguments); };
+var eea = ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH'];
+var choice = null;
+try { choice = JSON.parse(localStorage.getItem('pk_cookie_consent')); } catch (e) {}
+if (choice) {
+  // A choice the visitor made wins everywhere — no regional default here,
+  // because Google lets a region-specific default override a global one.
+  var ads = choice.advertising ? 'granted' : 'denied';
+  window.gtag('consent', 'default', { ad_storage: ads, ad_user_data: ads, ad_personalization: ads, analytics_storage: choice.analytics ? 'granted' : 'denied' });
+  if (!choice.advertising) (window.adsbygoogle = window.adsbygoogle || []).requestNonPersonalizedAds = 1;
+} else {
+  window.gtag('consent', 'default', { region: eea, wait_for_update: 500, ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied' });
+  window.gtag('consent', 'default', { ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted', analytics_storage: 'granted' });
+}
+`;
+
 import { AppProvider } from "@/components/AppContext";
 import ClientLayout from "./ClientLayout";
 
@@ -130,6 +151,18 @@ export default function RootLayout({ children }) {
         {/* adsbygoogle.js is loaded from ClientLayout, not here: this is a server
             component with no route awareness, so loading it here put Auto Ads on
             /admin-secure too. */}
+        {/* Consent, before any Google tag runs. The cookie banner used to store
+            the visitor's choice and nothing ever read it, so "Reject Optional"
+            still got analytics and personalised ads. This reads it first:
+            - Consent Mode tells Analytics and Google's ad tags what is allowed;
+            - requestNonPersonalizedAds is AdSense's own switch for the same.
+            With no choice made yet, visitors in the EEA, UK and Switzerland
+            start as "denied" (Google requires it there); everyone else as
+            "granted" until they say otherwise. */}
+        <script
+          id="consent-defaults"
+          dangerouslySetInnerHTML={{ __html: CONSENT_DEFAULTS_SCRIPT }}
+        />
       </head>
       <body>
         <script

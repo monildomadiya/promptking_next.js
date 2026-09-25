@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
-import { AlertTriangle, Info, ExternalLink, Cpu, ShieldCheck } from '@/components/Common/Icons';
+import { AlertTriangle, Info, ExternalLink, Cpu, ShieldCheck, Tag } from '@/components/Common/Icons';
+import { AMAZON_REQUIRED_STATEMENT } from '@/lib/affiliateLinks';
 
 import SocialSidebar from '@/components/Prompts/SocialSidebar';
 import SEOMetadata from '@/components/SEO/SEOMetadata';
@@ -88,7 +89,31 @@ const ClientDisclaimerPage = () => {
               <h3 style={{ fontSize: '1.5rem', fontWeight: 700 }}>External Links</h3>
             </div>
             <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: 1.8 }}>
-              This site may contain links to external websites that are not provided or maintained by or in any way affiliated with PromptKing. Please note that we do not guarantee the accuracy or completeness of any information on these external websites.
+              This site may contain links to external websites that are not provided or maintained by PromptKing. Please note that we do not guarantee the accuracy or completeness of any information on these external websites.
+            </p>
+          </section>
+
+          <section id="affiliate-disclosure" style={{ marginBottom: '50px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
+              <div style={{
+                padding: '12px',
+                borderRadius: '16px',
+                background: 'rgba(0, 0, 0, 0.05)',
+                color: 'var(--text-main)'
+              }}>
+                <Tag size={24} />
+              </div>
+              <h3 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Affiliate Disclosure</h3>
+            </div>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: 1.8 }}>
+              {AMAZON_REQUIRED_STATEMENT} PromptKing is a participant in the Amazon Associates Programme and the Flipkart Affiliate Programme.
+              Some product links on this site — on the Deals page, among the prompts on the home page (marked &ldquo;Sponsored&rdquo;) and under
+              &ldquo;Recommended for this prompt&rdquo; — are affiliate links. If you buy through them we may earn a small commission, at no extra
+              cost to you. This never changes the price you pay, and we only recommend products we think are genuinely useful.
+            </p>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: 1.8, marginTop: '15px' }}>
+              Prices and availability are set by the store and can change at any time; the price shown on Amazon or Flipkart at the time of
+              purchase is the one that applies. Orders, payments, delivery and returns are handled entirely by the store you buy from.
             </p>
           </section>
 

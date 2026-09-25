@@ -27,7 +27,7 @@ const SETTING_DEFAULTS = {
   flipkart_subid: '',
   affiliate_page_title: 'Deals & Gear We Recommend',
   affiliate_page_subtitle: 'Hand-picked products from Amazon, Flipkart and more — the tools, gadgets and gear that go with your AI creations.',
-  affiliate_disclosure: 'PromptKing is a participant in the Amazon Associates Programme and the Flipkart Affiliate Programme. When you buy through links on this page we may earn a small commission, at no extra cost to you.',
+  affiliate_disclosure: 'As an Amazon Associate I earn from qualifying purchases. PromptKing also participates in the Flipkart Affiliate Programme. When you buy through these links we may earn a small commission, at no extra cost to you.',
   affiliate_show_on_prompts: '1',
   affiliate_prompt_heading: 'Recommended for this prompt',
   affiliate_show_in_nav: '1',
@@ -262,7 +262,7 @@ function ProductsTab({ products, loading, settings, isMobile, onEdit, onNew, onC
         <div className="pk-am-empty">
           <Tag size={40} color="var(--text-muted)" />
           <h3>No affiliate products yet</h3>
-          <p>Paste an Amazon or Flipkart link above. Title, image, price and your affiliate tag are filled in automatically.</p>
+          <p>Paste an Amazon or Flipkart link above. The store, product ID and your affiliate tag are set automatically — add a title and image and it is ready.</p>
           <button type="button" className="pk-am-primary" onClick={() => onNew()}><Plus size={16} /> Add your first product</button>
         </div>
       ) : shown.length === 0 ? (
@@ -545,7 +545,7 @@ function SetupTab({ settings, setSettings, dirty, onSaved }) {
           <Field label="/deals page subtitle">
             <textarea rows={2} value={settings.affiliate_page_subtitle} onChange={set('affiliate_page_subtitle')} />
           </Field>
-          <Field label="Affiliate disclosure" hint="Required by Amazon Associates and Flipkart Affiliate terms (and ASCI in India). Shown on /deals and under every product shelf.">
+          <Field label="Affiliate disclosure" hint="Shown on /deals, under every product shelf, under the home-page grid and in the footer. Amazon's required line “As an Amazon Associate I earn from qualifying purchases.” is always kept, even if you remove it here.">
             <textarea rows={3} value={settings.affiliate_disclosure} onChange={set('affiliate_disclosure')} />
           </Field>
         </div>
@@ -555,10 +555,10 @@ function SetupTab({ settings, setSettings, dirty, onSaved }) {
         <div className="pk-am-sechead"><h3>How it works</h3></div>
         <ol className="pk-am-steps">
           <li><CheckCircle size={16} /> <span><b>Add your IDs</b> above once. Every product link is tagged at the moment of the click, so changing an ID here re-tags every product instantly.</span></li>
-          <li><CheckCircle size={16} /> <span><b>Paste a product link</b> in Products → Add. Store, ASIN / PID, title, image, price, MRP and rating are fetched automatically where the store allows it.</span></li>
+          <li><CheckCircle size={16} /> <span><b>Paste a product link</b> in Products → Add. The store and ASIN / PID are read from the link and any other affiliate&apos;s tag is removed. For Amazon, copy the title and image link from the <b>SiteStripe</b> bar on the product page.</span></li>
           <li><CheckCircle size={16} /> <span><b>Already have a short link</b> (amzn.to, fkrt.it, EarnKaro, Cuelinks)? Put it in the product’s “Custom affiliate link” and it is used exactly as-is.</span></li>
           <li><CheckCircle size={16} /> <span><b>Every Buy button</b> goes through <code>/go/&lt;slug&gt;</code>: clicks are counted, links carry <code>rel=&quot;sponsored&quot;</code>, and a hidden or expired product sends visitors to /deals instead of a dead page.</span></li>
-          <li><CheckCircle size={16} /> <span><b>Keep prices fresh.</b> Amazon asks that shown prices carry a date — the page prints “prices as of …”. Open a product and press Fetch details to refresh it.</span></li>
+          <li><CheckCircle size={16} /> <span><b>Amazon rules are built in.</b> Amazon allows prices and star ratings only live from its API, so Amazon cards show “See price on Amazon” instead, and the required line “As an Amazon Associate I earn from qualifying purchases.” is always part of the disclosure. Flipkart prices are shown with an “as of” date — update them now and then.</span></li>
         </ol>
       </div>
     </div>

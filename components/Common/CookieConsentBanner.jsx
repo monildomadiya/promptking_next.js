@@ -29,6 +29,20 @@ export default function CookieConsentBanner() {
       timestamp: new Date().toISOString(),
       version: '1.0',
     }));
+    // Tell the Google tags now, not just on the next page load — the choice
+    // was only ever stored before, and nothing acted on it. app/layout.js
+    // applies the stored value on every later visit.
+    const ads = consentData.advertising ? 'granted' : 'denied';
+    window.gtag?.('consent', 'update', {
+      ad_storage: ads,
+      ad_user_data: ads,
+      ad_personalization: ads,
+      analytics_storage: consentData.analytics ? 'granted' : 'denied',
+    });
+    // AdSense reads this before each ad request; the ones already on screen
+    // keep what they were served with.
+    window.adsbygoogle = window.adsbygoogle || [];
+    window.adsbygoogle.requestNonPersonalizedAds = consentData.advertising ? 0 : 1;
     setVisible(false);
   };
 

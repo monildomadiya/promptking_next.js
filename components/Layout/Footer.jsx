@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowRight, ChevronDown, ChevronUp } from '../Common/Icons';
 
 import { useAppContext } from '@/components/AppContext';
+import { AMAZON_REQUIRED_STATEMENT } from '@/lib/affiliateLinks';
 
 const FOOTER_SETTINGS_DEFAULTS = { logo_url: '', logo_width_desktop: '150', logo_width_mobile: '120' };
 
@@ -254,6 +255,16 @@ const Footer = ({ onLogoClick }) => {
               </div>
             )}
           </div>
+
+          {/* Site-wide, because affiliate links now sit on the home page and
+              every prompt page, not only on /deals. Amazon asks for this exact
+              sentence "clearly and prominently" on the site. */}
+          {settings.affiliate_enabled === '1' && (
+            <p style={{ fontSize: '0.75rem', color: '#64748b', margin: '14px 0 0', lineHeight: 1.6, textAlign: isMobile ? 'center' : 'left' }}>
+              {AMAZON_REQUIRED_STATEMENT} Some links on this site are affiliate links — we may earn a small commission, at no extra cost to you.{' '}
+              <Link href="/disclaimer" style={{ color: 'inherit' }}>Learn more</Link>
+            </p>
+          )}
         </div>
 
         <style>{`

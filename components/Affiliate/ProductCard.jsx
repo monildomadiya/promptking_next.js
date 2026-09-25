@@ -71,7 +71,7 @@ export default function AffiliateProductCard({ product, compact = false, sponsor
         ) : null}
 
         <span className="pk-aff-price">
-          {product.price ? <strong>{formatPrice(product.price, product.currency)}</strong> : <strong className="is-check">Check price</strong>}
+          {product.price ? <strong>{formatPrice(product.price, product.currency)}</strong> : <strong className="is-check">See price on {store.label}</strong>}
           {product.mrp && product.discount > 0 ? <s>{formatPrice(product.mrp, product.currency)}</s> : null}
         </span>
 

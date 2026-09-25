@@ -26,7 +26,7 @@ export const metadata = {
 };
 
 export default function PrivacyPage() {
-  const lastUpdated = "July 1, 2026";
+  const lastUpdated = "September 25, 2026";
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
     name: "Privacy Policy - PromptKing",
     description: "PromptKing's complete Privacy Policy explaining data collection, cookies, third-party services, and user rights.",
     url: "https://promptking.in/privacy",
-    dateModified: "2026-07-01",
+    dateModified: "2026-09-25",
     publisher: {
       "@type": "Organization",
       name: "PromptKing",
@@ -213,7 +213,17 @@ export default function PrivacyPage() {
               <li><strong>Google AdSense</strong> — Advertising (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style={linkStyle}>Privacy Policy</a>)</li>
               <li><strong>Google Analytics</strong> — Traffic analytics (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style={linkStyle}>Privacy Policy</a>)</li>
               <li><strong>Cloudinary</strong> — Image hosting and optimization</li>
+              <li><strong>Amazon Associates Programme</strong> — Affiliate links to Amazon.in (<a href="https://www.amazon.in/gp/help/customer/display.html?nodeId=200534380" target="_blank" rel="noopener noreferrer" style={linkStyle}>Privacy Notice</a>)</li>
+              <li><strong>Flipkart Affiliate Programme</strong> — Affiliate links to Flipkart (<a href="https://www.flipkart.com/pages/privacypolicy" target="_blank" rel="noopener noreferrer" style={linkStyle}>Privacy Policy</a>)</li>
             </ul>
+            <h3 style={h3Style}>Affiliate links</h3>
+            <p style={pStyle}>
+              Some product links on PromptKing are affiliate links. As an Amazon Associate we earn from qualifying purchases, and we also
+              participate in the Flipkart Affiliate Programme. When you click one, you pass through a short redirect on our own site
+              (<strong>promptking.in/go/…</strong>) that counts the click — only a per-product total, with no personal information and no
+              cookie set by us — and then continue to the store. Once there, Amazon or Flipkart may set their own cookies to record that
+              you arrived from PromptKing, as described in their privacy policies above. This never changes the price you pay.
+            </p>
           </section>
 
           {/* 9. Data Sharing */}
