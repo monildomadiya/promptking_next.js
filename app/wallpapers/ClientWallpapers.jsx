@@ -411,6 +411,26 @@ export default function ClientWallpapers({ wallpapers = [], categories = [] }) {
           </div>
         </>
       )}
+
+      {/* One editorial link, on the one page where it is on topic. Followed on
+          purpose — no nofollow or sponsored — and kept off the footer and the
+          detail pages: a link that turns up on every URL reads as a link
+          scheme, a single one beside the wallpapers reads as a recommendation. */}
+      <aside className="pk-wl-sister">
+        <span className="pk-wl-sister-icon" aria-hidden="true">
+          <Smartphone size={20} />
+        </span>
+        <span className="pk-wl-sister-body">
+          <strong>Got an iPhone Duo?</strong>
+          <span>
+            Our sister site has{' '}
+            <a href="https://iphoneduowallpaper.com/" target="_blank" rel="noopener">
+              iPhone Duo wallpapers
+            </a>{' '}
+            made for both the folded and unfolded screen, plus sizes for iPhone 18 Pro.
+          </span>
+        </span>
+      </aside>
     </main>
   );
 }
@@ -652,6 +672,22 @@ const styles = `
   background: var(--accent-main); color: #fff; text-decoration: none;
   font-size: 0.84rem; font-weight: 800;
 }
+
+.pk-wl-sister {
+  display: flex; align-items: center; gap: 14px;
+  margin: 40px auto 0; max-width: 640px; padding: 16px 20px;
+  border-radius: 20px; border: 1px solid rgba(229,9,20,0.18);
+  background: rgba(229,9,20,0.05);
+}
+.pk-wl-sister-icon {
+  flex: none; width: 44px; height: 44px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(229,9,20,0.09); color: var(--accent-main);
+}
+.pk-wl-sister-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.pk-wl-sister-body strong { font-size: 0.95rem; font-weight: 800; color: var(--text-main); }
+.pk-wl-sister-body > span { font-size: 0.84rem; line-height: 1.5; color: var(--text-secondary); }
+.pk-wl-sister-body a { color: var(--accent-main); font-weight: 700; text-underline-offset: 3px; }
 
 /* No hover to reveal anything, so the brackets and the label would either sit
    there permanently — covering the picture they advertise — or never appear.
